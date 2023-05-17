@@ -1,0 +1,6 @@
+df -h
+blkid (get uuID)
+lsblk -l & -f
+fdisk -l
+fdisk
+free -h (view Ram)

@@ -1,3 +1,5 @@
-
+to access server2 from server1
 [server1] ssh-keygen
 [server1] ssh-copy-id [ip of server2]
+
+shh key for github
