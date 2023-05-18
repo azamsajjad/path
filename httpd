@@ -1,1 +1,18 @@
 yum install httpd
+vim /etc/httpd/conf/httpd.conf
+chown apache:apache /contents
+chown apache:apache index.html
+curl localhost/index.html
+ACCESS DENIED
+setenforce 0
+curl localhost/index.html
+ACCESS 
+setenforce 1
+ls -lZ /var/www shows httpd_sys_content_t as context
+2 ways to change it for /contents
+chcon -t httpd_sys_content_t index.html
+or
+semanage fcontext -a -t httpd_sys_content_t '/content(/.*)?'
+restorecon -R /content
+ls -ldZ
+curl -k 192.168.100.34
