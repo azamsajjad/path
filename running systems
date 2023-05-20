@@ -1,0 +1,89 @@
+BOOT PROCESS
+grub bootloader, systemd, POST PROCESS
+
+We lost Root Password
+systemctl get-default -> graphical.target
+linux....... rd.break
+ctrl+x
+emergency mode
+mount -o remount,rw /sysroot
+chroot /sysroot
+paaswd Root
+touch .autorelabel
+mount -o ro,remount /sysroot
+exit
+if error
+then 
+linux..... systemd.unit=multi-user.target
+login
+systemctl get-default -> graphical.target
+systemctl set-defaulr multi-user
+systemctl get-default -> multi-user.target
+this was booting system into different targets manually
+
+SYSTEM LOGGING
+exam obj: locate & interrupt system log files & journals
+preserve system journals
+/var/log
+journald
+persistant journals
+
+grep -i systemd /var/log/messages | less
+grep systemd `find /var/log -maxdepth 1 -type f -print` | grep -v dnf |less
+grep -v dnf = exclude dnf entries
+shift+g to go to end - g to go to start
+
+journalctl -u httpd
+journalctl -g systemd | less (grep for systemd)
+journalctl -S 4:25:00 -U 4:26:00
+journalctl --list-boots
+journalctl SETTINGS - journalctl must be persistant
+cat /etc/systemd/journald.conf
+#storage=auto  (4 types, volatile /run/log/j, Persistent /var/log/j)
+                (NONE all j data dropped, Auto- default - persistent if /var/log/journal exists)
+journalctl --flush
+
+INTRUDER ALERT - runaway PROCESS
+first step, download STRESS from epel repo
+subscription-manager repos --list (copy codeready)
+subscription-manager repos --enable codeready-....
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+yum install -y STRESS
+stress -c 1 &
+ps -aux | grep stress
+or
+ps -ef | grep stress
+top
+r to renice
+kill -9 pid
+nice -n 19 stress -c 1 &
+renice -n 10 pid
+ADJUST PERFORMANCE OF A PROCESS
+chrt --max
+        SCHED_OTHER min/max priority    : 0/0
+        SCHED_FIFO min/max priority     : 1/99
+        SCHED_RR min/max priority       : 1/99
+        SCHED_BATCH min/max priority    : 0/0
+        SCHED_IDLE min/max priority     : 0/0
+        SCHED_DEADLINE min/max priority : 0/0
+chrt -f -p 45 pid 
+pgrep stress
+pkill stress
+
+
+WE ARE ASKED TO HELP TO REDUCE POWER CONSUMPTION IN OUR DATACENTER
+tuned-adm
+cat /etc/tuned/tuned-main.conf
+location for custom profiles
+/usr/tuned
+/usr/lib/tuned (distro specific profiles)
+systemctl start tuned
+systemctl enable tuned
+tuned-adm active
+tuned-adm list profiles
+tuned-adm profile powersave
+tuned-adm recommend
+ENABLE DYNAMIC TUNING
+vi /etc/tuned/tuned-main.conf
+dynamic_tuning=0 ->1
+systemctl restart tuned

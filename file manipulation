@@ -76,3 +76,15 @@ change umask for a user persistant
 echo 'umask 0027' >> ~/.bashrc
 logout and login
 umask = 0027
+
+
+[root@x230 ~]# cat > useradd.txt
+azam
+hassan
+faizi
+shahrukh
+[root@x230 ~]# cat useradd.txt
+azam
+hassan
+faizi
+shahrukh
