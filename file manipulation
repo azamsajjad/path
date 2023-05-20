@@ -1,0 +1,78 @@
+ARCHIVING_COMPRESSION, SYSTEM_DOCUMENTATION, LOGS, FILE_LINKS, UMASK
+
+ARCHIVING
+Remove clutter from /home directory
+tar,star ARCHIVING
+gzip,bzip2 COMPRESSION
+
+ARCHIVING
+tar cvf /home/archives/rupert.tar rupert/
+tar tvf rupert.tar | wc -l
+gzip rupert.tar
+ls -alh
+ARCHIVING + COMPRESSION
+tar cvfj /home/archieves/rupert.tar.bz2 rupert/
+tar cvfz /home/archieves/rupert.tar.gz rupert/      z is gzip
+
+pwd - extraction will be in working directory
+tar xvfj archives/rupert.tar.bz2
+tar xvfz archives/rupert.tar.gz
+how to uncompress single zip file (which is not archieved)
+bzip2 -d archives/centos.iso.bz2
+bzip2 -d archives/centos.iso.gz
+
+
+SYSTEM DOCUMENTATION
+MAN PAGES   search by /name
+whatis httpd
+apropos httpd   list everything related keywords
+    apachectl (8)        - Server control interface for httpd
+    httpd (8)            - Apache Hypertext Transfer Protocol Server
+    httpd@.service (8)   - httpd unit files for systemd
+    httpd.conf (5)       - Configuration files for httpd
+    httpd.service (8)    - httpd unit files for systemd
+    httpd.socket (8)     - httpd unit files for systemd
+    ostree-trivial-httpd (1) - Simple webserver
+man 8 httpd.socket
+INFO DOCS
+man info
+/USR/SHARE/DOC
+ls -la /usr/share/doc/httpd
+more licence
+
+
+LOGS
+/var/log
+create a new system log to track httpd events on our server
+tree /var/log
+mkdir -p log_project/raw_logs
+grep httpd /var/log/* > raw_logs/master.log 2> raw_logs/error_log
+wc -l raw_logs/master.log
+grep systemd raw_logs/master.log > httpd_logs/systemd.log
+egrep -v "dnf|secure" raw_logs/master.log > httpd_logs/no_dnf_secure.log
+-v is exclude dnf and secure
+rm -rf error_logs
+
+VI
+we have been asked to document /etc/hosts file on our servers
+cp /etc/hosts .
+vi hosts
+make it comma separated insert headings
+
+FILE LINKING
+Web team needs a new content location setup shared storage 4 group
+we cannot create hard link for directories
+mv -v /var/www /content
+ln -s /content/* /var/www (soft link)
+ls -li /var/www (shows links and inodes)
+ln /content/db_user/README . (created a hard link in current dir)
+rm -f original file
+link still exit in copied location 
+if you remove file which has a soft link, it breaks simlink which needs to be removed
+rm -f /var/www/db_stuff
+
+UMASK
+change umask for a user persistant
+echo 'umask 0027' >> ~/.bashrc
+logout and login
+umask = 0027

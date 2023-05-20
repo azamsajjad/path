@@ -1,0 +1,35 @@
+while true ; do clear ; df -h ; sleep 5 ; done
+
+    #!/bin/bash
+
+    # script to add users
+    # takes input file with usernames
+
+    # user name file
+USERFILE=$1
+
+if [ "$USERFILE" = "" ]
+then
+        echo "Please specify an input file!"
+        exit 10
+
+elif test -e $USERFILE
+then
+        for user in `cat $USERFILE`
+        do
+        echo "Creating the "$user" user..."
+                useradd -m $user
+        done
+        exit 20
+else
+        echo "Invlid input file specified!"
+        exit 30
+fi
+
+echo "azam hassan faizan shahrukh > file.txt
+./create_users.sh file.txt
+grep -E 'azam|hassan|faizan|shahrukh' /etc/passwd
+echo $? (tells exit code) we know script ran successfully
+
+root@x230:~/yum.sh
+

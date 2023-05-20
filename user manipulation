@@ -1,0 +1,11 @@
+set +o history (dnt record next command)
+echo "$user:linux" | chpasswd
+set -o history
+
+passwd -S reason (password info)
+passwd -e reason (set dummy password , user will change it after 1st login)
+
+
+for admins
+chage -l username
+chage -d 0 username (passwd expired and now user create new pass at next login)
