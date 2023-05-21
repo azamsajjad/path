@@ -4,6 +4,7 @@ set -o history
 
 passwd -S reason (password info)
 passwd -e reason (set dummy password , user will change it after 1st login)
+vim /etc/login.defs to change new users password settings
 
 
 for admins
@@ -11,3 +12,12 @@ chage -l username
 chage -d 0 username (passwd expired and now user create new pass at next login)
 
 files created in etc/skel/ directory are automatically copid in new user home directory
+
+new files must be owned by group owner
+set gid
+chmod g+s /UK
+drwxrws---.
+
+only the file creator can delete their own file
+set sticky bit
+chmod +t /UK
