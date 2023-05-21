@@ -1,3 +1,9 @@
+7-Manage basic networking
+Configure IPv4 and IPv6 addresses
+Configure hostname resolution
+Configure network services to start automatically at boot
+Restrict network access using firewall-cmd/firewall
+
 [root@x230 ~]# cd /etc/sysconfig/network-scripts/
 [root@x230 network-scripts]# ls
 readme-ifcfg-rh.txt

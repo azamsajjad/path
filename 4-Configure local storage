@@ -1,0 +1,78 @@
+4-Configure local storage
+List, create, delete partitions on MBR and GPT disks
+Create and remove physical volumes
+Assign physical volumes to volume groups
+Create and delete logical volumes
+Configure systems to mount file systems at boot by universally unique ID (UUID) or label
+Add new partitions and logical volumes, and swap to a system non-destructively
+
+du -sh /root combine size
+du -ah /root file sizes
+check directory size on disk
+create a swap partition
+df -h /
+df -h /mnt
+blkid (get uuID)
+lsblk -l & -f
+fdisk -l
+fdisk 
+t - to change partition type - select 82
+partprobe
+mkswap -L more_swap /dev/sda7 (label=more_swap)
+swapon /dev/sda7
+swapon
+edit /etc/fstab
+umount then mount -a (this way we will know its persistent)
+free -h (view Ram)
+
+Formatting Disk Partition with FAT32 File System
+1. To format a disk with a FAT32 file system, use:
+sudo mkfs -t vfat /dev/sdb1 upto 4gb
+wipefs -a /dev/sda7 to refresh df -h
+resize2fs /dev/sda7 to refresh df -h
+mkfs -t ntfs /dev/sdb1 upto 1kb
+ext4 16gb-16tb journaling filesystem to prevent data loss
+ext4 support signle filesize of 16gb
+ext4 is default in debian/ubuntu
+ext4 you can reduce the size of ext4
+ext4 is most compatible across linux,mac,windows
+ext4 is better for single r/w thread
+XFS is optimized for large file transfers and parrallel I/O operations
+XFS supports larger file sizes & volumes
+XFS uses more advanced journaling system
+XFS is better for multiple read/write threads
+XFS is default on RHEL
+XFS supports growing but not reducing size of partition
+XFS features built-in backup and recovery tools
+
+CREATE a LOGICAL VOLUME
+pvcreate /dev/sda7
+pvs
+vgcreate newVG /dev/sda7
+vgs
+lvcreate -l 100%FREE -n newLVM newVG
+lvs
+vdostats --hu
+lsblk
+mkfs.ext4 /dev/mapper/newVG-newLVM
+mkdir /dir
+vim /etc/fstab
+/dev/mapper/newVG-newLVM    /dir    ext4 defaults 0 0
+mount -a
+mount | grep dir
+ADD 1GB storage to dir
+pvcreate /dev/sda8
+vgextend newVG /dev/sda8
+lvextend -L +1G newVG/newLVM
+lvs
+df -h /dir -> still 2gb
+resize2fs /dev/mapper/newVG/newLVM
+
+to REMOVE
+umount /dir
+lvremove newLVM
+vgremove -f newVG
+pvremove /dev/sda7 /dev/sda8
+wipefs -a /dev/sda7 /dev/sda8
+
+partdev (not covered)
