@@ -5,3 +5,7 @@ lsblk -l & -f
 fdisk -l
 fdisk
 free -h (view Ram)
+pvcreate
+pvs
+vgcreate
+vgs
