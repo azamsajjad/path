@@ -5,3 +5,104 @@ Configure autofs
 Extend existing logical volumes
 Create and configure set-GID directories for collaboration
 Diagnose and correct file permission problems
+
+Formatting Disk Partition with FAT32 File System
+1. To format a disk with a FAT32 file system, use:
+sudo mkfs -t vfat /dev/sdb1 upto 4gb
+wipefs -a /dev/sda7 to refresh df -h
+resize2fs /dev/sda7 to refresh df -h
+mkfs -t ntfs /dev/sdb1 upto 1kb
+ext4 16gb-16tb journaling filesystem to prevent data loss
+ext4 support signle filesize of 16gb
+ext4 is default in debian/ubuntu
+ext4 you can reduce the size of ext4
+ext4 is most compatible across linux,mac,windows
+ext4 is better for single r/w thread
+XFS is optimized for large file transfers and parrallel I/O operations
+XFS supports larger file sizes & volumes
+XFS uses more advanced journaling system
+XFS is better for multiple read/write threads
+XFS is default on RHEL
+XFS supports growing but not reducing size of partition
+XFS features built-in backup and recovery tools
+vfat good for sharing files across d/f operating systems
+vfat is excellent for a usb 
+ FORMAT A USB TO BE USED ACROSS SYSTEMS
+
+ mkfs.vfat /dev/sda7
+ fsck.vfat /dev/sda7
+ xfs_repair /dev/sda7
+
+NFS
+SERVER
+/etc/exports
+/export/web_data1       192.168.100.34/24(rw,sync,no_root_squash,insecure)
+/export/web_data2       192.168.100.34/24(rw,sync,no_root_squash,insecure)
+/etc/fstab
+192.168.100.34/24:/export/web_data1 /mnt/nfs_web_data1  nfs defaults,_netdev 0 0
+192.168.100.34/24:/export/web_data2  /mnt/nfs_web_data2 nfs defaults,_netdev 0 0
+mount -a
+systemctl daemon-reload
+exportfs -a / -rv
+
+CLIENT
+yum install cifs-utils rpcbind
+rpcinfo -p 192.168.100.34
+showmount -e 192.168.100.34
+mount -t nfs 192.168.100.34:/export/web_data1 /nfs
+ mount -t nfs 192.168.100.34:/export/web_data2 /nfs2
+ FSTAB ??????
+
+WE HAVE USER HOME DIRECTORIES ON EVERY SERVER = INEFFICIENT
+WE NEED TO CONSOLIDATE THEM TO 1 SERVER
+THEY MUST BE AVAILABLE TO OTHER SERVERS VIA NFS & AUTOFS
+ autofs
+ /etc/autofs.conf
+ /etc/auto.master
+/etc/auto.home - Map files for individual on demand mount points
+
+auto.master
+# /export/home /etc/auto.home
+auto.home
+# * 192.168.100.34:/home/&
+showmount -e
+systemctl enable --now autofs
+
+SET UID - allows a file being executed to run with previleges of owner
+SET GID - allows a file to be executed with the authority of file's group
+STICKY BIT - only root, dir owner & owner of file can remove files in that dir
+
+for i in azam hassan faizi ; do useradd -m -G marketing $i ; done
+mmkdir /home/marketing
+chown -R :marketing /home/marketing
+chmod -R 770 /home/marketing
+stat /home/marketing
+
+STRATIS
+consits of:
+1 a Block device such as disk,partition,lvm,etc
+stratis pool - size is sum of block devices in the pool
+file system is xfs& managed via stratis, no fixed size, thinly provisioned, support snapshots
+# yum install -y stratisd stratis-cli 
+persistant stratis /etc/fstab
+/stratis/pool/fs1  /mnt/stratisfs1  xfs  defaults,x-systemd.requires=stratisd.service 0 0
+stratis filesystem destroy storage appfs1
+stratis pool destroy storage
+
+
+disk compression
+LVM logical volumes on top of VDO
+VDO on top of LVM Logical Volume
+LVM on VDO on top of LVM Logical Volume
+RHEL 9
+yum install lvm2 kmod-kvdo vdo
+pvcreate /dev/sda7
+vgcreate VG1 /dev/sda7
+lvcreate --type vdo --name VDO1 --size 13GB --virtualsize 1000GB VG1
+mkfs.xfs -K /dev/VG1/VDO1
+/etc/fstab
+# /dev/VG1/VDO1     /mnt/TB     xfs     defaults        0 0
+mount -a
+vdostats --human-readable
+lsblk
+

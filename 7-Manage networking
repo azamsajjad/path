@@ -45,3 +45,5 @@ conf.d  dispatcher.d  dnsmasq.d  dnsmasq-shared.d  NetworkManager.conf  system-c
 [root@x230 NetworkManager]# cd system-connections/
 [root@x230 system-connections]# ls
 4th-Reich.nmconnection  enp0s25.nmconnection  mycon.nmconnectioncat 4   
+
+

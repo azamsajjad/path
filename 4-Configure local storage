@@ -25,25 +25,7 @@ edit /etc/fstab
 umount then mount -a (this way we will know its persistent)
 free -h (view Ram)
 
-Formatting Disk Partition with FAT32 File System
-1. To format a disk with a FAT32 file system, use:
-sudo mkfs -t vfat /dev/sdb1 upto 4gb
-wipefs -a /dev/sda7 to refresh df -h
-resize2fs /dev/sda7 to refresh df -h
-mkfs -t ntfs /dev/sdb1 upto 1kb
-ext4 16gb-16tb journaling filesystem to prevent data loss
-ext4 support signle filesize of 16gb
-ext4 is default in debian/ubuntu
-ext4 you can reduce the size of ext4
-ext4 is most compatible across linux,mac,windows
-ext4 is better for single r/w thread
-XFS is optimized for large file transfers and parrallel I/O operations
-XFS supports larger file sizes & volumes
-XFS uses more advanced journaling system
-XFS is better for multiple read/write threads
-XFS is default on RHEL
-XFS supports growing but not reducing size of partition
-XFS features built-in backup and recovery tools
+
 
 CREATE a LOGICAL VOLUME
 pvcreate /dev/sda7
