@@ -8,3 +8,78 @@ Run a service inside a container
 Configure a container to start automatically as a systemd service
 Attach persistent storage to a container
 As with all Red Hat performance-based exams, configurations must persist after reboot without intervention.
+
+podman - buildah - scopio
+rhel9 -> kernel -> cgroups,selinux,namespaces,seccomp
+container-tools
+podman
+scopio - manage container images
+buildah - build images
+Container is a runtime instances of image
+
+podman image tree httpd:latest
+podman image inspect httpd:latest
+Config": {
+               "User": "1000",
+               "Env": [
+                    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+               ],
+               "Cmd": [
+                    "/usr/local/bin/podman_hello_world"
+
+podman container list / podman ps / podman ps -a
+podman container run -it httpd (interactive terminal)
+podman container run -it httpd /bin/bash
+podman container run --name=www -it httpd /bin/bash
+podman container start www
+podman ps -a
+podman container attach www
+podman container rm www
+podman container prune (delete all containers)
+podman container run --name=www -dit -p 8080:80 httpd (run it detached)
+ cat /etc/subuid
+ cat /etc/subgid
+ mkdir web/index.html
+  chcon -Rvt container_file_t web
+changing security context of 'web/index.html'
+changing security context of 'web'
+# chcon -Rvt container_file_t web
+[rupert@x230 ~]$ ls -lZ web/index.html
+-rw-r--r--. 1 rupert rupert unconfined_u:object_r:container_file_t:s0 8 May 25 02:29 web/index.html
+# [rupert@x230 ~]$ podman unshare chown 33:33 web
+[rupert@x230 ~]$ ls -ld web
+drwxr-xr-x. 2 100032 100032 24 May 25 02:29 web
+
+# [rupert@x230 ~]$ podman container exec -it www /bin/bash
+# root@63e03a5d574d:/usr/local/apache2#  grep www /etc/passwd
+/ www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+# root@63e03a5d574d:/usr/local/apache2# exit
+[rupert@x230 ~]$ podman ps
+
+CTRL+r reverse search type
+podman run container -v /local/dir:/container/dir:Z -d image:latest
+# podman container run --name=www -dit -p 8080:80 
+ # -v /home/rupert/web:/usr/local/apache2/htdocs httpd
+ [rupert@x230 ~]$ !cu (last command which began with cu)
+curl localhost:8080
+my page
+
+let systemd manage our containers
+setsebool -P container_manage_cgroup on
+
+CREATE IMAGE
+ mkdir myweb
+[rupert@x230 ~]$ cd myweb/
+[rupert@x230 myweb]$ vim Dockerfile
+           # FROM registry.fedoraproject.org/fedora:33
+              RUN yum -y install httpd; yum clean all; systemctl enable httpd;
+                RUN echo "Successful Web Server Test" | tee /var/www/html/index.html
+                   RUN mkdir /etc/systemd/system/httpd.service.d/; echo -e '[Service]\nRestart=always' | tee /etc/systemd/system/httpd.service.d/httpd.conf
+              EXPOSE 80
+              CMD [ "/sbin/init" ]
+[rupert@x230 myweb]$ podman image build --format=docker -t www-image .
+# everytime we write RUN, we create a nested image
+podman container run --name=www -dit -p 8080:80 www-image
+CONTAINER ID  IMAGE                       COMMAND     CREATED             STATUS             PORTS                 NAMES
+9795529d88ea  localhost/www-image:latest  /sbin/init  About a minute ago  Up About a minute  0.0.0.0:8080->80/tcp  www
+podman container top www
