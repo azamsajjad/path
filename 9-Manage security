@@ -9,3 +9,64 @@ Manage SELinux port labels
 Use boolean settings to modify system SELinux settings
 Diagnose and address routine SELinux policy violations
 
+firewall-cmd --help --reload --permanent --add-port 82/tcp --add-service mysql
+nmap -A 192.168.100.193
+nmap -sn 192.168.100.0/24
+
+1st highlight for default files, 2nd for old files
+[root@x230 home]# setfacl -Rm d:g:engineers:rwx,g:engineers:rwx /home/shared_docs/
+[root@x230 home]# setfacl -Rm d:u:faizi:rx,u:faizi:rx /home/shared_docs/
+[root@x230 home]# getfacl /home/shared_docs/
+getfacl: Removing leading '/' from absolute path names
+# file: home/shared_docs/
+# owner: root
+# group: engineers
+# flags: -st
+user::rwx
+user:faizi:r-x
+group::rwx
+group:engineers:rwx
+mask::rwx
+other::---
+default:user::rwx
+default:user:faizi:r-x
+default:group::rwx
+default:group:engineers:rwx
+default:mask::rwx
+default:other::---
+.
+.
+[root@x230 home]# stat shared_docs/
+  File: shared_docs/
+  Size: 47              Blocks: 0          IO Block: 4096   directory
+Device: 806h/2054d      Inode: 5521        Links: 2
+Access: (3770/drwxrws--T)  Uid: (    0/    root)   Gid: ( 1013/engineers)
+Context: unconfined_u:object_r:user_home_dir_t:s0
+Access: 2023-05-28 01:23:24.383510262 +0500
+Modify: 2023-05-28 01:19:03.915673208 +0500
+Change: 2023-05-28 01:19:03.915673208 +0500
+ Birth: 2023-05-28 00:12:00.314560793 +0500
+
+
+
+ SELinux
+ /etc/selinux/Config
+ Parameters - changing SELinux Modes at Boot Times
+ enforcing=0 starts the system in permissive mode - preferred method
+ selinux=0 causes autorelabel on next reboot
+ autorelabel=1 same as touch /.autorelabel ; reboot
+
+ Problem = selinux is preventing httpd to start
+ confirm by setenforce 0 then starting httpd
+ grep httpd /var/log/messages - it gives solution too
+ solution was =
+ ausearch -c 'httpd' --raw | audit2allow -M my-httpd
+ To make this policy package active, execute
+# semodule -i my-httpd.pp
+recheck
+grep httpd /var/log/messages - it gives solution too
+change context of http directory
+# semanage fcontext -a -t httpd_sys_content_t "web/(/.*)?"
+retorecon -Rv /web
+systemctl restart httpd
+tail -100 /var/log/messages | less

@@ -47,3 +47,23 @@ conf.d  dispatcher.d  dnsmasq.d  dnsmasq-shared.d  NetworkManager.conf  system-c
 4th-Reich.nmconnection  enp0s25.nmconnection  mycon.nmconnectioncat 4   
 
 
+SCAN ALL DEVICES IN YOUR LAN
+yum install nmap
+nmap -sn 192.168.100.0/24
+nmcli c s enp0s25
+netstat -rn
+# ip addr del 192.168.100.100/24 dev enp0s26
+
+# nmcli radio wifi off
+# nmcli radio
+WIFI-HW  WIFI      WWAN-HW  WWAN    
+enabled  disabled  enabled  enabled
+
+# attach a device to connection
+nmcli con modify enp0s26 connection.autoconnect yes
+nmcli con modify enp0s26 connection.interface-name enp0s25
+systemctl restart NetworkManager
+systemctl restart sshd
+
+# nmcli con mod enp0s26 ipv4.method "manual" ip4 "192.168.100.100/24" ipv4.dns "192.168.100.1,8.8.8.8" ipv4.gateway "192.168.100.1" ipv4.may-fail "no"
+# nmcli con mod enp0s26 ipv6.method "manual" ip6 "2407:aa80:314:d851::7/128" ipv4.may-fail "yes"

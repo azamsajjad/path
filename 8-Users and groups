@@ -18,12 +18,55 @@ chage -l username
 chage -d 0 username (passwd expired and now user create new pass at next login)
 
 files created in etc/skel/ directory are automatically copid in new user home directory
-
+.
 new files must be owned by group owner
 set gid
 chmod g+s /UK
 drwxrws---.
-
+.
 only the file creator can delete their own file
 set sticky bit
 chmod +t /UK
+.
+echo "echo this is rupert\'s script\!" > rupertscript.sh
+[rupert@x230 shared_docs]$ ./rupertscript.sh
+chmod ug+x rupertscript.sh
+.
+ 1013  chown -R :engineers /home/shared_docs/
+ 1014  ll
+ 1015  chmod -R 770 /home/shared_docs/
+ 1016  ll
+ 1017  chmod g+s /home/shared_docs/
+ 1018  ll
+ 1019  chmod +t /home/shared_docs/
+
+groudmod -n dba_managers it_managers
+new group name dba_managers
+
+useradd -m -G dba_managers,dba_staff jack
+-m = create home directory
+
+for user in rupert reason azam hassan faizi ; do echo "Password aging for "$user"" ; chage -l $user |
+grep number ; echo ; done | less
+chage rupert
+chage reason
+or 
+for user in rupert reason azam hassan faizi ; do echo "Adjust Password aging for "$user"" ; chage -m 15 -M 90 $user ; echo ; done | less
+
+chage -E $(date -d +1day +%Y-%m-%d) db_user
+for user in azam hassan faizi contsvc ; do echo "Setting Password for "$user"..." ; usermod -p $(openssl passwd Altreason1) $user ; done
+
+
+SUDOers
+visudo /etc/sudoers
+
+ACTIVATE BY removing #
+## Processes
+# Cmnd_Alias PROCESSES = /bin/nice, /bin/kill, /usr/bin/kill, /usr/bin/killall
+## messages
+OR ADD a LINE
+# Cmnd_Alias MESSAGES = /bin/tail -f /var/log/messages
+
+%wheel  ALL=(ALL)       ALL
+%engineers      ALL=SOFTWARE, SERVICES, PROCESSES
+#%dba_intern    ALL=MESSAGES
