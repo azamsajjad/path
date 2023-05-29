@@ -42,3 +42,6 @@ root@x230:~/yum.sh
 2 types of looping constructs used in shell scripts
 while and for
 done command is used to close these loops
+
+VIM STOP INDENTATION
+:setl nocin nosi noai inde=
