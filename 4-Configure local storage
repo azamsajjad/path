@@ -58,3 +58,5 @@ pvremove /dev/sda7 /dev/sda8
 wipefs -a /dev/sda7 /dev/sda8
 
 partdev (not covered)
+
+fdisk -l | grep "^/dev/xvd" | sort

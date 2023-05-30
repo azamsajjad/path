@@ -103,3 +103,97 @@ systemctl restart tuned
 systemctl --type=service
 systemctl --type=service --state=dead
 systemctl --type=service --state=running
+systemctl halt
+systemctl poweroff
+
+LEGACY SHUTDOWN COMMANDS
+[root@x230 ~]# which {shutdown,poweroff,reboot,halt} | xargs ls -l
+lrwxrwxrwx. 1 root root 16 Mar 21 00:16 /usr/sbin/halt -> ../bin/systemctl
+lrwxrwxrwx. 1 root root 16 Mar 21 00:16 /usr/sbin/poweroff -> ../bin/systemctl
+lrwxrwxrwx. 1 root root 16 Mar 21 00:16 /usr/sbin/reboot -> ../bin/systemctl
+lrwxrwxrwx. 1 root root 16 Mar 21 00:16 /usr/sbin/shutdown -> ../bin/systemctl
+sudo shutdown -r +15 "Please save all work, server is rebooting in 15 minutes"
+shutdown -c (to cancel sheduled shutdown)
+
+screen -S Sys-Monitor -t cmdline
+DIVIDE CLI into 2
+crtl+a |
+crtl+a tab
+crtl+a c (starts new bash session)
+pkill screen
+screen -ls
+screen -wipe
+
+
+chrt
+
+
+LAB - TUNEd 
+ls -l /usr/lib/tuned
+
+vimdiff /usr/lib/tuned/virtual-guest/tuned.conf /usr/lib/tuned/virtual-host/tuned.conf
+grep -n dynamic_tuning /etc/tuned/tuned-main.conf
+=10:dynamic_tuning = 1
+vim +10 /etc/tuned/tuned-main.conf
+shift+$ r to replace a character
+systemctl restart tuned
+1028  systemctl start tuned
+ 1029  systemctl status tuned
+ 1030  tuned-adm active
+ 1031  tuned-adm profile
+ 1032  tuned-adm profile powersave
+ 1033  tuned-adm active
+ 1034  tuned-adm profile powersave virtual-guest
+ 1035  tuned-adm active
+[root@x230 ~]# diff /usr/lib/tuned/virtual-guest/tuned.conf /usr/lib/tuned/virtual-host/tuned.conf
+6c6
+< summary=Optimize for running inside a virtual guest
+---
+> summary=Optimize for running KVM guests
+10,17c10,12
+< # If a workload mostly uses anonymous memory and it hits this limit, the entire
+< # working set is buffered for I/O, and any more write buffering would require
+< # swapping, so it's time to throttle writes until I/O can catch up.  Workloads
+< # that mostly use file mappings may be able to use even higher values.
+< #
+< # The generator of dirty data starts writeback at this percentage (system default
+< # is 20%)
+< vm.dirty_ratio = 30
+---
+> # Start background writeback (via writeback threads) at this percentage (system
+> # default is 10%)
+> vm.dirty_background_ratio = 5
+19,22c14,16
+< # Filesystem I/O is usually much more efficient than swapping, so try to keep
+< # swapping low.  It's usually safe to go even lower than this on systems with
+< # server-grade storage.
+< vm.swappiness = 30
+---
+> [cpu]
+> # Setting C3 state sleep mode/power savings
+> force_latency=cstate.id_no_zero:3|70
+
+
+SCHEDULER
+1005  stress -c 1 &
+ 1006  chrt --help
+ 1007  pgrep stress
+ 1008  chrt -p 29208
+ 1009  chrt -p 29209
+ 1010  chrt -r -p 33 29208
+ 1011  chrt -p 29209
+ 1012  chrt -r -p 33 29209
+ 1013  chrt -p 29209
+ 1014  chrt -r -p 33 29208
+ 1015  chrt -p 29208
+ 1016  kill -9 29209
+ 1017  sudo kill -9 29209
+ 1018  sudo kill -9 29208
+ 1019  pgrep stress
+ 1020  chrt -f 44 stress -c 1 &
+ 1021  pregep stress
+ 1022  pgrep stress
+ 1023  chrt -p 29231
+
+ 
+ LOG FILES & journals

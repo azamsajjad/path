@@ -89,3 +89,87 @@ Run a service inside a container
 Configure a container to start automatically as a systemd service
 Attach persistent storage to a container
 As with all Red Hat performance-based exams, configurations must persist after reboot without intervention.
+
+
+DEMO EXAM
+
+1. Configure the network.
+Assign hostname and ip address 1for your virtual machine.
+Hostname - servera.lab.example.com
+Ip address - 172.25.250.11
+Netmask - 255.255.255.0
+Gateway - 172.25.250.254
+NameServer - 172.25.250.254
+2. Create a repository
+http://classrom.example.com/rhel8.0/x86_64/devd/AppStream
+http://classrom.example.com/rhel8.0/x86_64/devd/BaseOS
+3. Configure the Selinux
+(a) Your webcontent has been configured in port 82 at the /var/www/html directory (Don't alter or remove any files in this directory) Make the content accessable.
+4. Create the following users, groups and group memberships:
+(a)A group named admin.
+(b)A user harry who belongs to admin as a secondary group.
+(c) A user natasha who belongs to admin as a secondary group.
+(d) A user sarah who does not have access to an interactive shell on the system and who is not a member of admin.
+(e)The users harry, natasha, sarah should all have password of password.
+5. Create a collaborative directory /common/admin with the following characteristics:
+(a)Group ownership of /common/admin is admin.
+(b) The directory should be readable, writable and accessible to members of admin, but not any other user.
+(It is understood that root has access to all files and directories on the system.)
+(c)Files created in /common/admin automatically have group ownership set to the admin group.
+6. Configure AutoFS
+● All Ldapuser2 home directory is exported via NFS, which is available on
+classroom.example.com (172.25.254.254) and your NFS-exports directory is
+/home/guests for Ldapuser2,
+● Ldapuser2's home directory is classroom.example.com:/home/guests/ldapuse2
+● Ldapuser2's home directory should be automount autofs service.
+● Home directories must be writable by their users.
+● while you are able to log in as any of the user ldapuser1 through ldapuser20, the only
+home directory that is accessible from your system is ldapsuser2
+7. Set a Cron job for harry on 12.30 at noon print /bin/echo on "hello".
+8. Configure Acl permission
+copy the file /etc/fstab to /var/tmp. Configure the permission of /var/tmp/fstab so that:
+(a)The file /var/tmp/fstab is owned by root user
+(b)The file /var/tmp/fstab belongs to the group root.
+(c)The file /var/tmp/fstab should not be executable by anyone.
+(d)The user harry is able to read and write by /var/tmp/fstab.
+(e)The user natasha can neither read nor write /var/tmp/fstab.
+(f)All other users (current/future) have the ability to read /var/tmp/fstab
+9.Configure the NTP
+a) Configure your system so that it is an NTP client of classroom.example.com.
+10. Locate the Files
+(a) Find the owner of the file harry and copy the file to given path of /root/find.user
+12. Create a user account
+a) Create a new user with UID 1326 and user name as alies.
+13. Create a archive file
+(a)Backup the /var/tmp as /root/test.tar.gz
+Note: For Practise 14 and 15 Questions
+a) In Our lab do this in "servere".
+b) In the Redhat lab do this in "servera".
+14. Create the container as a system startup service.
+(a)Create the container name as logserver with the images rsyslog are stored in registry on paradise user
+(b) The container should be configured as system startup services
+(c)The container directory is container_ journal should be created on paradise user
+15. Configure the Container as persistent storage and create logs for container
+(a)Configure the container with the persistent storage that mounted on /var/log/journal to /home/paradise/container
+(b)The container directory contains all journal files
+16.1 Set the permission
+(a)All new creating files for user natasha as -r-------- as default permission.
+(b) All new creating directories for user natasha as dr-x------ as default permission.
+16.2 Set the Password expire date
+(a)The password for all new users in serverb.lab.example.com should expires after 20 days.
+16.3 Assign Sudo Privilege
+(a)Assign the Sudo Privilege for Group "admin" and Group members can administrate without any password.
+
+NODE 2 1. Assign root user password as northale.
+2. Create a repository file
+http://classroom.example.com/content/thel8.0/x86_64/dvd/AppStream http://classroom.example.com/content/thel8.0/x86_64/dvd/BaseOS
+3. Create a swap partition 512MB size.
+4. Create one logical volume named database and it should be on datastore volume group with size 50 extent and assign the filesystem as ext3. the datastore volume group extend should be 8MiB (mount the logical volume under mount point /mnt/database.
+5. Create the vectra volume using the VDO with the logical size 50GB and mount under test directory
+6. Resize the logical volume size of 100 extent on /mnt/database directory.
+7. Set the recommended tuned profile for your system.
+
+
+SIMULATION
+find the files owned by harry and copy them to /opt/dir/
+find / -user harry -exec cp -rfp {} /opt/dir/ \;

@@ -126,7 +126,7 @@ total 0
  67111468 lrwxrwxrwx. 1 root root  8 May 29 02:30 softlink -> original
  67112287 lrwxrwxrwx. 1 root root 12 May 29 02:30 softlink_dir -> original_dir
 
- 
+
 
 
 UMASK
@@ -239,3 +239,5 @@ MANAGING FILES - copy/move
  1065  mv ~/code/mortimer/file*.json ~/code/ursula/json/
  1066  tree code
  1067  cp -r ~/code/mortimer/cloudform/ ~/code/ursula/
+
+ 
