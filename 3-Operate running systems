@@ -140,7 +140,7 @@ systemctl restart tuned
 1028  systemctl start tuned
  1029  systemctl status tuned
  1030  tuned-adm active
- 1031  tuned-adm profile
+ 1031  tuned-adm list
  1032  tuned-adm profile powersave
  1033  tuned-adm active
  1034  tuned-adm profile powersave virtual-guest
@@ -197,3 +197,25 @@ SCHEDULER
 
  
  LOG FILES & journals
+1039  journalctl
+ 1040  ls -l /var/log/journal
+ 1041  journalctl --list-boot
+ 1042  journalctl -b 0
+ 1043  journalctl | grep NTP
+ 1044  journalctl -u chronyd.service
+ 1045  journalctl --since=17:59:00 --until=18:15:00
+ 1046  journalctl --since=-3m
+ 1048  journalctl --since=-10m
+ 1049  journalctl --since=-60m
+ 1050  grep -i storage /etc/systemd/journald.conf
+ 1051  man journald
+ MAKE IT PERSISTANT
+ 1052  man journald.conf
+ 1053  mkdir -p /var/log/journal
+ 1054  journalctl --flush
+ 1055  ls -l /var/log/journal
+ /run/log/journal
+
+ True. Persistent journals are stored in the default location of /var/log/journal, if it exists.
+
+True. Volatile journals are stored in the default directory of /run/log/journal, if the /var/log/journal directory does not exist.

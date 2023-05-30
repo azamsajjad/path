@@ -60,3 +60,56 @@ wipefs -a /dev/sda7 /dev/sda8
 partdev (not covered)
 
 fdisk -l | grep "^/dev/xvd" | sort
+
+
+List your disk partitions using various tools
+Create a new partition and put a file system on it
+Unmount the file system
+Create an extended and logical partitions and confirm
+1  yum update -y
+    2  exit
+    3  fdisk -l
+    4  fdisk
+    5  lsblk
+    6  fdisk -l /dev/xvdb
+    7  fdisk /dev/xvdb
+    8  mkfs.ext4 /dev/xvdb1
+    9  parted /dev/xvdb1 print
+   10  mkdir /mnt/ext4disk
+   11  fdisk /dev/xvdc
+   12  mkfs.xfs /dev/xvdc5
+   13  lsblk
+   14  findmnt
+   15  lsblk -f
+   16  vim /etc/fstab
+   17  mount -a
+   18  mount | grep ext4
+   19  cat /proc/mounts | grep ext4
+   20  
+   
+   Add a swap file system to the system
+Add a swap file to the system
+NO NEED TO FDISK/CREATE A PARTITION
+   lsblk -fs
+   21  free
+   22  free -h
+   23  mkswap /dev/xvdd
+   25  lsblk -fs
+   26  vim /etc/fstab
+   27  swapon -v /dev/xvdd
+   28  free -h
+#    29  dd if=/dev/zero of=/moreswap bs=1024 count=65536
+#    30  mkswap /moreswap
+   31  free -h
+   32  chmod 600 /moreswap
+   33  vim /etc/fstab
+   /moreswap        swap    swap    defaults    0 0
+   34  systemctl daemon-reload
+   35  free -h
+#    36  swapon /moreswap
+   37  free -h
+   38  free -h ; grep moreswap /proc/swaps
+
+
+backup entire disk into another disk
+dd if=/dev/sda of=/dev/sdb
