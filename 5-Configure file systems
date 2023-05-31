@@ -105,4 +105,123 @@ mkfs.xfs -K /dev/VG1/VDO1
 mount -a
 vdostats --human-readable
 lsblk
+LVM on VDO RHEL8
+yum install vdo kmod-kvdo
+vdo create --name=vdo1 --device=/dev/xvdb --vdoLogicalSize=15G
+{ echo "===== `date` on `hostname` ====" ; vdostats --human-readable ; vdostats --verbose ; grep -C5 'used percent' ; } >> vdostats.log
+-C5 = grep word plus context, 5 lines above and below
+pvcreate /dev/mapper/vdo1
+vgcreate vdo_vg1 /dev/mapper/vdo1
+lvcreate -n vdo_vol1 -L+14.9G vdo_vg1
+vgs
+lvs
+lsblk
+mkfs.xfs -K /dev/vdo_vg1/vdo_vol1
+mkdir -p /mnt/vdo_data
+mount -o discard /dev/vdo_vg1/vdo_vol1 /mnt/data
+umount /mnt/data
+vim /etc/fstab
+UUID /mnt/data xfs defaults 0 0
+mount -a
+df -hT /mnt/data
+make a copy script
+for i in `
 
+
+STRATIS
+yum install -y stratisd stratic-cli
+    4  yum install -y stratisd stratis-cli
+    5  systemctl enable --now stratisd
+    6  systemctl status stratisd
+    7  stratis --help
+    8  stratis pool --help
+    9  stratis pool create -h
+   10  stratis pool create
+   11  stratis pool create pool0 /dev/xvdb
+   12  stratis pool list
+   13  stratis fs -h
+   14  lsblk
+   15  stratis fs create -h
+   16  stratis fs create pool0 stratisfs
+   17  mkdir -p /mnt/stratismnt
+   18  stratis pool
+   19  stratis fs
+   20  df -ht
+   21  df -hT
+   22  lsblk
+   23  fdisk -l
+   24  stratis fs
+   25  mount /dev/stratis/pool0/stratisfs /mnt/stratismnt/
+   26  ls -l /mnt/stratismnt/
+   27  touch /mnt/stratismnt/file1
+   28  mkdir /mnt/stratismnt/dir1
+   29  ls -l /mnt/stratismnt/
+   30  df -hT /mnt/stratismnt/
+   32  stratis fs
+   33  vim /etc/fstab
+   34  umount /mnt/stratismnt
+   35  systemctl daemon-reload
+   36  mount -a
+   37  df -hT /mnt/stratismnt/
+   38  ls -l /mnt/stratismnt/
+   39  touch /mnt/stratismnt/file2
+   41  stratis report
+   42  wipefs /dev/xvdc
+   43  wipefs /dev/xvdd
+   44  stratis pool add-data pool0 /dev/xvdc
+   45  stratis pool add-data pool0 /dev/xvdd
+   46  stratis pool
+   47  stratis fs
+   48  df -hT /mnt/stratismnt/
+   49  df -hT
+   50  lsblk -f
+   51  lsblk -l
+   52  fdisk -l
+   53  mkdir -p /mnt/stratismnt2
+   54  stratis fs snapshot pool0 stratisfs stratisfs-snapshot
+   55  mount /dev/stratis/pool0/stratisfs-snapshot /mnt/stratismnt2
+   56  ls -l /mnt/stratismnt /mnt/stratismnt2
+   57  rm -rf /mnt/stratismnt/file2
+   58  ls -l /mnt/stratismnt /mnt/stratismnt2
+   59  umount /mnt/stratismnt
+   60  umount /mnt/stratismnt2
+   61  vim /etc/fstab
+   62  systemctl daemon-reload
+   63  mount -a
+   64  df -hT /dev/stratis
+   65  stratis pool
+   66  stratis fs
+   67  vim /etc/fstab
+   68  systemctl daemon-reload
+   69  mount -a
+   70  grep stratis /proc/mounts
+   71  df -hT /mnt/stratisfs
+   74  ls -l /mnt/stratismnt
+   75  ls -l /mnt/stratismnt2
+   76  stratis fs destroy pool0 stratisfs
+   77  stratis fs
+   78  stratis blockdev
+
+
+
+
+Some practical examples on dd command :
+
+To backup the entire harddisk : To backup an entire copy of a hard disk to another hard disk connected to the same system, execute the dd command as shown. In this dd command example, the UNIX device name of the source hard disk is /dev/hda, and device name of the target hard disk is /dev/hdb.
+# dd if=/dev/sda of=/dev/sdb
+“if” represents inputfile, and “of” represents output file. So the exact copy of /dev/sda will be available in /dev/sdb.
+If there are any errors, the above command will fail. If you give the parameter “conv=noerror” then it will continue to copy if there are read errors.
+Input file and output file should be mentioned very carefully. Just in case, you mention source device in the target and vice versa, you might loss all your data.
+To copy, hard drive to hard drive using dd command given below, sync option allows you to copy everything using synchronized I/O.
+# dd if=/dev/sda of=/dev/sdb conv=noerror, sync
+To backup a Partition : You can use the device name of a partition in the input file, and in the output either you can specify your target path or image file as shown in the dd command.
+# dd if=/dev/hda1 of=~/partition.img
+To create an image of a Hard Disk : Instead of taking a backup of the hard disk, you can create an image file of the hard disk and save it in other storage devices. There are many advantages of backing up your data to a disk image, one being the ease of use. This method is typically faster than other types of backups, enabling you to quickly restore data following an unexpected catastrophe.It creates the image of a hard disk /dev/hda.
+# dd if=/dev/hda of=~/hdadisk.img
+To restore using the Hard Disk Image : To restore a hard disk with the image file of an another hard disk, the following dd command can be used
+# dd if=hdadisk.img of=/dev/hdb
+The image file hdadisk.img file, is the image of a /dev/hda, so the above command will restore the image of /dev/hda to /dev/hdb.
+
+To create CDROM Backup : dd command allows you to create an iso file from a source file. So we can insert the CD and enter dd command to create an iso file of a CD content.
+# dd if=/dev/cdrom of=tgsservice.iso bs=2048
+dd command reads one block of input and process it and writes it into an output file. You can specify the block size for input and output file. In the above dd command example, the parameter “bs” specifies the block size for the both the input and output file. So dd uses 2048bytes as a block size in the above command.

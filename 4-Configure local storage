@@ -113,3 +113,63 @@ NO NEED TO FDISK/CREATE A PARTITION
 
 backup entire disk into another disk
 dd if=/dev/sda of=/dev/sdb
+
+LAB
+Partition Disks and Create Physical Volumes
+Create and Extend a Volume Group and a Logical Volume
+Format, Mount, and Extend the Logical Volume and File System
+Reduce a Logical Volume and File System and Remove and Wipe a Physical Volume
+
+lsblk
+    3  fdisk /dev/xvdb
+    4  fdisk /dev/xvdc
+    5  fdisk /dev/xvdd
+    6  partprobe
+    7  fdisk -l
+    8  lsblk
+    9  lsblk -f
+   10  blkid
+   11  lsblk -fs
+   12  lsblk
+   13  pvcreate /dev/xvdb1
+   14  pvcreate /dev/xvdc1
+   15  pvcreate /dev/xvdd1
+   16  vgcreate VGVolume /dev/xvdb1
+   17  vgextend VGVolume /dev/xvdc1
+   18  lvcreate -L+3.99GB -n "datavolume" VGVolume
+   19  lvs
+   20  mkdir -p /mnt/lvmpoint
+   21  mkfs.ext4 /dev/VGVolume/datavolume
+   22  mount /dev/VGVolume/datavolume /mnt/lvmpoint/
+   23  ls -l /mnt/lvmpoint/
+   24  touch /mnt/lvmpoint/file3
+   25  ls -l /mnt/lvmpoint/
+   26  df -hT /mnt/lvmpoint/
+   27  lsblk
+   28  lvs
+   29  vgs
+   30  pvs
+   31  vgextend VGVolume /dev/xvdd1
+   32  vgs
+   33  lvs
+   34  lvextend -L+2GB /dev/VGVolume/datavolume
+   35  lvextend -L+1.95GB /dev/VGVolume/datavolume
+   36  lvs
+   37  df -hT /dev/VGVolume/datavolume
+   38  lvs
+   39  lvresize --resizefs --size 5.95GB /dev/VGVolume/datavolume
+   40  df -hT /dev/VGVolume/datavolume
+   41  ls -l /mnt/lvmpoint/
+   42  df -hT /mnt/lvmpoint/
+   43  lvreduce --resizefs --size 4GB /dev/VGVolume/datavolume
+   44  df -ht /mnt/lvmpoint/
+   45  vdreduce /dev/VGVolume /dev/xvdb1
+   46  vgreduce /dev/VGVolume /dev/xvdb1
+   47  lvs
+   48  lvreduce --resizefs --size 3.9GB /dev/VGVolume/datavolume
+   49  vgs
+   50  vgreduce /dev/VGVolume /dev/xvdb1
+   51  vgreduce /dev/VGVolume /dev/xvdd1
+   52  lsblk -f
+   53  pvremove /dev/xvdd1
+   54  lsblk -f
