@@ -33,6 +33,18 @@ vfat is excellent for a usb
  fsck.vfat /dev/sda7
  xfs_repair /dev/sda7
 
+
+
+AUTOFS RHEL9
+client : yum install nfs-utils autofs
+            vim /etc/auto.master
+                |-> /auto_mount /etc/auto.misc
+            vim /etc/auto.misc
+                |-> access          -rw,soft,intr       198.168.100.100:/share
+            systemctl enable --now autofs
+            directory /auto_mount/access automatically created under /
+
+
 NFS
 SERVER
 /etc/exports
@@ -91,6 +103,7 @@ stratis pool destroy storage
 
 
 disk compression
+$ lvmdiskscan
 LVM logical volumes on top of VDO
 VDO on top of LVM Logical Volume
 LVM on VDO on top of LVM Logical Volume
@@ -225,3 +238,6 @@ The image file hdadisk.img file, is the image of a /dev/hda, so the above comman
 To create CDROM Backup : dd command allows you to create an iso file from a source file. So we can insert the CD and enter dd command to create an iso file of a CD content.
 # dd if=/dev/cdrom of=tgsservice.iso bs=2048
 dd command reads one block of input and process it and writes it into an output file. You can specify the block size for input and output file. In the above dd command example, the parameter “bs” specifies the block size for the both the input and output file. So dd uses 2048bytes as a block size in the above command.
+
+
+AUTOFS 

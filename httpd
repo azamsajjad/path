@@ -16,3 +16,23 @@ semanage fcontext -a -t httpd_sys_content_t '/content(/.*)?'
 restorecon -R /content
 ls -ldZ
 curl -k 192.168.100.34
+
+
+nmap lists all servers
+nmap -sP 192.168.100.0/24
+
+curl ifconfig.me
+curl ipinfo.io/ip
+to view public ip addresses
+[root@x230 ~]# curl https://ipinfo.io/119.73.124.90
+{
+  "ip": "119.73.124.90",
+  "hostname": "static-host119-73-124-90.link.net.pk",
+  "city": "Rawalpindi",
+  "region": "Punjab",
+  "country": "PK",
+  "loc": "33.5817,73.1636",
+  "org": "AS135407 Trans World Enterprise Services (Private) Limited",
+  "postal": "45710",
+  "timezone": "Asia/Karachi",
+  "readme": "https://ipinfo.io/missingauth"

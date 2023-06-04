@@ -67,3 +67,50 @@ systemctl restart sshd
 
 # nmcli con mod enp0s26 ipv4.method "manual" ip4 "192.168.100.100/24" ipv4.dns "192.168.100.1,8.8.8.8" ipv4.gateway "192.168.100.1" ipv4.may-fail "no"
 # nmcli con mod enp0s26 ipv6.method "manual" ip6 "2407:aa80:314:d851::7/128" ipv4.may-fail "yes"
+
+CHECK BOTH CONNECTIONS ARE UP
+root@server1: ~ # { ip a s eth0 ; ip a s eth1 ; } | grep inet\
+    inet 10.0.1.188/24 brd 10.0.1.255 scope global dynamic noprefixroute eth0
+    inet 10.0.1.21/24 brd 10.0.1.255 scope global noprefixroute eth1
+root@server1: ~ # ping -I 10.0.1.188 10.0.1.21
+root@server1: ~ # ping -I 10.0.1.21 10.0.1.188
+
+You'll be using utilities such as nmcli, ip, vim, ifup, ping, and dig in this lab, and encountering files such as /etc/sysconfig/network-scripts/ifcfg-eth0, 
+# the /etc/hosts, /etc/resolv.conf, and /etc/nsswitch.conf files, and more as you troubleshoot why you cannot get accurate information about a remote domain's DNS.
+# TRINITY DNS RESOLUTION FILES
+
+CHECK IF YOUR NETWORKS WILL COME BACK UP ON BOOT
+systemctl status NETworkManager
+grep autoconnect /etc/Networkmanager/sys
+
+LAB
+$ hostnamectl
+HOSTNAME RESOLUTION
+        yum whatprovides dig
+    3  sudo yum install bind-utils
+    4  ping linux.com
+    5  cat /etc/resolv.conf
+    7  dig @10.0.0.2 linux.com
+    9  vim /etc/nsswitch.conf (changed hosts: files dns myhostname to dns files myhostname)
+   10  ping linux.com
+   11  vim /etc/hosts (removed wrong entry)
+   12  ping linux.com
+   now it pings to right address
+   13  vim /etc/nsswitch.conf
+   14  ping linux.com
+
+
+   NETWORKING question RHEL9
+   create a new connection named Net of type Ethernet having interface name eth0
+   ip ares 200.0.0.12/16
+   gateway 20.0.0.1
+   dns 8.8.8.8
+   --------------------------------------------------------------------------
+   nmcli con add con-name Net type ethernet ifname eth0 ip4 200..0.12/16 gw4 20.0.0.1
+   nmcli con mod Net ipv4.dns 8.8.8.8
+   (cant edit dns while nmcli con add)
+   nmcli con up
+   PArameters to take care of while adding connection
+   con-name | type | ifname | autoconnect | ap4 | gw4
+   if it asks to add another address
+   nmcli con mod Net +ipv4.addresses 200.0.0.13/16

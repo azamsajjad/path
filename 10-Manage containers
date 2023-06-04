@@ -9,6 +9,9 @@ Configure a container to start automatically as a systemd service
 Attach persistent storage to a container
 As with all Red Hat performance-based exams, configurations must persist after reboot without intervention.
 
+
+
+yum module install container-tools
 podman - buildah - scopio
 rhel9 -> kernel -> cgroups,selinux,namespaces,seccomp
 container-tools
@@ -111,10 +114,14 @@ uay.io/redhattraining/httpd-parent:latest
 
 Configure a container to start automatically as a systemd service
 # make it persistent enable ROOTLESS
+mkdir -p ~/.config/systemd/user
+mkdir ~/web
+echo "Test Data" > ~/web/text.txt
+
 podman run -dit --hostname localhost --name webit4 -p 8088:80 -v ~/web:/var/www/html:Z docker.io/centos/httpd:latest
   386  podman ps
-  387  curl localhost:8088
-  388  mkdir -p ~/.config/systemd/user
+  387  curl localhost:8088/test.txt
+  388
   389  podman generate systemd webit4 > ~/.config/systemd/user/webit4-container.service
   390  # or
        podman generate systemd --name webit4 --files --new

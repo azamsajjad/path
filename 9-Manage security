@@ -34,39 +34,104 @@ default:group::rwx
 default:group:engineers:rwx
 default:mask::rwx
 default:other::---
-.
-.
-[root@x230 home]# stat shared_docs/
-  File: shared_docs/
-  Size: 47              Blocks: 0          IO Block: 4096   directory
-Device: 806h/2054d      Inode: 5521        Links: 2
-Access: (3770/drwxrws--T)  Uid: (    0/    root)   Gid: ( 1013/engineers)
-Context: unconfined_u:object_r:user_home_dir_t:s0
-Access: 2023-05-28 01:23:24.383510262 +0500
-Modify: 2023-05-28 01:19:03.915673208 +0500
-Change: 2023-05-28 01:19:03.915673208 +0500
- Birth: 2023-05-28 00:12:00.314560793 +0500
+.?
+   13  sed -i -e 's/AllowZoneDrifting=yes/AllowZoneDrifting=no/' /etc/firewalld/firewalld.conf
+   14  grep '^AllowZone' /etc/firewalld/firewalld.conf
+   15  systemctl reload firewalld
+   16  firewall-cmd --zone=public --add-service=http --permanent
+   17  firewall-cmd --zone=public --add-service=https --permanent
+   18  firewall-cmd --zone=public --add-service=https
+   19  firewall-cmd --zone=public --add-service=http
+
+
+   ACL
+   cd ~
+    2  cd /opt/ProjectA
+    3  ll
+    4  getfacl /opt/ProjectA/
+    5  ls -ld /opt/ProjectA/
+    6  groups mortimer
+   6.  setfacl -m u:clarice:rwx /opt/ProjectA/
+   6.  setfacl -m u:caruso:rwx /opt/ProjectA/
+    7  setfacl -m g:managers:rwx /opt/ProjectA/
+    8  getfacl /opt/ProjectA/
+    9  su clarice
+   10  cd /opt/ProjectA/
+   11  ll
+   12  groups caruso
+   13  getfacl -R /opt/ProjectA/ > ~/ProjectA.acl.bu
+   14  cat ~/ProjectA.acl.bu
+   18  getfacl -R /opt/ProjectA/ > ~/ProjectA.acl.bu
+   19  cat ~/ProjectA.acl.bu
+   20  grep caruso ~/ProjectA.acl.bu
+   21  setfacl -m u:caruso:0 /opt/ProjectA/
+   22  getfacl -R /opt/ProjectA/
+   23  getfacl /opt/ProjectA/
+   24  head ~/ProjectA.acl.bu
+   25  cd /
+   26  getfacl /opt/ProjectA/
+   27  setfacl --restore=~/ProjectA.acl.bu ----------------->error
+   28  setfacl --restore=/home/mortimer/ProjectA.acl.bu
+   29  getfacl /opt/ProjectA/
+   ---------->caruso permissions restored
+
+
+   FIX APACHE SELINUX POLICY AND CONTEXT ISSUE
+   
+    3  grep httpd /var/log/messages
+    4  journalctl -xe  ----->suggested when we ran systemctl start httpd
+    4  journalctl -u httpd
+    4 grep httpd /var/log/audit/audit.log
+    5  ausearch -c 'httpd' --raw | audit2allow -M my-httpdpol ---->suggested by journalctl
+    6  ls -al my-httpdpol.*
+    7  file my-httpdpol.*
+    8  semodule -i my-httpdpol.pp 
+    9  systemctl start httpd
+   10  systemctl status httpd
+   14  curl localhost:85/test.html
+   15  curl http://127.0.0.1:85/test.html
+   16  grep 'httpd\|test.html' /var/log/messages
+   17  grep 'httpd\|test.html' /var/log/messages | more
+   18  grep 'httpd\|test.html' /var/log/messages
+   19  grep 'httpd\|test.html' /var/log/messages | less
+   20  ls -lZ /web
+   21  semanage --help
+   22  man semanage
+   23  info semanage
+   24  info semanage f-context
+   25  ls -ldZ /var/www
+   26  semanage fcontext -a -t httpd_sys_content_t "/web(/.*)?"
+   27  restorecon -Rv /web
+   28  ls -lZ /web
+   31  curl localhost:85/test.html
+   32  systemctl restart httpd
+      32  systemctl restart httpd
+         32  systemctl restart httpd
+   33  tail -30 /var/log/messages
 
 
 
- SELinux
- /etc/selinux/Config
- Parameters - changing SELinux Modes at Boot Times
- enforcing=0 starts the system in permissive mode - preferred method
- selinux=0 causes autorelabel on next reboot
- autorelabel=1 same as touch /.autorelabel ; reboot
-
- Problem = selinux is preventing httpd to start
- confirm by setenforce 0 then starting httpd
- grep httpd /var/log/messages - it gives solution too
- solution was =
- ausearch -c 'httpd' --raw | audit2allow -M my-httpd
- To make this policy package active, execute
-# semodule -i my-httpd.pp
-recheck
-grep httpd /var/log/messages - it gives solution too
-change context of http directory
-# semanage fcontext -a -t httpd_sys_content_t "web/(/.*)?"
-retorecon -Rv /web
+4 TYPES of Questions on SELinux on RHEL9 exam
+SELinux MODES
+getenforce | setenforce 0 for permissive | setenforce 1 for enforcing
+if they ask you to disable SELinux policy
+vim /etc/sysconfig/selinux --> SELINUX=disabled 
+SELinux BOOLEANS
+ensure httpd is able to access user home directory
+getsebool -a  ---> list all the BOOLEANS
+getsebool -a | grep httpd
+setsebool -p httpd_enable_homedirs on
+SELinux PORT 
+system is not able to connect to httpd at port 82
+semanage port -l --> list all ports
+semanage port -a -t http_port_t -p tcp 82
+SELinux CONTEXT
+httpd service is able to access & host files from /test directory
+ls -lZ /test
+semanage fcontext -a -t httpd_sys_content_t "/test(/.*)?"
+restorecon -R /test
+/etc/httpd/conf/httpd.conf
+DocumentRoot "/var/ww/httml" ---> "/test"
+<Directory "/var/www/html" ---> "/test"
 systemctl restart httpd
-tail -100 /var/log/messages | less
+restorecon -R 

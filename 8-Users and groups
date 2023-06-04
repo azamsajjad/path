@@ -4,6 +4,10 @@ Change passwords and adjust password aging for local user accounts
 Create, delete, and modify local groups and group memberships
 Configure superuser access
 
+grep '^[A-Z] /etc/login.defs (see default login settings)
+useradd -D (see default useradd setting)
+
+
 set +o history (dnt record next command)
 echo "$user:linux" | chpasswd
 set -o history
@@ -70,3 +74,34 @@ OR ADD a LINE
 %wheel  ALL=(ALL)       ALL
 %engineers      ALL=SOFTWARE, SERVICES, PROCESSES
 #%dba_intern    ALL=MESSAGES
+
+
+LAB
+sudo visudo
+allow a user to have admin previleges
+## User Aliases
+## These aren't often necessary, as you can use regular groups
+## (ie, from files, LDAP, NIS, etc) in this file - just use %groupname
+## rather than USERALIAS
+# User_Alias ADMINS = jsmith, mikem
+User_Alias      ADMINUSERS = sajjad
+.
+## Command Aliases
+## These are groups of related commands...
+Cmnd_Alias      ADMINTASKS = /usr/sbin/useradd, /bin/passwd, sudoedit /etc/hosts
+.
+.
+## Allow root to run any commands anywhere
+root    ALL=(ALL)       ALL
+ADMINUSERS      ALL=ADMINTASKS
+.
+.
+.
+use --> which useradd <-- command to see paths
+
+PASSWORD
+echo "dbapass" | passwd --stdin manny
+
+for user in manny moe jack ; do echo "creating "$user..." ; useradd -m $user ; done
+for user in manny moe jack ; do echo "setting passwords for "$user..." ; usermod -p $(openssl passwd -1 dbapass) $user ; done
+for user in manny moe jack ; do echo "setting group permissions for "$user..." ; chgrp -R $user /home/$user ; done

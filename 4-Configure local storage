@@ -26,7 +26,7 @@ umount then mount -a (this way we will know its persistent)
 free -h (view Ram)
 
 
-
+use #vgdisplay command to view Physical extent and logical extent sizes
 CREATE a LOGICAL VOLUME
 pvcreate /dev/sda7
 pvs
@@ -45,10 +45,17 @@ mount | grep dir
 ADD 1GB storage to dir
 pvcreate /dev/sda8
 vgextend newVG /dev/sda8
-lvextend -L +1G newVG/newLVM
+lvextend -r -L +1G newVG/newLVM (-------> -r to automatically install filesystem on extended space)
 lvs
 df -h /dir -> still 2gb
 resize2fs /dev/mapper/newVG/newLVM
+
+
+create LV named LV2 with 10 extent where the size of each extent is 8mb
+vgcreate -s 8mb VG1 /dev/sda7
+vgdisplay
+lvcreate -l 10 -n LV2 /dev/VG1/LV2
+
 
 to REMOVE
 umount /dir
@@ -173,3 +180,19 @@ lsblk
    52  lsblk -f
    53  pvremove /dev/xvdd1
    54  lsblk -f
+
+
+VDO on LVM RHEL9
+yum install lvm2 kmod-kvdo vdo 
+lsblk
+pvcreate /dev/sda7
+vgcreate VG1 /dev/sda7
+lvcreate --type vdo --name vdo1 --size 5GB --virtualsize 50Gb VG1
+lsblk
+mkfs.xfs  -k  /dev/VG1/VDO1
+mkdir -p /vdo_m
+vim /etc/fstab
+# /dev/VG1/VDO1 /vdo_m  xfs   defaults 0 0 
+mount -a
+
+autofs RHEL9

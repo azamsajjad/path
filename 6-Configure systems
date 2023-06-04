@@ -72,7 +72,7 @@ yum -y install chrony ntpstat
  1020  vim /etc/chrony.conf
  1021  systemctl restart chronyd
 .....
- timedatectl
+ # timedatectl set-ntp true
  ntpstat
  chronyc tracking
  chronyc makestep (corrections async of systemtime with ntp time) 
