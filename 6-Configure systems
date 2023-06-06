@@ -256,3 +256,34 @@ mv /boot/grub2/grubenv{,.orig} (backup)
 grub2-mkconfig -o /boot/grub2/grub.cfg
 grep -i 'style=hidden' /boot/grub2/grub.cfg
 reboot
+
+
+[rhel-8-baseos-rhui-rpms]
+name=RHEL8 BaseOS
+mirrorlist=https://rhui3.REGION.aws.ce.redhat.com/pulp/mirror/content/dist/rhel8/rhui/$releasever/$basearch/baseos/os
+enabled=1
+gpgcheck=1
+gpgkey=/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslclientkey=/etc/pki/rhui/content-rhel8.key
+sslclientcert=/etc/pki/rhui/product/content-rhel8.crt
+sslcacert=/etc/pki/rhui/cdn.redhat.com-chain.crt
+
+
+[rhel-8-appstream-rhui-rpms]
+name=RHEL8 Appstream
+mirrorlist=https://rhui3.REGION.aws.ce.redhat.com/pulp/mirror/content/dist/rhel8/rhui/$releasever/$basearch/appstream/os
+enabled=1
+gpgcheck=1
+gpgkey=/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+sslverify=1
+sslclientkey=/etc/pki/rhui/content-rhel8.key
+sslclientcert=/etc/pki/rhui/product/content-rhel8.crt
+sslcacert=/etc/pki/rhui/cdn.redhat.com-chain.crt
+
+
+[epel]
+name=EPEL
+baseurl=https://download.fedoraproject.org/pub/epel/$releasever/Everything/$basearch
+enabled=1
+gpgcheck=0

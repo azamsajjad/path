@@ -35,6 +35,38 @@ vfat is excellent for a usb
 
 
 
+# AUTOFS SERVER
+yum install -y nfs*
+mkdir /public
+mkdir /private
+chmod 777 /public
+chmod 777 /private
+cal > /public/calpublic.txt
+echo "Classes are Good!" > /private/echoprivately.txt
+vim /etc/exports
+                    /public 10.0.1.60(ro,sync)
+                    /private 10.0.1.60(rw,sync)
+exportfs -arvf
+firewall-cmd --add-service={nfs,rpc-bind,mountd} --zone=public --permanent
+firewall-cmd --list-all
+systemctl enable --now nfs-server.service
+
+# AUTOFS CLIENT
+yum install -y nfs* autofs
+    6  mkdir /automount
+    7  mkdir /automount/private
+    8  mkdir /automount/public
+   11  vim /etc/auto.master
+            /automount      /etc/automount.txt      --timeout=30
+   12  vim /etc/automount.txt
+            public -ro,sync 10.0.1.33:/public
+            private -rw,sync 10.0.1.33:/private
+   13  systemctl enable --now autofs
+   14  systemctl status autofs
+   15  systemctl status rpcbind
+   16  df -ht
+   17  df -hT
+   18  cd /automount/
 AUTOFS RHEL9
 client : yum install nfs-utils autofs
             vim /etc/auto.master
@@ -43,6 +75,9 @@ client : yum install nfs-utils autofs
                 |-> access          -rw,soft,intr       198.168.100.100:/share
             systemctl enable --now autofs
             directory /auto_mount/access automatically created under /
+
+
+
 
 
 NFS
@@ -65,6 +100,8 @@ mount -t nfs 192.168.100.34:/export/web_data1 /nfs
  mount -t nfs 192.168.100.34:/export/web_data2 /nfs2
  FSTAB ??????
 
+
+# AUTOFS export home directories
 WE HAVE USER HOME DIRECTORIES ON EVERY SERVER = INEFFICIENT
 WE NEED TO CONSOLIDATE THEM TO 1 SERVER
 THEY MUST BE AVAILABLE TO OTHER SERVERS VIA NFS & AUTOFS
@@ -73,12 +110,25 @@ THEY MUST BE AVAILABLE TO OTHER SERVERS VIA NFS & AUTOFS
  /etc/auto.master
 /etc/auto.home - Map files for individual on demand mount points
 
-auto.master
-# /export/home /etc/auto.home
-auto.home
-# * 192.168.100.34:/home/&
+SERVER
+yum install nfs*
+vim /etc/exports
+/home   192.168.100.99(rw,sync,no_root_squash)
+systemctl enable --now nfs-server.service
 showmount -e
+
+CLIENT
+yum install autofs
+auto.master
+# /export/home      /etc/auto.home
+auto.home
+# *         192.168.100.34:/home/&
+showmount -e
+mkdir -p /export/home
+for i in manny moe jack marcia jan cindy ; do usermod -d /export/home/$i $i ; done
 systemctl enable --now autofs
+showmount -e 192.168.100.34
+
 
 SET UID - allows a file being executed to run with previleges of owner
 SET GID - allows a file to be executed with the authority of file's group
@@ -91,7 +141,7 @@ chmod -R 770 /home/marketing
 stat /home/marketing
 
 STRATIS
-consits of:
+consists of:
 1 a Block device such as disk,partition,lvm,etc
 stratis pool - size is sum of block devices in the pool
 file system is xfs& managed via stratis, no fixed size, thinly provisioned, support snapshots
@@ -101,44 +151,6 @@ persistant stratis /etc/fstab
 stratis filesystem destroy storage appfs1
 stratis pool destroy storage
 
-
-disk compression
-$ lvmdiskscan
-LVM logical volumes on top of VDO
-VDO on top of LVM Logical Volume
-LVM on VDO on top of LVM Logical Volume
-RHEL 9
-yum install lvm2 kmod-kvdo vdo
-pvcreate /dev/sda7
-vgcreate VG1 /dev/sda7
-lvcreate --type vdo --name VDO1 --size 13GB --virtualsize 1000GB VG1
-mkfs.xfs -K /dev/VG1/VDO1
-/etc/fstab
-# /dev/VG1/VDO1     /mnt/TB     xfs     defaults        0 0
-mount -a
-vdostats --human-readable
-lsblk
-LVM on VDO RHEL8
-yum install vdo kmod-kvdo
-vdo create --name=vdo1 --device=/dev/xvdb --vdoLogicalSize=15G
-{ echo "===== `date` on `hostname` ====" ; vdostats --human-readable ; vdostats --verbose ; grep -C5 'used percent' ; } >> vdostats.log
--C5 = grep word plus context, 5 lines above and below
-pvcreate /dev/mapper/vdo1
-vgcreate vdo_vg1 /dev/mapper/vdo1
-lvcreate -n vdo_vol1 -L+14.9G vdo_vg1
-vgs
-lvs
-lsblk
-mkfs.xfs -K /dev/vdo_vg1/vdo_vol1
-mkdir -p /mnt/vdo_data
-mount -o discard /dev/vdo_vg1/vdo_vol1 /mnt/data
-umount /mnt/data
-vim /etc/fstab
-UUID /mnt/data xfs defaults 0 0
-mount -a
-df -hT /mnt/data
-make a copy script
-for i in `
 
 
 STRATIS
@@ -216,7 +228,43 @@ yum install -y stratisd stratic-cli
    78  stratis blockdev
 
 
-
+disk compression
+$ lvmdiskscan
+LVM logical volumes on top of VDO
+VDO on top of LVM Logical Volume
+LVM on VDO on top of LVM Logical Volume
+RHEL 9
+yum install lvm2 kmod-kvdo vdo
+pvcreate /dev/sda7
+vgcreate VG1 /dev/sda7
+lvcreate --type vdo --name VDO1 --size 13GB --virtualsize 1000GB VG1
+mkfs.xfs -K /dev/VG1/VDO1
+/etc/fstab
+# /dev/VG1/VDO1     /mnt/TB     xfs     defaults        0 0
+mount -a
+vdostats --human-readable
+lsblk
+LVM on VDO RHEL8
+yum install vdo kmod-kvdo
+vdo create --name=vdo1 --device=/dev/xvdb --vdoLogicalSize=15G
+{ echo "===== `date` on `hostname` ====" ; vdostats --human-readable ; vdostats --verbose ; grep -C5 'used percent' ; } >> vdostats.log
+-C5 = grep word plus context, 5 lines above and below
+pvcreate /dev/mapper/vdo1
+vgcreate vdo_vg1 /dev/mapper/vdo1
+lvcreate -n vdo_vol1 -L+14.9G vdo_vg1
+vgs
+lvs
+lsblk
+mkfs.xfs -K /dev/vdo_vg1/vdo_vol1
+mkdir -p /mnt/vdo_data
+mount -o discard /dev/vdo_vg1/vdo_vol1 /mnt/data
+umount /mnt/data
+vim /etc/fstab
+UUID /mnt/data xfs defaults 0 0
+mount -a
+df -hT /mnt/data
+make a copy script
+for i in `
 
 Some practical examples on dd command :
 
