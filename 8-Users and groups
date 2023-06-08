@@ -105,3 +105,26 @@ echo "dbapass" | passwd --stdin manny
 for user in manny moe jack ; do echo "creating "$user..." ; useradd -m $user ; done
 for user in manny moe jack ; do echo "setting passwords for "$user..." ; usermod -p $(openssl passwd -1 dbapass) $user ; done
 for user in manny moe jack ; do echo "setting group permissions for "$user..." ; chgrp -R $user /home/$user ; done
+
+
+chown -R :dba_staff /home/dba_docs/
+root@server2: ~ # chmod 770 /home/dba_docs/
+root@server2: ~ # chmod g+s /home/dba_docs/
+root@server2: ~ # chmod o+t /home/dba_docs/
+root@server2: ~ # setfacl -Rm d:g:dba_staff:rwx,g:dba_staff:rwx /home/dba_docs/
+root@server2: ~ # setfacl -Rm d:u:jack:r--,u:jack:r-- /home/dba_docs/
+root@server2: ~ # setfacl -Rm d:u:cindy:r--,u:cindy:r-- /home/dba_docs/
+root@server2: ~ # setfacl -Rm d:u:marcia:rwx,u:marcia:rwx /home/dba_docs/
+root@server2: ~ # stat /home/dba_docs/
+for user in manny moe cindy jack jan marcia ; do ln -s /home/dba_docs/ /home/$user/dba_docs ; done
+
+
+SET UID - allows a file being executed to run with previleges of owner
+SET GID - allows a file to be executed with the authority of file's group
+STICKY BIT - only root, dir owner & owner of file can remove files in that dir
+
+for i in azam hassan faizi ; do useradd -m -G marketing $i ; done
+mmkdir /home/marketing
+chown -R :marketing /home/marketing
+chmod -R 770 /home/marketing
+stat /home/marketing

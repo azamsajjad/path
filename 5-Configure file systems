@@ -112,10 +112,15 @@ THEY MUST BE AVAILABLE TO OTHER SERVERS VIA NFS & AUTOFS
 
 SERVER
 yum install nfs*
+vim /etc/hosts
+192.168.171.129 nfs-client
 vim /etc/exports
-/home   192.168.100.99(rw,sync,no_root_squash)
+/home   nfs-client(rw,sync,no_root_squash)
 systemctl enable --now nfs-server.service
+exportfs -arvf
 showmount -e
+firewall-cmd add service nfs mountd rpc-bind and ports 111,20048,2049 both tcp&udp
+
 
 CLIENT
 yum install autofs
@@ -128,17 +133,16 @@ mkdir -p /export/home
 for i in manny moe jack marcia jan cindy ; do usermod -d /export/home/$i $i ; done
 systemctl enable --now autofs
 showmount -e 192.168.100.34
+firewall-cmd add service nfs mountd rpc-bind and ports 111,20048,2049 both tcp&udp
+# Another method
+vim /etc/auto.master.d/home.autofs
+#       /export/home    /etc/auto.home
+vim /etc/auto.home
+# *     192.168.100.34:/home/&
+or 
+# *       -rw,sync,no_root_squash 192.168.171.128:/home/&
 
 
-SET UID - allows a file being executed to run with previleges of owner
-SET GID - allows a file to be executed with the authority of file's group
-STICKY BIT - only root, dir owner & owner of file can remove files in that dir
-
-for i in azam hassan faizi ; do useradd -m -G marketing $i ; done
-mmkdir /home/marketing
-chown -R :marketing /home/marketing
-chmod -R 770 /home/marketing
-stat /home/marketing
 
 STRATIS
 consists of:
@@ -263,8 +267,7 @@ vim /etc/fstab
 UUID /mnt/data xfs defaults 0 0
 mount -a
 df -hT /mnt/data
-make a copy script
-for i in `
+
 
 Some practical examples on dd command :
 

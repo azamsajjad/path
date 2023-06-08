@@ -114,3 +114,42 @@ HOSTNAME RESOLUTION
    con-name | type | ifname | autoconnect | ap4 | gw4
    if it asks to add another address
    nmcli con mod Net +ipv4.addresses 200.0.0.13/16
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MANGER ASK TO CREATE 3 SUBNETS FOR A COFFEE SHOP. 1 FOR OFFICE, 1 FOR FRONT DESk, 1 FOR CUSTOMERS. 
+
+SO WE WILL SELECT 4TH COLUMS AND CREATE 4 SUBNETS, 1 WILL BE WASTED
+original subnet was /24, means subnet 1
+to get 3or4 subnet we multiple 1 with 4 so we select 3rd column 
+
+ORIGINAL NETWORK ID = 192.168.4.0/24
+                           |-----|
+SUBNET           1     2   | 4   |  8     16     32   64    128    256
+HOST            256   128  | 64  |   32    16     8     4     2      1
+SUBNET MASK     /24   /25  | /26 |  /27   /28   /29   /30   /31    /32
+                           |_____|
+---------------------------------------------------------------------
+start with default Net id                           64-2=62 from table
+NETWORK ID      SUBNET      USABLE IPs RANGE        No.OF_IPs   BROADCAST IP    
+192.168.4.0     /26     192.168.4.1---192.168.4.62     62   192.168.4.63
+192.168.4.64    /26    192.168.4.65---192.168.4.127    62   192.168.4.127
+192.168.4.128   /26   192.168.4.129---192.168.4.192    62   192.168.4.191
+192.168.4.192   /26   192.168.4.193---192.168.4.254    62   192.168.4.255
