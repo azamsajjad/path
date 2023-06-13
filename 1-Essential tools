@@ -127,6 +127,25 @@ total 0
  67112287 lrwxrwxrwx. 1 root root 12 May 29 02:30 softlink_dir -> original_dir
 
 
+UMASK
+permanently change permissions for user azam
+owner should have read permissions on new files 
+others have no permissions. same for directories
+vim /etc/.bash_profile
+umask 277
+(total permission value - desired permission = umask value)
+         6 ---- 4 owner should have read permission = 2
+         7 ---- 0 group has NO permission = 7
+         7 ---- 0 others have no permission = 7
+for old files run === chmod -R 0-rwx ~
+as ROOT, change umask for all users at once === /etc/profile
+
+
+# Configure Umask to Ensure All Files Created by Any User Cannot Be Accessed by "other" Users
+The default umask for all users is set in the /etc/profile and /etc/bashrc files.
+change 002 to 026
+change 022 to 026 
+on both files
 
 
 UMASK
@@ -135,6 +154,10 @@ echo 'umask 0027' >> ~/.bashrc
 logout and login
 umask = 0027
 
+NEW USERS  created should have password expiry of 20 days 
+/etc/login.defs
+PASS_MAX_DAYS 99999 -> 20
+chage -l new
 
 [root@x230 ~]# cat > useradd.txt
 azam

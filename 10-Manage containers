@@ -135,6 +135,8 @@ podman run -dit --hostname localhost --name webit4 -p 8088:80 -v ~/web:/var/www/
   add to last line default.service
   397  systemctl --user enable --now webit4-container.service
   398  systemctl --user daemon-reload
+  (if error, it means you didnt login withh sshh into user, you just switched user)
+  solution --> export XDG_RUNTIME_DIR=run/user/$( id -u)
   399  systemctl --user enable --now webit4-container.service
   400  systemctl --user status webit4-container.service
   # delete podman container before starting systemd container 
@@ -153,3 +155,18 @@ podman run -d --name webit -p 8082:80 -v ~/web:/usr/local/apache2/htdocs:Z docke
   copy # docker.io/library/httpd
   from podman images
   skopeo inspect docker://docker.io/library/httpd
+
+
+  LAB 
+  Q1) create a container as a system startup service
+  a) container name = logserver with the images rsyslog stored in docker on paradise user
+  b) container should be configured as system startup service
+  c) container directory is container_journal should be created on paradise user
+
+  Q2) Configure the container as persistant storage and create logs for container
+  a) configure the container with persistent storage mounted on /var/log/journal to /home/paradise/container
+  b) the container directory contains all journal files
+
+
+skopeo inspect docker.io/httpd
+TELLS which port to use on a container

@@ -9,6 +9,13 @@ Manage SELinux port labels
 Use boolean settings to modify system SELinux settings
 Diagnose and address routine SELinux policy violations
 
+
+semanage port -l ----> command not found
+yum install policycoreutils*
+
+
+
+
 firewall-cmd --help --reload --permanent --add-port 82/tcp --add-service mysql
 nmap -A 192.168.100.193
 nmap -sn 192.168.100.0/24
@@ -126,6 +133,7 @@ system is not able to connect to httpd at port 82
 semanage port -l --> list all ports
 semanage port -a -t http_port_t -p tcp 82
 SELinux CONTEXT
+semanage fcontext -l
 httpd service is able to access & host files from /test directory
 ls -lZ /test
 semanage fcontext -a -t httpd_sys_content_t "/test(/.*)?"

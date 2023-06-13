@@ -15,6 +15,10 @@ cron file locations:
 /var/spool/cron - crontabs created via crontab -e - ONE FILE PER USER
 ......
 .....
+QUESTION deny creating cronjob for rupert
+vim /etc/cron.deny
+#rupert
+
 EXERCISE
 root - vi /etc/crontab
 * * * * * root tar cvfz /root/var-www-backup.tar.gz /var/www >> /root/
@@ -53,6 +57,10 @@ systemctl set-default multi-user -> boot without gui
 systemctl isolate multi-user
 systemctl list-units --type target --state inactive
 systemctl list-units
+
+QUESTION - configure your system so that it is NTP Client of system2.eight.example.com (192.168.55.151)
+vim /etc/chrony.conf
+server 192.168.55.151 iburst
 
 
 rhel8 - chronyd replaced ntp
@@ -287,3 +295,7 @@ name=EPEL
 baseurl=https://download.fedoraproject.org/pub/epel/$releasever/Everything/$basearch
 enabled=1
 gpgcheck=0
+
+
+add a repo by url
+yum-config-manager --add-repo=http.....

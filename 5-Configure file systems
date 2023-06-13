@@ -33,7 +33,8 @@ vfat is excellent for a usb
  fsck.vfat /dev/sda7
  xfs_repair /dev/sda7
 
-
+tune2fs ----> manipulate ext4 filesystem
+xfs_admin ---> manipulate xfs filesystem
 
 # AUTOFS SERVER
 yum install -y nfs*
@@ -85,10 +86,6 @@ SERVER
 /etc/exports
 /export/web_data1       192.168.100.34/24(rw,sync,no_root_squash,insecure)
 /export/web_data2       192.168.100.34/24(rw,sync,no_root_squash,insecure)
-/etc/fstab
-192.168.100.34/24:/export/web_data1 /mnt/nfs_web_data1  nfs defaults,_netdev 0 0
-192.168.100.34/24:/export/web_data2  /mnt/nfs_web_data2 nfs defaults,_netdev 0 0
-mount -a
 systemctl daemon-reload
 exportfs -a / -rv
 
@@ -98,7 +95,11 @@ rpcinfo -p 192.168.100.34
 showmount -e 192.168.100.34
 mount -t nfs 192.168.100.34:/export/web_data1 /nfs
  mount -t nfs 192.168.100.34:/export/web_data2 /nfs2
- FSTAB ??????
+ or
+ vim /etc/fstab
+192.168.100.34/24:/export/web_data1 /mnt/nfs_web_data1  nfs defaults,_netdev 0 0
+192.168.100.34/24:/export/web_data2  /mnt/nfs_web_data2 nfs defaults,_netdev 0 0
+mount -a
 
 
 # AUTOFS export home directories
