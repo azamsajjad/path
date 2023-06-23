@@ -1,0 +1,159 @@
+we have 2 tasks
+Change in Config file
+Restart the service
+
+The second task executes only when there is a change in config file i.e. first task.
+second task is dependent on the first task
+
+"HANDLERS ARE TASKS THAT RUN ONLY WHEN NOTIFIED"
+using [notify] keyword
+
+handler should have a globally unique name within the playbook
+handlers run in sequence written in handler section
+
+{Ansible_handlers.yml}
+---
+- name: install apache - add index.html - firewalld - enabled
+  hosts: web
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+    - name: create index.html
+      copy:
+        content: "Azam Classes are awesome."
+        dest: /var/www/html/index.html
+        owner: apache
+        group: apache
+        mode: 0644
+      notify:
+        - Add firewalld rule
+        - Start httpd
+  handlers:
+    - name: Start httpd
+      service:
+        name: httpd
+        state: started
+        enabled: true
+    - name: Add firewalld rule
+      firewalld:
+        permanent: true
+        immediate: true
+        service: http
+        state: enabled
+...
+
+# You can group HANDLERS by using 'LISTEN' keyword.
+
+---
+- name: Restart Services if a line echos
+  hosts: web
+  tasks:
+    - name: Print this line
+      command: echo "If this prints, then restart services"
+      notify: "restart services"
+  handlers:
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
+      listen: "restart services"
+    - name: Restart Rsyslog
+      service:
+        name: rsyslog
+        state: restarted
+      listen: "restart services"
+
+# if it was done the previous way
+notify:
+  - Restart Apache
+  - Restart Rsyslog
+
+
+# Handlers usually Run at the end, if you want to make handler run at a certain point. insert META module
+- name: Flush handlers
+  meta: flush_handlers
+
+---
+- name: Control when handlers run using meta directive
+  hosts: web
+  tasks:
+    - name: enable epel repo
+      command: sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+    - name: installing nginx web server
+      dnf:
+        name: nginx
+        state: latest
+      notify:
+        - start nginx
+    - name: install neofetch
+      dnf:
+        name: neofetch
+        state: latest
+  handlers:
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+...
+[ansible@x230 automation]$ ansible web -m command -a 'neofetch'
+node2 | CHANGED | rc=0 >>
+           .MMM..:MMMMMMM                  root@server2
+          MMMMMMMMMMMMMMMMMM               ------------
+          MMMMMMMMMMMMMMMMMMMM.            OS: Red Hat Enterprise Linux 9.1 (Plow) x86_6
+         MMMMMMMMMMMMMMMMMMMMMM            Host: VMware Virtual Platform None
+        ,MMMMMMMMMMMMMMMMMMMMMM:           Kernel: 5.14.0-162.23.1.el9_1.x86_64
+        MMMMMMMMMMMMMMMMMMMMMMMM           Uptime: 2 days, 16 hours, 14 mins
+  .MMMM'  MMMMMMMMMMMMMMMMMMMMMM           Packages: 819 (rpm)
+ MMMMMM    `MMMMMMMMMMMMMMMMMMMM.          Shell: bash 5.1.8
+MMMMMMMM      MMMMMMMMMMMMMMMMMM .         Resolution: 1280x768
+MMMMMMMMM.       `MMMMMMMMMMMMM' MM.       CPU: Intel i7-8650U (2) @ 2.111GHz
+MMMMMMMMMMM.                     MMMM      GPU: 00:0f.0 VMware SVGA II Adapter
+`MMMMMMMMMMMMM.                 ,MMMMM.    Memory: 523MiB / 1743MiB
+ `MMMMMMMMMMMMMMMMM.          ,MMMMMMMM.
+    MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+      MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM:
+         MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+            `MMMMMMMMMMMMMMMMMMMMMMMM:
+                ``MMMMMMMMMMMMMMMMM'
+
+
+# keep running playbook even if a task fails
+
+"ERROR HANDLING"
+---
+- name: Simulate a task to fail on a host
+  hosts: web
+  ignore_errors: yes
+  tasks:
+    - name: set a task to fail
+      shell: /bin/false
+    - name: set a task to run successfully
+      shell: /bin/true
+      notify: success
+  handlers:
+    - name: success
+      debug:
+        msg: "This task has been completed succesfully"
+
+
+PLAY [Simulate a task to fail on a host] ************************************************
+TASK [Gathering Facts] ******************************************************************
+ok: [node2]
+ok: [node1]
+TASK [set a task to fail] ***************************************************************
+fatal: [node2]: FAILED! => {"changed": true, "cmd": "/bin/false", "delta": "0:00:00.033353", "end": "2023-06-22 19:45:37.474882", "msg": "non-zero return code", "rc": 1, "start": "2023-06-22 19:45:37.441529", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+...ignoring
+fatal: [node1]: FAILED! => {"changed": true, "cmd": "/bin/false", "delta": "0:00:00.036524", "end": "2023-06-22 19:45:37.516684", "msg": "non-zero return code", "rc": 1, "start": "2023-06-22 19:45:37.480160", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [set a task to run successfully] ***************************************************
+changed: [node2]
+changed: [node1]
+
+RUNNING HANDLER [success] ***************************************************************
+ok: [node1] => {
+    "msg": "This task has been completed succesfully"
+ok: [node2] => {
+    "msg": "This task has been completed succesfully"

@@ -1,0 +1,185 @@
+ansible_conditionals.yml
+---
+- name: Ansible Conditionals using Ansible facts
+  hosts: web
+  tasks:
+    - name: print information depending on OS type
+      shell: echo "This is Redhat Machine"
+      when: ansible_distribution == "RedHat"
+
+
+#{Types of Conditionals}
+"  ==   =>   =<   >   < 
+AND - if booth conditions are met
+OR - if either 1 condition is met"
+---
+- name: Example of Conditional - installing httpd
+  hosts: web
+  tasks:
+    - name: Install apache web server in RHEL based machine
+      yum:
+        name: httpd
+        state: installed
+      when: ansible_distribution == "RedHat"
+
+    - name: Install apache web server in Ubuntu Based Machine
+      apt:
+        name: apache
+        state: present
+      when: ansible_distribution == "Ubuntu"
+
+
+[ansible@x230 automation]$ ansible web -m setup -a 'filter=*version*'    
+---
+- name: install ftp on machines running redhat AND version 7
+  hosts: web
+  tasks:
+    - name: install ftp
+      yum:
+        name: ftp
+        state: installed
+      when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7'
+      when: 
+        - ansible_distribution == 'RedHat'
+        - ansible_distribution_major_version == '7'
+
+no need to write 'and' in the above method another way to write
+      yum:
+        name: ftp
+        state: installed
+      when: ansible_distribution == 'RedHat' or ansible_distribution_major_version == '7'
+      
+
+      [yum:
+        name: ftp
+        state: installed
+      when: ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS'
+
+      yum:
+        name: ftp
+        state: installed
+      when: ansible_distribution == 'RedHat' or 'CentOS']
+
+
+"MERGING_CONDITIONS"
+---
+- name: install apache on rhel and having version 9 or centos having version 8
+  host: web
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: installed
+      when: (ansible_distribution == 'RedHat' and ansible_distribution_major_version == '9') or (ansible_distribution == 'CentOS' and ansible_distribution_majore_version == '8')
+~
+
+
+"Using Registered Variables to Establish Conditions"
+---
+- name: Ansible playbook to install vsftpd package through registered variable, not fact
+  hosts: web
+  tasks:
+    - name: print OS version from Node and store it in a variable
+      command: cat /etc/redhat-release
+      register: vers
+    - debug:
+        var: vers
+    - name:
+      yum:
+        name: vsftpd
+        state: installed
+      when: vers.stdout == 'Red Hat Enterprise Linux release 9.1 (Plow)'
+
+~
+[ansible_conditionals6.yml]
+---
+- name:
+  hosts: web
+  tasks:
+    - name: install vsftpd if memory is greater than 2Gb
+      yum:
+        name: vsftpd
+        state: installed
+      when: ansible_memtotal_mb > 2048
+...
+
+[ansible_conditionals7.yml]
+---
+- name: Check file existence, if file is not present, then create it
+  hosts: web
+  tasks:
+    - name: Check file existance
+      stat:
+        path: /tmp/Nehraclasses.txt
+      register: NC
+    - debug:
+        var: NC.stat.exists
+    - name: Create a file
+      copy:
+        content: "Nehra Classes are apt."
+        dest: /tmp/Nehraclasses.txt
+      when: NC.stat.exists == false
+...
+[HOW to know what to write in the conditionals]
+[ansible@x230 automation]$ ansible web -m stat -a 'path=/etc/passwd'
+node2 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "stat": {
+        "atime": 1687410764.7551117,
+        "attr_flags": "",
+        "attributes": [],
+        "block_size": 4096,
+        "blocks": 8,
+        "charset": "us-ascii",
+        "checksum": "d212d24edb4a285d6a26c388b1744e5e68bd566b",
+        "ctime": 1687410764.6481106,
+        "dev": 64768,
+        "device_type": 0,
+        "executable": false,
+        "exists": true,
+        "gid": 0,
+        "gr_name": "root",
+        "inode": 9281076,
+        "isblk": false,
+        "ischr": false,
+        "isdir": false,
+        "isfifo": false,
+        "isgid": false,
+        "islnk": false,
+        "isreg": true,
+        "issock": false,
+        "isuid": false,
+        "mimetype": "text/plain",
+        "mode": "0644",
+        "mtime": 1687410764.6461108,
+        "nlink": 1,
+        "path": "/etc/passwd",
+        "pw_name": "root",
+        "readable": true,
+        "rgrp": true,
+        "roth": true,
+        "rusr": true,
+        "size": 1744,
+        "uid": 0,
+        "version": "318798018",
+        "wgrp": false,
+        "woth": false,
+        "writeable": true,
+        "wusr": true,
+        "xgrp": false,
+        "xoth": false,
+        "xusr": false
+
+[ansible_conditionals8.yml]
+---
+- name: Ansible tasks to work on Ansible when value is greater than 5
+  hosts: node1
+  tasks:
+    - name: Run with items greater than 5
+      ansible.builtin.command: echo {{ item }}
+      loop: [ 0, 2, 4, 6, 8, 10 ]
+      when: item > 5
+...

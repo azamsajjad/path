@@ -1,0 +1,136 @@
+#task failure= when ansible receives a non-zero return code from a command or failure from a module,
+#it stops executing on that host and continues on other hosts.
+#But sometimes you may want different behavior. Sometimes a non-zero return code indicates success.
+#sometimes you may want a failure on one host to stop execution on all hosts.
+
+#Three Options:
+#1- Block & Rescue
+#2- Ignore Errors
+#3- Failed when
+
+#1-Block & Rescue
+# Blocks create logical group of tasks
+fail_blocks.yml
+---
+- name: Ansible Block & Rescue Example
+  hosts: web
+  tasks:
+    - block:
+        - name: Install httpd
+          yum:
+            name: httpd
+            state: latest
+        - name: start httpd
+          service:
+            name: httpd
+            enabled: true
+            state: started
+      become: yes
+      when: ansible_facts['distribution'] == "RedHat"
+...
+
+# if some thing is not happening and leading to error, then rescue will redirect it to something else
+fail_rescue.yml
+---
+- name: install epel repo on nodes, if couldnt, then copy from src to nodes
+  hosts: web
+  tasks:
+    - block:
+        - name: install epel repo
+          command: sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm.fail
+        - name: verify that it is installed
+          shell: ls /etc/yum.repos.d/epel.repo
+      rescue:
+        - name: copy epel repo from source node
+          copy:
+            src: /tmp/epel.repo
+            dest: /etc/yum.repos.d/epel.repo
+...
+
+#2- Ignore_errors
+---
+- name: Simulate a task to fail on a host
+  hosts: web
+  ignore_errors: yes
+  tasks:
+    - name: set a task to fail
+      shell: /bin/false
+    - name: set a task to run successfully
+      shell: /bin/true
+      notify: success
+  handlers:
+    - name: success
+      debug:
+        msg: "This task has been completed succesfully"
+
+---
+- name: ignore errors example
+  hosts: web
+  tasks:
+    - name: checking cockpit service status
+      command: systemctl is-active cockpit.socket
+      register: abc
+    - debug:
+        msg: "{{ abc }}"
+~
+# TASK [checking cockpit service status] **************************************************
+fatal: [node2]: FAILED! => {"changed": true, "cmd": ["systemctl", "is-active", "cockpit.socket"], "delta": "0:00:00.053760", "end": "2023-06-23 06:49:46.750019", "msg": "non-zero return code", "rc": 3, "start": "2023-06-23 06:49:46.696259", "stderr": "", "stderr_lines": [], "stdout": "inactive", "stdout_lines": ["inactive"]}
+fatal: [node1]: FAILED! => {"changed": true, "cmd": ["systemctl", "is-active", "cockpit.socket"], "delta": "0:00:00.065309", "end": "2023-06-23 06:49:46.783880", "msg": "non-zero return code", "rc": 3, "start": "2023-06-23 06:49:46.718571", "stderr": "", "stderr_lines": [], "stdout": "inactive", "stdout_lines": ["inactive"]}
+
+---
+- name: ignore errors example
+  hosts: web
+  tasks:
+    - name: checking cockpit service status
+      command: systemctl is-active cockpit.socket
+      register: abc
+      ignore_errors: yes
+    - debug:
+        msg: "{{ abc }}"
+
+USE THIS OPTION ONLY WHEN YOUARE CERTAIN THAT ANSIBLE IS TAKING IT AS AN ERROR BECAUSE OF TASK's result is a failed status or inactive or dead 
+donot use this option if otherwise
+PLAY RECAP ******************************************************************************
+node1                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1
+node2                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1
+
+
+
+
+fail_ignore_when.yml: 
+---
+- name: check status of cockpit service and start it if it is inactive
+  hosts: web
+  tasks:
+    - name: check status of cockpit service
+      command: systemctl is-active cockpit.socket
+      register: abc
+      ignore_errors: yes
+    - debug:
+        msg: "{{ abc }}"
+    - name: start the cockpit socket if it is inactive
+      service:
+        name: cockpit.socket
+        state: started
+      when: abc.rc != 0
+    - name: restarting cockpit socket if it is already running
+      service:
+        name: cockpit.socket
+        state: restarted
+      when: abc.rc == 0
+...
+~
+
+fail_when.yml: 
+---
+- name: fail when example
+  hosts: web
+  tasks:
+    - name: installs apache only on servers running centos
+      debug:
+        msg: "Incompatible Operating System"
+      failed_when: ansible_distribution == "RedHat"
+    - name: Install apache
+      yum:
+        name: httpd
+        state: installed

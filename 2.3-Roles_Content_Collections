@@ -1,0 +1,5 @@
+3- Use roles and Ansible Content Collections
+Create and work with roles
+Install roles and use them in playbooks
+Install Content Collections and use them in playbooks
+Obtain a set of related roles, supplementary modules, and other content from content collections, and use them in a playbook.

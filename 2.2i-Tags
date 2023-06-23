@@ -1,0 +1,47 @@
+apache_tags.yml
+---
+- name: install and configure apache
+  hosts: web
+  tasks:
+    - name: install Apache
+      yum:
+        name: httpd
+        state: latest
+      tags: pack_tag
+    - name: start Apache
+      service:
+        name: httpd
+        state: started
+        enabled: true
+      tags: serv_tag
+    - name: Configure index.html
+      copy:
+        content: "Hassan Classes are awesome"
+        dest: /var/www/html/index.html
+    - name: restart Apache
+      service:
+        name: httpd
+        state: restarted
+    - name: configure firewall setting for Apache
+      firewalld:
+        service: http
+        permanent: true
+        immediate: true
+        state: enabled
+      tags: fire_tag
+    - name: Reload firewall
+      service:
+        name: firewalld
+        state: restarted
+      tags: fire_tag
+
+
+[ansible@x230 automation]$ ansible-playbook playbooks/apache.yml --tags='fire_tag'
+run only tasks with [fire_tag]
+
+[ansible@x230 automation]$ ansible-playbook playbooks/apache.yml --skips-tags='fire_tag'
+run all tasks except [fire_tag]
+
+
+[ansible@x230 automation]$ ansible-playbook playbooks/apache.yml --tags='pack_tag,serv_tag'
+run only these 2 tags

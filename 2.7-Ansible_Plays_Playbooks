@@ -1,0 +1,6 @@
+7- Create Ansible plays and playbooks:
+Know how to work with commonly used Ansible modules
+Use variables to retrieve the results of running a command
+Use conditionals to control play execution
+Configure error handling
+Create playbooks to configure systems to a specified state

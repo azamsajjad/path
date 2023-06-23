@@ -1,0 +1,165 @@
+3 Types of loops
+[simple loops]
+1 key have multiple values
+vim playbooks/simple_loops.yml
+---
+- name: Simple user addition loop
+  hosts: web
+  tasks:
+    - name: Create 5 users
+      user:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - azam1
+        - hassan1
+        - faizi1
+        - shahrukh1
+
+---
+- name: Simple loops with yum command
+  hosts: web
+  tasks:
+    - name: Install 5 packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - httpd
+        - vsftpd
+        - wget
+        - stress
+
+This can also be done through making simple list with yum command. But it can be done through simple loops too.
+because yum module supports lists at kernel/OS level. yum install httpd nfs, but useradd doesnot support adding multiple users in a single command, so we use loop for that.
+
+                                2 or more keys have multiple values
+                                simple_loops3.yml
+                                ---
+                                - name: Creating users with simple loops with Admin Access
+                                hosts: web
+                                tasks:
+                                    - name: Create 5 users
+                                    user:
+                                        name: "{{ item }}"
+                                        state: present
+                                        groups: wheel
+                                    loop:
+                                        - azam1
+                                        - hassan1
+                                        - faizi1
+                                        - shahrukh1
+                                        - hussain1
+                                        - azaan1
+                                        - haider1
+
+
+
+users.yml
+users:
+  - azam2
+  - hassan2
+  - faizi2
+  - shahrukh2
+
+simple_loops4.yml
+---
+- name:
+  hosts: web
+  vars_files:
+    - ~/automation/users.yml
+  tasks:
+    - name: creating multiple users
+      user:
+        name: "{{ item }}"
+        state: present
+        groups: wheel
+      with_items:
+        - "{{ users }}"
+
+
+                                        "ansible-doc -t lookup lines"
+                                        easier formatting
+                                        make a file
+                                        admin1
+                                        admin2
+                                        admin3
+                                        admin4
+                                        admin5
+                                        playbooks/simple_loops5_lookup.yml
+                                        ---
+                                        - name: Adding Users with help of Lookup file
+                                        hosts: web
+                                        tasks:
+                                            - name: adding users
+                                            user:
+                                                name: "{{ item }}"
+                                                state: absent
+                                                groups: wheel
+                                            with_lines: cat ~/automation/lookupusers.txt
+
+
+2-"HASH_LOOPS"
+---
+- name: Adding users in bulk but each have different group
+  hosts: web
+  tasks:
+    - name: adding users
+      user:
+        name: "{{ item.name }}"
+        state: present
+        groups: "{{ item.groups }}"
+      loop:
+        - { name: 'azam3' , groups: wheel }
+        - { name: 'hassan3' , groups: root }
+        - { name: 'faizi3' , groups: wheel }
+        - { name: 'shahrukh3' , groups: root }
+
+
+hash_loops2.yml
+---
+- name: Managing Complex Tasks with Nested Loops
+  hosts: web
+  tasks:
+    - name: adding the groups
+      group:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - admin1
+        - admin2
+        - admin3
+    - name: Creating users and adding them to multiple groups
+      user:
+        name: "{{ item.usr }}"
+        groups: "{{ item.grp }}"
+        state: present
+      with_items:
+        - { usr: azam4, grp: admin1 }
+        - { usr: hassan4, grp: admin3 }
+        - { usr: faizi4, grp: admin2 }
+
+
+3-"NESTED LOOPS"
+user must be member of every group / more than 1 group
+---
+- name: Using Nested loops as we wish to add users to more than 1 group
+  hosts: web
+  tasks:
+    - name: adding groups first
+      group:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - datagroup
+        - itgroup
+        - hrgroup
+    - name: Creating users
+      user:
+        name: "{{ item[0] }}"
+        state: present
+        groups: "{{ item[1] }}"
+        append: yes
+      with_nested:
+        - { azam5, hassan5, faizi5, shahrukh5, azaan5, haider5, hussain5 }
+        - { datagroup, itgroup, hrgroup }

@@ -1,0 +1,362 @@
+Ansible built-in variables are also called Magic Variables
+
+[task1]
+create /tmp/testdir, 
+copy /etc/fstab to /tmp/testdir,
+install httpd
+start & enable httpd service
+
+$ ansible-playbook playbooks/task1.yml --check
+$ ansible-playbook playbooks/task1.yml -C 
+[ansible@x230 automation]$ ansible-playbook playbooks/task1.yml --step
+
+PLAY [web] *****************************************************************************************************
+Perform task: TASK: Gathering Facts (N)o/(y)es/(c)ontinue: y
+Perform task: TASK: Gathering Facts (N)o/(y)es/(c)ontinue: *****************************************************
+TASK [Gathering Facts] *****************************************************************************************
+ok: [192.168.100.102]
+ok: [192.168.100.101]
+Perform task: TASK: file (N)o/(y)es/(c)ontinue:
+
+"VARIABLES"
+[TYPES of VARIABLES]
+System-Defined VARIABLES
+playbook var
+- string
+- listing
+- mapping
+cli var 
+inventory type var 
+
+Data rules for creating YAML files:
+[string format]
+pair of single key and its single value
+hosts: webservers
+user: root
+package: httpd
+[array/listing format]
+one key has more than 1 values
+space before - is not mendatory
+[mapping format]
+key having multiple sub-keys in it as value-pairs which further have different values
+space before - is mendatory
+items cannot start from same indentation
+
+
+"STRING_VARIABLES"
+---
+- name: Example of String Type playbook variables
+  hosts: web
+  vars:
+    apache: httpd
+    apache_root: /var/www/html
+  tasks:
+    - name: Installing Apache Httpd Server
+      yum:
+        name: "{{ apache }}"
+        state: installed
+    - name: Starting & enabling httpd service.
+      service:
+        name: "{{ apache }}"
+        state: started
+        enabled: true
+    - name: Creating "{{ apache_root }}" directory
+      file:
+        path: "{{ apache_root }}"
+        state: directory
+    - name: Creating index.html page inside "{{ apache_root }}"
+      copy:
+        content: "Welcome to Nehra Classes"
+        dest: "{{ apache_root }}/index.html"
+...
+
+
+[import VARIABLES from one playbook to another]
+see playbooks/my_vars.yml
+apache: httpd
+apache_root: /var/www/html
+string_variable2.yml
+[ansible@x230 automation]$ cat playbooks/string_variables2.yml
+---
+- name: Example of String Type playbook variables
+  hosts: web
+  vars_files:
+    - ~/automation/playbooks/my_vars.yml
+  tasks:
+   - same as above
+
+
+[list_variables.yml]
+list_variables.yml
+ansible web -m command -a 'rpm -qa telnet'
+[ansible@x230 automation]$ cat playbooks/list_variables.yml
+---
+- name: Example of listing type playbook variables
+  hosts: web
+  vars:
+    mypkgs:
+      - ftp
+      - vsftpd
+      - zsh
+  tasks:
+    - name: installing the packages
+      yum:
+        name: "{{ mypkgs }}"
+        state: installed
+...
+[array_variables]
+---
+- name: Example of listing type playbook variables
+  hosts: web
+  vars:
+    mypkgs:
+      - ftp
+      - vsftp
+      - zsh
+      - telnet
+      - httpd
+  tasks:
+    - name: Installing packages
+      yum:
+        name: "{{ mypkgs [3] }}"
+        state: installed
+...
+[mapping_variables]
+[ansible@x230 automation]$ cat playbooks/mapping_variables.yml
+---
+- name: Example of Mapping Variable
+  hosts: web
+  tasks:
+    - name: Create new users
+      user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+        state: present
+      loop:
+        - name: vikas
+          uid: 1020
+        - name: amit
+          uid: 1021
+        - name: greta
+          uid: 1022
+
+
+[PROMPT_VARIABLES]
+manually input fields while running playbook
+used for sensitive INFORMATION
+[ansible@x230 automation]$ cat playbooks/prompt_variables.yml
+---
+- name: Example of prompt variables
+  hosts: web
+  vars_prompt:
+    - name: user_name
+      prompt: Please enter your username.
+      private: no
+    - name: password
+      prompt: Please enter your password.
+      private: yes
+  tasks:
+    - debug:
+        msg: "The Username is {{ user_name }} and password is {{ password }}"
+...
+
+
+"COMMAND_LINE_VARIABLES"
+--extra-vars or -e 
+---
+- name: Command line Variables
+  hosts: web
+  tasks:
+    - name: Creating user accounts
+      user:
+        name: "{{ user_name }}"
+        state: present
+        password: "{{ password }}"
+...
+
+ansible-playbook playbooks/command_variables.yml -e user_name=trump -e password=redhat
+WARNING: use encrypted password
+if playbook has variable values and we still provide -e cli values
+cli values takes precedent and executes 
+PLAYBOOK VARIABLE HAS LOW PRIORITY THAN CLI VARIABLE
+---
+- name: Command line Variables
+  hosts: web
+  tasks:
+    - name: Creating user accounts
+      user:
+        name: "{{ user_name }}"
+        state: present
+        password: "{{ password | password_hash ('sha512') }}"
+
+[COMMAND_PROMPT_VARIABLE]
+---
+- name: Example of Command line Variables with Prompt
+  hosts: web
+  vars_prompt:
+      - name: user_name
+        prompt: please mention the username
+        private: no
+      - name: password
+        prompt: please mention the password
+        private: yes
+  tasks:
+    - name: to create user accounts
+      user:
+        name: "{{ user_name }}"
+        state: present
+        password: "{{ password | password_hash ('sha512') }}"
+...
+
+
+"INVENTORY_VARIABLES"
+[HOST SCOPE VARIABLES]
+whenever you define variable infront of host in inventory file 
+Task - create playbook to create directories
+
+vim inventory.yml file
+[web]
+node1 dir=/tmp/newwdir
+node2 
+edit inventory file for the sake running playbook, then revert changes
+
+
+---
+- name: Example of variables defined in inventory file
+  hosts: web
+  tasks:
+    - name: Create new Directory
+      file:
+        path: "{{ dir }}"
+        state: directory
+    - debug:
+        msg: "{{ dir }}"
+
+PLAY RECAP *****************************************************************************************************
+node1                      : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+node2                      : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+
+[Better Practice
+create two directories for host specific and group specific variables in the same directory where inventory file is located
+mkdir /home/ansible/automation/host_vars
+mkdir /home/ansible/automation/group_vars
+to define a varible for a specific host
+vim /home/ansible/automation/host_vars/node1
+# dir: /tmp/testdir
+vim /home/ansible/automation/host_vars/web
+# dir: /tmp/testdir
+now, when you run playbook, ansible will up variable from these files
+ADVANTAGE: original inventory file remains intact]
+
+
+
+
+
+"CUSTOM_VARIABLE = ANSIBLE_FACTS"
+"REGISTERED_VARIABLES"
+You can create variables from output of Ansible_tasks with the task keyword Register.
+REGISTERED_VARIABLES are only stored in memory. only usable in current playbook
+generally, REGISTERED_VARIABLES are used with Loops
+Ansible, by default, does not carry/keep output of any task
+
+{TASK1}
+
+[ansible@x230 automation]$ vim playbooks/registered_variables.yml
+---
+- name: Example of Registered Variables
+  hosts: web
+  tasks:
+    - name: check the machine hostname
+      command: hostname
+      register: abc
+
+    - debug:
+        var: abc
+[ansible@x230 automation]$ ansible-playbook playbooks/registered_variables.yml
+                            TASK [debug] ***************************************************************************************************
+                            ok: [node1] => {
+                                "abc": {
+                                    "changed": true,
+                                    "cmd": [
+                                        "hostname"
+                                    ],
+                                    "delta": "0:00:00.021243",
+                                    "end": "2023-06-21 09:49:52.993805",
+                                    "failed": false,
+                                    "msg": "",
+                                    "rc": 0,
+                                    "start": "2023-06-21 09:49:52.972562",
+                                    "stderr": "",
+                                    "stderr_lines": [],
+                                    "stdout": "server1",
+                                    "stdout_lines": [
+                                        "server1"
+                                    ]
+                                }
+                            }
+------------------------------------------------------------------------------------
+---
+- name: Example of Registered Variables
+  hosts: web
+  tasks:
+    - name: check the machine hostname
+      command: hostname
+      register: abc
+
+    - debug:
+        var: abc.stdout
+[ansible@x230 automation]$ ansible-playbook playbooks/registered_variables.yml
+
+                            PLAY [Example of Registered Variables] *************************************************************************
+
+                            TASK [debug] ***************************************************************************************************
+                            ok: [node1] => {
+                                "abc.stdout": "server1"
+                            }
+                            ok: [node2] => {
+                                "abc.stdout": "server2"
+                            }
+
+
+
+{TASK2}
+
+[ansible@x230 automation]$ vim playbooks/registered_variables2.yml
+---
+- name: Registering Variables
+  hosts: web
+  tasks:
+    - name: check hardware
+      command: uname -m
+      register: abc
+
+    - debug:
+        var: abc.stdout
+
+    - name: copy information over all the nodes
+      copy:
+        content: This is the hardware mode "{{ abc.stdout }}"
+        dest: /tmp/hwmode.txt
+[ansible@x230 automation]$ ansible web -m command -a 'cat /tmp/hwmode.txt'
+node2 | CHANGED | rc=0 >>
+This is the hardware mode "x86_64"
+node1 | CHANGED | rc=0 >>
+This is the hardware mode "x86_64"
+
+{TASK3}
+
+---
+- name: Registering the variable in Ansible
+  hosts: web
+  tasks:
+    - name: installing httpd package
+      yum:
+        name: httpd
+        state: installed
+
+    - name: checking apache version and storing it in ver variable
+      command: httpd -v
+      register: ver
+
+    - debug:
+        var: ver.stdout

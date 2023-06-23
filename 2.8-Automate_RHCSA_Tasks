@@ -1,0 +1,11 @@
+8- Automate standard RHCSA tasks using Ansible modules that work with:
+Software packages and repositories
+Services
+Firewall rules
+File systems
+Storage devices
+File content
+Archiving
+Task scheduling
+Security
+Users and groups

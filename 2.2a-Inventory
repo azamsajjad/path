@@ -1,0 +1,106 @@
+$ ansible --version
+# shows current facts about ansible
+[INVENTORY]
+
+# DEFAULT INVENTORY FILE IS LOCATED AT /etc/ansible/hosts⁡
+[web]
+192.168.10
+0.101
+192.168.100.102
+
+# you can make multiple inventory files
+# $ ansible web --list-hosts -i ~/ansible
+# $ ansible all --list-hosts -i ~/ansible
+# $ ansible vmservers --list-hosts
+# (servers added in default /etc/ansible/hosts file)
+
+# you can mention hostnames as well
+# app1.nehraclasses.local
+# app2.nehraclasses.local
+
+# if we have large no. of hosts
+# 192.168.100.[1:20]
+
+# if we have large no. of hosts in sequesnce
+# server[1:9].nehraclasses.local
+
+# we can also create groups using groups as well.
+# [test:children]
+# web
+# dev
+
+Change default path of ansible config file
+vim /root/ansible/ansible.cfg
+-> [defaults]
+inventory = /root/ansible/inventory/nodes
+ansible --version -> switches to new location
+
+if you create it elsewhere and not in your home directory
+export ANSIBLE_CONFIG=/tmp/new_ansible.cfg
+echo $ANSIBLE_CONFIG
+ansible --version
+to make it persistent
+add the export variable to .bashrc file
+EVERYTIME YOU LOG IN , BASHRC GETS EXECUTED
+
+by default , ansible looks for default config files in 4 locations 
+1- exported value (priority)
+2- present working directory
+3- user home directory
+4- /etc/ansible/hosts
+
+
+[ANSIBLE SETUP]
+1053  useradd ansible
+ 1054  echo "Altreason1" | passwd --stdin ansible
+ 1055  echo "ansible ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ansible
+ 1056  su - ansible
+  5  ssh-keygen
+    6  ssh-copy-id rupert@192.168.100.101
+    7  ssh rupert@192.168.100.101
+    8  ssh-copy-id rupert@192.168.100.102
+    9  ssh rupert@192.168.100.102
+echo "rupert ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/rupert
+echo "rupert ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/rupert
+
+vim ~/automation/ansible.cfg (check configuration)
+    [defaults]
+    inventory = ./inventory
+    host_key_checking = false
+    remote_user = rupert
+    ask_pass = false
+
+    [privilege_escalation]
+    become=true
+    become_method=sudo
+    become_user=root
+    become_ask_pass=False
+vim ~/automation/inventory
+    [web]
+    192.168.100.101
+    192.168.100.102
+or without ssh setup
+vim ~/automation/inventory
+    [web]
+    192.168.100.101 ansible_ssh_user=rupert ansible_ssh_pass=Altreason1
+    192.168.100.102 ansible_ssh_user=reason ansible_ssh_pass=Altreason1
+    or
+    [web:vars]
+    ansible_ssh_user=rupert 
+    ansible_ssh_pass=Altreason1
+
+
+[SSH Shortcuts]
+[ansible@x230 ~]# cat ~/.ssh/config 
+Host 101
+    HostName 192.168.100.101
+    User rupert
+    IdentityFile ~/.ssh/id_rsa
+
+Host 102
+    HostName 192.168.100.102
+    User rupert
+    IdentityFile ~/.ssh/id_rsa
+
+$ ssh 101
+$ ssh 102

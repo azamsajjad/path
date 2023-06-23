@@ -1,0 +1,49 @@
+9- Manage content
+Create and use templates to create customized configuration files
+Use Ansible Vault in playbooks to protect sensitive data
+
+
+{TASK1}
+[ansible@x230 automation]$ vim playbooks/ansible_vault.yml
+---
+- name: Ansible Vault Playbook
+  hosts: web
+  vars:
+    pw: redhat
+  tasks:
+    - name: Creating user account and password
+      user:
+        name: trump
+        password: "{{ pw }}"
+
+ansible-vault encrypt playbook/ansible_vault.yml
+[ansible@x230 automation]$ ansible-vault encrypt playbooks/ansible_vault.yml
+New Vault password:
+Confirm New Vault password:
+Encryption successful
+[ansible@x230 automation]$ cat playbooks/ansible_vault.yml
+$ANSIBLE_VAULT;1.1;AES256
+#Adv Encryption Standard - 256 bit key used to convert text into cipher
+
+
+encrypt whole file
+[ansible@x230 automation]$ ansible-playbook playbooks/ansible_vault.yml --ask-vault-password
+[ansible@x230 automation]$ ansible-vault edit playbook/ansible_vault.yml
+
+encrypt only a variable and call it from encrypted file
+[ansible@x230 automation]$ ansible-vault view playbook/ansible_vault2.yml
+[ansible@x230 automation]$ ansible-vault create ~/crypt.yml
+[ansible@x230 automation]$ ansible-vault rekey ~/crypt.yml
+
+save password in a file
+[ansible@x230 automation]$ ansible-vault encrypt playbook/ansible_vault3.yml
+passowrd: redhat
+vim pass.txt 
+redhat
+[ansible@x230 automation]$ ansible-playbook playbooks/ansible_vault3.yml --vault-password-file pass.txt
+
+
+encrypt a string
+[ansible@x230 automation]$ ansible-vault encrypt_string 'bar' --name 'foo'
+foo has been encrypted as bar
+[ansible@x230 automation]$ ansible-vault encrypt_string 'bar' --name 'foo' > bar.txt

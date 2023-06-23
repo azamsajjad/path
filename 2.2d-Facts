@@ -1,0 +1,219 @@
+facts are system properties of managed nodes collected by Ansible when executing a task
+[gathering facts]
+ansible web -m setup ---> output is [gathering facts]
+ansible web -m setup -a 'filter=ansible_hostname'
+ ansible web -m setup -a 'filter=ansible_kernel' > kernelreport.txt
+
+[ansible@x230 automation]$ cat playbooks/ansible_facts.yml
+---
+- name: Ansible facts use case
+  hosts: all
+  tasks:
+...
+
+no need to mention tasks, ansible by-default do [gathering facts]
+---
+- name: Ansible facts use case
+  hosts: all
+  tasks:
+    - name: Capture the kernel information
+      copy:
+        content: "The available kernel version is {{ ansible_kernel }}"  <--- this is not a variable, its a fact of nodes
+        dest: /tmp/kernel_version.txt
+...
+
+[ansible@x230 automation]$ ansible web -m command -a 'cat /tmp/kernel_version.txt'
+        node2 | CHANGED | rc=0 >>
+        The available kernel version is 5.14.0-162.23.1.el9_1.x86_64
+        node1 | CHANGED | rc=0 >>
+        The available kernel version is 5.14.0-284.11.1.el9_2.x86_64
+
+
+
+
+"REAL USES of THESE FACTS"
+TASK---> you want to add hostnames of your /etc/hosts file to all your nodes' /etc/hosts files'
+{STEPS}
+find Fully Qualified Domain Names of your NODES
+{1} [ansible@x230 automation]$ ansible web -m setup -a 'filter=*fqdn*'
+        node2 | SUCCESS => {
+            "ansible_facts": {
+                "ansible_fqdn": "server2",
+                "discovered_interpreter_python": "/usr/bin/python3"
+            },
+            "changed": false
+        }
+        node1 | SUCCESS => {
+            "ansible_facts": {
+                "ansible_fqdn": "li929-23.members.linode.com",
+                "discovered_interpreter_python": "/usr/bin/python3"
+            },
+            "changed": false
+        }
+find ipv4 information of nodes
+{2} [ansible@x230 automation]$ ansible web -m setup -a 'filter=*ipv4*'
+        node2 | SUCCESS => {
+            "ansible_facts": {
+                "ansible_all_ipv4_addresses": [
+                    "192.168.100.102"
+                ],
+                "ansible_default_ipv4": {
+                    "address": "192.168.100.102",
+                    "alias": "ens160",
+                    "broadcast": "192.168.100.255",
+                    "gateway": "192.168.100.1",
+                    "interface": "ens160",
+                    "macaddress": "00:0c:29:54:a6:05",
+                    "mtu": 1500,
+                    "netmask": "255.255.255.0",
+                    "network": "192.168.100.0",
+                    "prefix": "24",
+                    "type": "ether"
+                },
+                "discovered_interpreter_python": "/usr/bin/python3"
+            },
+            "changed": false
+        }
+        node1 | SUCCESS => {
+            "ansible_facts": {
+                "ansible_all_ipv4_addresses": [
+                    "192.168.100.101"
+                ],
+                "ansible_default_ipv4": {
+                    "address": "192.168.100.101",
+                    "alias": "ens160",
+                    "broadcast": "192.168.100.255",
+                    "gateway": "192.168.100.1",
+                    "interface": "ens160",
+                    "macaddress": "00:0c:29:5c:09:67",
+                    "mtu": 1500,
+                    "netmask": "255.255.255.0",
+                    "network": "192.168.100.0",
+                    "prefix": "24",
+                    "type": "ether"
+                },
+                "discovered_interpreter_python": "/usr/bin/python3"
+            },
+            "changed": false
+        }
+
+make  playbook 
+{3}- name: Ansible playbook for making an entry in /etc/hosts file
+  hosts: web
+  tasks:
+    - name: Append the IP Address and hostname information
+      lineinfile:
+        line: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }}"
+        dest: /etc/hosts
+...
+
+NOTE: when a variable has subheadings in {},how we use is --> variable.subheading
+
+[ansible@x230 automation]$ ansible web -m command -a 'cat /etc/hosts'
+
+node2 | CHANGED | rc=0 >>
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.100.102 server2
+
+node1 | CHANGED | rc=0 >>
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.100.101 li929-23.members.linode.com
+---------------------------------------------------------------------------------
+Another way of doing things
+[ansible@x230 automation]$ cat playbooks/ansible_facts3.yml
+---
+- name: Ansible playbook for making an entry in /etc/hosts file
+  hosts: web
+  tasks:
+    - name: Append the IP Address and hostname information
+      lineinfile:
+        line: "{{ ansible_default_ipv4['address'] }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+        dest: /etc/hosts
+...
+"TO DISABLE [GATHERING_FACTS]" the default action
+- name: 
+  hosts: all
+  gather_facts: false
+...
+but playbook will fail if task takes action on facts, / is dependent on facts
+
+
+{You can also mention [gather_facts] behavior in ansible.cfg file
+[defaults]
+gathering = explicit
+or 
+gathering = implicit <---now facts will be gathered all the time
+but priority is playbook setting}
+
+
+TASK:
+"CUSTOM_FACTS"
+what is facts: information you are capturing from nodes
+what if you need information that is not readily available
+but it can be fetched by manually creating information by defining it first on a node
+[rupert@server1 ~]$ sudo mkdir -p /etc/ansible/facts.d
+[rupert@server1 ~]$ sudo vim /etc/ansible/facts.d/httpd.fact 
+                        [basic]
+                        package=httpd
+                        service=httpd
+                        state=started
+                        enabled=true
+* no need to install ansible on node, just create directory
+* Ansible stores node specific local fact in variable ansible_local
+
+[ansible@x230 automation]$ ansible node2 -m setup -a 'filter=ansible_local'
+node2 | SUCCESS => {
+    "ansible_facts": {
+        "ansible_local": {},
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false
+}
+[ansible@x230 automation]$ ansible node1 -m setup -a 'filter=ansible_local'
+node1 | SUCCESS => {
+    "ansible_facts": {
+        "ansible_local": {
+            "httpd": {
+                "basic": {
+                    "enabled": "true",
+                    "package": "httpd",
+                    "service": "httpd",
+                    "state": "started"
+                }
+            }
+        },
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false
+}
+
+"PLAYBOOK"
+---
+- name: install httpd
+  hosts: node1
+  tasks:
+    - name: install httpd
+      yum:
+        name: "{{ ansible_facts['ansible_local']['httpd']['basic']['package'] }}"
+        state: latest
+    - name: start and enable httpd
+      service:
+        name: "{{ ansible_facts['ansible_local']['httpd']['basic']['service'] }}"
+        state: "{{ ansible_facts['ansible_local']['httpd']['basic']['state'] }}"
+        enabled: "{{ ansible_facts['ansible_local']['httpd']['basic']['enabled'] }}"
+...
+
+"MAGIC VARIABLEs"
+e.g. hostvrs, groups, group_names, inventory_variables, etc
+
+---
+- name: gather facts
+  hosts: web
+  tasks:
+    - name: gather all facts for {{ inventory_hostname }}
+      debug:
+        var: ansible_facts
+# last line mention that inventory_hostname is part of ansible_facts variable
+LONG ANSWER - COMPLETE INFORMATION OF NODE MACHINESb

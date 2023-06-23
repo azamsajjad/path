@@ -143,3 +143,64 @@ DocumentRoot "/var/ww/httml" ---> "/test"
 <Directory "/var/www/html" ---> "/test"
 systemctl restart httpd
 restorecon -R 
+
+
+
+FIREWALL ZONES
+/usr/lib/firewalld/zones/home.xml 
+firewall-cmd --permanent --new-zone=myoffice
+firewall-cmd --get-zones
+firewall-cmd --get-active-zones
+firewall-cmd --get-services
+firewall-cmd --zone=public --list-services/ports
+firewall-cmd --zone=dmz --list-services
+firewall-cmd --zone=home --list-services ---> list all services firewall understands in a zone
+firewall-cmd --reload
+firewall-cmd --zone=public --remove-service=http 
+firewall-cmd --zone=public --remove-port=9000/tcp 
+firewall-cmd --zone=public --change-interface=ens224  --->do this for quick work ,then return back to restricted zone
+firewall-cmd --get-active-zones
+home
+   interface: ens160 (nic)
+public
+   interface: ens224 (nic)
+
+FIREWALL SCRIPTS
+how firewall knows which service use which port?
+/usr/lib/firewalld/services ---> script files -- http.xml / ftp.xml
+when you use a script, new configuration saves in /usr/lib/f/services directory
+/etc/firewalld
+how to define a custom service
+cp /usr/lib/f/services/ssh.xml /etc/firewalld/services/example.xml
+vim example.com 
+         <?xml version="1.0" encoding="utf-8"?>
+         <service>
+            <short>SSH</short>
+            <description>Secure Shell (SSH) is a protocol for logging into and executing commands on remote machines. It provides secure encrypted communications. If you plan on accessing your machine remotely via SSH over a firewalled interface, enable this option. You need the openssh-server package installed for this option to be useful.</description>
+            <port protocol="tcp" port="22"/>
+         </service>
+edit example.com 
+         <?xml version="1.0" encoding="utf-8"?>
+         <service>
+            <short>example</short>
+            <description>example is a protocol for logging into and executing commands on remote machines. It provides secure encrypted communications. If you plan on accessing your machine remotely via SSH over a firewalled interface, enable this option. You need the openssh-server package installed for this option to be useful.</description>
+            <port protocol="tcp" port="7777"/>
+         </service>
+firewall-cmd --reload
+firewall-cmd --get-services | grep example
+
+FIREWALL MASQUERADING
+firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8080 --permanent
+--reload
+firewall-cmd --list-forward-ports
+firewall-cmd --zone=public --remove-forward-port=port=80:proto=tcp:toport=8080 --permanent
+-------------------------------------------
+firewall-cmd --zone=public --add-masquerade 
+firewall-cmd --zone=public --add-forward-port=port=80:proto=tcp:toport=8080:toaddr=192.168.100.99 --permanent
+
+FIREWALL RICH RULES
+only accept ssh on port 22 from 1 ip address
+solution - RICH RULES                  --remove 
+firewall-cmd --permanent --zone=public --add-rich-rule 'rule family="ipv4" source address="10.0.8.8" port port=22 protocol=tcp accept'
+firewall-cmd --list-rich-rules --permanent
+
