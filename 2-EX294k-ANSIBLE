@@ -20,12 +20,12 @@ Loops - "session 14,15,16"
 Conditional tasks - "session 17"
 Plays
 Handling task failure - "session 19"
-Playbooks
+Playbooks 
 Configuration files
-Roles
+Roles "session 22"
 Use provided documentation to look up specific information about Ansible modules and commands
 
-3- Use roles and Ansible Content Collections
+3- Use roles and Ansible Content Collections "session 22"
 Create and work with roles
 Install roles and use them in playbooks
 Install Content Collections and use them in playbooks
