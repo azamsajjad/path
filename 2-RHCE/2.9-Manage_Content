@@ -51,6 +51,7 @@ foo has been encrypted as bar
 
 
 "*************************************************************"
+"JINJA2 TEMPLATES"
 Python based templating engine
 helpful in creating static configuration files for each of the node
 jinja2 templates store variables that can change from time to time 
@@ -84,12 +85,12 @@ motb.yml
         dest: /etc/motd
 
 
-
+"*************************************************************"
 index.j2
 <html>
 <center><h1>*** Apache Webserver Hosted on {{ ansible_hostname }} ***</h1></center>
 </html>
-~
+~"*************************************************************"
 ---
 - name: instal and configure apache for nodes
   hosts: web
@@ -122,7 +123,7 @@ index.j2
         state: restarted
 
 
-
+"*************************************************************"
 fruits.j2
 The list of fruit names are as follows
 {% for item in fruits %}
@@ -131,7 +132,7 @@ The list of fruit names are as follows
 
 {% endfor %}
 
-
+"*************************************************************"
 jinja_conditionals.yml
 ---
 - name: Ansible jinja template with conditionals
@@ -150,7 +151,7 @@ jinja_conditionals.yml
         src: ~/automation/template/fruit_loop.j2
         dest: /home/rupert/fruits.txt
 ~
-
+"*************************************************************"
 [USING FILTERS WITH jinja2]
 {{ variable | arguement }}
 # e.g. we want upper case letters of the string

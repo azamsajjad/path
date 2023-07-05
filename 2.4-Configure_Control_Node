@@ -1,5 +1,0 @@
-4- Install and configure an Ansible control node
-Install required packages
-Create a static host inventory file
-Create a configuration file
-Create and use static inventories to define groups of hosts

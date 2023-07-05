@@ -65,11 +65,15 @@
 [file]
     ansible web -m file -a 'path=/tmp/data state=directory'
     ansible web -m file -a 'path=/tmp/data state=absent' --->delete dir
-
+    ansible web -m file -a 'path=/home/user/text state=touch'
+    ansible web -m file -a 'path=/home/user/text' ---> with no state, it prints out information
+    ansible web -m file -a 'path=/home/user/text mode=0400'
+    ansible web -b -m file -a 'path=/home/user/text owner=root'
 [user]
     ansible web -m user -a 'name=sehrish state=present uid=1350 groups=wheel'
     [groups=wheel ----> secondary group]
     [group=wheel ----> primary group]
+    ansible web -m user -a 'name=sehrish append=yes groups=staff'
     ansible web -m command -a 'id -a sehrish'
     # 192.168.100.102 | CHANGED | rc=0 >>
     uid=1350(sehrish) gid=1350(sehrish) groups=1350(sehrish),10(wheel)

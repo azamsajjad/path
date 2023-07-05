@@ -206,7 +206,7 @@ node1 | SUCCESS => {
 ...
 
 "MAGIC VARIABLEs"
-e.g. hostvrs, groups, group_names, inventory_variables, etc
+e.g. hostvars, groups, group_names, inventory_variables, etc
 
 ---
 - name: gather facts

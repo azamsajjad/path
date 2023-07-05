@@ -4,8 +4,7 @@ $ ansible --version
 
 # DEFAULT INVENTORY FILE IS LOCATED AT /etc/ansible/hosts⁡
 [web]
-192.168.10
-0.101
+192.168.100.101
 192.168.100.102
 
 # you can make multiple inventory files

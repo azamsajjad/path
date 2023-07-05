@@ -1,3 +1,11 @@
+4- Install and configure an Ansible control node
+Install required packages
+Create a static host inventory file
+Create a configuration file
+Create and use static inventories to define groups of hosts
+
+"*************************************************************"
+"DYNAMIC INVENTORY"
 boto is AWS sdk for python
 boto enables easy-to-use object-oriented APIs 
 boto is low access to aws services
@@ -66,8 +74,8 @@ become_ask_pass = false
 
 ansible all -m ping 
 
--------------------------------------------------------
-"MANAGING FROUPS IN DYNAMIC INVENTORY"
+"*************************************************************"
+"MANAGING GROUPS IN DYNAMIC INVENTORY"
 ec2.py is a script file 
 ec2.ini is the config file for ec2.py and can be used to limit the scope of Ansible's reach
 You can specify regions, instance tags, roles that ec2.py script will find. 

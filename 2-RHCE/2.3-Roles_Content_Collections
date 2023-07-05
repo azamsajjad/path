@@ -28,3 +28,4 @@ upload roles on Ansible-Galaxy from Git
   826  git push origin master
         ->username?
         ->password? (new access token from developers menu in github)
+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

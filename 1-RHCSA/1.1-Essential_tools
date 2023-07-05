@@ -124,7 +124,7 @@ total 0
  67111007 -rw-r--r--. 1 root root  0 May 29 02:29 original
 134715247 drwxr-xr-x. 2 root root  6 May 29 02:29 original_dir
  67111468 lrwxrwxrwx. 1 root root  8 May 29 02:30 softlink -> original
- 67112287 lrwxrwxrwx. 1 root root 12 May 29 02:30 softlink_dir -> original_dir
+ 671122g87 lrwxrwxrwx. 1 root root 12 May 29 02:30 softlink_dir -> original_dir
 
 
 UMASK
@@ -264,3 +264,29 @@ MANAGING FILES - copy/move
  1067  cp -r ~/code/mortimer/cloudform/ ~/code/ursula/
 
  
+ "*************************************************************"
+ 3 versions of regular expressions
+ BRE: Basic Regular expressions
+ ERE: Extended Regular expressions
+ PRCE: Perl Regular expressions
+
+"BRE"
+using grep, you can force the use of BRE by using -G option
+"ERE"
+using grep, you can force the use of ERE by using -E option
+"PRCE"
+using grep, you can force the use of PRCE by using -P option
+
+grep a$ names.txt
+tania
+valentina
+   
+grep ^val names.txt
+valentina
+
+grep over files.txt
+governor is governing 
+winter is over
+
+grep -w over files.txt
+winter is over

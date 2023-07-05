@@ -1,4 +1,4 @@
-Ansible built-in variables are also called Magic Variables
+#Ansible built-in variables are also called Magic Variables
 
 [task1]
 create /tmp/testdir, 
@@ -170,7 +170,7 @@ used for sensitive INFORMATION
     - name: Creating user accounts
       user:
         name: "{{ user_name }}"
-        state: present
+        state: present:
         password: "{{ password }}"
 ...
 

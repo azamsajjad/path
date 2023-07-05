@@ -5,6 +5,10 @@ Process script inputs ($1, $2, etc.)
 Processing output of shell commands within a script
 
 
+
+$script terminal.txt
+starts terminal recording, ctrl+D to exit
+
 while true ; do clear ; df -h ; sleep 5 ; done
 
     #!/bin/bash

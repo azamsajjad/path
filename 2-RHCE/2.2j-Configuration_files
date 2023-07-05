@@ -1,0 +1,10 @@
+ansible-config command
+$ ansible-config list
+$ ansible-config dump
+$ ansible-config view
+
+Commonly Used Settings
+"inventory" - default inventory file
+"roles_path" - sets paths to search in for roles
+"forks" - specifies the amount of hosts configured by Ansible at the same time (Parrallelism)
+"ansible_managed" - Text inserted into templates which indicate that file is managed by Ansible and changes will be overwritten

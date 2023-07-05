@@ -1,0 +1,276 @@
+8- Automate standard RHCSA tasks using Ansible modules that work with:
+Software packages and repositories
+Services
+Firewall rules
+File systems
+Storage devices
+File content
+Archiving
+Task scheduling
+Security
+Users and groups
+
+"*********************************************************"
+3 versions of regular expressions - session 27
+ BRE: Basic Regular expressions
+ ERE: Extended Regular expressions
+ PRCE: Perl Regular expressions
+
+"BRE"
+using grep, you can force the use of BRE by using -G option
+"ERE"
+using grep, you can force the use of ERE by using -E option
+"PRCE"
+using grep, you can force the use of PRCE by using -P option
+
+grep a$ names.txt
+tania
+valentina
+   
+grep ^val names.txt
+valentina
+
+grep over files.txt
+governor is governing 
+winter is over
+
+grep -w over files.txt
+winter is over
+
+USING REGULAR EXPRESSIONS IN ANSIBLE:
+[ansible@x230 automation]$ cat playbooks/rhcsa1_selinux2.yml
+---
+- name: Changing SELINUX mode in Config file using Variables
+  hosts: RHEL
+  become: true
+  vars:
+    status: permissive
+  tasks:
+    - name: Changing SELINUX mode in /etc/selinux/config file
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX={{ status  }}'
+...
+[ansible@x230 automation: $ ansible-playbook rhcsa1_selinux2.yml -e status=enforcing
+[ansible@x230 automation: $ ansible vmservers -m command -a 'sestatus'
+*NO NEED TO KEEP CHANGING PLAYBOOK, JUST ADD A variable AND CHANGE ITS VALUE ON CLI:
+
+
+"*****************************************************************"
+MANAGE USERS & GROUPS  - session 28
+cat /etc/default/useradd or useradd -D 
+[ansible@x230 playbooks]$ cat rhcsa2_useradd.yml
+---
+- name: Managing users and groups
+  hosts: vmservers
+  become: yes
+  vars:
+    password: mySecret
+  tasks:
+    - name: Add a simple user called Greta Grace
+      user:
+        name: gretagrace
+        comment: Greta Grace
+
+    - name: Add user amit with a password
+      user:
+        name: amit
+        password: "{{ password | password_hash('sha512') }}"
+        update_password: on_create
+
+    - name: add a group Nehrastaff
+      group:
+        name: nehrastaff
+        state: present
+
+    - name: Add a user ashish and add to group nehrastaff
+      user:
+        name: ashish
+        groups: nehrastaff
+        append: yes
+
+    - name: Add user rahul and generate ssh keys for  them
+      user:
+        name: rahul
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa
+
+    - name: Add a user nohome with no home directory and account expires after few days
+      user:
+        name: nohome
+        create_home: no
+        expires: 1590155615
+
+    - name: add user suraj with sh login shell and group Nehrastaff
+      user:
+        name: suraj
+        groups: nehrastaff
+        append: yes
+        shell: /bin/sh
+
+    - name: add user 'Vijay Sharma' with specific uid as 1077 having username as vijay, with home dir as /home/vijaysharma
+      user:
+        name: vijay
+        comment: Vijay Sharma
+        uid: 1077
+        createhome: yes
+        home: /home/vijaysharma
+
+
+"*****************************************************************"
+LINUX PROCESS MANAGEMENT - session 29
+[ansible@x230 playbooks]$ #linux process management
+[ansible@x230 playbooks]$ date
+Fri Jun 30 04:34:59 PM PKT 2023
+[ansible@x230 playbooks]$ sleep 50
+
+^C
+[ansible@x230 playbooks]$ ps
+    PID TTY          TIME CMD
+ 557478 pts/0    00:00:00 bash
+ 566311 pts/0    00:00:00 ps
+[ansible@x230 playbooks]$ sleep 50 &
+[1] 566470
+[ansible@x230 playbooks]$ ps
+    PID TTY          TIME CMD
+ 557478 pts/0    00:00:00 bash
+ 566470 pts/0    00:00:00 sleep
+ 566501 pts/0    00:00:00 ps
+[ansible@x230 playbooks]$ pidof sleep
+566682 566470
+[ansible@x230 playbooks]$ pgrep sleep
+566470
+566724
+[ansible@x230 playbooks]$ ps -C sleep
+    PID TTY          TIME CMD
+ 566779 ?        00:00:00 sleep
+[1]+  Done                    sleep 50
+[ansible@x230 playbooks]$ jobs
+[ansible@x230 playbooks]$ sleep 50 &
+[1] 566889
+[ansible@x230 playbooks]$ jobs
+[1]+  Running                 sleep 50 &
+[ansible@x230 playbooks]$ fg 1
+sleep 50
+^C
+[ansible@x230 playbooks]$ jobs
+[ansible@x230 playbooks]$ #Every process has a parent process (with a PP id) child procarent process
+[ansible@x230 playbooks]$ pstree
+systemd─┬─ModemManager───3*[{ModemManager}]
+        ├─NetworkManager───2*[{NetworkManager}]
+        ├─accounts-daemon───3*[{accounts-daemon}]
+        ├─alsactl
+        ├─at-spi-bus-laun─┬─dbus-daemon
+        │                 └─3*[{at-spi-bus-laun}]
+        ├─at-spi2-registr───2*[{at-spi2-registr}]
+        ├─atd
+        ├─auditd─┬─sedispatch
+        │        └─2*[{auditd}]
+        ├─avahi-daemon───avahi-daemon
+        ├─bluetoothd
+        ├─chronyd
+        ├─colord───3*[{colord}]
+        ├─crond
+        ├─cupsd
+        ├─dbus-broker-lau───dbus-broker
+        ├─dconf-service───2*[{dconf-service}]
+        ├─dmeventd───2*[{dmeventd}]
+        ├─firewalld───{firewalld}
+        ├─gdm─┬─gdm-session-wor─┬─gdm-wayland-ses─┬─dbus-run-sessio─┬─dbus-daemon
+        │     │                 │                 │                 └─gnome-session-b─┬
+[ansible@x230 playbooks]$ kill -l
+ 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP
+ 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1
+11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM
+16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP
+21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
+26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR
+31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3
+38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8
+43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13
+48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12
+53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7
+58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2
+63) SIGRTMAX-1  64) SIGRTMAX
+[ansible@x230 playbooks]$ firewall-cmd --list-services
+Authorization failed.
+    Make sure polkit agent is running or run the application as superuser.
+[ansible@x230 playbooks]$ sudo -i
+[root@x230 ~]# firewall-cmd --list-services
+cockpit dhcpv6-client mountd nfs rpc-bind samba smtp ssh
+[root@x230 ~]# firewall-cmd --add-service=http --permanent
+success
+[root@x230 ~]# firewall-cmd --list-services
+cockpit dhcpv6-client mountd nfs rpc-bind samba smtp ssh
+[root@x230 ~]# ps -C firewalld
+    PID TTY          TIME CMD
+    916 ?        00:00:02 firewalld
+[root@x230 ~]# kill -1 916
+[root@x230 ~]# firewall-cmd --list-services
+cockpit dhcpv6-client http mountd nfs rpc-bind samba smtp ssh
+[root@x230 ~]# sllep 200 &
+[1] 576394
+[root@x230 ~]# sleep 200 &
+[1] 576480
+[root@x230 ~]# sleep 300 &
+[2] 576505
+[root@x230 ~]# kill 576480
+[root@x230 ~]# jobs
+[1]-  Terminated              sleep 200
+[2]+  Running                 sleep 300 &
+[root@x230 ~]# # SIGHUP: Reload Config File
+[root@x230 ~]# # SIGTERM: Normal Termination - default -15
+[root@x230 ~]# # SIGKILL: process sent to kernel to be killed -9
+[root@x230 ~]# jobs
+[2]+  Running                 sleep 300 &
+[root@x230 ~]# kill -9 576505
+[root@x230 ~]# jobs
+[2]+  Killed                  sleep 300
+[root@x230 ~]# # SIGSTOP: Stopping a process for a while -19
+[root@x230 ~]# # SIGCONT: starting a stopped process -18
+[root@x230 ~]# sleep 700 &
+[1] 578225
+[root@x230 ~]# jobs
+[1]+  Running                 sleep 700 &
+[root@x230 ~]# kill -19 578225
+
+[1]+  Stopped                 sleep 700
+[root@x230 ~]# kill -18 578225
+[root@x230 ~]# jobs
+[1]+  Running                 sleep 700 &
+[root@x230 ~]# pkill sleep
+[1]+  Terminated              sleep 700
+[root@x230 ~]# killall sleep
+[root@x230 ~]# killall -9 sleep
+[root@x230 ~]# #PRIORITY value &&&&& NICE value
+[root@x230 ~]#  # PRIORITY: Process's actual priority which is used by linux kernel to , system priorities are 0 to 139 in which 0 to 99 are for real-time and 100 to 139 are
+[root@x230 ~]# # NICE: User Space Values that we can use to control priority of a proce -20 is highest, 0 default, 19 lowest
+[root@x230 ~]# # PRIORITY = NICE + 20
+[root@x230 ~]#
+logout
+[1]+  Terminated              sleep 1000
+[ansible@x230 playbooks]$ cd ~
+[ansible@x230 ~]$ vim infinite.sh
+[ansible@x230 ~]$ chmod +x infinite.sh
+[ansible@x230 ~]$ jobs
+[1]+  Running                 ./infinite.sh &
+[ansible@x230 ~]$ sh infinite.sh
+^C
+[ansible@x230 ~]$ sh infinite.sh &
+[2] 584844
+[ansible@x230 ~]$ nice -n +10 sh infinite.sh
+^C
+[ansible@x230 ~]$ nice -n +10 sh infinite.sh &
+[3] 585730
+[ansible@x230 ~]$ renice -10 585730
+renice: failed to set priority for 585730 (process ID): Permission denied
+[ansible@x230 ~]$ sudo renice -10 585730
+585730 (process ID) old priority 10, new priority -10
+[ansible@x230 ~]$ sudo -i
+[root@x230 ~]# renice -10 -u ansible
+1331 (user ID) old priority -10, new priority -10
+[root@x230 ~]#
+
+PROCESS MANAGEMENT USING ANSIBLE
