@@ -8,3 +8,8 @@ Commonly Used Settings
 "roles_path" - sets paths to search in for roles
 "forks" - specifies the amount of hosts configured by Ansible at the same time (Parrallelism)
 "ansible_managed" - Text inserted into templates which indicate that file is managed by Ansible and changes will be overwritten
+
+# if your YUM module fails
+interpretor_python = auto 
+# add this to ansible.cfg when you make new config file
+this will use usr/lib/exec instead of usr/lib/python (python 2)

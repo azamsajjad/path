@@ -360,3 +360,43 @@ This is the hardware mode "x86_64"
 
     - debug:
         var: ver.stdout
+
+
+"*******************************************************"
+CLOUD_GURU
+ssh 102
+---
+- name: create a file and register valaues to a file
+  hosts: server1.vmserver.com
+  tasks:
+    - name: Create a file on servers
+      file:
+        path: /home/rupert/cloudgurufile
+        state: touch
+      register: var
+    - name: Print values
+      debug:
+        msg: "{{ var }}"
+    - name: Store important values in a file
+      lineinfile:
+        path: /home/rupert/cloudgurufile
+        line: "UID of newly created file is {{ var.uid }} and its GID is {{ var.gid }}, while is permissions are {{ var.mode }}"
+
+rhcsa3_pid3.yml
+---
+- name: process mnagement using ansible playbook
+  hosts: node1
+  become: yes
+  tasks:
+    - name: get running proceses list from remote host
+      ignore_errors: yes
+      shell: "ps -few | grep httpd | awk '{print $2}'"
+      register: running_processes
+    - name: printing process ids of httpd processes
+      debug:
+        msg: "{{ running_processes }}"
+    - name: kill the running httpd processes
+      ignore_errors: yes
+      shell: "kill {{ item }}"
+      with_items: "{{ running_processes.stdout_lines }}"
+...

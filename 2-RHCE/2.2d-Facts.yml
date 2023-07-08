@@ -4,6 +4,10 @@ ansible web -m setup ---> output is [gathering facts]
 ansible web -m setup -a 'filter=ansible_hostname'
  ansible web -m setup -a 'filter=ansible_kernel' > kernelreport.txt
 
+
+ansible vmservers -m setup --tree /tmp/tree
+
+
 [ansible@x230 automation]$ cat playbooks/ansible_facts.yml
 ---
 - name: Ansible facts use case

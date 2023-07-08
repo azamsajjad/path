@@ -1,0 +1,124 @@
+8- Automate standard RHCSA tasks using Ansible modules that work with:
+Software packages and repositories
+Services
+Firewall rules
+File systems
+Storage devices
+File content
+Archiving
+Task scheduling
+Security
+Users and groups
+
+"*********************************************************"
+3 versions of regular expressions - session 27
+ BRE: Basic Regular expressions
+ ERE: Extended Regular expressions
+ PRCE: Perl Regular expressions
+
+"BRE"
+using grep, you can force the use of BRE by using -G option
+"ERE"
+using grep, you can force the use of ERE by using -E option
+"PRCE"
+using grep, you can force the use of PRCE by using -P option
+
+grep a$ names.txt
+tania
+valentina
+   
+grep ^val names.txt
+valentina
+
+grep over files.txt
+governor is governing 
+winter is over
+
+grep -w over files.txt
+winter is over
+
+USING REGULAR EXPRESSIONS IN ANSIBLE:
+[ansible@x230 automation]$ cat playbooks/rhcsa1_selinux2.yml
+---
+- name: Changing SELINUX mode in Config file using Variables
+  hosts: RHEL
+  become: true
+  vars:
+    status: permissive
+  tasks:
+    - name: Changing SELINUX mode in /etc/selinux/config file
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX={{ status  }}'
+...
+[ansible@x230 automation: $ ansible-playbook rhcsa1_selinux2.yml -e status=enforcing
+[ansible@x230 automation: $ ansible vmservers -m command -a 'sestatus'
+*NO NEED TO KEEP CHANGING PLAYBOOK, JUST ADD A variable AND CHANGE ITS VALUE ON CLI:
+
+
+"*****************************************************************"
+MANAGE USERS & GROUPS  - session 28
+cat /etc/default/useradd or useradd -D 
+[ansible@x230 playbooks]$ cat rhcsa2_useradd.yml
+---
+- name: Managing users and groups
+  hosts: vmservers
+  become: yes
+  vars:
+    password: mySecret
+  tasks:
+    - name: Add a simple user called Greta Grace
+      user:
+        name: gretagrace
+        comment: Greta Grace
+
+    - name: Add user amit with a password
+      user:
+        name: amit
+        password: "{{ password | password_hash('sha512') }}"
+        update_password: on_create
+
+    - name: add a group Nehrastaff
+      group:
+        name: nehrastaff
+        state: present
+
+    - name: Add a user ashish and add to group nehrastaff
+      user:
+        name: ashish
+        groups: nehrastaff
+        append: yes
+
+    - name: Add user rahul and generate ssh keys for  them
+      user:
+        name: rahul
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa
+
+    - name: Add a user nohome with no home directory and account expires after few days
+      user:
+        name: nohome
+        create_home: no
+        expires: 1590155615
+
+    - name: add user suraj with sh login shell and group Nehrastaff
+      user:
+        name: suraj
+        groups: nehrastaff
+        append: yes
+        shell: /bin/sh
+
+    - name: add user 'Vijay Sharma' with specific uid as 1077 having username as vijay, with home dir as /home/vijaysharma
+      user:
+        name: vijay
+        comment: Vijay Sharma
+        uid: 1077
+        createhome: yes
+        home: /home/vijaysharma
+
+
+"*****************************************************************"
+
+

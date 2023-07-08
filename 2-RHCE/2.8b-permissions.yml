@@ -1,0 +1,234 @@
+"*****************************************************************"
+"PERMISSIONS MANAGEMENT WITH ANSIBLE - session 30"
+[Standard File permissions]rwxrwxrwx.
+"chmod,chgrp,chown"
+[Advanced File permissions]rwSrwsrwt.
+"sticky bit, sgid, suid" -suid=if placed, file gets executed as if its owner has executed the file e.g. /etc/shadow and usr/bin/passwd - s for executable file and S for normal file
+sticky bit 1777 guid 2777 suid 4777
+e.g. public shares dir such as /tmp
+e.g. chmod 4600 /project/vik.txt
+[Access Control Lists]rwxrwxrwx+
+"setfacl,getfacl" - special permissions for a particular user,group
+
+SET NEW ACL    --->setfacl -m g:project:7 /project/vik.txt
+DELETE AN ACL  --->setfacl -x project /project/vik.txt
+REMOVE ALL ACL --->setfacl -b /project/vik.txt
+
+
+"HARD & SOFT LINKS"
+ansible node1 -m command -a 'ln /tmp/ansible.txt /tmp/ansible_link.txt'
+ansible node1 -m command -a 'ln -s /tmp/ansible.txt /tmp/ansible_link.txt'
+"ls lhi /tmp/*both" 
+same_inode rwxrwxrwx. 2 root root "HARD LINK"
+diff_inode rwxrwxrwx. 1 root root "SOFT LINK"
+
+rhcsa4_acl2.yml
+---
+- name: file permissions with sticky bit
+  hosts: node1
+  tasks:
+    - name: create file
+      file:
+        path: /tmp/nehrastaff2
+        state: directory
+        owner: root
+        group: root
+        mode: 1777
+      register: ver
+    - name: print
+      debug:
+        msg: "{{ ver }}"
+...
+
+rhcsa4_link.yml
+---
+- name: create symbolic link
+  hosts: node1
+  become: true
+  tasks:
+    - name: create a symbolic link
+      file:
+        src: /etc/redhat-release
+        dest: /tmp/link
+        owner: rupert
+        group: rupert
+        state: link
+...
+~
+rhcsa4_link2.yml
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: create a hard link
+      file:
+        src: /etc/redhat-release
+        dest: /tmp/hardlink
+        state: hard
+...
+~
+~
+rhcsa4_acl3.yml
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: Touch a file, using symbolic modes to set permission 0644
+      file:
+        path: /tmp/linux.conf
+        state: touch
+        mode: u=rw,g=r,o=r
+...
+~
+rhcsa4_acl3.yml
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: Touch a file, using symbolic modes to set permission 0644
+      file:
+        path: /tmp/linux.conf
+        state: touch
+        mode: u+x,g-r,o-r
+...
+~
+
+
+- - - - - - - - - --  - - - - - - - - - - - - - - - - - - - - - - -
+[ansible@x230 automation]$ ansible node1 -m command -a 'ls -alu /tmp'
+'u' tells time
+-rw-r--r--.  1 root   root      0 Jul  6 21:28 linux.conf
+rhcsa4_acl4.yml
+---
+- name: managing file permissions using ansible
+  hosts: node1
+  become: true
+  tasks:
+    - name: Touch again the same file, but do not change TIMES, this makes the task idempotent
+      file:
+        path: /tmp/linux.conf
+        state: touch
+        mode: g+w,o+w
+        modification_time: preserve
+        access_time: preserve
+
+~
+[ansible@x230 automation]$ ansible node1 -m command -a 'ls -alu /tmp'
+'u' tells time
+-rw-rw-rw-.  1 root   root      0 Jul  6 21:28 linux.conf
+ - - - - - - - - - - - - -  - - - - - - - - - - - - - -  - - - - - -
+
+
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: Change access time of a directory
+      file:
+        path: /tmp/linuxdir
+        state: directory
+        modification_time: now
+        access_time: now
+...
+#if you write touch in state, it picks up mod time automatically, but in case of directory, you have to mention it
+~
+~
+~
+
+---
+- name: file permissions.
+  hosts: node1
+  become: true
+  tasks:
+    - name: Change access time of a file
+      file:
+        path: /etc/linux.conf
+        state: file
+        access_time: '202201021015.30' #yyyymmddhhmm.ss
+~
+~
+
+rhcsa4_acl7.yml
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: create a directory
+      file:
+        path: /tmp/acldirectory
+        state: directory
+      register: result
+
+    - name: Printing the result of the previous task
+      debug:
+        msg: "{{ result }}"
+
+    - name: RECURSIVELY CHANGE OWNERSHIP OF acldirectory
+      file:
+        path: /tmp/acldirectory
+        state: directory
+        recurse: yes
+        owner: rupert
+        group: rupert
+...
+
+rhcsa_acl8.yml
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: remove directory recursively
+      file:
+        path: /tmp/acldirectory
+        state: absent
+
+~
+rhcsa4_acl9.yml
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: grant user reason read access to a file
+      ansible.posix.acl:
+        path: /tmp/acldirectory
+        entity: reason
+        etype: user
+        permissions: r
+        state: present
+
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: Grant user faizi read write access
+      acl:
+        path: /tmp/acldirectory
+        entity: azam
+        etype: user
+        state: absent
+
+
+rhcsa_acl10
+---
+- name: file permissions
+  hosts: node1
+  become: true
+  tasks:
+    - name: Setting ACL for a USER, Another Method
+      acl:
+        path: /tmp/linux
+        entry: default:user:faizi:rw-
+        state: present
+      register: acl_info
+    - name: Obtain acl for a specific file
+      debug:
+        msg: "{{ acl_info }}"
+~

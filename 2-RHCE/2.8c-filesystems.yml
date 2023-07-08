@@ -1,0 +1,183 @@
+"*******************************************************"
+$ parted 
+->print
+->mklabel msdos<->gpt (change b/w fdisk and gdisk)
+->mkpart 
+->q
+partprobe
+[you can make gpt partitions using fdisk
+fdisk
+->m ->g ->n]
+
+AD_HOC
+1019  ansible node1 -m raw -a 'echo -e "n\np\n2\n\n+2G\nw" | sudo fdisk /dev/nvme0n5'
+ 1020  ssh 101
+ 1021  ansible node1 -m command -a 'sudo partprobe /dev/nvme0n5'
+ 1023  ansible node1 -m command -a 'sudo lsblk'
+ 1024  # ansible node1 -m command -a 'sudo mkfs.xfs /dev/nvme0n5p2'
+ 1025  ansible node1 -m filesystem -a 'dev=/dev/nvme0n5p2 fstype=xfs state=present force=true' -b
+ 1027  ansible node1 -m command -a 'ls -alh /'
+ 1029  # ansible node1 -m command -a 'sudo mount /dev/nvme0n5p2 /datanvme5'
+ 1030  ansible node1 -m command -a 'sudo mount /dev/nvme0n5p2 /datanvme5'
+ 1034  ansible node1 -m command -a 'df -hT'
+ 1035  ansible node1 -m lineinfile -a 'path=/etc/fstab line="/dev/nvme0n5p2 /datanvme5 xfs defaults 0 0" state=present'
+ 1036  ansible node1 -m lineinfile -a 'path=/etc/fstab line="/dev/nvme0n5p2 /datanvme5 xfs defaults 0 0" state=present' -b
+ 1037  ansible node1 -m command -a 'sudo cat /etc/fstab'
+ 1038  ansible node1 -m command -a 'sudo mount -a'
+ 1039  ansible node1 -m lineinfile -a 'path=/etc/fstab line="/dev/nvme0n5p2 /datanvme5 xfs defaults 0 0" state=absent' -b
+ 1040  ansible-doc lineinfile
+ 1041  ansible node1 -m command -a 'sudo mount -a'
+ 1042  ansible node1 -m command -a 'sudo cat /etc/fstab'
+ 1043  ansible node1 -m mount -a 'path=/datanvme5 src=/dev/nvme0n5p2 fstype=xfs opts=rw state=present' -b
+ 1046  ansible node1 -m mount -a 'path=/datanvme5 src=/dev/nvme0n5p2 fstype=xfs opts=rw state=mounted' -b
+ 1047  ansible node1 -m command -a 'sudo umount /datanvme5'
+ 1048  ansible node1 -m command -a 'df -hT'
+ 1049  ansible node1 -m mount -a 'path=/datanvme5 src=/dev/nvme0n5p2 fstype=xfs opts=rw state=absent' -b
+
+ 1057  ansible node1 -m raw -a 'echo -e "d\n2\nw" | sudo fdisk /dev/nvme0n5'
+ 1058  ansible node1 -m command -a 'lsblk'
+
+
+PLAYBOOKS 
+[ansible@x230 automation]$ ls -alh playbooks/rhcsa_parted*
+-rw-r--r--. 1 ansible ansible 201 Jul  8 18:03 playbooks/rhcsa_parted_fs_blank.yml
+-rw-r--r--. 1 ansible ansible 260 Jul  8 18:00 playbooks/rhcsa_parted_fs.yml
+-rw-r--r--. 1 ansible ansible 334 Jul  8 17:54 playbooks/rhcsa_parted_gpt.yml
+-rw-r--r--. 1 ansible ansible 402 Jul  8 17:44 playbooks/rhcsa_parted_last.yml
+-rw-r--r--. 1 ansible ansible 269 Jul  8 17:25 playbooks/rhcsa_parted_lvm.yml
+-rw-r--r--. 1 ansible ansible 249 Jul  8 18:21 playbooks/rhcsa_parted_mount1.yml
+-rw-r--r--. 1 ansible ansible 262 Jul  8 18:32 playbooks/rhcsa_parted_mount_smb.yml
+-rw-r--r--. 1 ansible ansible 249 Jul  8 18:21 playbooks/rhcsa_parted_mount.yml
+-rw-r--r--. 1 ansible ansible 219 Jul  8 18:08 playbooks/rhcsa_parted_uuid.yml
+-rw-r--r--. 1 ansible ansible 184 Jul  8 17:18 playbooks/rhcsa_parted.yml
+[ansible@x230 automation]$ cat playbooks/rhcsa_parted*
+---
+- name: create gpt partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: Blank filesystem signature on /dev/nvme0n5p1
+      filesystem:
+        device: /dev/nvme0n5p1
+        state: absent
+
+---
+- name: create gpt partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: Create ext2 fs on /dev/nvme0n5
+      filesystem:
+        fstype: ext2
+        dev: /dev/nvme0n5p1
+        force: true
+...
+# force wipes and overwrites any previous filesystems
+---
+- name: create gpt partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: create gpt partition of 1Gb on a 10Gb disk
+      parted:
+        label: gpt
+        state: present
+        device: /dev/nvme0n5
+        number: 6
+        name: p1
+        flags: [ lvm ]
+        part_start: 0%
+        part_end: 10%
+        unit: '%'
+
+---
+- name: delete old partition and create new
+  hosts: node1
+  become: true
+  tasks:
+    - name: delete old partition
+      parted:
+        device: /dev/nvme0n5
+        number: 2
+        state: absent
+    - name: Create new partition with a size of 2GiB at disk's end
+      parted:
+        device: /dev/nvme0n5
+        number: 2
+        state: present
+        fs_type: ext3
+        part_start: -1GiB
+
+Device         Boot    Start      End Sectors Size Id Type
+/dev/nvme0n5p1          2048  6291455 6289408   3G 83 Linux
+/dev/nvme0n5p2      18874368 20971519 2097152   1G 83 Linux
+
+---
+- name: parted for lvm
+  hosts: node1
+  become: true
+  tasks:
+    - name: create new partition for future lvm
+      parted:
+        device: /dev/nvme0n5
+        number: 2
+        flags: [ lvm ]
+        state: present
+        part_start: 3GiB
+        part_end: 4GiB
+---
+- name: create gpt partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: Mount DVD Read-Only
+      mount:
+        path: /tmp
+        src: /dev/sr0
+        fstype: iso9660 #standard fstype for cdrom
+        opts: ro
+        state: mounted
+
+
+- name: Mount Ephemeral SMB Vloume
+  mount:
+    src: //192.168.100.101/share
+    path: /mnt/smb
+    opts: "rw,vers=3,file_mode=0600,dir_mode=0700,dom={{ ad_domain }},username={{ ad_username }},password={{ ad_passwod }}"
+    fstype: cifs
+    state: ephemeral
+
+
+
+
+---
+- name: create gpt partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: Mount DVD Read-Only
+      mount:
+        path: /tmp
+        src: /dev/sr0
+        fstype: iso9660 #standard fstype for cdrom
+        opts: ro
+        state: mounted
+---
+- name: create gpt partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: set/reset xfs filesystem uuid on /dev/nvme0n5
+      filesystem:
+        fstype: xfs
+        dev: /dev/nvme0n5p1
+        uuid: generate
+---
+- name: create a parted of 3gb on nvme0n5 node1
+  hosts: node1
+  tasks:
+    - parted:
+        device: /dev/nvme0n5
+        number: 2
+        state: present
+        part_end: 3GiB

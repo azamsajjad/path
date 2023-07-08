@@ -247,6 +247,12 @@ VS
 /home/reason/.bash_history:touch reasonfile
 /home/reason/.bash_history:rm rupertfile
 /home/reason/.bash_history:rm reasonfile
+[rupert@server2 ~]$ ps -few | grep sleep | awk '{print $2}'
+17351
+97359
+97680
+[rupert@server2 ~]$ ps -few | grep sleep | awk '{print $2}' | head -1
+17351
 
 
 LAB

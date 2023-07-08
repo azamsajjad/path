@@ -5,6 +5,55 @@ Create a configuration file
 Create and use static inventories to define groups of hosts
 
 "*************************************************************"
+when installing ansible on a control node - (DO the following 3 steps if NEEDED)
+yum search ansible 
+subscription manager repos --list | grep ansible
+subscription-manager repos --enable ansible-2.8....
+yum install -y ansible 
+
+ssh 102
+INSTALL ANSIBLE FROM SOURCE - GITHUB
+yum install git
+mkdir git && cd git 
+git clone --single-branch --branch stable-2.15 https://github.com/ansible/ansible.git
+echp $PATH
+--> /home/rupert/.local/bin:/home/rupert/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+[rupert@server2 ansible]$ source ./hacking/env-setup
+[rupert@server2 ansible]$ echo $PATH
+--> /home/rupert/git/ansible/bin:/home/rupert/.local/bin:/home/rupert/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+to make it persistent, add it in .bash_profile
+so it loads up ansible env variables when you log in
+
+install dpeendencies
+sudo yum install pip
+pip install --user -r ~/git/ansible/requirements.txt
+
+"*************************************************************"
+"STATIC INVENTORY"
+see 2.2a-Inventory.yml
+
+"*************************************************************"
+"CREATE ansible.cfg file"
+cp ~/git/ansible/examples/ansible.cfg /etc/ansible/ansible.cfg 
+cp ~/git/ansible/examples/hosts /etc/ansible/host
+to create commented config file from scratch
+$ ansible-config init --disable > ansible.cfg 
+$ ansible-config list  
+
+~/ansible/ansible.cfg
+[defaults]
+
+interpreter_python = auto
+inventory = /home/rupert/ansible/inventory/inv.ini
+roles = /etc/ansible/roles:/home/rupert/ansible/roles
+
+#ORDER OF PREFERENCE FOR ansible.cfg
+ANSIBLE_CONFIG
+ansible.cfg (working dir)
+ansible.cfg (user homedir)
+ansible.cfg (/etc/ansible/ansible.cfg) 
+
+"*************************************************************"
 "DYNAMIC INVENTORY"
 boto is AWS sdk for python
 boto enables easy-to-use object-oriented APIs 

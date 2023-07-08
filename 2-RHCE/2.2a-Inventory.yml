@@ -14,14 +14,14 @@ $ ansible --version
 # (servers added in default /etc/ansible/hosts file)
 
 # you can mention hostnames as well
-# app1.nehraclasses.local
-# app2.nehraclasses.local
+# app1.nehrastaff.local
+# app2.nehrastaff.local
 
 # if we have large no. of hosts
 # 192.168.100.[1:20]
 
 # if we have large no. of hosts in sequesnce
-# server[1:9].nehraclasses.local
+# server[1:9].nehrastaff.local
 
 # we can also create groups using groups as well.
 # [test:children]
@@ -103,3 +103,59 @@ Host 102
 
 $ ssh 101
 $ ssh 102
+
+"*******************************************************"
+#CREATE STATIC INVENTORY FILE 
+server2 ansible_host=server2.vmserver.com
+#shorthand in-line variable (either here or place it in host_vars directory)
+
+[kvmservers]
+server3.vmserver.com
+server4.vmserver.com
+
+[vmservers]
+server1.vmserver.com
+server3.vmserver.com
+server4.vmserver.com
+~
+"BEST PRACTICE"
+
+vim inv.ini
+.......
+server2 
+
+[kvmservers]
+server3.vmserver.com
+server4.vmserver.com
+
+[vmservers]
+server1.vmserver.com
+server3.vmserver.com
+server4.vmserver.com
+#how to specify child groups for a parent group i.e. servers
+[servers:children]
+vmservers
+kvmservers
+.......
+
+mkdir host_vars && cd host_vars
+vim server2
+---
+ansible_host:server2.vmserver.com
+... 
+
+SAME inv.ini inventory file in inv.yml format
+all:
+    children:
+        servers:
+            children:
+                vmservers:
+                    hosts:
+                        server1.vmserver.com
+                        server3.vmserver.com
+                        server4.vmserver.com
+                kvmservers:
+                    hosts:
+                        server3.vmserver.com
+                        server4.vmserver.com
+

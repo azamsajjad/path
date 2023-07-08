@@ -157,3 +157,29 @@ ok: [node1] => {
     "msg": "This task has been completed succesfully"
 ok: [node2] => {
     "msg": "This task has been completed succesfully"
+
+
+[ansible@x230 playbooks]$ vim ansible_handlers_replace.yml
+# handlers take action when called
+# handlers are called when a change is made
+# handlers are called using NOTIFY keyword
+# handlers can have multiple tasks
+# handlers will only run once
+---
+- name: handlers
+  hosts: node1
+  tasks:
+    - name: update httpd.conf
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^ServerAdmin.*$'
+        replace: 'ServerAdmin cloud_user@localhost'
+        backup: yes
+      notify: "restart web server"
+  handlers:
+    - name: "restart apache"
+      service:
+        name: httpd
+        state: restarted
+        listen: "restart web server"
+...

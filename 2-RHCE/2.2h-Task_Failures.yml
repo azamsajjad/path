@@ -134,3 +134,32 @@ fail_when.yml:
       yum:
         name: httpd
         state: installed
+
+
+"*******************************************************"
+# two ways to handle failure
+# either use keyword 'ignore_errors' with a task
+# or use a block to handle errors
+---
+- name: error handling via ignore_errors
+  hosts: vmservers
+  tasks:
+    - name: copy remote files
+      fetch:
+        src: /tmp/errorfile
+        dest: /tmp
+      ignore_errors: yes
+      tags: ignore
+
+    - name: copy remote files
+      block:
+        - fetch:
+            src: /tmp/blockfile
+            dest: /tmp
+      rescue:
+        - debug:
+            msg: "File doesn't exist on {{ ansible_hostname }}"
+      always:
+        - debug:
+            msg: "Playbook is complete"
+

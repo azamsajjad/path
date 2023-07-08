@@ -1,5 +1,0 @@
-5- Configure Ansible managed nodes
-Create and distribute SSH keys to managed nodes
-Configure privilege escalation on managed nodes
-Deploy files to managed nodes
-Be able to analyze simple shell scripts and convert them to playbooks
