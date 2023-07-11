@@ -400,3 +400,42 @@ rhcsa3_pid3.yml
       shell: "kill {{ item }}"
       with_items: "{{ running_processes.stdout_lines }}"
 ...
+
+variable_files.yml and vars/user.yml
+students:
+  - zach
+  - kelly
+  - slater
+  - lisa
+faculty:
+  - belding
+  - bliss
+~
+---
+- name: create users listed in a file
+  hosts: node1
+  become: yes
+  vars_files:
+    - /home/ansible/automation/vars/users.yml
+  tasks:
+    - name: create users
+      user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+      loop: "{{ [students,faculty]|flatten(1) }}"
+
+- name: creater using another method
+  hosts: node2
+  become: yes
+  vars_files:
+    - /home/ansible/automation/vars/users.yml
+  tasks:
+    - name: create users
+      user:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ students }}"
+        - "{{ faculty }}"
+

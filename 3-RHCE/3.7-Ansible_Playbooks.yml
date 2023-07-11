@@ -1,0 +1,323 @@
+7- Create Ansible plays and playbooks:
+Know how to work with commonly used Ansible modules
+Use variables to retrieve the results of running a command
+Use conditionals to control play execution
+Configure error handling
+Create playbooks to configure systems to a specified state
+
+
+CLOUD_GURU_LAB1
+Install httpd on the webserver group.
+Start the httpd service on the webserver group.
+Create a dba account on the dbserver group.
+Copy /root/DBAstuff.txt to the new user's home directory. Make sure he is the owner and group of the file, set permissions to 0600.
+Create index.html in /var/www/html on the webserver.
+Use the git module to check out https://github.com/ansible/ansible.git on the Admin server - put it in the /opt directory.
+--
+- name: for lab
+  hosts: webservers
+  become: true
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+    - name: start httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+    - name: configure index.html
+      copy:
+        content: "This is a webpage."
+        dest: /var/www/html/index.html
+- name: for dbservers
+  hosts: dbservers
+  become: true
+  tasks:
+    - name: add a user
+      user:
+        name: dba
+        state: present
+    - name: copy a file
+      copy:
+        src: /root/DBAstuff.txt
+        dest: /home/dba/DBAstuff.txt
+        owner: dba
+        group: dba
+        mode: 0600
+- name: for admins
+  hosts: admins
+  become: true
+  tasks:
+    - name: git set up
+      yum:
+        name: git
+        state: present
+    - name: clone git repo
+      git:
+        repo: 'https://github.com/ansible/ansible.git'
+        dest: /opt
+
+
+
+CLOUD_GURU_LAB2
+Notice: Ansible is installed as the root user, so please work on all tasks after elevating to the root user.
+Our backup team wants us to install their backup package everywhere in the environment, and make sure that there's an archive file for them to back up, even if it's empty.
+We know that the backup team's repository server has a very low uptime. We need to write our playbook so that installing the linuxacademy_backup_package will not cause the entire playbook to fail. In addition, we have to check and make sure that /root/archive.tar exists, and then create it if it doesn't.
+---
+- name: install package and check archive file
+  hosts: all
+  tasks:
+    - name: install required package
+      yum:
+        name: linuxacademy_backup_package
+        state: present
+      ignore_errors: yes
+    - name: check if file exists
+      command: ls /root/archive.tar
+      register: check_result
+      ignore_errors: yes
+    - name: create archive file
+      file:
+        path: /root/archive.tar
+        state: touch
+      when: check_result is failed
+~
+
+
+CLOUD_GURU_LAB3
+Management has just told us they bought 300 servers, and we've been tasked with writing a playbook to get them ready to go as quickly as possible. They've already had the OS installed and configured to work with our Ansible environment.
+
+We need to write a single playbook that will run and make sure that all the servers involved are correctly configured and in the desired state when it's finished running. We also need to ensure that all commands are idempotent.
+
+Install the linuxacademy-backup-software package throughout our environment. Due to the high potential for this repository server to be unavailable, ensure a failure doesn't stop the playbook from running.
+Install httpd on the webserver group.
+Start and enable the httpd service on the webserver group.
+Create a dba account on the dbserver group.
+Copy /root/DBAstuff.txt to the new user's home directory. Make sure that user (and the group with the same name) owns the file, and set permissions to 0600.
+Create index.html in /var/www/html on the web server.
+Ensure index.html on the web servers contains the line "Waiting for content."
+Install git on the webserver and dbserver group if it is not already.
+On each Red Hat server, create a file (/root/addresses) that contains all of the IPv4 addresses for the server.
+
+---
+- name: for webservers
+  hosts: webservers
+  become: true
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+    - name: enable httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+    - name: index.html
+      lineinfile:
+        path: /var/www/html/index.html
+        line: Waiting for content.
+        create: yes
+        owner: dba
+        group: dba
+        mode: 0600
+        state: present
+
+- hosts: dbservers
+  become: true
+  tasks:
+    - name: create a user
+      user:
+        name: dba
+        groups: dbaserver
+        state: present
+    - name: copy a file to dbaserver
+      copy:
+        src: /root/dbastuff.txt
+        dest: /home/dba/dbastuff.txt
+        owner: dba
+        group: dba
+        mode: 0600
+
+- hosts: all:!admins
+  become: true
+  tasks:
+    - name: install git
+      yum:
+        name: git
+        state: present
+
+- hosts: all
+  become: true
+  tasks:
+    - name: install software
+      yum:
+        name: linuxacademy-backup-software
+        state: installed
+      ignore_errors: yes
+
+
+CLOUD_GURU_LAB4
+One of the tasks that you and your admin team does periodically is copy all of /var/log/messages from a remote server and pull it to a local machine for analysis. Rather than doing it manually you'd like to have Ansible do it.
+Write a script that will use tar to compress /var/log/messages on a remote server and then copy that tar file to /tmp/messages/ on the Ansible Host.
+
+vim messages.sh
+#!/bin/bash
+for i in dbserver1 webserver1 adminserver1;
+do ssh ansible@$i "sudo tar -czf /tmp/messages.tar.gz /var/log/messages";
+done
+ansible all -m fetch -a "src=/tmp/messages.tar.gz dest=/tmp/messages"
+~
+~
+
+FIREWALLd 
+---
+- name: firewalld rich rules
+  hosts: vmservers
+  become: yes
+  tasks:
+    - name: enable http https
+      firewalld:
+        zone: public
+        service: "{{ item }}"
+        permanent: yes
+        immediate: yes
+        state: disabled
+      loop:
+        - http
+        - https
+    - name: add port 8080-8084
+      firewalld:
+        zone: public
+        port: 8080-8084/tcp
+        permanent: yes
+        immediate: yes
+        state: disabled
+    - name: add rich rule
+      firewalld:
+        zone: public
+        rich_rule: rule family=ipv4 forward-port port=443 protocol=tcp to-port=8443
+        permanent: yes
+        immediate: yes
+        state: disabled
+
+~
+~
+:%s/enabled/disabled/g
+
+
+
+
+---
+- name: file,lineinfile,copy,replace
+  hosts: node1
+  tasks:
+    - name: touch a new file
+      file:
+        path: /tmp/testfilecloud1
+        state: touch
+      tags: file1
+    - name: add line with copy
+      copy:
+        content: added by copy module
+        dest: /tmp/testfilecloud2
+      tags: file2
+    - name: line in file
+      lineinfile:
+        path: /tmp/testfilecloud3
+        line: added by lineinfile module
+        create: yes
+      tags: file3
+
+    - name: replace a line in testfile2
+      replace:
+        path: /tmp/testfilecloud2
+        regexp: '^added.*$'
+        replace: "line replaced by replace module"
+    - name: replace a line in testfile3
+      lineinfile:
+        path: /tmp/testfilecloud3
+        regexp: '.module$'
+        line: "line replaced by lineinfile module"
+
+
+
+
+CLOUD_GURU_LAB8.1
+Ensure Ports 80 and 22 Are Open on Webservers
+Ensure Ports 5432 and 22 Are Open on dbservers
+Enable SELinux on All Servers
+
+--
+- name: setup firewalls on webservers
+  become: yes
+  hosts: webservers
+  tasks:
+    - name: firewalld
+      firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        immediate: yes
+        state: enabled
+      loop:
+        - ssh
+        - http
+- hosts: dbservers
+  become: yes
+  tasks:
+    - name: firewalld
+      firewalld:
+        service: ssh
+        immediate: yes
+        permanent: yes
+        state: enabled
+    - name: firewall
+      firewalld:
+        service: postgresql
+        immediate: yes
+        permanent: yes
+        state: enabled
+- hosts: all
+  become: true
+  tasks:
+    - name: selinux
+      selinux:
+        policy: targeted
+        state: enforcing
+
+
+
+CLOUD_GURU_LAB8.2
+You received a ticket to upgrade the application and database for servers in your environment. There is an index.html and deploy.sh script in the /root directory on your Ansible Host. Write a playbook that deploys the index.html file to the webserver (in /var/www/html/), then deploys deploy.sh script to the dbserver in /opt, and finally executes that deploy.sh script. Use curl to test your deployment.
+
+Once that deployment has finished, your developers let you know they found and fixed a major bug, and this fix needs to be deployed immediately. Deploy the /root/index2.html file to address this issue.
+---
+- name: deploy
+  hosts: webserver
+  become: yes
+  tasks:
+    - name: index.html
+      copy:
+        src: /root/index.html
+        dest: /var/www/html/index.html
+        owner: apache
+        group: apache
+        mode: 0644
+- hosts: dbservers
+  become: yes
+  tasks:
+    - name: deploy.sh
+      copy: /root/deploy.sh
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: run deploy
+      shell: sh /root/deploy.sh
+
+~
+~
+
+

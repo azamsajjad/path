@@ -1,3 +1,28 @@
+"SELinux"
+---
+- name: selinux, sebool, sefcontext
+  hosts: node1
+  become: yes
+  tasks:
+    - name: selinux to enforcing
+      selinux:
+        policy: targeted
+        state: enforcing
+    - name: enable httpd cgi
+      seboolean:
+        name: httpd_enable_cgi
+        state: yes
+        persistent: yes
+    - name: set sefcontext
+      sefcontext:
+        target: '/home/rupert/webcontent(/.*)?'
+        setype: httpd_sys_content_t
+        state: present
+    - name: run restorecon
+      command: restorecon -irv /home/rupert/webcontent
+~
+~
+~
 "*****************************************************************"
 "PERMISSIONS MANAGEMENT WITH ANSIBLE - session 30"
 [Standard File permissions]rwxrwxrwx.

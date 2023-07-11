@@ -210,3 +210,5 @@ Writing inode tables: done
 Creating journal (65536 blocks): done
 Writing superblocks and filesystem accounting information: done   
 autofs RHEL9
+
+

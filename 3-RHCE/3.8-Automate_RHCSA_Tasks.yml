@@ -118,7 +118,117 @@ cat /etc/default/useradd or useradd -D
         createhome: yes
         home: /home/vijaysharma
 
+rhcsa_user_group.yml
+---
+- hosts: node1
+  become: yes
+  tasks:
+    - name: create groups
+      group:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - hr
+        - eng
+    - name: create user zach
+      user:
+        name: zach
+        comment: zacharia
+        shell: /bin/sh
+        groups: hr,eng
+        append: yes
+        state: present
+    - name: create kelly
+      user:
+        name: kelly
+        comment: kelly kapoor
+        uid: 1010
+        groups: hr,eng
+        append: yes
+        state: present
+    - name: create slatter
+      user:
+      name: slater
+      comment: ac slater
+
+---
+- hosts: node1
+  become: yes
+  tasks:
+    - name: create groups
+      group:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - hr
+        - eng
+    - name: create user zach
+      user:
+        name: zach
+        comment: zacharia
+        shell: /bin/sh
+        groups: hr,eng
+        append: yes
+        state: absent
+        remove: yes
+    - name: create kelly
+      user:
+        name: kelly
+        comment: kelly kapoor
+        uid: 1010
+        groups: hr,eng
+        append: yes
+        state: absent
+        remove: yes   <---------------------------- remove home directory
+    - name: create slatter
+      user:
+        name: slater
+        comment: ac slater
+        state: absent
+        remove: yes
 
 "*****************************************************************"
 
+---
+- name: task sheduling
+  hosts: node1
+  become: yes
+  tasks:
+    - name: install at
+      yum:
+        name: at
+        state: latest
+      tags: at2
+    - name: start at
+      service:
+        name: atd
+        state: started
+        enabled: yes
+      tags: at2
+    - name: copy httpd errorlog
+      at:
+        command: cp /var/log/httpd/error_log /home/rupert   # or script_file: /path/to/script.sh
+        count: 10
+        units: minutes
+      tags: at3
 
+    - name: crontab
+      cron:
+        name: "weekly yum update"
+        minute: "*"
+        hour: "10"
+        month: "*"
+        weekday: "0"
+        user: root
+        state: present
+        job: "yum -y update"
+~
+
+[rupert@server1 ~]$ sudo crontab -l
+#Ansible: weekly yum update
+* 10 * * 0 yum -y update
+[rupert@server1 ~]$ sudo atq
+1       Mon Jul 10 10:07:00 2023 a root
+[rupert@server1 ~]$ sudo at -c 1
+
+"*******************************************************"

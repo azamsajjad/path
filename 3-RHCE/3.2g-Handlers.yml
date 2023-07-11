@@ -183,3 +183,28 @@ ok: [node2] => {
         state: restarted
         listen: "restart web server"
 ...
+
+---
+- name: install repo
+  hosts: vmservers
+  become: yes
+  tasks:
+    - name: add epel repo
+      yum_repository:
+        name: epel
+        description: EPEL REPO
+        enabled: yes
+        gpgcheck: no
+        baseurl: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+      notify: "yum_clean"
+    - name: return print
+      command: yum repolist --enabled
+      register: repolist
+    - debug:
+        msg: "{{ repolist }}"
+  handlers:
+    - name: clean cache
+      command: yum clean all
+      listen: "yum_clean"
+
+

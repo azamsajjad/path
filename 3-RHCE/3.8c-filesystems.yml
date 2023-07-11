@@ -1,4 +1,94 @@
+FILE_CONTENTs
+---
+- name: file,lineinfile,copy,replace
+  hosts: node1
+  tasks:
+    - name: touch a new file
+      file:
+        path: /tmp/testfilecloud1
+        state: touch
+      tags: file1
+    - name: add line with copy
+      copy:
+        content: added by copy module
+        dest: /tmp/testfilecloud2
+      tags: file2
+    - name: line in file
+      lineinfile:
+        path: /tmp/testfilecloud3
+        line: added by lineinfile module
+        create: yes
+      tags: file3
+
+    - name: replace a line in testfile2
+      replace:
+        path: /tmp/testfilecloud2
+        regexp: '^added.*$'             <--------------------------------------------------------
+        replace: "line replaced by replace module"
+    - name: replace a line in testfile3
+      lineinfile:
+        path: /tmp/testfilecloud3
+        regexp: '.module$'              <--------------------------------------------------------
+        line: "line replaced by lineinfile module"
+
+
+"*******************************************************"      
+[ansible@x230 automation]$ cat playbooks/rhcsa_archive.yml
+---
+- name: node1 archive
+  hosts: node1
+  become: yes
+  tasks:
+    - name: archive multiple files
+      archive:
+        path:
+          - /home/rupert/archive/testdir/testfile2
+          - /home/rupert/archive/testdir/testfile4
+          - /home/rupert/archive/testdir/testfile6
+        format: gz
+        dest: /home/rupert/unarchive/multi/multifile.tgz
+    - name: archive with wildcard
+      archive:
+        path: /home/rupert/archive/testdir/testfile*
+        exclude_path:
+          - /home/rupert/archive/testdir/testfile2
+          - /home/rupert/archive/testdir/testfile4
+        format: gz
+        dest: /home/rupert/unarchive/glob/globexclude.tgz
+    - name: archive a directory
+      archive:
+        path: /home/rupert/archive/testdir
+        format: gz
+        dest: /home/rupert/unarchive/dir/dir.tgz
+
+[ansible@x230 automation]$ cat playbooks/rhcsa_unarchive.yml
+---
+- name: unarchive
+  become: true
+  hosts: node1
+  tasks:
+    - name: unarchive multifile
+      unarchive:
+        src: /home/rupert/unarchive/multi/multifile.tgz
+        dest: /home/rupert/unarchive/multi
+        remote_src: yes
+    - name: unpack globexclude.tgz
+      unarchive:
+        src: /home/rupert/unarchive/glob/globexclude.tgz
+        dest: /home/rupert/unarchive/glob
+        remote_src: yes
+    - name: unpack dir.tgz
+      unarchive:
+        src: /home/rupert/unarchive/dir/dir.tgz
+        dest: /home/rupert/unarchive/dir
+        remote_src: yes
+    - name: transfer playbooks
+      unarchive:
+        src: /home/ansible/automation/playbooks.tgz
+        dest: /home/rupert/
+        remote_src: no
 "*******************************************************"
+
 $ parted 
 ->print
 ->mklabel msdos<->gpt (change b/w fdisk and gdisk)
@@ -181,3 +271,52 @@ Device         Boot    Start      End Sectors Size Id Type
         number: 2
         state: present
         part_end: 3GiB
+
+
+
+
+rhcsa_parted_loop.yml
+---
+- name: create 2 partitions for lvm vol
+  hosts: node1
+  become: yes
+  tasks:
+    - name: Create Partitions
+      parted:
+        device: "{{ item }}"
+        number: 1
+        part_end: 2GiB
+        label: msdos
+        flags: [lvm]
+      loop:
+        - /dev/nvme0n6
+        - /dev/nvme0n7
+    - name: Create Volume Group
+      lvg:
+        pvs: /dev/nvme0n6p1,/dev/nvme0n7p1
+        vg: vg.ansible
+        state: present
+    - name: Create Logical volume
+      lvol:
+        vg: vg.ansible
+        lv: lv.ansible
+        size: 512m
+        state: present
+
+rhcsa_parted_loop_fs_mount.yml
+---
+- name: create fs and mount it
+  hosts: node1
+  tasks:
+    - name: create ext4 filesystem on logical volume
+      filesystem:
+        dev: /dev/vg.ansible/lv.ansible
+        fstype: ext4
+    - name: mounting it
+      mount:
+        path: /mnt/test_mount
+        src: /dev/vg.ansible/lv.ansible
+        fstype: ext4
+        state: mounted
+        backup: yes
+~
