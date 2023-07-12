@@ -30,6 +30,23 @@ upload roles on Ansible-Galaxy from Git
         ->password? (new access token from developers menu in github)
 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
 
+"**********************************************************************************"
+vim /etc/ansible/ansible.ini
+[defaults]
+interpreter_python = auto
+host_key_checking = false
+remote_user = rupert
+ask_pass = false
+roles_path = /home/ansible/automation/roles:/etc/ansible/roles
+"***********************************************************************************"
+#roles can be installed from a file
+ansible-galaxy install -r file.yml
+ansible-galaxy collection install hypersql_devops.postgres
+ansible-galaxy list
+ansible-galaxy install geerlingguy.postgresql
+ansible-galaxy info geerlingguy.postgresql
+ansible-galaxy remove geerlingguy.postgresql
+
 
 role.yml
 ---
@@ -131,3 +148,4 @@ admin: rupert
                   # DirectoryIndex: sets the file that Apache will serve if a directory
                   <IfModule dir_module>
                   DirectoryIndex index.html
+"****************************************************************************************"
