@@ -12,6 +12,7 @@ how many nodes a task is being executed on at a time
     - 50%
   tasks:
 first run all tasks on server 1, then 2, then 50% of all left
+"********************************************************************************"
 
 VAULT
 {TASK1}
@@ -68,7 +69,7 @@ helpful in creating static configuration files for each of the node
 jinja2 templates store variables that can change from time to time 
 All templating happens on the Ansible Controller before the task is sent, This approach minimizes the package requirements on the target machines
 j2 template file is a text file that contains variables that get evaluated and replaced by actual values upon runtime or code execution.
-{{}}
+{{}} used when you call a variable in the template
 {% %} used for control statements such as loops & if-else statements
 {# #} comments
 JINJA2 IS SIMILAR TO copy module. copy module is static, jinja template is dynamic

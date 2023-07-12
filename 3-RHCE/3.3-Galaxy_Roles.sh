@@ -149,3 +149,11 @@ admin: rupert
                   <IfModule dir_module>
                   DirectoryIndex index.html
 "****************************************************************************************"
+
+---
+# tasks file for /home/ansible/automation/roles/apache
+- import_tasks: install.yml
+- import_tasks: service.yml
+- import_tasks: config.yml
+~
+"****************************************************************************************"
