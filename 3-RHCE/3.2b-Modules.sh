@@ -94,7 +94,7 @@
     or
     ansible web -m yum_repository -a 'name=test description="test repo" baseurl=http://baseos.com/appstream anabled=1 gpgcheck=0'
     ansible web -m command -a 'yum repolist all'
-    ansible web -m ymu_repository -a 'name=test state=absent' --> to delete a repo
+    ansible web -m yum_repository -a 'name=test state=absent' --> to delete a repo
 [package]
     ansible web -m package -a 'name=zsh state=present/installed use=yum'
     ansible web -m package -a 'name=httpd status=latest'
@@ -127,7 +127,6 @@
     ansible web -m systemd -a 'name=httpd masked=true'
 [debug]
     ansible localhost -m debug -a 'msg="{{ ansible_version.full }}"'
-
 [uri]
     check to see if nodes have internet access
     uri = url testing

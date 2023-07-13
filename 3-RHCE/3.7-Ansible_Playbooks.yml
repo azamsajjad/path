@@ -320,4 +320,20 @@ Once that deployment has finished, your developers let you know they found and f
 ~
 ~
 
+CLOUD_LAB_VAULT
+Our database administrators have started using a third party tool to run some analysis on their database. This tool needs access to the password used by the dba account. We've been given the database password to enable this tool. Our task is to put that password in /home/dba/.pgpass but make sure that no one (without the vault password) can read the password on our local filesystem. The password is LinuxAcad. The file must be owned by the dba user and have a mode of 0600.
 
+---
+- name: dbapassword
+  hosts: dbservers
+  tasks:
+    - name: dbpass
+      lineinfile:
+        line: "LinuxAcad"
+        create: yes
+        owner: dba
+        group: dba
+        mode: 0600
+        path: /home/dba/.pgpass
+
+ansible-vault encrypt dppass.yml

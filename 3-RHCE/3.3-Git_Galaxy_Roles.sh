@@ -18,6 +18,7 @@ upload roles on Ansible-Galaxy from Git
 
   817  git init
   818  ls -alh
+  819  git clone https://github.com/syedsajjad-rh/playbooks.git
   819  git remote add origin https://github.com/syedsajjad-rh/ansible-httpd.git
   820  git status
   821  git add .
@@ -28,7 +29,40 @@ upload roles on Ansible-Galaxy from Git
   826  git push origin master
         ->username?
         ->password? (new access token from developers menu in github)
-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
+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
+
+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
+# new
+
+git rm --cached -r PDFs/
+git add .
+git commit -m ""
+git push
+
+ pip install --upgrade ansible (if ansible module fails - accidental deletion)
+
+
+clone your repo from remote server , then make changes and push back
+git clone https://github.com/syedsajjad-rh/playbooks.git/ original
+
+   89  git clone https://github.com/syedsajjad-rh/playbooks.git/ playbooks
+   92  ll playbooks/
+   93  git clone playbooks/ playbooksr/
+   94  # clone repo from folder to folder
+   95  cd playbooksr
+   96  git status
+   97  git add newfile.txt
+   98  echo newfile > newfile.txt
+   99  git status
+  100  git add .
+  101  git commit -m "nf"
+  102  git config user.email syedsajjad.rh@gmail.com
+  103  git config user.name syedsajjad-rh
+  104  git commit -m "nf"
+  105  git remote -v
+  106  git status
+  107  git push https://github.com/syedsajjad-rh/playbooks.git/
+    username and password
 
 "**********************************************************************************"
 vim /etc/ansible/ansible.ini

@@ -320,3 +320,30 @@ rhcsa_parted_loop_fs_mount.yml
         state: mounted
         backup: yes
 ~
+
+
+LVM 
+
+ 151  ansible node1 -m raw -a 'echo -e "n\np\n1\n\n+5G\nw" | sudo fdisk /dev/nvme0n5' -b
+  152  ansible node1 -m command -a 'lsblk'
+  153  ansible node1 -m lvg -a 'vg=ansible.vg pvs=/dev/nvme0n5p1 pesize=32' -b
+  154  ansible node1 -m command -a 'lsblk'
+  155  ansible node1 -m command -a 'lvs' -b
+  156  ansible node1 -m command -a 'vgs' -b
+  157  ssh 101
+  158  ansible node1 -m command -a 'vgs' -b
+  159  ansible node1 -m lvol -a 'vg=ansible.vg lv=ansible.lv size=100m' -b
+  160  ansible node1 -m command -a 'lvs' -b
+  161  ansible node1 -m command -a 'lsblk' -b
+  162  ansible node1 -m command -a 'lvdisplay' -b
+  163  ansible node1 -m filesystem -a 'dev=/dev/ansible.vg/ansible.lv fstype=ext4 state=present' -b
+  164  ansible node1 -m command -a 'lsblk -f' -b
+  165  ansible node1 -m mount -a 'path=/mnt/ansiblelvm src=/dev/ansible.vg/ansible.lv fstype=ext4 opts=defaults state=mounted' -b
+  166  ansible node1 -m command -a 'cat /etc/fstab' -b
+  167  ansible node1 -m command -a 'df -hT' -b
+  168  ansible node1 -m lvol -a 'vg=ansible.vg lv=ansible.lv size=+1G resizefs=true' -b
+  169  ansible node1 -m command -a 'df -hT' -b
+  170  ansible node1 -m lvol -a 'vg=ansible.vg lv=ansible.lv state=absent force=true' -b
+  171  ansible node1 -m mount -a 'path=/mnt/ansiblelvm src=/dev/ansible.vg/ansible.lv fstype=ext4 opts=defaults state=absent' -b
+  172  ansible node1 -m command -a 'df -hT' -b
+  173  ansible node1 -m lvol -a 'vg=ansible.vg lv=ansible.lv state=absent force=true' -b

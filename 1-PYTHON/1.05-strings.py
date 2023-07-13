@@ -63,3 +63,4 @@ print(seperated_list)
 #
 values = "".join(char if char not in seperated_list else " " for char in number).split()
 print([int(val) for val in values]) 
+# see 1.19 for details

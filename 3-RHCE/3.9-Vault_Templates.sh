@@ -13,7 +13,6 @@ how many nodes a task is being executed on at a time
   tasks:
 first run all tasks on server 1, then 2, then 50% of all left
 "********************************************************************************"
-
 VAULT
 {TASK1}
 [ansible@x230 automation]$ vim playbooks/ansible_vault.yml
@@ -52,14 +51,20 @@ save password in a file
 passowrd: redhat
 vim pass.txt 
 redhat
-[ansible@x230 automation]$ ansible-playbook playbooks/ansible_vault3.yml --vault-password-file pass.txt
-
+[ansible@x230 automation]$ ansible-playbook playbooks/ansible_vault3.yml 
+                          "--vault-password-file" pass.txt
 
 encrypt a string
 [ansible@x230 automation]$ ansible-vault encrypt_string 'bar' --name 'foo'
 foo has been encrypted as bar
 [ansible@x230 automation]$ ansible-vault encrypt_string 'bar' --name 'foo' > bar.txt
+ansible-vault encrypt_string --ask-vault-pass '8080' --name 'http_port'
 
+Prompt for a Password with Vault-id
+ansible-playbook --vault-id label@prompt playbook.yml
+
+Prompt for two Passwords with Vault-id
+ansible-playbook --vault-id label@prompt --vault-id label2@prompt playbook.yml
 
 
 "*************************************************************"
@@ -84,7 +89,7 @@ you can use ANSIBLE_FACTS as variable in templates
 motd.j2
 ***** Welcome to {{ ansible_distribution }} Server. *****
 IP Address of This Machine is {{ ansible_all_ipv4_addresses }}
-Today is {{ ansible_date_time['date'] }}
+Today is {{ ansible_date_time['date']['time']['tz'] }}
 
 motb.yml
 ---
