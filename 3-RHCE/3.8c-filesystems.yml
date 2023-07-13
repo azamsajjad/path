@@ -347,3 +347,129 @@ LVM
   171  ansible node1 -m mount -a 'path=/mnt/ansiblelvm src=/dev/ansible.vg/ansible.lv fstype=ext4 opts=defaults state=absent' -b
   172  ansible node1 -m command -a 'df -hT' -b
   173  ansible node1 -m lvol -a 'vg=ansible.vg lv=ansible.lv state=absent force=true' -b
+
+
+[ansible@x230 automation]$ vim playbooksr/rhcsa_parted_lvm1.yml
+---
+- name: create partition
+  hosts: node1
+  become: true
+  tasks:
+    - name: create new partition with size of 1GiB
+      parted:
+        device: /dev/nvme0n5
+        number: 1
+        state: present
+        part_end: 1GiB
+    - name: volume group
+      lvg:
+        vg: ansible-vg
+        pvs: /dev/nvme0n5p1
+        pesize: 32
+- name: create a volume group on /dev/nvme0n5 with p extent size od 128KiB
+  hosts: node1
+  become: true
+  tasks:
+    - name: create new partition on /dev/nvme0n5
+      parted:
+        device: /dev/nvme0n5
+        number: 2
+        state: present
+        part_start: 1GiB
+        part_end: 2GiB
+    - name: vgs
+      lvg:
+        vg: ansible-vg2
+        pvs: /dev/nvme0n5p2
+        pesize: 128K
+- name: another
+  hosts: node1
+  become: true
+  tasks:
+    - name: create new partition
+      parted:
+        device: /dev/nvme0n5
+        part_start: 2GiB
+        part_end: 3GiB
+        state: present
+        flags: [lvm]
+        number: 3
+    - name: vgs
+      lvg:
+        vg: ansible-vg2
+        pvs: /dev/nvme0n5p3,/dev/nvme0n5p2
+        pvresize: true
+        reset_vg_uuid: true
+      tags: vgs
+
+- name: Now create Logical volumes
+  hosts: node1
+  become: true
+  tasks:
+    - name: create logical volume
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lvcache
+        size: 512m
+        opts: --type cache-pool
+      
+    - name: Create logical volume
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lv
+        size: +100%FREE
+      tags: vgs
+    - name: Create lvm with Read Ahead Sectors - Read ahead is system call of Linux kernel that loads file's contents into the page cache - default is 256
+      lvol:
+        vg: ansible-vg2
+        lv: ansible-lv2
+        size: 100
+        opts: -r 16
+      tags: vgs
+    - name: delete lvm
+      lvol:
+        vg: ansible-vg2
+        lv: ansible-lv2
+        state: absent
+        force: true
+      tags: vgs
+    - name: make lvm percentage of vg size
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lvcache
+        size: 20%VG
+        force: true
+    - name: make lvm percentage of vg size
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lv
+        size: 20%VG
+        force: true
+    - name: Amazing feature of lvm . Take snapshots of logical volumes as backups
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lv
+        snapshot: snap1
+        size: 50m
+    - name: Make LVM inactive - can be confirmed with LVSCAN Command
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lv
+        active: false
+        force: true
+
+
+    - name: Create thin Provisioned LVMs - took place of VDO (RHEL8) - first we need to create a thinpool e.g. of 100mb over a volume group. lvm can then be provisioned over thinpool with sizes 5 or 6 time the size of thin pool
+      lvol:
+        vg: ansible-vg
+        thinpool: ansiblepool
+        size: 150m
+      tags: snap
+
+    - name: create LVM of more size than what is available
+      lvol:
+        vg: ansible-vg
+        lv: ansible-lvpool
+        thinpool: ansiblepool
+        size: 900m
+      tags: snap
