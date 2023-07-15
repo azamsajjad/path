@@ -16,10 +16,10 @@ print(type(age))
 age = "2 years"
 print(age)
 print(type(age))
-#we have re-bounded the label 'age' to string value '2 years'
+# we have re-bounded the label 'age' to string value '2 years'
 
 msg = "Roll a Dice"
-print(msg) 
+print(msg)
 my_str = "This is python script"
 print(my_str)
 my_str += " testing"
@@ -27,4 +27,4 @@ print(my_str)
 
 a = 7
 print(bin(a))
-#print binary of 7 
+# print binary of 7

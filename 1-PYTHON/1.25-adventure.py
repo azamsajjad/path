@@ -7,10 +7,10 @@
 #     chosen_path = input("Please choose an exit: ")
 # print("aren't you glad you got out of there")
 
-#same with BREAK option
+# same with BREAK option
 available_exits = ["north", "south", "east", "west"]
 
-chosen_path = "" 
+chosen_path = ""
 
 while chosen_path not in available_exits:
     chosen_path = input("Please choose an exit: ")

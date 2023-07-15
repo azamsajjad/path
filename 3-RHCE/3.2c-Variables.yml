@@ -188,7 +188,7 @@ PLAYBOOK VARIABLE HAS LOW PRIORITY THAN CLI VARIABLE
         name: "{{ user_name }}"
         state: present
         password: "{{ password | password_hash ('sha512') }}"
-
+  #passowrd: "{{ password | password_hash ('sha512') }}"
 [COMMAND_PROMPT_VARIABLE]
 ---
 - name: Example of Command line Variables with Prompt

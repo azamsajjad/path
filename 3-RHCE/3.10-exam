@@ -1,0 +1,68 @@
+These are the twelve tasks you'll need to complete in order to prepare for the exam:
+
+Set up an Ansible inventory.
+Set up SSH keys.
+Set up sudoers.
+Write a playbook to install httpd only on WebServer1. Make sure the service is started and enabled.
+Use an ad-hoc command to install tcpdump on AdminServer1
+Use the LVM module in a playbook to set up the disk attached to DBServer1 (/dev/xvdg), then make sure it's formatted with XFS and mounted persistently on /mnt/dbdata. The disk's size should be 10G.
+Create the users adam, john, sara, and sam on all servers.
+Write a Bash script that queries each server for its Ansible facts, and outputs that information to a file in /tmp; there should be one file for each server name.
+Using the ssh.tmpl sample file in /root on the Ansible Host to write a template and playbook that will deploy the file on all hosts in the environment. It should turn off Password Authentication on all servers, and ensure X11 forwarding is on for administrative servers only.
+Create two custom roles: web and database.
+In the database role, create a password file that will be copied into the dba user's home directory. Encrypt the file. Ensure the database role is deployed correctly.
+For the web role, ensure that /var/www/html/index.html contains the Ansible hostname of the server and all IP addresses connected to that server. Ensure that httpd is running and enabled, and that the role deploys correctly.
+
+
+Write a Bash Script That Will Collect the Required Ansible Information
+We want to get each host's Ansible facts and dump the information into respective text files. So you've got to write a script, facts.sh, that will query each one and put its relevant info into a text file. The script should look something like the following:
+
+#!/bin/bash
+for i in webserver1 dbserver1 adminserver1
+do
+        ansible -m setup $i > /tmp/$i\_facts
+done
+
+Using the ssh.tmpl sample file in /root on the Ansible Host to write a template and playbook that will deploy the file on all hosts in the environment. It should turn off Password Authentication on all servers, and ensure X11 forwarding is on for administrative servers only.
+
+---
+- name: review task 9
+  hosts: all:!admin
+  become: yes
+  vars:
+    - pa_ans: "no"
+      x11_ans: "no"
+  tasks:
+    - name: copy template
+      template:
+        src: /root/ssh.j2
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: 0600
+        validate: usr/sbin/sshd -t -f %s
+
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+
+- hosts: admin
+  become: true
+  vars:
+    - pa_ans: "no"
+    - x11_ans: "yes"
+  tasks:
+    - name: copy template
+      template:
+        src: /root/ssh.j2
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: 0600
+        validate: usr/sbin/sshd -t -f %s    <-------------------------no /usr becaus root
+
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted

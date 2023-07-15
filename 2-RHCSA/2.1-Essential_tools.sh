@@ -14,7 +14,23 @@ Locate, read, and use system documentation including man, info, and files in /us
 yum-ultils
 yumdownloader stress
 
+
+
 ARCHIVING_COMPRESSION, SYSTEM_DOCUMENTATION, LOGS, FILE_LINKS, UMASK
+
+if apropos perm -> mothing appropriate
+DOCs
+$yum install -y man-pages
+$yum install -y makewhatis (regenerate manpage database search through apropos)
+$updatedb
+$mandb -c  <----fixes nothing appropriate issue
+
+NOW.....
+$apropos perm
+"Shows a list of commands that has something to do with perm"
+
+
+
 
 ARCHIVING
 Remove clutter from /home directory
