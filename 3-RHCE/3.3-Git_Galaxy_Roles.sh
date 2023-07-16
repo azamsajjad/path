@@ -29,9 +29,10 @@ upload roles on Ansible-Galaxy from Git
   826  git push origin master
         ->username?
         ->password? (new access token from developers menu in github)
-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
 
 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
+
+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 roles
 # new
 
 git rm --cached -r PDFs/
@@ -150,38 +151,38 @@ admin: rupert
                   - On 4th-Reich Network, This Website is hosted on {{ ansible_nodename }} Running {{ ansible_os_family }}
                   - System is {{ ansible_processor[2] }}
 
-                  #httpd.conf.j2
-                  Listen {{ http_port }}
-                  # LoadModule foo_module modules/mod_foo.so
-                  Include conf.modules.d/*.conf
-                  User apache
-                  Group apache
-                  # 'Main' server configuration
-                  ServerAdmin {{ admin }}@{{ ansible_hostname }}
+#httpd.conf.j2
+Listen {{ http_port }}
+# LoadModule foo_module modules/mod_foo.so
+Include conf.modules.d/*.conf
+User apache
+Group apache
+# 'Main' server configuration
+ServerAdmin {{ admin }}@{{ ansible_hostname }}
 
-                  <Directory />
-                  AllowOverride none
-                  Require all denied
-                  </Directory>
+<Directory />
+AllowOverride none
+Require all denied
+</Directory>
 
-                  DocumentRoot "{{ content_dir }}"
-                  #
-                  <Directory "{{ content_dir }}">
-                  AllowOverride None
-                  # Allow open access:
-                  Require all granted
-                  </Directory>
-                  # Further relax access to the default document root:
-                  <Directory "{{ content_dir }}">
-                  #
-                  Options Indexes FollowSymLinks
-                  AllowOverride None
-                  # Controls who can get stuff from this server.
-                  Require all granted
-                  </Directory>
-                  # DirectoryIndex: sets the file that Apache will serve if a directory
-                  <IfModule dir_module>
-                  DirectoryIndex index.html
+DocumentRoot "{{ content_dir }}"
+#
+<Directory "{{ content_dir }}">
+AllowOverride None
+# Allow open access:
+Require all granted
+</Directory>
+# Further relax access to the default document root:
+<Directory "{{ content_dir }}">
+#
+Options Indexes FollowSymLinks
+AllowOverride None
+# Controls who can get stuff from this server.
+Require all granted
+</Directory>
+# DirectoryIndex: sets the file that Apache will serve if a directory
+<IfModule dir_module>
+DirectoryIndex index.html
 "****************************************************************************************"
 
 ---
