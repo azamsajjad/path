@@ -8,7 +8,7 @@ input("Press Enter to Start!")
 # we want computer to guess, nd user to input directions to guess lower or higher
 # True is always True, so this loop will go on forever
 guesses = 1
-while True:
+while low != high:
     #print("\tGuessing in the range of {} and {}".format(low, high))
     guess = low + (high - low) // 2
     high_low = input(
@@ -32,3 +32,13 @@ while True:
     #guesses = guesses + 1
     guesses += 1
     #AUGMENTED ASSIGNMENT is efficient
+
+#COPIEd
+# we can make this program more impressive by not asking if number guessed is correct
+# we know it must be, when low == high
+# we can tell the player we have guessed their number 
+else:
+    print("You thought of the number {}".format(low))
+    print("I got it in {} guesses".format(guesses))
+
+# else in loop is basically 'completed' loop condition

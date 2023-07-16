@@ -1,0 +1,113 @@
+
+PRECEDENCE MAP - TOP HAS LEAST PRECEDENCE
+
+Role Defaults (defined in defaults/main.yml)
+Inventory group_vars
+Inventory group_vars/all
+Playbook group_vars/all
+Inventory group_vars/*
+Playbook group_vars/*
+Inventory host_vars
+Inventory host_vars/*
+Playbook host_vars/*
+Host Facts / Cached set_facts
+Play vars:
+Play vars_prompt:
+Play vars_files:
+Role vars (defined in vars/main.yml)
+Block vars (only for tasks in block)
+Task vars (only for the task)
+set_facts / Registered vars
+Role (and include_role) parameter in role execution file
+include parameters
+extra vars with -e "user=my_user" on Command Line
+
+
+"**********************************************************************"
+"INVENTORY_VARIABLES"
+[vmservers]
+node1
+node2
+node3
+[vmservers:vars]
+http_port=80
+content_dir=/webcontent
+
+web:
+  hosts:
+    node1
+    node2
+  vars:
+    http_port: 80
+apache:
+  hosts:
+    node3
+    node2
+  vars:
+    http_port: 8080
+
+(Ansible will use ASCII priority , so alphabetically, apache would be prioritized, and port 8080 will be set)
+#However, if you mention ansible_group_priority variable , it will override ASCII
+
+web:
+  hosts:
+    node1
+    node2
+  vars:
+    http_port: 80
+    ansible_group_priority: 10
+apache:
+  hosts:
+    node3
+    node2
+  vars:
+    http_port: 8080
+
+if you mention 2 files with -1 option on ansible-playbook - file specified last will have priority
+$ansible-playbook -i static.ini -i inventory.ini play.yml 
+but if......
+$ansible-playbook -i 02-static.ini -i 01-inventory.ini play.yml 
+static variables will have precedence because it has higher ASCII number in its filename
+
+"********************************************************************************"
+
+separate USERs File to add users
+users:
+  - name: azam_sajjad
+    uid: 1111
+    comment: azam sajjad
+  - name: hassan_sajjad
+    uid: 1112
+    comment: hassan sajjad
+  - name: faizan_sajjad
+    uid: 1113
+    comment: faizan sajjad
+  - name: shahrukh_sajjad
+    uid: 1114
+    comment: shahrukh sajjad
+  - name: azaan_sajjad
+    uid: 1115
+    comment: azaan sajjad
+  - name: hussain_sajjad
+    uid: 1116
+    comment: hussain sajjad
+  - name: haider_sajjad
+    uid: 1117
+    comment: haider sajjad
+
+---
+- name: add users from a file
+  hosts: node3
+  become: true
+  vars_files:
+    - ~/automation/files/users_to_add.yml
+  tasks:
+    name: create users
+    user:
+      name: "{{item.name}}"
+      state: present
+      uid: "{{item.uid}}"
+      comment: "{{item.comment}}"
+    with_items: "{{users}}"
+
+"********************************************************************************"

@@ -337,3 +337,27 @@ Our database administrators have started using a third party tool to run some an
         path: /home/dba/.pgpass
 
 ansible-vault encrypt dppass.yml
+
+
+
+ADVANCE AUTOMATION lab
+There are 2 tasks to accomplish for this hands-on lab.
+Modify that playbook to populate the /opt/backup/streams file with the value of the host based-variable from the Ansible inventory file.
+
+inventory.ini
+
+---
+- name: install csh
+  hosts: backup_servers
+  become: true
+  tasks:
+    - name: create path
+      file:
+        path: /opt/backup
+        state: directory
+    - name: var in file
+      copy:
+        path: /opt/backup/streams
+        content: "{{ streams }}"
+        state: present
+~

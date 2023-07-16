@@ -1,4 +1,4 @@
-apache_tags.yml
+$ansible-playbook apache_tags.yml --list-tags
 ---
 - name: install and configure apache
   hosts: web

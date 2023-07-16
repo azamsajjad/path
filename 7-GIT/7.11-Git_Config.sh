@@ -52,7 +52,7 @@ for duplicate settings, whichever is listed last on the list, wins
 
 
 
-
+[*************************************************************************]
 ERROR 
 
 
@@ -67,3 +67,15 @@ git clone --depth 1 <repo_URI>
 # cd to your newly created directory
 git fetch --unshallow 
 git pull --all
+
+
+git remote -v
+git reset --hard
+git fetch --refetch
+
+
+Solution:. cloned from remote. copied its .gti file into folder. then git add .
+git commit
+then push
+
+[*************************************************************************]
