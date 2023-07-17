@@ -1,3 +1,4 @@
+
 Study points for the exam
 As an RHCE exam candidate, you should be able to handle all responsibilities expected of a Red Hat Certified System Administrator, including these tasks:
 
@@ -71,11 +72,12 @@ Users and groups
 Create and use templates to create customized configuration files
 Use Ansible Vault in playbooks to protect sensitive data - "session 13"
 
-
-
-
-
-
+vmware workstation pro license key
+4A4RR-813DK-M81A9-4U35H-06KND
+NZ4RR-FTK5H-H81C1-Q30QH-1V2LA
+JU090-6039P-08409-8J0QH-2YR7F
+4Y09U-AJK97-089Z0-A3054-83KLA
+4C21U-2KK9Q-M8130-4V2QH-CF810
 
 "************************************************************************"
 These are the twelve tasks you'll need to complete in order to prepare for the exam:
@@ -146,3 +148,125 @@ Using the ssh.tmpl sample file in /root on the Ansible Host to write a template 
       service:
         name: sshd
         state: restarted
+
+
+"***************************************"
+Version: 5.0
+Question: 1
+Install and configure ansible
+User bob has been created on your control node. Give him the appropriate permissions on the control
+node. Install the necessary packages to run ansible on the control node.
+Create a configuration file /home/bob/ansible/ansible.cfg to meet the following requirements:
+• The roles path should include /home/bob/ansible/roles, as well as any other path that may be
+required for the course of the sample exam.
+• The inventory file path is /home/bob/ansible/inventory.
+• Ansible should be able to manage 10 hosts at a single time.
+• Ansible should connect to all managed nodes using the bob user.
+Create an inventory file for the following five nodes:
+nodel.example.com
+node2.example.com
+node3.example.com
+node4.example.com
+node5.example.com
+Configure these nodes to be in an inventory file where node1 is a member of group dev. nodc2 is a
+member of group test, nodc3 is a member of group proxy, nodc4 and node 5 are members of group prod.
+Also, prod is a member of group webservers.
+Answer: See the
+Explanation for
+complete Solution
+below.
+Explanation:
+In/home/sandy/ansible/ansible.cfg
+[defaults]
+inventory=/home/sandy/ansible/inventory
+roles_path=/home/sandy/ansible/roles
+remote_user= sandy
+host_key_checking=false
+[privilegeescalation]
+become=true
+become_user=root
+Questions & Answers PDF Page 3
+become_method=sudo
+become_ask_pass=false
+In /home/sandy/ansible/inventory
+[dev]
+node 1 .example.com
+[test]
+node2.example.com
+[proxy]
+node3 .example.com
+[prod]
+node4.example.com
+node5 .example.com
+[webservers:children]
+prod
+Question: 2
+Create a file called adhoc.sh in /home/sandy/ansible which will use adhoc commands to set up a new
+repository. The name of the repo will be 'EPEL' the description 'RHEL8' the baseurl is
+'https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rmp' there is no gpgcheck, but you
+should enable the repo.
+* You should be able to use an bash script using adhoc commands to enable repos. Depending on your
+lab setup, you may need to make this repo "state=absent" after you pass this task.
+Answer: See the
+Explanation for
+complete Solution
+below.
+Explanation:
+chmod 0777 adhoc.sh
+vim adhoc.sh
+#I/bin/bash
+Questions & Answers PDF Page 4
+ansible all -m yum_repository -a 'name=EPEL description=RHEL8
+baseurl=https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rmp
+gpgcheck=no enabled=yes'
+Question: 3
+Create a file called packages.yml in /home/sandy/ansible to install some packages for the following
+hosts. On dev, prod and webservers install packages httpd, mod_ssl, and mariadb. On dev only install the
+development tools package. Also, on dev host update all the packages to the latest.
+Answer: See the
+Explanation for
+complete Solution
+below.
+Explanation:
+Solution as:
+** NOTE 1 a more acceptable answer is likely 'present' since it's not asking to install the latest
+state: present
+** NOTE 2 need to update the development node
+- name: update all packages on development node
+yum:
+name: '*'
+state: latest
+Question: 4
+Questions & Answers PDF Page 5
+Create a role called sample-apache in /home/sandy/ansible/roles that enables and starts httpd, enables
+and starts the firewall and allows the webserver service. Create a template called index.html.j2 which
+creates and serves a message from /var/www/html/index.html Whenever the content of the file
+changes, restart the webserver service.
+Welcome to [FQDN] on [IP]
+Replace the FQDN with the fully qualified domain name and IP with the ip address of the node using
+ansible facts. Lastly, create a playbook in /home/sandy/ansible/ called apache.yml and use the role to
+serve the index file on webserver hosts.
+Answer: See the
+Explanation for
+complete Solution
+below.
+Explanation:
+/home/sandy/ansible/apache.yml
+/home/sandy/ansible/roles/sample-apache/tasks/main.yml
+Questions & Answers PDF Page 6
+/home/sandy/ansible/roles/sample-apache/templates/index.html.j2
+In /home/sandy/ansible/roles/sample-apache/handlers/main.yml
+Questions & Answers PDF Page 7
+Question: 5
+Create a file called requirements.yml in /home/sandy/ansible/roles to install two roles. The source for
+the first role is geerlingguy.haproxy and geerlingguy.php. Name the first haproxy-role and the second
+php-role. The roles should be installed in /home/sandy/ansible/roles.
+Answer: See the
+Explanation for
+complete Solution
+below.
+Explanation:
+in /home/sandy/ansible/roles
+vim requirements.yml
+Run the requirements file from the roles directory:
+ansible-galaxy install -r requirements.yml -p /home/sandy/ansible/roles

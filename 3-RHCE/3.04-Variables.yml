@@ -69,9 +69,12 @@ but if......
 $ansible-playbook -i 02-static.ini -i 01-inventory.ini play.yml 
 static variables will have precedence because it has higher ASCII number in its filename
 
-"********************************************************************************"
 
-separate USERs File to add users
+"********************************************************************************"
+#populating variable from anywhere except ANSIBLE_FACT, is outside source
+# Lists
+# separate USERs File to add users
+---
 users:
   - name: azam_sajjad
     uid: 1111
@@ -110,4 +113,15 @@ users:
       comment: "{{item.comment}}"
     with_items: "{{users}}"
 
-"********************************************************************************"
+
+
+Dictonaries (key value pairs)
+- sally:
+    name: Sally Jenkins
+    id: 2501
+    skills:
+      - Jenkins Admin
+      - Linux Guru 
+
+to call a value:
+{{ sally.skills[1] }} or {{ sally['skills[1]'] }} (2nd is preferred)

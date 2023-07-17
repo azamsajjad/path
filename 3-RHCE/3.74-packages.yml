@@ -1,0 +1,122 @@
+YUM - Yellowdog Updater Modified
+$cat /etc/redhat-release
+ls -lh /var/lib/rpm # all rpm data
+$ rpm -qa #(list all installed packages)
+rpm -qa | grep chrony
+rpm -q bash #detail of a package
+
+rpm -Uvh zsh-5.2.3..2.aarch64.rpm #show dependency local package
+rpm -e zsh # remove a package
+rpm -ivh zsh-5.noaarch64.rpm # install package when dependencies are resolved
+
+yum list 
+yum search zsh 
+yum list installed zsh 
+yum provides /usr/share/man/man5/passwd.5.gz # which package provides this file
+yum update # PATCHING - Update all Packages
+yum update httpd 
+yum history # Important when PATCHING
+yum downgrade httpd # if problem with updated package
+yum history info 3
+yum history undo 3 # Revert Back to previous state
+---
+yum grouplist
+yum groupinstall 'Server With GUI'
+yum groupinstall 'Container Management'
+
+# DNF is faster than YUM
+dnf list # Available packages
+dnf list zsh 
+dnf provides /usr/share/man/man5/passwd.5.gz # which package provides this
+dnf install -y zsh
+dnf update
+dnf downgrade httpd 
+dnf history 
+dnf grouplist 
+
+
+both YUM $ DNF uses /etc/yum.conf as configuration file - global settings
+/etc/repos.d/ has repo files 
+yum repolist all 
+
+[***********************************************************************]
+ANSIBLE FOR PACKAGE MANAGEMENT ON MANAGED NODES 
+
+MOST IMP FOR EXAM 
+ ansible node1 -m yum_repository -a 'name=epel description=EPEL_REPO baseurl=https://..... metalink=https://..... enabled=true gpgcheck=true gpgkey=file:///etc/pki...' -b
+
+ ansible node1 -m yum_repository -a 'name=epel description=EPEL_REPO baseurl=https://..... metalink=https://..... enabled=true gpgcheck=true gpgkey=file:///etc/pki... state=absent' -b
+
+ansible node1 -m command -a 'yum repolist'
+ansible node1 -m command -a 'rpm -qa | grep httpd'
+ansible node1 -m command -a 'rpm -q httpd'
+ansible node1 -m command -a 'dnf list'
+ansible node1 -m command -a 'dnf list installed httpd'
+
+ansible node1 -m yum -a 'list=httpd'
+ansible node1 -m yum -a 'name=httpd state=installed' -b
+ansible node1 -m package -a 'name=httpd state=installed' -b 
+
+
+To remove a repository
+---
+- name:
+  hosts: node1
+  become: true
+  tasks:
+    - name: remove a repo from a file which has multiple repos
+      yum_repository:
+            name: epel2
+            file: external_repos
+            state: absent
+
+---
+- name:
+  hosts: node1
+  become: true
+  tasks:
+    - name: update all packages
+      yum:
+         name: *
+         state: latest
+
+---
+- name:
+  hosts: node1
+  become: true
+  tasks:
+    - name: update all packages, excluding kernel & chrony packages
+      yum:
+         name: '*'
+         state: latest
+         exclude: kernel*,chrony*
+
+- name:
+  hosts: node1
+  become: true
+  tasks:
+    - name: install package from a remote url
+      yum:
+         name: http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.e16.ngx.noarch.rpm
+         state: present
+         disable_gpg_check: true
+
+- name:
+  hosts: node1
+  become: true
+  tasks:
+    - name: install package from local directory
+      yum:
+         name: /home/ansible/nginx-release-centos-6-0.e16.ngx.noarch.rpm
+         state: present
+         disable_gpg_check: true
+
+- name:
+  hosts: node1
+  become: true
+  tasks:
+    - name: install 'Development Tools' package group
+      yum:
+         name: "@Development tools"
+         state: present
+

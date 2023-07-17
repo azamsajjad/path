@@ -361,3 +361,45 @@ inventory.ini
         content: "{{ streams }}"
         state: present
 ~
+CONFIGURE ansible.cfg
+[defaults]
+inventory=/home/ansible/ansible/inventory
+roles_path=/home/ansible/ansible/roles
+remote_user=bob
+ask_pass=false
+host_key_checking=false
+[privilegeescalation]
+become=true
+become_user=root
+become_method=sudo
+become_ask_pass=false
+
+
+Create a file called packages.yml in /home/sandy/ansible to install some packages for the following
+hosts. On dev, prod and webservers install packages httpd, mod_ssl, and mariadb. On dev only install the
+development tools package. Also, on dev host update all the packages to the latest.
+---
+- name: Create a file called packages.yml in /home/sandy/ansible to install some packages for the following hosts. On dev, prod and webservers install packages httpd, mod_ssl, and mariadb. On dev only install the development tools package. Also, on dev host update all the packages to the latest.
+  hosts: dev,test,webservers
+  become: true
+  tasks:
+    - name: install 3 packages
+      yum:
+        name:
+          - httpd
+          - mod_ssl
+          - mariadb
+        state: present
+
+    - name: install development package
+      yum:
+        name: '@Development tools'
+        state: present
+      when: 'dev' in group_names
+    - name: update all packages
+      yum:
+        name: '*'
+        state: latest
+      when: 'dev' in group_names
+~
+~

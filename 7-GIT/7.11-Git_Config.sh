@@ -50,7 +50,10 @@ file:.git/config        user.name=syed sajjad
 System file is read first, then user, then local
 for duplicate settings, whichever is listed last on the list, wins
 
+git remote set-url origin https://github.com/syedsajjad-rh/ansible_playbooks.git
 
+GIT SAVE PASSWORD
+git config --global credential.helper store
 
 [*************************************************************************]
 ERROR 
