@@ -83,6 +83,17 @@ ansible-galaxy info geerlingguy.postgresql
 ansible-galaxy remove geerlingguy.postgresql
 
 
+
+pre_tasks: (out of scope)
+tasks:
+YOU CAN INCLUDE OTHER PLAYBOOKS IN A PLAYBOOK
+tasks:
+  - include: folder/packages.yml
+this file should have only the task, not everything
+
+
+
+
 role.yml
 ---
 - name: for apachej2 role

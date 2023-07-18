@@ -270,3 +270,9 @@ in /home/sandy/ansible/roles
 vim requirements.yml
 Run the requirements file from the roles directory:
 ansible-galaxy install -r requirements.yml -p /home/sandy/ansible/roles
+
+
+
+
+
+"*************************************************************************"

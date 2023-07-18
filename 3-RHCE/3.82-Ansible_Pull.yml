@@ -1,0 +1,142 @@
+https://github.com/ansible/ansible_pull.git
+sync across laptop and remote servers 
+github will be used to push tasks onto remote servers
+
+clone ansible_pull repo on both x230 and vmserver2
+[ansible@x230 ansible_pull]$ git clone git@github.com:syedsajjad-rh/ansible_pull.git
+[rupert@server2 ansible_pull]$ git clone git@github.com:syedsajjad-rh/ansible_pull.git
+
+"push tasks from x230, pull and run from vmserver2"
+
+[ansible@x230 ansible_pull]$ cat localhost.yml
+---
+- name: remote server must pull this default yml from github and run on itself
+  hosts: localhost
+  connection: local
+  become: true
+  tasks:
+    - include: tasks/packages.yml
+
+
+tasks/packages.yml
+---
+- name: tasks
+  yum:
+    name:
+      - mc 
+      - tmux 
+
+
+[rupert@server1 ~]$ ansible-pull -U git@github.com:syedsajjad-rh/ansible_pull.git --key-file ~/.ssh/id_rsa --accept-host-key -C main localhost.yml
+# Starting Ansible Pull at 2023-07-18 08:19:49
+# /usr/local/bin/ansible-pull -U git@github.com:syedsajjad-rh/ansible_pull.git --key-file /home/rupert/.ssh/id_rsa --accept-host-key -C main localhost.yml
+
+
+
+[rupert@server2 ansible]$ ansible-pull -C main -U https://github.com/syedsajjad-rh/ansible_pull.git localhost.yml
+# Starting Ansible Pull at 2023-07-18 00:53:55
+# /home/rupert/git/ansible/bin/ansible-pull -C main -U https://github.com/syedsajjad-rh/ansible_pull.git localhost.yml
+# [WARNING]: Could not match supplied host pattern, ignoring: server2
+# [WARNING]: Could not match supplied host pattern, ignoring:
+# server2.vmserver.com
+# localhost | SUCCESS => {
+#     "after": "c6c622f23f260f3d0d06b0f3f8071b86bc8acbfa",
+#     "before": "c6c622f23f260f3d0d06b0f3f8071b86bc8acbfa",
+#     "changed": false,
+#     "remote_url_changed": false
+# }
+# [WARNING]: provided hosts list is empty, only localhost is available. Note that
+# the implicit localhost does not match 'all'
+# [WARNING]: Could not match supplied host pattern, ignoring: server2
+# [WARNING]: Could not match supplied host pattern, ignoring:
+# server2.vmserver.com
+# [DEPRECATION WARNING]: "include" is deprecated, use include_tasks/import_tasks
+# instead. See https://docs.ansible.com/ansible-
+# core/2.15/user_guide/playbooks_reuse_includes.html for details. This feature
+# will be removed in version 2.16. Deprecation warnings can be disabled by
+# setting deprecation_warnings=False in ansible.cfg.
+
+# PLAY [remote server must pull this default yml from github and run on itself] ***
+
+# TASK [Gathering Facts] *********************************************************
+# ok: [localhost]
+
+# TASK [install packages] ********************************************************
+# changed: [localhost]
+
+# PLAY RECAP *********************************************************************
+# localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+automate THIS process
+---
+- name: Install a cronjob for servers to pull from git every 10 minutes
+  cron:
+    user: rupert
+    name: "ansible provision"
+    minute: "*/10"
+    job: "/usr/local/bin/ansible-pull -U git@github.com:syedsajjad-rh/ansible_pull.git --key-file /home/rupert/.ssh/id_rsa --accept-host-key -C main localhost.yml > ~/ansible-pull.log"
+
+
+
+
+- name: Install a cronjob for servers to pull from git every 10 minutes
+  cron:
+    user: rupert
+    name: "ansible provision"
+    minute: "*/10"
+    job: "/usr/bin/ansible-pull -o -C main -U https://github.com/syedsajjad-rh/ansible_pull.git localhost.git > /dev/null"
+~
+# -o = run only when there is a change in repo
+# "*/10" = run every 10 minutes subject to change
+# /usr/bin/ansible-pull = fully qualified run binary for ansible-pull
+---
+    job: "~/git/ansible/bin/ansible-pull -o -C main -U https://github.com/syedsajjad-rh/ansible_pull.git localhost.git > /dev/null"
+# if ansible is installed via git cloning
+# run which ansible-pull to know exact path
+
+
+[rupert@server2 ~]$ crontab -l
+#Ansible: ansible provision
+*/10 * * * * /home/rupert/git/ansible/bin/ansible-pull -o -C main -U https://github.com/syedsajjad-rh/ansible_pull.git localhost.git > /dev/null
+[rupert@server2 ~]$
+
+
+
+
+
+"***********************************************************************"
+# Re-using playbooks
+# You can incorporate multiple playbooks into a main playbook. However, you can only use imports to re-use playbooks. For example:
+
+# - import_playbook: webservers.yml
+# - import_playbook: databases.yml
+# Importing incorporates playbooks in other playbooks statically. Ansible runs the plays and tasks in each imported playbook in the order they are listed, just as if they had been defined directly in the main playbook.
+
+# You can select which playbook you want to import at runtime by defining your imported playbook filename with a variable, then passing the variable with either --extra-vars or the vars keyword. For example:
+
+# - import_playbook: "/path/to/{{ import_from_extra_var }}"
+# - import_playbook: "{{ import_from_vars }}"
+#   vars:
+#     import_from_vars: /path/to/one_playbook.yml
+
+
+
+# Imports: static re-use
+# Importing roles, tasks, or playbooks adds them to a playbook statically. Ansible pre-processes imported files and roles before it runs any tasks in a playbook, so imported content is never affected by other tasks within the top-level playbook.
+
+# The filenames for imported roles and tasks support templating, but the variables must be available when Ansible is pre-processing the imports. This can be done with the vars keyword or by using --extra-vars.
+
+# You can pass variables to imports. You must pass variables if you want to run an imported file more than once in a playbook. For example:
+
+# tasks:
+# - import_tasks: wordpress.yml
+#   vars:
+#     wp_user: timmy
+
+# - import_tasks: wordpress.yml
+#   vars:
+#     wp_user: alice
+
+# - import_tasks: wordpress.yml
+#   vars:
+#     wp_user: bob

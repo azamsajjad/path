@@ -6,6 +6,9 @@ Configure error handling
 Create playbooks to configure systems to a specified state
 
 
+
+ansible-playbook --ask-become-pass play.yml
+
 CLOUD_GURU_LAB1
 Install httpd on the webserver group.
 Start the httpd service on the webserver group.
@@ -13,6 +16,8 @@ Create a dba account on the dbserver group.
 Copy /root/DBAstuff.txt to the new user's home directory. Make sure he is the owner and group of the file, set permissions to 0600.
 Create index.html in /var/www/html on the webserver.
 Use the git module to check out https://github.com/ansible/ansible.git on the Admin server - put it in the /opt directory.
+
+
 --
 - name: for lab
   hosts: webservers
