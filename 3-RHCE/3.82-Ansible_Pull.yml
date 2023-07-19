@@ -18,7 +18,7 @@ clone ansible_pull repo on both x230 and vmserver2
     - include: tasks/packages.yml
 
 
-tasks/packages.yml
+# tasks/packages.yml
 ---
 - name: tasks
   yum:

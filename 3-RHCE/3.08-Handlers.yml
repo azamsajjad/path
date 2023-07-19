@@ -208,3 +208,22 @@ ok: [node2] => {
       listen: "yum_clean"
 
 
+
+PRACTICE_WHEN_REGISTER
+---
+- name: install ansible
+  hosts: localhost
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+      register: result
+    - name: restart httpd
+      service:
+        name: httpd
+        state: restarted
+      when: result.changed
+
+handler is more efficient way to doing the same thing
+even if you notify for 5 tasks, for change in either one of them, handler will run

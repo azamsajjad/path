@@ -183,3 +183,22 @@ node2 | SUCCESS => {
       loop: [ 0, 2, 4, 6, 8, 10 ]
       when: item > 5
 ...
+
+
+PRACTICE_WHEN_REGISTER
+---
+- name: install ansible
+  hosts: localhost
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+      register: result
+    - name: restart httpd
+      service:
+        name: httpd
+        state: restarted
+      when: result.changed
+
+# OR USE HANDLER

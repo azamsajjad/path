@@ -45,16 +45,16 @@ no need to individually curl 50 nodes to check webserver status
 
 
 
-[*******************************************************]
-Modify the Provided Playbook to Filter Packages Based on Tags
+#[*******************************************************]
+#Modify the Provided Playbook to Filter Packages Based on Tags
 
-The provided playbook doesn't have any tags in it, so if it's run as is, unneeded software will be installed on the servers. Add tags so that tasks can be filtered based on which group is being targeted.
+#The provided playbook doesn't have any tags in it, so if it's run as is, unneeded software will be installed on the servers. Add tags so that tasks can be filtered based on which group is being targeted.
 
-Add a Conditional for Web Services to Restart if an Index Is Modified
-There is a vendor requirement to restart Apache services if the index.html is modified. Build that into the provided playbook.
+#Add a Conditional for Web Services to Restart if an Index Is Modified
+#There is a vendor requirement to restart Apache services if the index.html is modified. Build that into the provided playbook.
 
-Add a Task That Has the Local Ansible Host Verify the Web Server Is Working
-There is a firewall in place that we want to ensure isn't blocking traffic on the web server. Verify from the Ansible host that pages load correctly.
+#Add a Task That Has the Local Ansible Host Verify the Web Server Is Working
+#There is a firewall in place that we want to ensure isn't blocking traffic on the web server. Verify from the Ansible host that pages load correctly.
 ---
 - hosts: all
   become: yes
@@ -113,9 +113,9 @@ There is a firewall in place that we want to ensure isn't blocking traffic on th
       listen: "restart apache"
 
 
-OROROROROROROROROROROROROROROROROROR instead of using handler, you can use a variable 
+#OROROROROROROROROROROROROROROROROROR instead of using handler, you can use a variable 
 ---
-- name: Configure /var/www/html/index.html
+- name: #Configure /var/www/html/index.html
       copy:
         dest: "/var/www/html/index.html"
         content: |
@@ -123,11 +123,11 @@ OROROROROROROROROROROROROROROROROROR instead of using handler, you can use a var
           Please replace this with the actual content from the developers before going production.
       register: statuschange
 ---      
-- name: Restart apache
+- name: #Restart apache
       service:
         name: httpd
         state: restarted
         enabled: true
       when: statuschange.changed
 
-This task will only run if the task above it changes something
+#This task will only run if the task above it changes something

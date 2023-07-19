@@ -408,3 +408,265 @@ development tools package. Also, on dev host update all the packages to the late
       when: 'dev' in group_names
 ~
 ~
+
+"*************************************************************************"
+CLOUD_LAB 
+#BACKUP.YML
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: create backup directories
+      file:
+        path: /mnt/backup_vol/{{ ansible_hostname }}
+        state: directory
+      tags:
+        - hostvar
+        - webservervars
+        - mediavars
+- hosts: web1
+  become: yes
+  tasks:
+    - name: backup scripts
+      archive:
+        dest: /mnt/backup_vol/{{ ansible_hostname }}/scripts.tgz
+        path: "{{ script_files }}"
+      tags: hostvar
+
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: backup httpd configs
+      archive:
+        dest: /mnt/backup_vol/{{ ansible_hostname }}/httpd_configs.tgz
+        path: "{{ httpd_config }}"
+      tags: webservervars
+    - name: backup webroot
+      archive:
+        dest: /mnt/backup_vol/{{ ansible_hostname }}/httpd_webroot.tgz
+        path: "{{ httpd_webroot }}"
+      tags: webservervars
+
+- hosts: media
+  become: yes
+  tasks:
+    - name: backup media content
+      archive:
+        dest: /mnt/backup_vol/{{ ansible_hostname }}/media_content.tgz
+        path: "{{ media_content }}"
+      tags: mediavars
+    - name: backup media index
+      archive:
+        dest: /mnt/backup_vol/{{ ansible_hostname }}/media_index.tgz
+        path: "{{ media_index }}"
+      tags: mediavars
+
+
+#!/bin/sh
+
+# Need to take a tag varialbe
+# mediavars to test media
+# webservervars to test webservers
+# hostvar to test host var
+# use playbook tags maybe?
+
+script to run multiple playbooks
+
+
+case "$1" in
+  mediavars)
+    ansible-playbook -i /home/ansible/inventory /home/ansible/scripts/backup.yml --tags "mediavars"
+    exit $?
+    ;;
+  webservervars)
+    ansible-playbook -i /home/ansible/inventory /home/ansible/scripts/backup.yml --tags "webservervars"
+    exit $?
+    ;;
+  hostvar)
+    ansible-playbook -i /home/ansible/inventory /home/ansible/scripts/backup.yml --tags "hostvar"
+    exit $?
+    ;;
+  *)
+    ansible-playbook -i /home/ansible/inventory /home/ansible/scripts/backup.yml
+    exit $?
+esac
+
+
+******SOLUTION*******
+vim /home/ansible/inventory
+[media]
+media1
+media2
+[webservers]
+web1
+web2
+
+$ mkdir host_vars -> vim web1 
+script_files: /tmp/usr/local/scripts
+
+$ mkdir group_vars -> vim media 
+media_content: /tmp/var/media/content
+media_index: /tmp/opt/media/mediaIndex
+
+$ mkdir group_vars -> vim webservers 
+httpd_webroot: /var/www
+media_index: /etc/httpd
+
+
+# "**********************************************************************"
+# Summary tasks list:
+
+# Create an inventory in /home/ansible/inventory containing a host group named web. The web group should contain node1 and node2.
+# Create a playbook in /home/ansible/web.yml.
+# Configure the playbook to install httpd on the web group.
+# Configure the playbook to start and enable the httpd service on the web group.
+# Configure the playbook to retrieve the website from http://repo.example.com/website.tgz on each server in the web group.
+# Configure the playbook to unarchive the website into /var/www/html on all servers in the web group.
+# Execute the playbook you created using the inventory you created to verify your work.
+---
+- name: install website
+  hosts: web
+  become: true
+  tasks:
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+    - name: enable
+      service:
+        name: httpd
+        state: started
+        enabled: true
+    - name: url
+      get_url:
+        url: http://repo.example.com/website.tgz
+        dest: /tmp/website.tgz
+    - name: unarchive
+      unarchive:
+        remote_src: yes
+        src: /tmp/website.tgz
+        dest: /var/www/html
+
+"*******************************************************""
+
+Create a playbook: `/home/ansible/report.yml`
+
+Configure the Playbook to Download *http://apps.l33t.com/transaction_list* to `/home/ansible/transaction_list` on `localhost` and Outputs the Message "File downloaded." to `stdout`
+
+Configure the Playbook to Handle Connection Failure by Outputting "l33t.com appears to be down. Try again later." to `stdout`
+
+Configure the Playbook to Output "Attempt Completed" to `stdout`, Whether It Was Successful or Not
+
+Configure the Playbook to Replace All Instances of `#BLANKLINE` with the Line Break Character `\n`
+
+Verify Configuration by Running the Playbook
+
+wrong method
+# ---
+# - name: download file
+#   hosts: localhost
+#   become: true
+#   tasks:
+#     - name: download
+#       get_url:
+#         url: http://apps.l33t.com/transaction_list
+#         dest: /home/ansible/transaction_list
+#       register: download
+#     - debug:
+#         msg: "{{ download }}"
+#       when: download.changed == true
+#     - debug:
+#         msg: "l33t.com appears to be down. Try again later"
+#       when: download.failed == true
+#     - debug:
+#         msg: "The attempt completed successfully"
+#       when: download.exist == true
+
+right method
+---
+- name: download file
+  hosts: localhost
+  become: true
+  tasks:
+    - name: block example
+      block:
+        - name: download
+          get_url:
+            url: http://apps.l33t.com/transaction_list
+            dest: /home/ansible/transaction_list
+        - debug:
+            msg: "File Downloaded"
+      rescue:
+        - debug:
+            msg: "l33t.com appears to be down. Try again later"
+      always:
+        - debug:
+            msg: "The attempt completed successfully"
+~
+~
+~
+~
+~THIS SCRIPT CHANGES DOWNLOAD BEHAVIOR
+
+#!/bin/sh
+
+# Remove transaction_list, otherwise playbook will not check url again.
+rm -f /home/ansible/transaction_list > /dev/null;
+
+# Is httpd running?
+nc -z -w 50ms apps.l33t.com 80 > /dev/null
+
+
+# Switch states depending on if it is up or down
+if [ $? -ne 0 ];
+then
+  echo -n "Starting apps.l33t.com...";
+  ansible node1 -b -m service -a "name=httpd state=started" > /dev/null;
+  echo "done."
+else
+  echo -n "Stopping apps.l33t.com...";
+  ansible node1 -b -m service -a "name=httpd state=stopped" > /dev/null;
+  echo "done."
+fi
+
+
+"*******************************************************"
+Create a Template *sudoers* File in `/home/ansible/hardened.j2` That Produces a File with Appropriate Output for Each Host
+
+The Deployed File Should Resemble the Example File Except with the *IP* and *hostnames* Customized Appropriately
+
+Create a Playbook in `/home/ansible/security.yml` That Uses the Template Module to Deploy the Template on All Servers in the Default Ansible Inventory After Validating the Syntax of the Generated File
+
+Run the Playbook and Ensure the Files Are Correctly Deployed
+
+Grant users in the sysops group the ability to run all commands as root for each local system by IP address. This would be what the entry in your result file except with the target system's IP: 
+%sysops 34.124.22.55 = (ALL) ALL.
+Define the host_alias group WEBSERVERS to contain all servers in the ansible web inventory group:
+Host_Alias WEBSERVERS = <host name>
+Define the host_alias group DBSERVERS to contain all servers in the ansible database inventory group: 
+Host_Alias DBSERVERS = <host name>
+Grant users in the httpd group the ability to sudo su - webuser on the WEBSERVERS hosts: 
+%httpd WEBSERVERS = /bin/su - webuser
+Grant users in the dba group sudo su - dbuser on the DBSERVERS hosts: 
+%dba DBSERVERS = /bin/su - dbuser
+The file must be validated using /sbin/visudo -cf before deployment.
+
+vim `/home/ansible/hardened.j2
+%sysops {{ ansible_default_ipv4.address }} = (ALL) ALL
+Host_Alias WEBSERVERS = {{ groups['web']|join(' ') }}
+Host_Alias DBSERVERS = {{ groups['database']|join(' ') }}
+%httpd WEBSERVERS = /bin/su - webuser
+%dba DBSERVERS = /bin/su - dbuser
+
+
+---
+- name: copy template
+  hosts: all
+  become: true
+  tasks:
+    - name: copy template
+      template:
+        src: /home/ansible/hardened.j2
+        dest: /etc/sudoers.d/hardened
+        validate: /sbin/visudo -cf %s
+# crucial to validate or sudo will break on target

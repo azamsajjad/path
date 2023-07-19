@@ -1,0 +1,128 @@
+firewall-cmd --state
+firewall-cmd --get default-zone
+firewall-cmd --list-all --zone=dmz
+firewall-cmd --list-all (according to zone)
+firewall-cmd --get-zones
+
+firewall-cmd --zone=home --change-interface=ens160
+firewall-cmd --zone=home --list-all
+
+cd /usr/lib/firewalld 
+cd services 
+cat ssh.xml - port 22 is defined - thats how firewall knows settings
+usr/lib/firewalld is reserved for reference only
+
+but firewalld uses /etc/firewalld for settings - same files
+
+e.g. we want a custom service defined on firewall
+cp /usr/lib/firewalld/services/ssh.xml  /etc/firewalld/services/example.xml
+
+# <?xml version="1.0" encoding="utf-8"?>
+# <service>
+#   <short>example service</short>
+#   <description>This is just an example service. It probably shouldn't be  used on a real system.</description>
+#   <port protocol="tcp" port="7777"/>
+#   <port protocol="udp" port="8888"/>
+# </service>
+firewall-cmd --reload
+firewall-cmd --list-all -> example service  
+#zones are also xml files listed in same format with just defined ports and rules
+firewall-cmd --permanent --new-zone=myoffice
+
+firewall-cmd --zone=public --add-port=9009/tcp --permanent 
+firewall-cmd --zone=public --remove-port=9009/tcp --permanent
+firewall-cmd --zone=public add-forward-port=port=80:proto=tcp:toport=8080:toaddr=192.168.100.101: --permanent 
+firewall-cmd --zone=public remove-forward-port=port=80:proto=tcp:toport=8080:toaddr=192.168.100.101 
+
+
+firewall-cmd --zone=p --add-masquarade
+
+WE WANT TO ALLOW SSH TRAFFIC FROM JUST ONE IP ADDRESS:
+RICH rule:
+firewall-cmd --permanent --zone=public --add-rich-rule 
+'rule family="ipv4" source address="192.168.100.99" port port=22 protocol=tcp accept/reject'
+
+**********************************************************
+
+ANSIBLE with firewalld 
+ 899  #open shortest path first = ospf /tcp /udp
+  900  ansible node1 -m firewalld -a 'protocol=ospf permanent=true state=enabled' -b
+  901  ansible node1 -m command -a 'firewall-cmd --list-all' -b
+  902  ansible node1 -m command -a 'firewall-cmd --reload' -b
+  903  ansible node1 -m command -a 'firewall-cmd --list-all' -b
+  904  ansible node1 -m firewalld -a 'protocol=ospf permanent=true state=disabled' -b
+  905  ansible node1 -m command -a 'firewall-cmd --reload' -b
+  906  ansible node1 -m command -a 'firewall-cmd --list-all' -b
+  907  # reload or use immediate=yes
+  908  ansible node1 -m firewalld -a 'zone=drop icmp_block_inversion=true permanent=true state=enabledimmediate=yes' -b
+  
+  909  ansible node1 -m firewalld -a 'zone=drop icmp_block_inversion=true permanent=true state=enabled immediate=yes' -b
+  910  ansible node1 -m firewalld -a 'zone=drop icmp_block_inversion=false permanent=true state=enabled immediate=yes' -b
+  
+  911  ansible node1 -m firewalld -a 'rich_rule="rule family=ipv4 forward-port port=443 protocol=tcp to-port=8443" zone=public permanent=true state=enabled immediate=yes' -b
+  913  ansible node1 -m firewalld -a 'rich_rule="rule family=ipv4 forward-port port=443 protocol=tcp to-port=8443" zone=public permanent=true state=disabled immediate=yes' -b
+  914  ansible node1 -m command -a 'firewall-cmd --list-all' -b
+
+
+PLAYBOOKS: 
+---
+- name: Manage firewall
+  hosts: node1
+  become: true
+  tasks:
+    - name: permit traffic in default zone for https service
+      firewalld:
+        service: https
+        state: enabled
+        permanent: true
+        imeediate: true
+
+    - name: allow ospf protocol
+      firewalld:
+        protocol: ospf
+        permanent: true
+        state: enabled
+
+    - name:
+      firewalld:
+        port: 8081/tcp
+        state: disabled
+
+    - name: Allow traffic from udp ports 161 & 162 in the firewall
+      firewalld:
+        zone: dmz
+        port: 161-162/udp
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: allow http traffic from dmz zone
+      firewalld:
+        zone: dmz
+        service: http
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: allow rich rule
+      firewalld:
+        rich_rule: rule service name="ftp" audit limit value="1/m" accept
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: change interface
+      firewalld:
+        zone: trusted
+        interface: lo
+        state: enabled
+        permanent: true
+        immediate: true
+
+    - name: add custome zone
+      firewalld:
+        zone: custom
+        state: enabled
+        permanent: true
+        immediate: true
+                                        
