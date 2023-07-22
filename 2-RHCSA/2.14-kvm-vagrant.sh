@@ -146,3 +146,63 @@ connect --> QEMU user-session
 
 [rupert@x230 ~]$ sysctl net.ipv4.ip_forward
 net.ipv4.ip_forward = 1
+
+
+
+"*********************************************************"
+INSTALL VIRTUALBOX
+lscpu | grep -i virtualization
+#install dependencies
+#Step 2: Enable EPEL Repo in RHEL
+$ sudo dnf install binutils kernel-devel kernel-headers libgomp make patch gcc glibc-headers glibc-devel dkms -y
+
+
+#add repo
+sudo dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo
+#import gpg key
+rpm --import https://www.virtualbox.org/download/oracle_vbox.asc
+#OR
+# [virtualbox]
+# name=Oracle Linux / RHEL / CentOS-$releasever / $basearch - VirtualBox
+# baseurl=http://download.virtualbox.org/virtualbox/rpm/el/$releasever/$basearch
+# enabled=1
+# gpgcheck=1
+# repo_gpgcheck=1
+# gpgkey=https://www.virtualbox.org/download/oracle_vbox_2016.asc
+
+
+dnf install VirtualBox-7.1 -y
+
+#Be sure to add the logged-in user to the vboxusers group using the following commands.
+$ sudo usermod -aG vboxusers $USER
+$ newgrp vboxusers
+
+#To install the VirtualBox Extension Pack, visit the official Virtualbox downloads page. Similarly, you can download the extension pack using the wget command as shown.
+
+$ wget https://download.virtualbox.org/virtualbox/7.0.2/Oracle_VM_VirtualBox_Extension_Pack-7.0.2.vbox-extpack
+
+sudo VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-7.0.2.vbox-extpack
+
+#finally
+sudo /sbin/vboxconfig
+#if error This system is currently not set up to build kernel modules. Please install the Linux kernel "header" files matching the current kernel for adding new hardware support to the system.
+uname -r
+yum install -y kernel-devel-$(uname -r)
+sudo /sbin/vboxconfig
+
+vagrant up
+[ansible@x230 vagrant]$ vboxmanage startvm 21744d62-4f4f-4787-a5f4-9b4f2fa9b9b0 --type emergencystop
+[ansible@x230 vagrant]$ VBoxManage unregistervm 21744d62-4f4f-4787-a5f4-9b4f2fa9b9b0       
+
+"******************************************************"
+
+VAGRANT - goto website hashicorp-
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+sudo yum -y install vagrant
+
+Install Vagrant VMware Utility - download from website
+
+yum group-install "Development Tools"
+https://app.vagrantup.com/boxes/search (Search boxes)
+
