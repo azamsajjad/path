@@ -36,12 +36,12 @@ $ansible-playbook apache_tags.yml --list-tags
       tags: fire_tag
 
 
-[ansible@x230 automation]$ ansible-playbook playbooks/apache.yml --tags='fire_tag'
-run only tasks with [fire_tag]
+- ansible-playbook playbooks/apache.yml --tags='fire_tag'
+ run only tasks with [fire_tag]
 
-[ansible@x230 automation]$ ansible-playbook playbooks/apache.yml --skips-tags='fire_tag'
-run all tasks except [fire_tag]
+- ansible-playbook playbooks/apache.yml --skips-tags='fire_tag'
+ run all tasks except [fire_tag]
 
 
-[ansible@x230 automation]$ ansible-playbook playbooks/apache.yml --tags='pack_tag,serv_tag'
-run only these 2 tags
+- ansible-playbook playbooks/apache.yml --tags='pack_tag,serv_tag'
+ run only these 2 tags

@@ -22,7 +22,6 @@
       command: restorecon -irv /home/rupert/webcontent
 ~
 ~
-~
 "*****************************************************************"
 "PERMISSIONS MANAGEMENT WITH ANSIBLE - session 30"
 [Standard File permissions]rwxrwxrwx.

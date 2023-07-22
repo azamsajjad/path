@@ -549,17 +549,17 @@ media_index: /etc/httpd
 
 "*******************************************************""
 
-Create a playbook: `/home/ansible/report.yml`
+# Create a playbook: `/home/ansible/report.yml`
 
-Configure the Playbook to Download *http://apps.l33t.com/transaction_list* to `/home/ansible/transaction_list` on `localhost` and Outputs the Message "File downloaded." to `stdout`
+# Configure the Playbook to Download *http://apps.l33t.com/transaction_list* to `/home/ansible/transaction_list` on `localhost` and Outputs the Message "File downloaded." to `stdout`
 
-Configure the Playbook to Handle Connection Failure by Outputting "l33t.com appears to be down. Try again later." to `stdout`
+# Configure the Playbook to Handle Connection Failure by Outputting "l33t.com appears to be down. Try again later." to `stdout`
 
-Configure the Playbook to Output "Attempt Completed" to `stdout`, Whether It Was Successful or Not
+# Configure the Playbook to Output "Attempt Completed" to `stdout`, Whether It Was Successful or Not
 
-Configure the Playbook to Replace All Instances of `#BLANKLINE` with the Line Break Character `\n`
+# Configure the Playbook to Replace All Instances of `#BLANKLINE` with the Line Break Character `\n`
 
-Verify Configuration by Running the Playbook
+# Verify Configuration by Running the Playbook
 
 wrong method
 # ---
@@ -612,11 +612,8 @@ right method
 
 # Remove transaction_list, otherwise playbook will not check url again.
 rm -f /home/ansible/transaction_list > /dev/null;
-
 # Is httpd running?
 nc -z -w 50ms apps.l33t.com 80 > /dev/null
-
-
 # Switch states depending on if it is up or down
 if [ $? -ne 0 ];
 then
@@ -670,3 +667,210 @@ Host_Alias DBSERVERS = {{ groups['database']|join(' ') }}
         dest: /etc/sudoers.d/hardened
         validate: /sbin/visudo -cf %s
 # crucial to validate or sudo will break on target
+
+
+
+
+
+#"*******************************************************"
+# Your supervisor has asked you to find a way to automate and audit basic system configuration for new servers in your environment. Given that Ansible is already configured at a basic level in your environment, the simplest solution would be to just write a playbook for bootstrapping your new hosts. Create a playbook called /home/ansible/bootstrap.yml to fulfill the following boot strap requirements:
+
+All servers:
+
+# Edit /etc/hosts to include the following entry- 
+# ansible.xyzcorp.com 169.168.0.1
+# Install elinks
+# Create the user xyzcorp_audit
+# Copy the files /home/ansible/motd and /home/ansible/issue to /etc/
+Network servers:
+# Install nmap-ncat
+# Create the user xyzcorp_network
+SysAdmin servers:
+# Copy /home/ansible/scripts.tgz from the control node to /mnt/storage
+
+# The Ansible control node has been configured for you and each testing server has already been configured for use with Ansible. The default inventory has been configured to include a the groups network and sysadmin. Each group includes a sample host.
+
+
+---
+- name: playbook for all
+  hosts: all
+  become: true
+  tasks:
+    - name: include an entry in xyz corp
+      lineinfile:
+        path: /etc/hosts
+        line: ansible.xyzcorp.com 169.168.0.1
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+    - name: create user
+      user:
+        name: xyzcorp_audit
+        state: present
+    - name: copy 2 files
+      copy:
+        src: /home/ansible/motd
+        dest: /etc/motd
+    - name: copy 2 files
+      copy:
+        src: /home/ansible/issue
+        dest: /etc/issue
+
+- hosts: network
+  become: true
+  tasks:
+    - name: install software
+      yum:
+        name: nmap-ncat
+        state: present
+    - name: create user
+      user:
+        name: xyzcorp_network
+        state: present
+
+- hosts: sysadmin
+  become: true
+  tasks:
+    - name: copy script
+      copy:
+        src: /home/ansible/scripts.tgz
+        dest: /mnt/storage
+
+
+
+"******************************************"
+# On nfs:
+
+# Make sure nfs-utils is installed.
+# Configure /etc/exports via an Ansible template stored in /home/ansible/exports.j2. Deploy the template so that /mnt/nfsroot is exported with read and write to all hosts.
+# Note: Your template file should contain the following with the variable {{ share_path }} being defined within your playbook:
+
+# {{ share_path }} *(rw)
+# Note: The file /etc/exports on nfs should have the following content once deployed:
+
+# /mnt/nfsroot *(rw)
+# Create a handler that runs the command exportfs -a if the file /etc/exports is modified in a playbook task.
+# You can assume all necessary firewall rules have been deployed.
+# On remote:
+
+# Configure /etc/hosts from a template file stored on control at /home/ansible/etc.hosts.j2 with the following entries:
+
+#   127.0.0.1 localhost {{ ansible_hostname }}
+#   {{ nfs_ip }}  {{ nfs_hostname }}
+# Note: You should populate the variables {{ nfs_ip }} and {{ nfs_hostname }} using magic variables in your playbook.
+# Create users from file stored on control at /home/ansible/user-list.txt only if the remote host has the file /opt/user-agreement.txt.
+
+---
+   - name: playbook
+     hosts: nfs
+     become: true
+     vars:
+       - share_path: /mnt/nfsroot
+     tasks:
+       - name: install nfs-utils
+         yum:
+          name: nfs-utils
+          state: present
+      - name: export template
+        template:
+          src: /home/ansible/exports.j2
+          dest: /etc/exports
+        notify: "exportfs"
+    handlers:
+      - name: exportfs -a
+        command: "exportfs -a"
+        listen: "exportfs"
+ 
+  - hosts: remote
+    become: true
+    vars:
+      - nfs_ip: "{{ hostvars['nfs']['ansible_default_ipv4']['address'] }}"
+      - nfs_hostname: "{{ hostvars['nfs']['ansible_hostname'] }}"
+    vars_files:
+      - /home/ansible/user-list.txt
+    tasks:
+      - name: copy template
+        template:
+          src: /home/ansible/etc.hosts.j2
+          dest: /etc/hosts
+ 
+      - name: check existance of a file
+        stat:
+          path: /opt/user-agreement.txt
+        register: abc
+ 
+ 
+      - name: create users
+        user:
+          name: "{{item}}"
+          state: present
+        with_items: "{{users}}"
+        when: abc.stat.exists == True
+
+
+"*******************************************************"
+
+# ansible@control ~]$ cat vhost.conf.j2
+# <VirtualHost {{ ansible_default_ipv4.address }}:80>
+# ServerAdmin webmaster@xyzcorp.com
+# DocumentRoot /var/www/html
+
+# <Directory "/var/www/html">
+#   AuthType Basic
+#   Authname "Authorized Users Only"
+#   AuthUserFile /etc/httpd/conf/htpasswd
+#   Require valid-user
+# </Directory>
+# </VirtualHost>
+
+# On the host group webservers:
+
+# Deploy httpd.
+# You can assume all necessary firewall rules have been deployed.
+# Start and enable httpd.
+# Configure virtual host using the provided templates in /home/ansible/vhost.conf.j2 and /home/ansible/htpasswd.j2.
+# Note: The template references a variable defined in /home/ansible/confidential which must be included as a variable file in your playbook.
+# Use ansible vault to secure /home/ansible/confidential with password "I love ansible".
+Run the data job stored in /opt/data-job.sh on each node in webservers asynchronously, without polling for status.
+# Create tags for the following tasks:
+# base-install for httpd installation and service configuration.
+# vhost for virtual host deployment.
+# data-job to execute the asynchronous data job.
+# The Ansible control node has been configured for you and each webserver has already been configured for use with Ansible. The default inventory has been configured to include the webservers group and sample hosts.
+
+---
+- name: deploy httpd
+  hosts: webservers
+  become: true
+  vars_files:
+    - /home/ansible/confidential
+  tasks:
+    - name: install httpd
+      tags: base-install
+      yum:
+        name: httpd
+        state: installed
+    - name: configure httpd
+      template:
+        src: /home/ansible/vhost.conf.j2
+        dest: /etc/httpd/conf.d/vhost.conf
+    - name: configure vhost
+      template:
+        src: /home/ansible/htpasswd.j2
+        dest: /etc/httpd/conf/htpasswd
+      notify: httpd restart
+
+    - name: run script
+      command: /opt/data-job.sh
+      async: 600
+      poll: 0
+      tags: data-job
+
+  handlers:
+    - name: start httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      listen: httpd restart

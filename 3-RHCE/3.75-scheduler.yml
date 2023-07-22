@@ -1,0 +1,145 @@
+yum install -y atd 
+systemctl enable --now adt
+
+ 979  at 3:00 PM 20 July 2023
+  980  atq
+  981  at -l
+  982  tail /var/log/cron
+  983  sudo tail /var/log/cron
+  984  ls -rf /tmp
+  985  ls /tmp
+  986  ll /tmp
+  987  rm -rf /tmp/*
+  988  sudo rm -rf /tmp/*
+  989  ll /tmp
+  990  tty
+  991  atq
+  992  ll /tmp
+  993  df -hT > /dev/pts/0 | at 3:02 PM
+  994  df -hT > /dev/pts/0 | at 3:03 PM
+  995  atq
+  996  atrm 12
+  997  atq
+  998  echo "hi"  > /dev/pts/0 | at 3:05 PM
+  999  sudo tail /var/log/cron
+ 1000  at 4:05 PM
+ 1001  at now _5 hours
+ 1002  at now +5 hours
+ 1003  atq
+ 1004  at -c
+ 1005  at -c 16
+ 1006  ll /var/spool/at
+ 1007  sudo ll /var/spool/at
+ 1008  sudo ls /var/spool/at
+ 1009  sudo cat /var/spool/at/spool
+ 1010  cat /etc/at.deny
+ 1011  echo nehraclasses > /tmp/batchoutput.txt | batch
+ 1012  atq
+ 1013  cat /tmp/batchoutput.txt
+ 1014  #batch job will be executed when system load will be appropriate
+ 1015  rpm -q crontab
+ 1016  rpm -q crontabs
+ 1017  systemctl crond
+ 1018  systemctl status crond
+ 1019  cat /etc/cronrab
+ 1020  cat /etc/crontab
+ 1021  crontab -e
+ 1022  cat /etc/anacrontab
+ 1023  # used for machine that are not ON 24/7
+ 1024  # crontab -r removes all crontab
+ 1025  cat /etc/cron.deny
+
+ANSIBLE
+
+1029  ansible node1 -m shell -a 'echo "Nehra Classes Are Awesome" > /tmp/file1.txt | at 16:40' -b
+ 1030  # cannot use filter pipe operation with command module
+ 1031  ansible-doc at
+ 1032  ansible node1 -m at -a 'command=df>/tmp/df.txt count=3 units=days' -b
+ 1033  ansible node1 -m cron -a 'name=hostnameinfo job=hostnamectl>/tmp/cronhost.txt minute=10 hour=22' -b
+ 1034  ansible node1 -m command -a 'crontab -l'
+ 1035  ansible node1 -m command -a 'crontab -l -u rupert'
+ 1036  ansible node1 -m command -a 'crontab -l -u rupert' -b
+ 1037  ansible-doc cron
+ 1038  ansible node1 -m cron -a 'name=memstat job=free>/tmp/cronreboot.txt special_time=reboot user=root' -b
+ 1039  ansible node1 -m command -a 'crontab -l' -b
+ 1040  ansible node1 -m command -a 'ls /tmp' -b
+ 1041  ansible node1 -m command -a 'reboot' -b
+ 1042  ansible node1 -m command -a 'ls /tmp' -b
+
+
+
+---
+- name: schedule future jobs
+  hosts: node1
+  become: true
+  tasks:
+    - name: schedule a command to execute in 1 minutes as root
+      at:
+        command: lsblk > /tmp/lsblk.txt
+        count: 5
+        units: minutes
+
+    - name: schedule a command to execute in 3 days as root
+      at:
+        command: uptime > /tmp/uptime.txt
+        count: 3
+        units: days
+
+    - name: remove a task
+      at:
+        command: uptime > /tmp/uptime.txt
+        state: absent
+
+    - name: see current jobs
+      command: "atq"
+      register: atq
+
+    - debug: msg={{ atq }}
+
+    - name: schedule a task to execute in 20 minutes making sure it is unique in the queue
+      at:
+        command: ls -d > /dev/null
+        count: 20
+        units: minutes
+        unique: true
+
+
+
+
+---
+- name: schedule future jobs
+  hosts: node1
+  become: true
+  tasks:
+    - name: Capture the users login information in /tmp/login.txt file at 2 & 5 hour daily
+      cron:
+        name: "Users Login"
+        minute: "0"
+        hour: "2,5"
+        job: "who > /tmp/login.txt"
+
+    - name: show who is logged on and what they are doing at system reboot
+      cron:
+        name: "System info"
+        special_time: reboot
+        job: "w > /tmp/systeminfo.txt"
+
+    - name: create a cron file under /etc/cron.d with result of yum auto update
+      cron:
+        name: yum autoupdate
+        weekday: "2"
+        minute: "0"
+        hour: "12"
+        user: root
+        job: "YUMINTERACTIVE=0 /usr/sbin/yum-autoupdate"
+        cron_file: ansible_yum-autoupdate
+
+    - name: removes a cron file under /etc/cron.d
+      cron:
+        name: yum autoupdate
+        cron_file: ansible_yum-autoupdate
+        state: absent
+
+
+~
+~
