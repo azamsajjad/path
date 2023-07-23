@@ -13,7 +13,7 @@ Playbook host_vars/*
 Host Facts / Cached set_facts
 Play vars:
 Play vars_prompt:
-Play vars_files:
+Play vars_files:      OR        ansible-playbook play.yml -e @var_file.yml:
 Role vars (defined in vars/main.yml)
 Block vars (only for tasks in block)
 Task vars (only for the task)
@@ -113,7 +113,8 @@ users:
       comment: "{{item.comment}}"
     with_items: "{{users}}"
 
-
+or mention it on command line
+ansible-playbook play.yml -e @var_file.yml:
 
 Dictonaries (key value pairs)
 - sally:

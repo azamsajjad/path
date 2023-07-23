@@ -72,3 +72,36 @@ else
   ansible node1 -b -m service -a "name=httpd state=stopped" > /dev/null;
   echo "done."
 fi
+
+
+
+"******************************************"
+---
+- name: ignore changed_when failed_when example
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: install farzi software
+      yum:
+        name: broke
+        state: latest
+      ignore_errors: yes
+
+    - name: Run utility
+      command: /home/ansible/automation/scripts/do_stuff.sh farzi
+      register: output
+      changed_when: "'CHANGED' is in output.stdout"
+      failed_when: "'FAILED' is in output.stdout"
+
+# Run command without a text to get changed status, or run with a text to get failed status
+#!/bin/bash
+
+if [ -z $1 ]
+then
+   echo "I CHANGED SOMETHING"
+   exit 100
+else
+   echo "I FAILED"
+   exit 200
+fi
+~

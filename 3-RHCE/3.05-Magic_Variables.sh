@@ -1,3 +1,25 @@
+"*******************************************************"
+"*"
+* YOU CAN ONLY USE hostvars (magic variableS) as input for 1 server after:
+* - hosts: all
+*   tasks:
+*       debug:
+*          var: hostvars 
+* AFTER CALLING them FIRST IN THE PLAYBOOK for all hosts
+"*" SEE playbooks/hostvars.yml as example
+*********************************************************
+
+
+
+
+
+
+
+
+
+
+
+
 Special Variables
 Magic variables
 These variables cannot be set directly by the user; Ansible will always override them to reflect internal state.
@@ -176,3 +198,7 @@ The path to the Python executable Ansible should use on the target host.
 
 ansible_user
 The user Ansible ‘logs in’ as.
+
+
+
+

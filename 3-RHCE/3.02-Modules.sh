@@ -163,3 +163,42 @@
 [cron]
     ansible web -m cron -a 'name=nehra weekday=1 minute=48 hour=22 user=root job="echo NehraClasses > /var/log/messages"'
     ansible web -m command -a 'crontab -l -u root'
+
+
+
+
+
+# Become `ansible` user and then download http://software.xyzcorp.com/enigma.tgz to `/tmp` on each host in qa-servers and verify the sha256 checksum via http://software.xyzcorp.com/enigma-checksum.txt.
+
+# Note: This URL only works correctly when accessed on the lab servers. The domain name DNS entry is overridden in /etc/hosts on each lab server. If you attempt to access it from another system, you will reach a parked domain.
+
+# On EACH of the hosts in 'qa-servers' inventory, become the ansible user:
+
+# sudo su - ansible
+# As the ansible user (above), run the following commands on each host in the qa-servers:
+
+CHECKSUM=$(curl http://software.xyzcorp.com/enigma-checksum.txt | cut -f1 -d' ')
+ansible qa-servers -m get_url -a "url=http://software.xyzcorp.com/enigma.tgz dest=/tmp/enigma.tgz checksum=sha256:$CHECKSUM"
+
+# Extract `/tmp/enigma.tgz` to `/opt/` on all hosts in `qa-servers`.
+
+# Run 
+ansible qa-servers -b -m unarchive -a "src=/tmp/enigma.tgz dest=/opt/ remote_src=yes".
+
+
+# Update the line of text "DEPLOY_CODE" in `/opt/enigma/details.txt` to the "CODE_RED" on each server in `qa-servers`.
+
+#Run 
+ansible qa-servers -b -m lineinfile -a "regexp=DEPLOY_CODE line=CODE_RED path=/opt/enigma/details.txt".
+
+
+# Set the group ownership of the directory `/opt/enigma/secret/` and each file contained within the directory so that the group owner is `protected` for each host in `qa-servers`.
+
+# Run 
+ansible qa-servers -b -m file -a "recurse=yes state=directory path=/opt/enigma/secret group=protected".
+
+
+# Delete the file `/opt/enigma/tmp/deployment-passwords.txt` from all servers.
+
+# Run 
+ansible all -b -m file -a "state=absent path=/opt/enigma/tmp/deployment-passwords.txt".

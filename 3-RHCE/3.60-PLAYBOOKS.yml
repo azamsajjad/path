@@ -5,7 +5,18 @@ Use conditionals to control play execution
 Configure error handling
 Create playbooks to configure systems to a specified state
 
-
+*******************************************************
+*
+* You can use become for individual tasks too 
+* - hosts: 
+*    tasks: 
+*       - name: copy a file to /etc/hosts
+*         become: true 
+*         copy: 
+*           src: 
+*           dest: 
+*
+*********************************************************
 
 ansible-playbook --ask-become-pass play.yml
 
@@ -874,3 +885,72 @@ Run the data job stored in /opt/data-job.sh on each node in webservers asynchron
         state: started
         enabled: yes
       listen: httpd restart
+
+"*******************************************************"
+# You have just started a new job as the operations lead at a small company. There is currently no formal server baseline, and it makes for a mixed configuration environment that is consuming more support and maintenance than it should. You have decided to create a baseline process using Ansible by creating a baseline role. You have noted the following commonalities that should be included in the baseline role:
+
+# Set /etc/motd based on a template.
+# Install the latest Nagios client.
+# Add the Nagios server to /etc/hosts.
+# Create a noc user.
+# Import the noc user's public key (copy authorized keys to /home/noc/.ssh/authorized_keys).
+# The role should be called "baseline" and should reside in /etc/ansible/roles on the ansible control node.
+
+# You will test your role on some newly requested webservers. A playbook called web.yml has been provided for you and deploys httpd to all servers in the web group (defined in your default inventory). You will need to edit the playbook to deploy the baseline role to the servers in the web group as well.
+
+# You will find the motd template, Nagios server IP information, the noc user's public key, and the web.yml playbook in /home/ansible/resources on the ansible control node.
+
+# Summary tasks list:
+
+# Create the necessary directories and files for the baseline role.
+# Configure the role to deploy the /etc/motd template.
+# Configure the role to install the latest Nagios client.
+# Configure the role to add an entry to /etc/hosts for the Nagios server.
+# Configure the role to create the noc user and deploy the provided public key for the noc user on target systems (copy authorized_keys to /home/noc/.ssh/authorized_keys with the owner and group owner set as noc and the mode as 0600).
+# Edit web.yml to deploy the baseline role in addition to what it already does.
+# Verify that your role works by deploying web.yml with Ansible.
+
+
+---
+# tasks file for baseline
+- name: configure motd
+  import_tasks: deploy_motd.yml
+- name: configure nagios
+  import_tasks: deploy_nagios.yml
+- name: create user and its ssh access
+  import_tasks: deploy_user.yml
+
+
+- name: template motd
+  template:
+    src: motd.j2
+    dest: /etc/motd
+
+- name: install nagios client
+  yum:
+    name: nagios
+    state: latest
+
+- name: add entry for nagios in /etc/hosts
+  lineinfile:
+    line: "10.0.1.69 nagios.example.com"
+    path: /etc/hosts
+
+- name: add user noc
+  user:
+    name: noc
+    state: present
+
+- name: add authorized access for noc
+  file:
+    src: authorized_keys
+    dest: /home/noc/.ssh/authorized_keys
+    owner: noc
+    group: noc
+    mode: 0600
+  copy:
+    src: authorized_keys
+    dest: /home/noc/.ssh/authorized_keys
+    owner: noc
+    group: noc
+    mode: 0600

@@ -66,7 +66,43 @@ ansible-playbook --vault-id label@prompt playbook.yml
 Prompt for two Passwords with Vault-id
 ansible-playbook --vault-id label@prompt --vault-id label2@prompt playbook.yml
 
-
+CLOUD_LAB
+# Encrypt home/ansible/secret using the ansible-vault command.
+# Create /home/ansible/vault as a vault password file that may be used to access the encrypted secret file without prompt.
+# Run the playbook /home/ansible/secPage.yml using your vault password file to validate your work.
+# Verify that the secure page deployed correctly by attempting to access http://node1/secure/classified.html as the user bond with the password james.
+---
+- hosts: webservers
+  become: yes
+  vars_files:
+    - /home/ansible/secret
+  tasks:
+  - name: install apache
+    yum: name=httpd state=latest
+  - name: configure httpd as necessary
+    template:
+      src: /home/ansible/assets/httpd.conf.j2
+      dest: /etc/httpd/conf/httpd.conf
+  - name: create secure directory
+    file: state=directory path=/var/www/html/secure mode=0755
+  - name: deploy htaccess file
+    template:
+      src: /home/ansible/assets/htaccess.j2
+      dest: /var/www/html/secure/.htaccess
+  - name: make sure passlib is installed for htpasswd module
+    yum: name=python-passlib state=latest
+  - name: create users for basic auth
+    htpasswd:
+      path: /var/www/html/secure/.passwdfile
+      name: "{{ secure_user }}"
+      password: "{{ secure_password }}"
+      crypt_scheme: md5_crypt
+  - name: start and enable apache
+    service: name=httpd state=started enabled=yes
+  - name: install secure files
+    copy:
+      src: /home/ansible/assets/classified.html
+      dest: /var/www/html/secure/classified.html
 "*************************************************************"
 "JINJA2 TEMPLATES"
 Python based templating engine
@@ -390,3 +426,21 @@ Welcome to {{ ansible_hostname }} refered to as {{ inventory_hostname }}
       listen: "restart firewall"
 
 "***************************************************************"
+###############################################################################
+{{ ansible_hostname }} is....
+     ___      .__   __.      _______. __  .______    __       _______
+    /   \     |  \ |  |     /       ||  | |   _  \  |  |     |   ____|
+   /  ^  \    |   \|  |    |   (----`|  | |  |_)  | |  |     |  |__
+  /  /_\  \   |  . `  |     \   \    |  | |   _  <  |  |     |   __|
+ /  _____  \  |  |\   | .----)   |   |  | |  |_)  | |  `----.|  |____
+/__/     \__\ |__| \__| |_______/    |__| |______/  |_______||_______|
+
+.___  ___.      ___      .__   __.      ___       _______  _______  _______
+|   \/   |     /   \     |  \ |  |     /   \     /  _____||   ____||       \
+|  \  /  |    /  ^  \    |   \|  |    /  ^  \   |  |  __  |  |__   |  .--.  |
+|  |\/|  |   /  /_\  \   |  . `  |   /  /_\  \  |  | |_ | |   __|  |  |  |  |
+|  |  |  |  /  _____  \  |  |\   |  /  _____  \ |  |__| | |  |____ |  '--'  |
+|__|  |__| /__/     \__\ |__| \__| /__/     \__\ \______| |_______||_______/
+
+
+################################################################################

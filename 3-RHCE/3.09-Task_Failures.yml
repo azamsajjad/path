@@ -163,3 +163,57 @@ fail_when.yml:
         - debug:
             msg: "Playbook is complete"
 
+
+
+"******************************************"
+---
+- name: ignore changed_when failed_when example
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: install farzi software
+      yum:
+        name: broke
+        state: latest
+      ignore_errors: yes
+
+    - name: Run utility
+      command: /home/ansible/automation/scripts/do_stuff.sh farzi
+      register: output
+      changed_when: "'CHANGED' is in output.stdout"
+      failed_when: "'FAILED' is in output.stdout"
+
+# Run command without a text to get changed status, or run with a text to get failed status
+#!/bin/bash
+
+if [ -z $1 ]
+then
+   echo "I CHANGED SOMETHING"
+   exit 100
+else
+   echo "I FAILED"
+   exit 200
+fi
+~
+
+
+"******************************************"
+---
+- name: run an async job with a timeout of 60 seconds, if the job is not completed by then, kill it. keep checking for completion every 10 seconds.
+  hosts: localhost
+  tasks:
+    - name: run sleep
+      command: /home/ansible/automation/scripts/async_sleep.sh
+      async: 60
+      poll: 10
+
+#!/bin/bash
+
+sleep 30
+echo "I am done."
+exit 100
+
+~
+task will fail if you set sleep to 90 while async is 60
+
+"******************************************"

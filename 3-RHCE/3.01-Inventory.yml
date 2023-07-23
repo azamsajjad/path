@@ -1,6 +1,7 @@
 $ ansible --version
 # shows current facts about ansible
 [INVENTORY]
+ansible-config dump --only-changed
 
 # DEFAULT INVENTORY FILE IS LOCATED AT /etc/ansible/hosts⁡
 [web]
