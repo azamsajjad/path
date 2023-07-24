@@ -2,9 +2,3 @@
     "editor.wordWrap": "wordWrapColumn",
     
 }
-
-{
-    "editorError.foreground": "#00000000",
-    "editorWarning.foregorund": "#00000000",
-    "editorInfo.foreground": "#00000000",    
-}

@@ -217,3 +217,32 @@ exit 100
 task will fail if you set sleep to 90 while async is 60
 
 "******************************************"
+
+DELEGATE_TO
+task will only run on the delegated host, not all hosts
+
+---
+- name: using delegate keyword with async and poll
+  hosts: vmservers
+  tasks:
+    - name: create scripts directory
+      file:
+        path: /home/rupert/scripts
+        state: directory
+    - name: copy script
+      copy:
+        src: ~/automation/scripts/async_sleep.sh
+        dest: /home/rupert/scripts/async_sleep.sh
+        owner: rupert
+        group: rupert
+        mode: 0770
+    - name: run ~/scripts/async_sleep.sh
+      command: ~/scripts/async_sleep.sh
+      async: 60
+      poll: 11
+      delegate_to: server2
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+      become: yes

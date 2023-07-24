@@ -236,6 +236,7 @@ state: present
 yum:
 name: '*'
 state: latest
+
 Question: 4
 Questions & Answers PDF Page 5
 Create a role called sample-apache in /home/sandy/ansible/roles that enables and starts httpd, enables
@@ -246,10 +247,8 @@ Welcome to [FQDN] on [IP]
 Replace the FQDN with the fully qualified domain name and IP with the ip address of the node using
 ansible facts. Lastly, create a playbook in /home/sandy/ansible/ called apache.yml and use the role to
 serve the index file on webserver hosts.
-Answer: See the
-Explanation for
-complete Solution
-below.
+
+Answer: See the Explanation for complete Solution below.
 Explanation:
 /home/sandy/ansible/apache.yml
 /home/sandy/ansible/roles/sample-apache/tasks/main.yml
