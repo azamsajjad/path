@@ -1,0 +1,81 @@
+1014  touch /tmp/httpfile
+ 1015  ls -lZ /tmp/httpfile
+ 1016  sudo chcon -t httpd_t /tmp/httpfile
+ 1017  chcon -t httpd_sys_content_t /tmp/httpfile
+ 1018  ls -lZ /tmp/httpfile
+ 1019  # that was temporary method
+ 1020  # this is permanent
+ 1021  semanage fcontext -l
+ 1022  # if you did autorelabeling by creating .autorelabel file on root dir, system will restore all default contexts defined in above command when system restarts
+ 1023  semanage fcontext -l | grep /tmp/httpfile
+ 1024  sudo semanage fcontext -l | grep /tmp/httpfile
+ 1025  restorecon -vR /tmp/httpfile
+ 1026  ls -lZ /tmp/httpfile
+ 1027  #now permanent change
+ 1028  cd ..
+ 1029  ansible-doc selinux
+ 1030  ansible-doc sefcontext
+ 1031  # selinux logs are in /var/log/audit
+ 1032  # if you chnge context of a system prebuilt file, then running restorecon will revert changes back to original context
+ 1033  ps -elfZ | grep bash
+ 1034  # se context of processes
+ 1036  getsebool -a | grep ssh
+ 1037  semanage port -l | grep ssh
+ 1038  semanage port -l
+ 1039  # selinux modules are in ansible.posix
+ 1040  # you can only diable selinux through grubby in RHEL9
+ 1041  ansible-doc sefcontext
+ 1042  # sefcontext modules are in community.general collection
+ 1043  ansible-doc sebool
+ 1044  ansible-doc seboolean
+ 1045  ansible-doc seport
+ 1046  ansible node3 -m seport -a 'ports=20222 proto=tcp setype=ssh_port_t state= present'
+ 1047  ansible node3 -m seport -a 'ports=20222 proto=tcp setype=ssh_port_t state= present' -b
+ 1048  ansible server3 -m seport -a 'ports=20222 proto=tcp setype=ssh_port_t state= present' -b
+ 1049  ansible-doc seport
+ 1050  ansible-doc selinux
+ 1051  vim playbooks/rhcsa_selinux_tmp.yml
+ 1052  ansible-playbook playbooks/rhcsa_selinux_tmp.yml
+ 1053  ansible-playbook playbooks/rhcsa_selinux_tmp.yml -b
+ 1054  ansible server1 -a 'ls -ldZ /tmp'
+ 1055  ansible server1 -a 'ls -lZ /tmp'
+ 1056  vim playbooks/rhcsa_selinux_tmp.yml
+ 1057  ansible-playbook playbooks/rhcsa_selinux_tmp.yml -b
+ 1058  vim playbooks/rhcsa_selinux_tmp.yml
+ 1059  ansible-playbook playbooks/rhcsa_selinux_tmp.yml -b
+ 
+ 
+ 1062  ansible server1 -m raw -a 'semanage port -l | grep memcache' -b
+
+---
+- name: Manage SELinux
+  hosts: server1
+  tasks:
+    - name: LET HTTPD manage /tmp files
+      sefcontext:
+        target: '/tmp(/.*)?'
+        setype: httpd_sys_content_t
+        state: absent
+    - name: restorecon
+      command: restorecon -irv /tmp
+
+    - seport:
+        ports: 20224
+        proto: tcp
+        setype: ssh_port_t
+        state: present
+
+    - name: allow memcached to listen on a range of ports
+      seport:
+        ports: 10000-10100,10112
+        proto: tcp
+        setype: memcache_port_t
+        state: present
+
+
+
+[ansible@x230 automation]$ ansible server1 -m raw -a 'semanage port -l | grep memcache' -b
+server1 | CHANGED | rc=0 >>
+memcache_port_t                tcp      10112, 10000-10100, 11211
+memcache_port_t                udp      11211
+Shared connection to server1 closed.

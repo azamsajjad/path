@@ -1,0 +1,91 @@
+[ansible@x230 navigator]$ cat ../playbooks/parrallelism_serial.yml
+---
+- name: managing parralelism in ansible
+  hosts: vmservers
+  serial: 1
+  become: true
+  tasks:
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+[ansible@x230 navigator]$
+
+
+ansible vmservers -m ping -f 1
+
+serial =1 tells ansible to first run all tasks on 1 server at a time
+then next
+
+
+[ansible@x230 navigator]$ cat ../playbooks/parrallelism_serial.yml
+---
+- name: managing parralelism in ansible
+  hosts: vmservers
+  serial: 
+    - "10%"
+    - "30%"
+    - "50%"
+  become: true
+  tasks:
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+[ansible@x230 navigator]$
+
+
+this playbook target 10% of the hosts first. then 30%, then 50% 
+remaining 10% of the hosts will be targeted last automatically
+
+[ansible@x230 navigator]$ cat ../playbooks/parrallelism_serial.yml
+---
+- name: managing parralelism in ansible
+  hosts: vmservers
+  serial: 
+    - 5
+    - "30%"
+    - "50%"
+  become: true
+  tasks:
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+[ansible@x230 navigator]$
+
+run 5 hosts first. then 30% of remaining hosts ....
+
+
+"******************************************"
+[ansible@x230 navigator]$ cat ../playbooks/parrallelism_serial.yml
+---
+- name: managing parralelism in ansible
+  hosts: vmservers
+  max_fail_percentage: 10
+  serial: 
+    - 5
+    - "30%"
+    - "50%"
+  become: true
+  tasks:
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+[ansible@x230 navigator]$
+
+if 10% of hosts fail, stop execution
+---
+- name: install software
+  max_fail_percentage: 40
+  serial:
+    - 1
+    - "50%"
+  become: true
+  tasks:
+    - name: install farzi software
+      yum:
+        name: farzi
+        state: latest
+

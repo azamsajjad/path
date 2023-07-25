@@ -163,3 +163,25 @@ user must be member of every group / more than 1 group
       with_nested:
         - { azam5, hassan5, faizi5, shahrukh5, azaan5, haider5, hussain5 }
         - { datagroup, itgroup, hrgroup }
+
+
+
+
+---
+- name: copy files using loop
+  hosts: server1
+  tasks:
+    - name: copy 2 files
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: rupert
+        group: rupert
+        mode: 0644
+      with_items:
+        - src: ~/automation/files/motd.j2
+          dest: ~/motd.copied
+        - src: ~/automation/files/users.txt
+          dest: ~/users.copied
+~
+~

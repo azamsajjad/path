@@ -131,3 +131,33 @@ no need to individually curl 50 nodes to check webserver status
       when: statuschange.changed
 
 #This task will only run if the task above it changes something
+
+
+DELEGATE_TO
+task will only run on the delegated host, not all hosts
+
+---
+- name: using delegate keyword with async and poll
+  hosts: vmservers
+  tasks:
+    - name: create scripts directory
+      file:
+        path: /home/rupert/scripts
+        state: directory
+    - name: copy script
+      copy:
+        src: ~/automation/scripts/async_sleep.sh
+        dest: /home/rupert/scripts/async_sleep.sh
+        owner: rupert
+        group: rupert
+        mode: 0770
+    - name: run ~/scripts/async_sleep.sh
+      command: ~/scripts/async_sleep.sh
+      async: 60
+      poll: 11
+      delegate_to: server2
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+      become: yes

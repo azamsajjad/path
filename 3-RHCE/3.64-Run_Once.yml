@@ -1,0 +1,49 @@
+---
+- name: using delegate keyword with async and poll
+  hosts: vmservers
+  tasks:
+    - name: create scripts directory
+      file:
+        path: /home/rupert/scripts
+        state: directory
+    - name: copy script
+      copy:
+        src: ~/automation/scripts/async_sleep.sh
+        dest: /home/rupert/scripts/async_sleep.sh
+        owner: rupert
+        group: rupert
+        mode: 0770
+    - name: run ~/scripts/async_sleep.sh
+      command: ~/scripts/async_sleep.sh
+      async: 60
+      poll: 11
+        #delegate_to: server2
+      run_once: yes
+      ignore_errors: yes
+    - name: install elinks
+      yum:
+        name: elinks
+        state: present
+      become: yes
+~
+~
+~task will run only once on any one server
+if youwant to use run_once along with serials. keep in mind that task will run once per serial
+
+
+
+Result   Host     Number  Changed  Task                             Task action    Duration
+ 0│Ok       server1       0  False    Gathering Facts                  gather_facts        14s
+ 1│Ok       server2       1  False    Gathering Facts                  gather_facts        13s
+ 2│Ok       server3       2  False    Gathering Facts                  gather_facts        11s
+ 3│Ok       server1       3  False    create scripts directory         file                 2s
+ 4│Ok       server2       4  False    create scripts directory         file                 1s
+ 5│Ok       server3       5  False    create scripts directory         file                 1s
+ 6│Ok       server1       6  False    copy script                      copy                 3s
+ 7│Ok       server2       7  False    copy script                      copy                 3s
+ 8│Ok       server3       8  False    copy script                      copy                 1s
+ 9│Ignored  server1       9  True     run ~/scripts/async_sleep.sh     command             41s
+10│Ok       server1      10  False    install elinks                   yum                 11s
+11│Ok       server2      11  False    install elinks                   yum                 11s
+12│Failed   server3      12  False    install elinks                   yum                  7s
+
