@@ -1,0 +1,119 @@
+Create a jinja template in /home/sandy/ansible/ and name it hosts.j2. Edit this file so it looks like the one below. The order of the nodes doesn't matter. Then create
+a playbook in /home/sandy/ansible called hosts.yml and install the template on dev node at /root/myhosts
+
+127.0.0.1 localhost localhost.localdomain localhost4 localhot4.localdomain4
+::1     localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+10.0.2.1 node1.example.com node1
+10.0.2.1 node2.example.com node2
+10.0.2.1 node3.example.com node3
+10.0.2.1 node4.example.com node4
+10.0.2.1 node5.example.com node5
+10.0.2.1 node6.example.com node6
+
+
+---
+name: 
+hosts: dev
+tasks:
+    - name: template
+      template:
+        src:
+        dest:
+
+template.j2 
+{%for host in groups['all']%}
+{{ hostvars[host]['ansible_default_ipv4.address'] }} {{ hostvars[host]['ansible_fqdn }} {{ hostvars[host]['ansible_hostname'] }}
+{%endfor%}
+
+
+------------------------------------------------------------------
+8 . Write a Bash script that queries each server for its Ansible facts, and outputs that information to a file in /tmp; there should be one file for each server name.
+We want to get each host's Ansible facts and dump the information into respective text files. So you've got to write a script, facts.sh, that will query each one and put its relevant info into a text file. Create the script:
+
+[root@server1 ]# vim facts.sh
+
+[root@server1 ]# cat facts.sh
+
+#!/bin/bash
+
+for i in webserver1 dbserver1 adminserver1
+do
+        ansible -m setup $1 > /tmp/$i\_facts
+done      
+
+--------------------------------------------------------------
+9 . Create an SSH Configuration File and Distribute It
+Currently, there is a file sitting in /root called ssh.tmpl. Open that for editing:
+
+[root@server1 ]# vim ssh.tmpl
+
+We need to alter two lines (starting with PasswordAuthentication and X11Forwarding). There are a few lines separating them. They should look similar to these:
+
+PasswordAuthentication {{ PAanswer }}
+
+...
+
+...
+
+X11Forwarding {{ X11Answer }}
+
+Now we need to write a playbook to deploy all that. Create the file:
+
+[root@server1 ]# vim ssh.yml
+
+To apply the template, the playbook needs to look like this:
+
+---
+
+- name: Review Task 9
+  hosts: all:!admins
+  become: yes
+  vars:
+   PAanswer: "no"
+   X11Answer: "no"
+
+ 
+
+  tasks:
+
+   - name: Apply Template
+     template:
+      src: /root/ssh.tmpl
+      dest: /etc/ssh/sshd_config
+      validate: /sbin/sshd -t -f %s
+
+ 
+
+   - name: Restart SSHD
+     service:
+      name: sshd
+      state: restarted
+
+ 
+
+- name: Review Task 9b
+  hosts: admins
+  become: yes
+  vars:
+   PAanswer: "no"
+   X11Answer: "yes"
+
+ 
+
+  tasks:
+
+   - name: Apply template
+     template:
+      src: /root/ssh.tmpl
+      dest: /etc/ssh/sshd_config
+      validate: /sbin/sshd -t -f %s
+
+   - name: Restart SSHD
+     service:
+      name: sshd
+      state: restarted
+
+Now run it:
+
+[root@server1 ]# ansible-playbook ssh.yml

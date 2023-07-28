@@ -1,0 +1,77 @@
+
+NEW QUESTION 6
+- (Exam Topic 1)
+Install and configure ansible
+User sandy has been created on your control node with the appropriate permissions already, do not change or modify ssh keys. Install the necessary packages to
+run ansible on the control node. Configure ansible.cfg to be in folder /home/sandy/ansible/ansible.cfg and configure to access remote machines via the sandy user.
+All roles should be in the path /home/sandy/ansible/roles. The inventory path should be in
+/home/sandy/ansible/invenlory.
+Configure these nodes to be in an inventory file where node I is a member of group dev. nodc2 is a member of group test, node3 is a member of group proxy,
+nodc4 and node 5 are members of group prod. Also, prod is a member of group webservers.
+
+-------ANSWER-------
+
+[defaults]
+interpreter_python = auto
+host_key_checking = false
+remote_user = rupert
+ask_pass = false
+roles_path = /home/ansible/automation/roles:/etc/ansible/roles
+inventory = /home/ansible/automation/inventory/inventory.ini
+collections_path = /home/ansible/automation/collections
+~
+~
+remote_user = student
+inventory = /home/matthew/ansible/inventory
+ask_pass = false
+ask_sudo_pass = false 
+roles_path = /home/ansible/roles
+
+[privilege_escalation] 
+become=true
+become_method=sudo 
+become_user=root 
+become_ask_pass=false 
+
+inventory 
+
+[dev] 
+[test] 
+[prod]
+[balancer]
+[webservers:children] 
+
+--------------------------------------------------------------
+
+Create shell script to enable repos
+#!/bin/bash
+ansible all -m command -a 'name="EX294_BASE" description="EX294 Base Repo" baseurl=http://example.com/BaseOS enabled=yes gpgcheck=yes gpgkey=http://example.com/rpm-gpg-key'
+ansible all -m command -a 'name="EX294_AppStream" description="EX294 Base Repo" baseurl=http://example.com/AppStreamOS enabled=yes gpgcheck=yes gpgkey=http://example.com/rpm-gpg-key'
+
+-------ANSWER-------
+
+Create a playbook called packages.yml
+- name: install packages 
+  hosts: dev,test,prod 
+  tasks: 
+    - name: install php and mariadb 
+      yum:
+        name: 
+          - php 
+          - mariadb 
+        state: present 
+
+    - name: install development tools 
+      yum: 
+        name: '@Development tools' 
+        state: present 
+        when: "'dev' in group_names"
+
+    - name: update all packages 
+      yum:
+        name: '*' 
+        state: latest 
+      when: "'dev' in group_names"
+-------------------------------------------------------------- 
+
+

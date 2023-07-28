@@ -4,6 +4,8 @@ Install roles and use them in playbooks
 Install Content Collections and use them in playbooks
 Obtain a set of related roles, supplementary modules, and other content from content collections, and use them in a playbook.
 
+ansible-galaxy install -r re.yml -p role/
+
 for firewalld
 $ansible-galaxy collection install ansible.posix
 

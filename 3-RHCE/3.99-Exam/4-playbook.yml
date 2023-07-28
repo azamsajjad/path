@@ -1,0 +1,170 @@
+NEW QUESTION 2
+- (Exam Topic 2)
+Create a playbook called web.yml as follows:
+* The playbook runs on managed nodes in the "dev" host group
+* Create the directory /webdev with the following requirements:
+--> membership in the apache group
+--> regular permissions: owner=r+w+execute, group=r+w+execute, other=r+execute s.p=set group-id
+* Symbolically link /var/www/html/webdev to /webdev
+* Create the file /webdev/index.html with a single line of text that reads: “Development”
+-->
+it should be available on http://servera.lab.example.com/webdev/index.html
+
+
+------ANSWER-------
+
+
+-----------------------------------------------------------------
+
+NEW QUESTION 1
+- (Exam Topic 2)
+Create user accounts
+-----------------------
+--> A list of users to be created can be found in the file called user_list.yml
+which you should download from http://classroom.example.com/user_list.yml and
+save to /home/admin/ansible/
+--> Using the password vault created elsewhere in this exam, create a playbook called create_user.yml
+that creates user accounts as follows:
+--> Users with a job description of developer should be:
+--> created on managed nodes in the "dev" and "test" host groups assigned the password from the "dev_pass"
+variable and these user should be member of supplementary group "devops".
+--> Users with a job description of manager should be:
+--> created on managed nodes in the "prod" host group assigned the password from the "mgr_pass" variable
+and these user should be member of supplementary group "opsmgr"
+--> Passwords should use the "SHA512" hash format. Your playbook should work using the vault password file created elsewhere in this exam.
+while practising you to create these file hear. But in exam have to download as per questation.
+user_list.yml file consist:
+--
+user:
+- name: user1 job: developer
+- name: user2 job: manager
+
+
+-----------------------------------------------------------------
+Create a playbook with the name, install.yml in /home/lisa/ansible. The playbook will do the following:
+
+– Execute on managed hosts in the production host group
+
+-install the web services which are; php, httpd, and postgresql.
+
+-start and enable the web services which are; php,httpd, and postgresql. If any of the web services fails to be started and enabled, print the message “one of the services can’t be started and enabled”.
+
+-Turn off EnableSendfile option in the httpd configuration file (/etc/httpd/conf/httpd.conf).
+
+To turn it off, the EnableSendfile option must be set as; (EnableSendfile off). The httpd service must be restarted for changes to take effect.
+
+– add the http and https connections to the firewall rule.
+
+The conditions for the tasks to run are as follow:
+
+-The operating system must be Red Hat
+
+-System memory must be greater than 152 mb
+
+If you must create a variable file, it should be created with the name, lamp.yml, and in /home/lisa/ansible.
+
+------ANSWER-------
+---
+- name: Install packages
+  hosts: production
+  vars:
+    webpackages:
+     - httpd
+     - php
+     - postgresql
+  tasks:
+    - name: install web packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ webpackages }}"
+      when: ansible_distribution == "RedHat" and  ansible_memtotal_mb > 152
+
+    - name: start and enable web service
+      block:
+        - name: start and enable web service only
+          service:
+             name: "{{ item }}"
+             state: started
+             enabled: yes
+          loop: "{{ webpackages }}"
+          when: ansible_distribution == "RedHat" and ansible_memtotal_mb > 152
+
+      rescue:
+        - name: debug configuration error
+          debug:
+              msg: "one of the services can't be started and enabled"
+
+    - name: edit httpd configuration file
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: 'EnableSendfile on'
+        replace: 'EnableSendfile off'
+        backup: yes
+      notify: restart httpd
+
+    - name: Add services to firewall
+      firewalld:
+        service: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      loop:
+        - https
+        - http
+
+  handlers:
+    - name: restart httpd
+      service:
+        name: httpd
+        state: started
+
+You may also decide to create a variable file, lamp.yml and define the variables in there, then create a playbook that will refer to the variable.
+
+*create the variable file
+
+[lisa@drdev1 ansible]$ vim lamp.yml
+---
+webpackages:
+  - httpd
+  - php
+  - postgresql
+
+mem_value: 152
+
+
+-----------------------------------------------------------------
+Modify file content.
+
+Create a playbook called /home/admin/ansible/modify.yml as follows:
+
+* The playbook runs on all inventory hosts
+
+* The playbook replaces the contents of /etc/issue with a single line of text as
+
+follows:
+
+→ On hosts in the dev host group, the line reads: ‘’Development’’
+
+→ On hosts in the test host group, the line reads: ‘’Test’’
+
+→ On hosts in the prod host group, the line reads: ‘’Production’’
+
+A. Explanation: Solution as: # pwd /home/admin/ansible # vim modify.yml — — — name: hosts: all tasks: 
+— name: 
+  copy: 
+    content: "Development” 
+    dest: /etc/issue 
+  when: inventory_hostname in groups[‘dev’] 
+  — name: 
+    copy: 
+      content: “Test” 
+      dest: /etc/issue 
+    when: inventory_hostname in groups[‘test’] 
+  — name: 
+    copy:
+      content: “Production” 
+      dest: /etc/issue 
+    when: inventory_hostname in groups[‘prod’] :wq 
+    
+# ansible-playbook modify.yml — -syntax-check # ansible-playbook modify.yml

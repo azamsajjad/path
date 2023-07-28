@@ -1,0 +1,117 @@
+git clone https://github.com/geerlingguy/ansible-role-haproxy.git
+on exam 
+wget http://content.example.com/EX294/Ansible_files/xyz
+
+vim requirements.yml 
+- src: http://content.example.com/EX294/Ansible_files/balancer.tar.gz
+  name: balancer 
+- src: http://content.example.com/EX294/Ansible_files/phpinfo.tar.gz
+  name: phpinfo
+
+ansible-galaxy install -r roles/requirements.yml -p roles/  
+
+--------------------------------------------------------------
+
+Create a playbook called balance.yml as follows:
+* The playbook contains a play that runs on hosts in balancers host group and uses the balancer role.
+--> This role configures a service to loadbalance webserver requests between hosts in the webservers host group.curl
+--> When implemented, browsing to hosts in the balancers host group (for example
+http://node5.example.com)
+should produce the following output:
+Welcome to node3.example.com on 192.168.10.z
+--> Reloading the browser should return output from the alternate web server: Welcome to node4.example.com on 192.168.10.a
+
+* The playbook contains a play that runs on hosts in webservers host group and uses the phphello role.
+--> When implemented, browsing to hosts in the webservers host group with the URL / hello.php should produce the following output:
+Hello PHP World from FQDN
+--> where FQDN is the fully qualified domain name of the host. For example,
+browsing
+to http://node3.example.com/hello.php, should produce the following output: Hello PHP World from node3.example.com
+*
+Similarly, browsing to http://node4.example.com/hello.php, should produce the following output:
+Hello PHP World from node4.example.com
+
+
+-------ANSWER-------
+- name: Including phphello role 
+  hosts: webservers
+  roles:
+    - ./roles/phphello
+- name: Including balancer role 
+  hosts: balancer
+  roles:
+    - ./roles/balancer wq!
+
+if it gives error, then swap roles, balancer up, php down
+# ansible-playbook balancer.yml --syntax-check
+# ansible-playbook balancer.yml
+
+--------------------------------------------------------------
+
+- (Exam Topic 2)
+Create a role called apache in "/home/admin/ansible/roles" with the following requirements:
+--> The httpd package is installed, enabled on boot, and started.
+--> The firewall is enabled and running with a rule to allow access to the web server.
+--> template file index.html.j2 is used to create the file /var/www/html/index.html with the output:
+Welcome to HOSTNAME on IPADDRESS
+--> Where HOSTNAME is the fqdn of the managed node and IPADDRESS is the IP-Address of the managed node.
+note: you have to create index.html.j2 file.
+--> Create a playbook called httpd.yml that uses this role and the playbook runs on hosts in the webservers host group.
+
+-------ANSWER-------
+
+
+--------------------------------------------------------------
+
+NEW QUESTION 3
+- (Exam Topic 2)
+Create a role called apache in "/home/admin/ansible/roles" with the following requirements:
+--> The httpd package is installed, enabled on boot, and started.
+--> The firewall is enabled and running with a rule to allow access to the web server.
+--> template file index.html.j2 is used to create the file /var/www/html/index.html with the output:
+Welcome to HOSTNAME on IPADDRESS
+--> Where HOSTNAME is the fqdn of the managed node and IPADDRESS is the IP-Address of the managed node.
+note: you have to create index.html.j2 file.
+--> Create a playbook called httpd.yml that uses this role and the playbook runs on hosts in the webservers host group.
+
+-------ANSWER-------
+
+--------------------------------------------------------------
+Install the RHEL system roles package and create a playbook called timesync.yml that:
+
+--> Runs over all managed hosts.
+--> Uses the timesync role.
+--> Configures the role to use the time server 192.168.10.254 ( Hear in redhat lab use "classroom.example.com" )
+--> Configures the role to set the iburst parameter as enabled.
+
+AExplanation:
+Solution as:
+# pwd
+home/admin/ansible/
+# sudo yum install rhel-system-roles.noarch -y
+# cd roles/
+# ansible-galaxy list
+# cp -r /usr/share/ansible/roles/rhelsystem-roles.timesync .
+# vim timesync.yml
+---
+- name: timesynchronization
+hosts: all
+vars:
+timesync_ntp_provider: chrony
+timesync_ntp_servers:
+- hostname: classroom.example.com _ in exam its ip-address
+iburst: yes
+timezone: Asia/Kolkata
+roles:
+- rhel-system-roles.timesync
+tasks:
+- name: set timezone
+timezone:
+name: '{{ timezone }}'
+:wq!
+timedatectl list-timezones | grep india
+# ansible-playbook timesync.yml --syntax-check
+# ansible-playbook timesync.yml
+# ansible all -m shell -a 'chronyc sources -v'
+# ansible all -m shell -a 'timedatectl'
+# ansible all -m shell -a 'systemctl is-enabled chronyd'

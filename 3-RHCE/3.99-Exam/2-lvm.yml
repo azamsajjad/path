@@ -1,0 +1,107 @@
+NEW QUESTION 4
+- (Exam Topic 2)
+Create Logical volumes with lvm.yml in all nodes according to following requirements.
+* Create a new Logical volume named as 'data'
+* LV should be the member of 'research' Volume Group
+* LV size should be 1500M
+* It should be formatted with ext4 file-system.
+--> If Volume Group does not exist then it should print the message "VG Not found"
+--> If the VG can not accommodate 1500M size then it should print "LV Can not be created with
+following size", then the LV should be created with 800M of size.
+--> Do not perform any mounting for this LV.
+
+---  
+- name: create lvm 
+  hosts: dev
+  become: true 
+  tasks:
+    - name: create lvm 
+      block:
+        - name: debug not found msg 
+          debug:
+            msg: "VG not found"
+          when: "'research' not in ansible_lvm.vgs"
+        - name: create lvm of 1500m 
+          lvol:
+            vg: research 
+            lv: data 
+            size: 1500m 
+          when: "'research' in ansible_lvm.vgs"
+      
+      resecue:
+        - name: print size not enough 
+          debug:
+            msg: "LV cannot be created of that size"
+        - name: create 800m lvm 
+          lvol:
+            vg: research 
+            lv: data 
+            size: 800m 
+          when: "'research' in ansible_lvm.vgs" 
+      always:
+        - name: filesystem 
+          filesystem:
+            dev: /dev/research/data 
+            fstype: ext4 
+          when: "'research' in ansible_lvm.vgs"
+
+--------------------------------------------------------------
+
+
+2 . Use the LVM module in a playbook to set up the disk attached to DBServer1 (/dev/xvdg), then make sure it's formatted with XFS and mounted persistently on /mnt/dbdata. The disk's size should be 10G.
+
+
+--------------------------------------------------------------
+HWREPORT
+Create a file in /home/sandy/ansible/ called report.yml. Using this playbook, get a file called report.txt (make it look exactly as below). Copy this file over to all
+remote hosts at /root/report.txt. Then edit the lines in the file to provide the real information of the hosts. If a disk does not exist then write NONE.
+
+[ansible@x230 automation]$ vim files/hwreport.empty
+HOST=inventory_hostname
+MEMORY=memory_in_mb
+BIOS=bios_version
+VDA_DISK=disk_nvme0_size
+VDB_DISK=disk_nvme1_size
+~
+~
+~
+
+---
+- name: generate hwreport
+  hosts: all
+  become: true
+  tasks:
+    - name: download the file first
+      get_url:
+        url: http://example.lab.com/hereport.empty
+        dest: /root/hwreport.txt
+      ignore_errors: yes
+    - name: copy hw report
+      copy:
+        src: ~/automation/files/hwreport.empty
+        dest: /root/hwreport.txt
+    - name: inventory hostname
+      replace:
+        path: /root/hwreport.txt
+        regexp: "inventory_hostname"
+        replace: "{{ ansible_hostname }}"
+    - name: totalmemory
+      replace:
+        path: /root/hwreport.txt
+        regexp: "memory_in_mb"
+        replace: "{{ ansible_memtotal_mb }}"
+    - name: bios version
+      replace:
+        path: /root/hwreport.txt
+        regexp: "bios_version"
+        replace: "{{ ansible_bios_version }}"
+    - name: nvme size
+      replace:
+        path: /root/hwreport.txt
+        regexp: "disk_nvme0_size"
+        replace: "{{ ansible_devices.vda.size | default('NONE') }}"
+    - name: nvme size
+      replace:
+        path: /root/hwreport.txt
+        regexp: "disk_nvme1_size"
+        replace: "{%if ansible_devices.nvme0n7 is defined%}{{ansible_devices.nvme0n7.size}}{%else%}NONE{%endif%}"
