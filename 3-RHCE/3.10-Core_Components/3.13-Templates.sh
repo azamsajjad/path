@@ -1,71 +1,223 @@
-9- Manage content
-Create and use templates to create customized configuration files
-Use Ansible Vault in playbooks to protect sensitive data
 
-PARRALLELISM
-forks = 50 (how many simultaneous processes should control node start)
-how many nodes a task is being executed on at a time
-  hosts: vmservers
-  serial:
-    - 1
-    - 2
-    - 50%
-  tasks:
-first run all tasks on server 1, then 2, then 50% of all left
-"********************************************************************************"
-VAULT
-{TASK1}
-[ansible@x230 automation]$ vim playbooks/ansible_vault.yml
----
-- name: Ansible Vault Playbook
-  hosts: web
-  vars:
-    pw: redhat
-  tasks:
-    - name: Creating user account and password
-      user:
-        name: trump
-        password: "{{ pw }}"
-
-ansible-vault encrypt playbook/ansible_vault.yml
-[ansible@x230 automation]$ ansible-vault encrypt playbooks/ansible_vault.yml
-New Vault password:
-Confirm New Vault password:
-Encryption successful
-[ansible@x230 automation]$ cat playbooks/ansible_vault.yml
-$ANSIBLE_VAULT;1.1;AES256
-#Adv Encryption Standard - 256 bit key used to convert text into cipher
+--------------------------------------------------------------------------
 
 
-encrypt whole file
-[ansible@x230 automation]$ ansible-playbook playbooks/ansible_vault.yml --ask-vault-password
-[ansible@x230 automation]$ ansible-vault edit playbook/ansible_vault.yml
+Synopsis
+A Jinja template is simply a text file. Jinja can generate any text-based format (HTML, XML, CSV, LaTeX, etc.). A Jinja template doesn’t need to have a specific extension: .html, .xml, or any other extension is just fine.
 
-encrypt only a variable and call it from encrypted file
-[ansible@x230 automation]$ ansible-vault view playbook/ansible_vault2.yml
-[ansible@x230 automation]$ ansible-vault create ~/crypt.yml
-[ansible@x230 automation]$ ansible-vault rekey ~/crypt.yml
+A template contains variables and/or expressions, which get replaced with values when a template is rendered; and tags, which control the logic of the template. The template syntax is heavily inspired by Django and Python.
 
-save password in a file
-[ansible@x230 automation]$ ansible-vault encrypt playbook/ansible_vault3.yml
-passowrd: redhat
-vim pass.txt 
-redhat
-[ansible@x230 automation]$ ansible-playbook playbooks/ansible_vault3.yml 
-                          "--vault-password-file" pass.txt
+Below is a minimal template that illustrates a few basics using the default Jinja configuration. We will cover the details later in this document:
 
-encrypt a string
-[ansible@x230 automation]$ ansible-vault encrypt_string 'bar' --name 'foo'
-foo has been encrypted as bar
-[ansible@x230 automation]$ ansible-vault encrypt_string 'bar' --name 'foo' > bar.txt
-ansible-vault encrypt_string --ask-vault-pass '8080' --name 'http_port'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Webpage</title>
+</head>
+<body>
+    <ul id="navigation">
+    {% for item in navigation %}
+        <li><a href="{{ item.href }}">{{ item.caption }}</a></li>
+    {% endfor %}
+    </ul>
 
-Prompt for a Password with Vault-id
-ansible-playbook --vault-id label@prompt playbook.yml
+    <h1>My Webpage</h1>
+    {{ a_variable }}
 
-Prompt for two Passwords with Vault-id
-ansible-playbook --vault-id label@prompt --vault-id label2@prompt playbook.yml
+    {# a comment #}
+</body>
+</html>
+The following example shows the default configuration settings. An application developer can change the syntax configuration from {% foo %} to <% foo %>, or something similar.
 
+There are a few kinds of delimiters. The default Jinja delimiters are configured as follows:
+
+{% ... %} for Statements
+
+{{ ... }} for Expressions to print to the template output
+
+{# ... #} for Comments not included in the template output
+
+#  ... ## for Line Statements
+
+--------------------------------------------------------------------------
+Variables
+# Template variables are defined by the context dictionary passed to the template.
+
+# You can mess around with the variables in templates provided they are passed in by the application. Variables may have attributes or elements on them you can access too. What attributes a variable has depends heavily on the application providing that variable.
+
+# You can use a dot (.) to access attributes of a variable in addition to the standard Python __getitem__ “subscript” syntax ([]).
+
+The following lines do the same thing:
+
+{{ foo.bar }}
+{{ foo['bar'] }}
+# It’s important to know that the outer double-curly braces are not part of the variable, but the print statement. If you access variables inside tags don’t put the braces around them.
+
+# If a variable or attribute does not exist, you will get back an undefined value. What you can do with that kind of value depends on the application configuration: the default behavior is to evaluate to an empty string if printed or iterated over, and to fail for every other operation.
+
+Implementation
+# For the sake of convenience, foo.bar in Jinja2 does the following things on the Python layer:
+
+# check for an attribute called bar on foo (getattr(foo, 'bar'))
+
+# if there is not, check for an item 'bar' in foo (foo.__getitem__('bar'))
+
+# if there is not, return an undefined object.
+
+# foo['bar'] works mostly the same with a small difference in sequence:
+
+# check for an item 'bar' in foo. (foo.__getitem__('bar'))
+
+# if there is not, check for an attribute called bar on foo. (getattr(foo, 'bar'))
+
+# if there is not, return an undefined object.
+
+# This is important if an object has an item and attribute with the same name. Additionally, the attr() filter only looks up attributes.
+
+Filters
+# Variables can be modified by filters. Filters are separated from the variable by a pipe symbol (|) and may have optional arguments in parentheses. Multiple filters can be chained. The output of one filter is applied to the next.
+
+# For example, {{ name|striptags|title }} will remove all HTML Tags from variable name and title-case the output (title(striptags(name))).
+
+# Filters that accept arguments have parentheses around the arguments, just like a function call. For example: {{ listx|join(', ') }} will join a list with commas (str.join(', ', listx)).
+
+# The List of Builtin Filters below describes all the builtin filters.
+
+Tests
+# Beside filters, there are also so-called “tests” available. Tests can be used to test a variable against a common expression. To test a variable or expression, you add is plus the name of the test after the variable. For example, to find out if a variable is defined, you can do name is defined, which will then return true or false depending on whether name is defined in the current template context.
+
+# Tests can accept arguments, too. If the test only takes one argument, you can leave out the parentheses. For example, the following two expressions do the same thing:
+
+{% if loop.index is divisibleby 3 %}
+{% if loop.index is divisibleby(3) %}
+The List of Builtin Tests below describes all the builtin tests.
+
+Comments
+# To comment-out part of a line in a template, use the comment syntax which is by default set to {# ... #}. This is useful to comment out parts of the template for debugging or to add information for other template designers or yourself:
+
+{# note: commented-out template because we no longer use this
+    {% for user in users %}
+        ...
+    {% endfor %}
+#}
+
+
+---------------------------List of Builtin Filters------------------------
+abs()
+float()
+lower()
+round()
+tojson()
+attr()
+forceescape()
+map()
+safe()
+trim()
+batch()
+format()
+max()
+select()
+truncate()
+capitalize()
+groupby()
+min()
+selectattr()
+unique()
+center()
+indent()
+pprint()
+slice()
+upper()
+default() <------------------
+int()
+random()
+sort()
+urlencode()
+dictsort()
+join() <-------------
+reject()
+string()
+urlize()
+escape()
+last()
+rejectattr()
+striptags()
+wordcount()
+filesizeformat()
+length()
+replace() <--------------
+sum()
+wordwrap()
+first()
+list()
+reverse()
+title()
+xmlattr()
+
+
+
+
+--------------------[List of Builtin Tests()]-------------------------
+callable() - even() - le() - none() - string() 
+- defined() <----------------
+ge() - lower() - number() 
+- undefined()
+divisibleby()
+gt() #greater than
+lt() # less than
+odd()
+upper()
+eq() # equal
+in() 
+mapping()
+sameas() <------------------------
+escaped()
+iterable()
+ne()
+sequence()
+
+-----------callable(obj, /)
+Return whether the object is callable (i.e., some kind of function).
+
+Note that classes are callable, as are instances of classes with a __call__() method.
+
+------------defined(value)
+Return true if the variable is defined:
+
+{% if variable is defined %}
+    value of variable: {{ variable }}
+{% else %}
+    variable is not defined
+{% endif %}
+
+
+---------sameas(value, other)
+Check if an object points to the same memory address than another object:
+
+{% if foo.attribute is sameas false %}
+    the foo attribute really is the `False` singleton
+{% endif %}
+
+------------------------Expression Statement------------------------
+If the expression-statement extension is loaded, a tag called do is available that works exactly like the regular variable expression ({{ ... }}); except it doesn’t print anything. This can be used to modify lists:
+
+{% do navigation.append('a string') %}
+
+
+----------------------Loop Controls---------------------------------
+If the application enables the Loop Controls, it’s possible to use break and continue in loops. When break is reached, the loop is terminated; if continue is reached, the processing is stopped and continues with the next iteration.
+
+Here’s a loop that skips every second item:
+
+{% for user in users %}
+    {%- if loop.index is even %}{% continue %}{% endif %}
+    ...
+{% endfor %}
+Likewise, a loop that stops processing after the 10th iteration:
+
+{% for user in users %}
+    {%- if loop.index >= 10 %}{% break %}{% endif %}
+{%- endfor %}
 CLOUD_LAB
 # Encrypt home/ansible/secret using the ansible-vault command.
 # Create /home/ansible/vault as a vault password file that may be used to access the encrypted secret file without prompt.

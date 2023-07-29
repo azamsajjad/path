@@ -28,6 +28,30 @@ ansible-config dump --only-changed
 # [test:children]
 # web
 # dev
+ansible-inventory --graph
+@all:
+  |--@ungrouped:
+  |  |--localhost
+  |--@vmservers:
+  |  |--server1
+  |  |--server2
+  |--@rhel1:
+  |  |--server1
+  |--@rhel2:
+  |  |--server2
+
+
+
+
+[ansible@x230 automation]$ ansible-inventory --graph
+@all:
+  |--@ungrouped:
+  |  |--localhost
+  |--@vmservers:
+  |  |--@rhel1:
+  |  |  |--server1
+  |  |--@rhel2:
+  |  |  |--server2
 
 VIM SETTINGS FOR YAML:
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab

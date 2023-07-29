@@ -39,6 +39,105 @@ user:
 - name: user1 job: developer
 - name: user2 job: manager
 
+------ANSWER-------
+---
+- name: create user and group
+  hosts: rhel1
+  vars_files:
+    - /home/ansible/automation/files/rhceusers.yml
+    - /home/ansible/automation/variables/locker.yml
+  become: true
+  tasks:
+    - name: create user
+      user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+        state: present
+        groups: devops
+        append: yes
+        password: "{{ dev_pass | password_hash('sha512') }}"
+        password_expire_max: "{{ item.password_expire_max }}"
+      loop: "{{myusers}}"
+      when: "item.job == 'developer'"
+
+- name: create user and group
+  hosts: rhel2
+  vars_files:
+    - /home/ansible/automation/files/rhceusers.yml
+    - /home/ansible/automation/variables/locker.yml
+  become: true
+  tasks:
+    - name: create user
+      user:
+        name: "{{item.name}}"
+        uid: "{{item.uid}}"
+        state: present
+        groups: opsmgr
+        append: yes
+        password: "{{ mgr_pass | password_hash ('sha512') }}"
+        password_expire_max: "{{item.password_expire_max}}"
+      loop: "{{myusers}}"
+      when: "item.job == 'manager'"
+
+
+# ---
+# - name: create users
+#   hosts: rhel1,rhel2
+#   become: true
+#   vars_files:
+#     - /home/ansible/automation/variables/locker.yml
+#     - /home/ansible/automation/files/rhceusers.yml
+#   tasks:
+#     - name: add group first
+#       group:
+#         name: devops-opsmgr
+#         state: present
+#       when: "'rhel1' and 'rhel2' in group_names"
+
+#     - name: add group first
+#       group:
+#         name: devops
+#         state: present
+#       when: "'rhel1' in group_names"
+
+#     - name: create users
+#       user:
+#         name: "{{ item.name }}"
+#         uid: "{{ item.uid }}"
+#         password: "{{ dev_pass | password_hash('sha512') }}"
+#         state: present
+#         groups: devops
+#         append: yes
+#       loop: "{{ myusers }}"
+      when: "item.job == 'developer' and 'rhel1' in group_names"
+
+#     - name: set password expiry
+#       shell: "chage -M {{ item.password_expire_max }} {{ item.name }}"
+#       loop: "{{ myusers }}"
+      when: "item.job == 'developer' and 'rhel1' in group_names"
+
+
+#     - name: add group
+#       group:
+#         name: opsmgr
+#         state: present
+#       when: "'rhel2' in group_names"
+
+#     - name: add user
+#       user:
+#         name: "{{ item.name }}"
+#         uid: "{{ item.uid }}"
+#         state: present
+#         groups: opsmgr
+#         append: yes
+#         password: "{{ mgr_pass | password_hash('sha512') }}"
+#       loop: "{{ myusers }}"
+      when: "item.job == 'manager' and 'rhel2' in group_names"
+
+#     - name: set password expiry
+#       shell: "chage -M {{ item.password_expire_max }} {{ item.name }}"
+#       loop: "{{ myusers }}"
+      when: "item.job == 'manager' and 'rhel2' in group_names"
 
 -----------------------------------------------------------------
 Create a playbook with the name, install.yml in /home/lisa/ansible. The playbook will do the following:
@@ -168,3 +267,17 @@ A. Explanation: Solution as: # pwd /home/admin/ansible # vim modify.yml — — 
     when: inventory_hostname in groups[‘prod’] :wq 
     
 # ansible-playbook modify.yml — -syntax-check # ansible-playbook modify.yml
+
+-----------------------------------------------------------------
+add cronjob
+------ANSWER-------
+---
+- name: create cron for a user
+  hosts: rhel1
+  tasks:
+    - name: create cronjob
+      cron:
+        name: uptime script
+        minute: "*/2"
+        user: natasha
+        job: 'logger "EX294 Exam is in Process"'
