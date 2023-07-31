@@ -1,0 +1,20 @@
+$color: red;
+
+ul {
+    font-size: 14px;
+    color: $color;
+
+}
+
+ol {
+    font-size: 18px;
+    color: $color;
+}
+
+/* but you need to recompile saas css file into css file after editing, so a browser can understand it. 
+download saas
+$ sass variables.scss:variables.css
+$ sass --watch variables.scss:variables.css 
+(whenever sass sees a change, it recompiles
+now in .html file
+<link rel="stylesheet" href="variables.css"> */
