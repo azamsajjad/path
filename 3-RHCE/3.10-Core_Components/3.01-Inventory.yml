@@ -2,7 +2,7 @@ $ ansible --version
 # shows current facts about ansible
 [INVENTORY]
 ansible-config dump --only-changed
-
+ansible-playbook -i "localhost," -c local playbook.yml
 # DEFAULT INVENTORY FILE IS LOCATED AT /etc/ansible/hosts⁡
 [web]
 192.168.100.101

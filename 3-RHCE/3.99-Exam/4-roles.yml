@@ -115,3 +115,53 @@ timedatectl list-timezones | grep india
 # ansible all -m shell -a 'chronyc sources -v'
 # ansible all -m shell -a 'timedatectl'
 # ansible all -m shell -a 'systemctl is-enabled chronyd'
+
+--------------------------------------------------------------
+Install rhel system role package, Use a rhel system role to create a playbook called timesync.yml that: 
+- runs on all managed nodes 
+- uses the timesync role 
+- configure the role to use currently active NTP provider 
+- configure the role to use the time server 172.24.1.254
+- configure the role to enable iburst parameter 
+-------ANSWER-------
+first, goto /usr/share/ansible/roles/rhel-system-roles.timesync/README.md
+and copy 2 variables
+---
+- name: install and configure time server using role
+  hosts: all
+  vars:
+    timesync_ntp_servers:
+      - hostname: foo.example.com   # Hostname or address of the server
+        iburst: true                # Flag enabling fast initial synchronization
+  roles:
+    - rhel-system-roles.timesync
+
+~
+--------------------------------------------------------------
+Install SElinux roles and enable selinux enforcing on all managed nodes.
+use a rhel system role install the rhel system role package
+enable SElinux state 'enforcing' and policy 'targeted' mode on all managed nodes 
+-------ANSWER-------
+first, goto /usr/share/ansible/roles/rhel-system-roles.selinux/README.md
+and copy 2 variables
+---
+- name: install rhel system role for selinux
+  hosts: vmservers
+  become: true
+  vars:
+    selinux_policy: targeted
+    selinux_state: enforcing
+  roles:
+    - rhel-system-roles.selinux
+--------------------------------------------------------------
+Q 6 : install roles using Ansible Galaxy with a requirements.yml file /home/user/ansible/roles/requirements.yml to download and install roles to /roles  
+URL: http://workstation.lab.example.com/galaxyroles/haproxy.tar
+or 
+https://github.com/geerlingguy/ansible-role-haproxy.git 
+The name of the role should be balancer 
+AND 
+https://github.com/bbatsche/Ansible-PHP-Site-Role.git 
+The name of the role should be phpinfo
+
+-------ANSWER-------
+
