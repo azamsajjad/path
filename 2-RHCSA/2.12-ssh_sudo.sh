@@ -38,7 +38,7 @@ scp /home/cloud_user/final.txt cloud_user@44.203.210.185:~/
 cloud_user@server2: ~ $ ssh -t cloud_user@18.234.181.169 free >> server_health.txt
 Connection to 18.234.181.169 closed.
 cloud_user@server2: ~ $ ssh -t cloud_user@18.234.181.169 df -hT >> server_health.txt
-Connection to 18.234.181.169 closed.
+Connection to 18.234.181.169 closed..
 cloud_user@server2: ~ $ ssh -t cloud_user@18.234.181.169 nmcli c s  >> server_health.txt
 Connection to 18.234.181.169 closed.
 cloud_user@server2: ~ $ eval $(ssh-agent -s)
