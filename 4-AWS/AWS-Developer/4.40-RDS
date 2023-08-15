@@ -1,0 +1,84 @@
+rds multi-az and read replicas
+rds backups and snapshots
+rds proxy
+rds is for OLTP - online transaction processing, customer orders
+Automated Backups - automated , u define backup window
+        point in time snapshot + transaction log
+        retention period - upto 35 days
+        used to recover database
+vs 
+DB Snapshots -user initiated
+        point in time snapshot 
+        retention period - indefinite
+        used to backup db instance to a known state and restore to that specific state
+
+
+RDS can be encrypted at Creation, not afterwards
+encryption include all underlying sotrage, backups, snapshots, logs and RRs
+RDS integrates with KMS 
+to Encrypt existing DB - snapshot > encrypt snapshot > restore it to DB
+
+
+MULTI_AZ 
+        exact copy of your DB in another AZ 
+        in case of failure, RDS automatically failover to standby instance
+        used for disaster recovery
+vs
+READ REPLICA - read-only copy
+        used to scale read performance for read-only workloads
+        in same AZ or cros-AZ or cross-region
+
+[Elasticache 101 for Rds]
+    in-memory cache
+    improves database performance
+    good for read-heavy database workloads
+    2 types:
+        Memcached - inmemory key-value data store
+                    good for object caching
+                    good for simple caching solution
+                    no persistence or multi-AZ
+        Redis - inmemory key-value data store
+                persistence, replication, multi-az, failover
+                supports sorting and ranking data 
+                good for lists, hasshes, gaming boards
+                millisecond read latency
+                use case - website that needs to store session data
+
+elasticache is good choice if database is read-heavy and not prone to frequent changing 
+caching doesnot help if you are overloaded with write loads, then you need to scale up your database and if you are using OLAP, think redshift.
+
+[MemoryDB 101 for Redis]
+massively scalable - in-memory database
+highly available - transaction log for recovery and durability
+primary dataset - entire dataset for an application can be stored in memory (instead of a database plus a cache)
+miilisecond write latency
+microsecond read latency
+use case - microservices & online gaming company with millions of users sharing digital assets
+
+MemoryDB vs ElastiCache 
+MemoryDB can store whole dataset in memory - no database required 
+Elasticache is an in-memory cache for database e.g. RDS
+
+RDS PROXY 
+pools and shares DB connections to assist with application scalability and database efficiency
+Application is pointed @ RDS PROXY <> DATABASE
+RDS PROXY is serverless and scales automatically 
+app -> rds proxy > db1 
+app -> rds proxy > db1
+app -> rds proxy > db2
+detects failover and routes requests to standby DB 
+Deployable over multi-AZ for protection from infra failure
+66% faster failover times 
+
+
+AWS SYSTEMS MANAGER - PARAMETER STORE 
+    safe place to store licence keys, passwords, database connection strings,  in plain text or encrypted
+    you can reference your parameters using parameter name e.g. in a script
+    its integrated to be used with ec2, cloudformation, lambda, codebuild, codepipeline, codedeploy
+
+AWS SECRETS MANAGER 
+    secrets are encrypted using AWS KMS key
+    CMK customer master key holds key material to encrypt data. CMKs can encrypt upto 4kb of data
+    Secret Rotation is done through lambda function
+
+ 

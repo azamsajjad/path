@@ -1,0 +1,210 @@
+Lambda Charges: (pay only when your code executes)
+1 - Based on Requests
+first million requests per month are free 
+$0.20 per month per 1 million requests 
+
+2- Duration 
+You are charged in millisecond increments 
+price depend on amount of memory you allocate to your lambda function 
+Price per GB-Second 
+$0.00001667 per GB-Second 
+A function that uses 512mb and runs for 100ms 
+0.5GB x 0.1s = 0.05 GB-Seconds 
+cost = $0.0000000083 
+First 400,000 GB-Seconds per month are free
+
+Lambda is Event-driven 
+Lambda is Independent - each event will trigger a single function
+Lambda is triggered by Events e.g. changes to s3 bucket/DB run function
+Lambda is also triggered User Request e.g. alexa
+
+LAMBDA TRIGGERS: (aws services)
+DynamoDB
+Kinesis 
+SQS 
+Application Load Balancer 
+API Gateway 
+Alexa 
+CloudFront 
+S3
+SNS 
+SES 
+CloudFormation 
+CloudWatch 
+CodeCommit 
+CodePipeline
+
+
+API : Application Programming Interface 
+we use APIs to interact with web applications 
+Applications use APIs to communicate with each other
+
+API GATEWAY : is serverless, supports throttling, logged to CloudWatch
+API GATEWAY provides endpoints for your apps running in aws
+publish maintain and monitor APIs 
+API TYPES :
+RESTful APIs are optimized for stateless, serverless workloads
+REST=REpresentational State Transfer, supports JSON
+Websocket APIs are for real-time, two-way, stateful communication e.g. chat apps
+users -> API GATEWAY -> Lambda
+users -> API GATEWAY -> EC2
+users -> API GATEWAY -> DynamoDB
+
+$LATEST is the latest version of code you uploaded into lambda 
+how to version control 
+upload code > action > publish new version > create alias 
+(weighted traffic routing also supported between versions)
+
+Concurrent Execution Limit is 1000 functions per region per account
+HTTP status code 429
+you can also reserve some concurrency for critical lambda functions
+they will be prioritized
+but it also sets limit for that function.e.g if you reserve 500 simultaneous function execution for a particular function, it will never go beyond 500 concurrent runs
+
+LAMBDA and VPC Access 
+it is possible to enabe lambda access resources that are inside private VPC
+these resources can be EC2/RDS/etc
+Lambda creates ENIs using IP from private subnets
+configuration > permissions > Execution role url
+AWSLambdaVPCAccessExecutionRole (add this policy for lambda to access VPC)
+
+
+---------------------------------------------------------------------------
+Severless Architectures are Event-Driven and Asynchronous
+->so an event may trigger an action, but no response is required/expected
+SQS allows you to queue messages
+EventBridge helps to handle events & route them to application components
+Characteristics of Event-Driven Architecture 
+        Event Source    --> Event Router -->    Event Destination
+            s3              EventBridge         Lambda
+            dynamoDB                            SNS
+                                                Lambda
+---------------------------------------------------------------------------
+STEP Functions: 
+provide visual interfac for serverless apps app is series of steps excuted in order as defined by your business logic
+Output of one step can be input of next step
+step functions also logs state of each step
+
+STEP Functions Workflows
+Standard Workflows: 
+     -> Long-Running (upto 1 yar)
+     -> At-Most-Once Model  - (tasks are never executed more than once, unless explicitly specified by retry actions.)
+     -> Non-Idempotent Actions e.g. when processing payments, you want payment to be processed once
+     -> Change in State? a req is non-idempotent if it always change state
+
+Express Workflows:
+    -> Short-Lived (upto 5 minutes)
+    -> At-Least-Once 
+    -> Idempotent Actions
+    -> Identical Request - has no side effect
+    2 types of Express Workflows
+        -> Synchronous - begins workflow->wait till complete->return result
+            workflows hold u up until they are complete
+            e.g. job interview, successful payment b4 processing order
+        -> Asynchronous - begins->confirm that its started->cloudwatch logs
+            runs in the background
+            e.g. email to a colleage, messaging system
+
+---------------------------------------------------------------------------
+LAMBDA STORAGE PATTERNS:
+
+Lambda is stateless (you cannot permanently store any data in the function)
+Lambda is Ephemeral (not used for apps that need to run 4longer than 15min)
+To make Lambda Persistent -> make it interact with a data store.
+                            e.g. S3,EFS,DynamoDB or /tmp,layers
+
+/tmp , lambda layers = Native Lambda storage options
+/tmp = by default 512mb, configurable upto 10GB (but NON_PERSISTENT)
+/tmp = used while function is executing
+/tmp = like a cached file system
+
+Storing Lambda Libraries - can be included with the code as zip file 
+LAYERS                     but it makes deployment heavy
+LAYERS = limit 50mb zipped, 250mb unzipped
+- Best Practice (Add libraries & SDKs as layers)
+    (However, if you want to change version of a library included)
+    (you can''t update it dynamically)
+    (you need to create a new layer & reference that)
+
+PERSISTENT_STORAGE:
+S3  -> elastic, means no size limit
+    -> but there are constraints, because S3 is object storage 
+    -> allows you to store & retrieve objects, not a file system 
+    -> Cannot Append data 
+    -> if you want to change data, you need to upload a new object
+better option = EFS ~ Shared file system 
+EFS = dynamically updated, no size limit
+    = mounted by the function when execution environment is created 
+    = can be shared across invocations 
+    = VPC-to use EFS, lambda function must be in same VPC as EFS file system
+
+---------------------------------------------------------------------------
+LAMBDA ENVIRONMENT VARIABLES 
+-> adjust your function behavior, without changing your code
+-> make your function behave differently in dev env. than it does in prod.
+-> key-value pairs (key=environment, value=development)
+ENV Variables are locked once the Version is published 
+ENV Variables are defined before Version is published
+USE-CASES = references S3 resources, SNS Topic, DynamoDB Table
+             BUCKET=my-bucket  SNSTOPIC=my-Topic  TABLE=my-table
+
+---------------------------------------------------------------------------
+LAMBDA INVOCATIONS 
+when invoking a function, you can invoke it synchronously or asynchronously
+SYNC Invocation -> lambda runs the function, wait for its response, returns the response
+                -> the service calling the function will know if the function completed successfully or not
+                -> e.g. API Gateway invoking a function and returning error code to the caller
+ASYNC Invocation -> No Acknowledgement to let you know invocation was successful
+                -> the service calling the function will not know if the function completed successfully or not
+LAMBDA Retries:
+default -> performs 2 retries 
+lambda waits 1 min before first retry, it waits 2 minutes before 2nd retry
+
+Dead-Letter Queues (DLQs):
+save failed invocations for further processing 
+associated with a particular version of a function 
+can be an event source for a function, allowing you to re-process events.
+handles failures only 
+SQS->holds failed events in the queue until they are retrieved 
+SNS->send notification about failed events to one or more destinations
+
+Lambda Destinations: optionally, configure lambda to send invocation records to another service 
+lambda --invocation_success-->EventBridge-->so successful inv are tracked
+lambda --invocation_success-->SQS-->queue for review
+lambda --invocation_failure-->SNS-->mail or sms
+lambda --invocation_failure-->lambda-->trigger another function
+
+---------------------------------------------------------------------------
+LAMBDA DEPLOYMENT PACKAGE
+when you paste code in lambda, lambda automatically creates a deployment package for you in .zip which includes your code and dependencies.
+
+Other Method -> create deployment package yourself and upload zip file 
+             -> limit is 50 mb
+             -> if deployment package is greater than 50 mb 
+             -> upload it to S3 in same region as u create your function
+             -> then specify S3 object when u create your function 
+
+Other Method -> Lambda Layers
+             -> libraries, custon runtimes, etc 
+             -> a layer can be used by multiple functions 
+             -> helps reduce the size of deployment package 
+             -> BEST PRACTICE
+---------------------------------------------------------------------------
+LAMBDA PERFORMANCE TUNING 
+memory 128 mb to 10,240 mb
+adding memory will improve function performance because with more memory, you get more cpu.
+adding memory may reduce duration the function runs for
+Steps:
+DOWNLOADS CODE ---> CONFIGURE ---> STATIC INITIALIZATION ---> FUNCTION CODE
+set ups execution   memory,         import libraries,sdks     tmp, re-use 
+environment         runtime          (ADDS LATENCY)           execution env
+                                                        for next function
+
+How to optimize STATIC INITIALIZATION
+three factors to reduce latency:
+1- code - the amount of code that needs to run during initialization phase 
+2- function package size 
+3- performance - libraries/other services that require connections to be set up e.g. connections to S3 or database
+e.g. dont import entire aws-sdk if your code can run on just one or two services 
+instead of (aws-sdk), import (aws-sdk/clients/dynamodb)
+---------------------------------------------------------------------------

@@ -1,0 +1,284 @@
+s3 is object based storage
+not suitable for OS or DB installation 
+
+rather than in file systems or data blocks
+s3 objects can be of 5tb of size 
+Universal Namespace, globally unique 
+s3 url 
+https://bucket-name.s3.region.amazonaws.com/key-name
+HTTP 200 code if upload is successfull (api/cli)
+s3 is KEY VALUE store 
+key = object name 
+value = sequence of data that make up the object 
+Version ID = multiple versions of same object 
+Metadata = data about the data you are storing e.g. last-modified
+data is spread across multiple devices and facilities to ensure availability and durability >= 3AZs
+99.9x11 % durability 
+99.95-99.99% availability depending on s3 tier 
+
+
+PRICING
+S3 standard 
+S3 standard in-frequent Access 30days(min storage duration: 30 days)
+S3 one zone in-frequent Access  30days(min storage duration: 30 days)
+(stored redundantly within single AZ) 20% less than regular S3-IA 
+S3 Glacier (pay each time you access your data) only for archiving
+retrieval time 1 min to 12 hours - 90 days min storage duration
+S3 Glacier Instant Retrieval - 
+S3 Glacier Flexible Retrieval - retrieve at no cost 
+S3 Glacier Deep Archive - default retrieval time of 12 hours - 180 Days 
+(e.g. finincial records for legal purposes)
+S3 Intelligent Tiering
+Frequent and inFrequent - $0.0025 monthly fee per 1000 objects
+
+HIGHEST COST IS S3 standard
+Then Intelligent Tiering 
+Retrieval fee applies to all infrequent access
+
+
+
+ENCRYPTION 
+S3 is very secure by Default
+server-side encryption 
+ACLs who has access 
+BUCKET POLICIES - which actions are allowed which are not.
+BUCKET POLICIES applied at bucket level , not on object level 
+BUCKET ACLs applied at object level 
+[3] Ecryption Options
+1- Encryption in transit 
+    ` SSL/TLS 
+    ` HTTPS 
+2- Encryption at rest: Server-Side Encryption
+` Server-side encryption with Amazon S3 managed keys (SSE-S3) AES256-bit
+                (ENABLED BY DEFAULT when you create bucket)
+` Server-side encryption with AWS Key Management Service keys (SSE-KMS) 
+` Dual-layer server-side encryption with AWS Key Management Service keys (DSSE-KMS)
+// Secure your objects with two separate layers of encryption. For details on pricing, see DSSE-KMS pricing on the Storage tab of the Amazon S3 pricing page. 
+// Bucket Key
+// Using an S3 Bucket Key for SSE-KMS reduces encryption costs by lowering calls to AWS KMS. S3 Bucket Keys aren't supported for DSSE-KMS. Learn more 
+// Disable
+// Enable
+3- Encryption at rest: Client-Side Encryption SSE-C
+You encrypt yourself before uploading to S3 
+
+
+TO HOST STATIC WEBSITE OR
+TO make contents of a bucket or a file PUBLIC
+goto bucket > permissions
+Block public access (bucket settings) = OFF
+BUCKET POLICY - Generate 
+    type of plicy = S3 Bucket Policy
+    principal = * (anyone can access)
+    Actions = Get Object 
+    Amazon Resource Name (ARN) = arn:aws:s3:::reason320320/* for all files */
+    GENERATE POLICY 
+    Then copy and paste into Bucket Policy
+then enable Static Website in Properties of Bucket 
+
+S3 Access Logs - everytime user reads, writes creates, deletes a file 
+can be written to a different S3 Bucket
+
+
+CORS - cross origin resource sharing 
+allowing code in 1 bucket to access code in another bucket 
+index.html(bucket1) --> loadpage.html(bucket2)
+copy index bucket URL and paste it in Loadpage bucket CORS section in permission.
+
+[
+    {
+        "AllowedHeaders": [
+            "Authorization"
+        ],
+        "AllowedMethods": [
+            "GET"
+        ],
+        "AllowedOrigins": [
+            "http://my-index-bucket-329329.s3-website-us-east-1.amazonaws.com"
+        ],
+        "MaxAgeSeconds": 3000
+    }
+]
+
+
+----------------------------------------------------------------------
+CLOUDFRONT - Amazons CDN content delivery network
+CLOUDFRONT Origin - EC2,S3,ELB,R53 address
+CLOUDFRONT EDGE LOCATION - location where content is cached
+CLOUDFRONT Distribution - name given to config settings
+
+AWS operates 200+ edge locations
+it also works with non-aws origin server 
+default TTL is 1 day - time to live is age for cached objects
+you can clear the cache yourself if you have made changes to your page
+
+Cloudfront S3 Transfer Acceleration enables fast, secure transfer of files b/w your s3 bucket and your end-users - if you want your users to upload files at your s3 bucket at london, they can upload via edge location via their local network.--> As data arrives at edge location, it is routed to your Amazon S3 in london, over an optimized network path of AWS
+           in cloudfront settings - for Transfer acceleration, select 3rd
+            Allowed HTTP methods
+            GET, HEAD
+            GET, HEAD, OPTIONS
+            GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+Edge locations are not Read-only, you can write to them too.
+
+Restrict viewer access (GOOD OPTION FOR PAID CONTENT)
+If you restrict viewer access, viewers must use CloudFront signed URLs or signed cookies to access your content.
+No
+Yes
+INVALIDATION - give path to delete cache for that file
+
+OAI - Origin Access Identity
+to block public access at bucket level and serve content only through cloudfront url
+When creating cloudfront distribution - set 
+        Origin accessInfo Public
+        `Bucket must allow public access.
+        `Origin access control settings (recommended)
+        `Bucket can restrict access to only CloudFront.
+         Legacy access identities
+Use a CloudFront origin access identity (OAI) to access the S3 bucket.
+
+
+CLOUDFRONT Allowed HTTP Methods
+Allowed HTTP methods
+GET, (allow you to read data)
+GET, HEAD (allow you to read data and header)
+GET, HEAD, OPTIONS
+GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE (if your users need read & write access to your website)
+   PUT is idenpotent - write data (send data to create new resource)
+   PATCH (partial modify)= modify contents of shopping cart 
+   POST (insert data)= comment on a blog post
+   DELETE (also write action) = deleting your email address
+   OPTIONS (receive a list of supported HTTP methods)
+
+--------------------------------------------------------------------------
+ATHENA
+interactive query service using standard SQL
+serverless 
+no need to set up complex Extract/Transform/Load (ETL) processes
+works directly with data stored on S3
+USES:
+    QUERY log files stored on s3 
+    PERFORM aws costs and usage reports
+    GENERATE business reports on data stored on s3
+    ANALYZE - run queries on click-stream data
+
+LAB: 
+1- configure a trail in CloudTrail 
+2- CloudTrail sends logs to S3 
+3- create another S3 for athena results. add it in setting of athena
+3- Create an Athena Table to query data stored in S3 with SQL
+QUERY 1 - creates a database
+CREATE DATABASE athenadb
+QUERY 2 - creates a table
+CREATE EXTERNAL TABLE cloudtrail_logs (
+eventversion STRING,
+useridentity STRUCT<
+               type:STRING,
+               principalid:STRING,
+               arn:STRING,
+               accountid:STRING,
+               invokedby:STRING,
+               accesskeyid:STRING,
+               userName:STRING,
+sessioncontext:STRUCT<
+attributes:STRUCT<
+               mfaauthenticated:STRING,
+               creationdate:STRING>,
+sessionissuer:STRUCT<  
+               type:STRING,
+               principalId:STRING,
+               arn:STRING, 
+               accountId:STRING,
+               userName:STRING>>>,
+eventtime STRING,
+eventsource STRING,
+eventname STRING,
+awsregion STRING,
+sourceipaddress STRING,
+useragent STRING,
+errorcode STRING,
+errormessage STRING,
+requestparameters STRING,
+responseelements STRING,
+additionaleventdata STRING,
+requestid STRING,
+eventid STRING,
+resources ARRAY<STRUCT<
+               ARN:STRING,
+               accountId:STRING,
+               type:STRING>>,
+eventtype STRING,
+apiversion STRING,
+readonly STRING,
+recipientaccountid STRING,
+serviceeventdetails STRING,
+sharedeventid STRING,
+vpcendpointid STRING
+)
+ROW FORMAT SERDE 'com.amazon.emr.hive.serde.CloudTrailSerde'
+STORED AS INPUTFORMAT 'com.amazon.emr.cloudtrail.CloudTrailInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION 's3://aws-cloudtrail-logs-928151643990-20c29fa1/AWSLogs/928151643990/';
+
+QUERY 3 - outputs mentioned fields from data
+SELECT
+ useridentity.arn,
+ eventname,
+ sourceipaddress,
+ eventtime
+FROM cloudtrail_logs
+LIMIT 100;
+
+------------------------------------------------------------------------
+You would like to configure your S3 bucket to only serve content over HTTPS/SSL and explicitly deny all unencrypted HTTP access. In your bucket policy, how should you specify the type of request that should be denied?
+{
+  "Id": "ExamplePolicy",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowSSLRequestsOnly",
+      "Action": "s3:*",
+      "Effect": "Deny",
+      "Resource": [
+        "arn:aws:s3:::DOC-EXAMPLE-BUCKET",
+        "arn:aws:s3:::DOC-EXAMPLE-BUCKET/*"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      },
+      "Principal": "*"
+    }
+  ]
+}
+Explicitly denying requests that are identified as "aws:SecureTransport": "false" would deny requests that are using HTTP and are unencrypted.
+
+A developer is working on an application in her AWS account that uses Amazon S3 to store sensitive data. To enhance security, the developer wants to ensure that all S3 buckets in the application are not publicly accessible. Which of the following actions should the developer take to meet this requirement? Choose the best option.
+    Enable block public access settings at the account level to apply to all current and future S3 buckets in the account.
+
+
+You would like to configure your S3 bucket to deny put object requests that do not use server-side encryption. Which bucket policy can you use to deny permissions to upload objects, unless the request includes server-side encryption?
+
+{
+                "Version": "2012-10-17",
+                "Id": "PutObjPolicy",
+                "Statement": [
+                    {
+                        "Sid": "DenyUnEncryptedObjectUploads",
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:PutObject",
+                        "Resource": "arn:aws:s3:::bucket/*",
+                        "Condition": {
+                            "Null": {
+                                "s3:x-amz-server-side-encryption": "true"
+                            }
+                        }
+                    }
+                ]
+            }
+The condition above looks for a Null value for the s3:x-amz-server-side-encryption key. If this condition is true, it means the request is Null and does not include server-side encryption. Setting the condition in the condition policy to "s3:x-amz-server-side-encryption": "true" with "Effect": "Deny" and "Action": "s3:PutObject" would deny put object requests that do not use server-side encryption
+
+
+Which S3 storage class is ideal for backup and disaster recovery use cases, when large sets of data occasionally need to be retrieved in minutes, without concern for costs?
+        Amazon S3 Glacier Flexible Retrieval (Formerly S3 Glacier)
+    S3 Glacier Flexible Retrieval (formerly S3 Glacier) is the ideal storage class for archive data that does not require immediate access but needs the flexibility to retrieve large sets of data at no cost, such as backup or disaster recovery use cases.

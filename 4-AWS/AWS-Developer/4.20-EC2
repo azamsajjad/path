@@ -1,0 +1,215 @@
+
+EC2 is a virtual machine
+4 pricing options
+ON-DEMAND - pay by the hour
+RESERVED - upto 72% discount on hourly charge
+SPOT - purchase unused capacity at 90% discount
+DEDICATED - physical ec2 dedicated to you
+
+EBS VOLUMES - attached to ec2 instance 
+types:
+Elastic block store - SSDs
+gp2 ssd - boot & gen - upto 16,000 IOPS per volume - 99.9% durable
+gp3 ssd - boot & gen - 3,000 - 16,000 IOPS per volume - 99.9% durable
+Provisioned IOPS:
+io1 - OLTP (latency-sensitive) 50IOPS/GB-upto 64,000 IOPS per volume - 99.9%
+io2 - OLTP (latency-sensitive) 500IOPS/GB-upto 64,000 IOPS per volume - 99.999%
+io2 Block Express- Critical Apps SAP HANA,etc upto 64 TB, 500IOPS/GB - upto 256,000 IOPS per volume - 99.999%
+
+HDD Volumes - 
+st1 - 500mb/s - not boot - 99.9%
+sc1 - 250mb/s - not boot - 99.9% lowest cost 
+
+EBS SNAPSHOTS
+point in time copy of EBS Volume
+if you create new EBS volume from an encrypted snapshot, you will get an encrypted volume - same for unencrypted 
+Create a snapshot of the EC2 volume. Then create a copy of the snapshot, checking the box to enable encryption. Create an AMI of the copied snapshot and then redeploy the EC2 instance using the encrypted AMI. Delete the old EC2 instance.
+
+[Elastic LOAD Balancer]
+Application Load Balancers - for http/s, routes to specific webserver based on type of request e.g. car dealer website 
+Network Load Balancer - for TCP - traffic manager - expensive
+Classic Load Balancers - http/s & TCP 
+Gateway Load Balancers - provides load balancing for 3rd-party virtual appliances
+
+X-Forwarded-For - if you need ipv4 address of your end user, look for XForwardedFor HTTP Header
+504 Error - Gateway Timeout - application is not responding within timeout period - troubleshoot application or database server
+
+
+[ROUTE 53]
+amazons DNS service
+Maps ip,s3 bucket, load balancer to domain name
+Hosted Zone - container for DNS records for your domain
+Alias - allows you to route traffic to top of DNS Namespace dhamaps.com
+
+-------------------------------------------------------------------------
+[AWS CLI]
+use least privilege 
+use IAM groups
+
+or create IAM Roles
+
+[ec2-user@ip-10-0-4-250 ~]$ aws configure
+AWS Access Key ID [None]: AKIA53NOYTCQLRHA7KYA
+AWS Secret Access Key [None]: 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
+Default region name [None]: us-east-1
+Default output format [None]: json
+
+
+
+10  aws s3 mb s3://reasonable329329
+11  aws s3 ls
+12  echo "acloudlab activity" > hello.txt
+13  ll
+14  aws s3 cp hello.txt s3://reasonable329329
+15  aws s3 ls s3://reasonable329329
+16  aws s3 ls
+17  aws s3 ls reasonable329329
+
+
+
+
+[ec2-user@ip-10-0-4-250 ~]$ aws s3api list-objects --bucket reasonable329329
+// {
+//     "Contents": [
+//         {
+//             "Key": "hello.txt",
+//             "LastModified": "2023-08-13T14:12:53+00:00",
+//             "ETag": "\"c1ea7ac31e3982a3b34a329f71b83265\"",
+//             "Size": 19,
+//             "StorageClass": "STANDARD",
+//             "Owner": {
+//                 "DisplayName": "lab-aws+LabServices-prod-7879",
+//                 "ID": "2f631eb694151ffa4d7c8e9cc9236038a15cd65db7917164eb8f3d0bab26346d"
+//             }
+//         }
+//     ]
+// }
+[ec2-user@ip-10-0-4-250 ~]$ aws s3api list-objects --bucket reasonable329329 --page-size 100
+
+
+or create a role with s3FullAccess and attach it to EC2 
+This is recommended way to allow an instance to manage s3 buckets
+
+---------------------------------------------------------------------------
+
+
+
+
+[EC2 IMAGE BUILDER]
+first create a role with permissions:
+EC2InstanceProfileForImageBuilder
+AmazonSSMManagedInstanceCore
+BASEOS IMAGE > SOFTWARE > TESTS > DISTRIBUTE IMAGE TO REGIONS
+AMIs are regional, to use it in diff region, create a copy
+you cannot create an unencrypted AMI by copying an Encrypted AMI across region
+unencrypted to unencrypted is ok
+encrypted to encrypted is ok
+unencrypted to encrypted is ok
+encrypted to unencrypted is NOT
+if you want encrypt existing AMI, create a copy and specify encryption at start
+Step 1: Pipeline details
+// General
+// Pipeline name
+// My Image Pipeline
+// Tags-
+// Description-
+// Dependency Update settings
+// Run pipeline based on schedule
+// Enhanced meta data collection - Disabled
+// Enhanced scanning - Disabled
+// Build schedule - Manual
+
+
+
+Step 2: Image recipe
+// Recipe details
+// General
+// Recipe name - My Recipe
+// Recipe version 1.0.0
+// Image OS type - Linux
+// Base image
+// arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2-x86/x.x.x
+// Working directory - /tmp
+// ARN-
+// Tags-
+// Instance configuration
+// Remove SSM After Build - Enabled
+// [Components]
+//             Build components
+//             update-linux/x.x.x
+//             Test components
+//             simple-boot-test-linux/x.x.x
+// Storage (volumes)
+// Device name
+// Snapshot ID
+// Size (GiB)
+// Volume type
+// IOPS
+// Throughput (MB/s)
+// Delete on termination
+// Encryption (KMS key)
+// /dev/xvda	snap-08ee067a1efaa16fc	8	gp2	100	-	Enabled	Do not enable
+
+
+Step 3: Infrastructure configuration
+// Infrastructure details
+// Configuration name
+// My Config
+// Instance type
+// t3.micro
+// Security group
+// -
+// Metadata version
+// -
+// Configuration description
+// -
+// SNS
+// -
+// Key pair
+// -
+// Metadata token response hop limit
+// -
+// IAM role
+// MyImageBuilderRole
+// VPC ID
+// -
+// Terminate instance on failure
+// Enabled
+// Resource tags
+// -
+// ARN
+// -
+// Subnet
+// -
+// Logs
+// -
+// Tags
+// -
+
+
+
+
+Step 4: Distribution settings
+// Distribution details
+// Configuration name
+// -
+// Configuration description
+// -
+// AMI tags-
+// ARN-
+// Tags-
+// Region
+// Output AMI name
+// Encryption (KMS key)
+// Target accounts for distribution
+// Principals with shared permission
+// Target accounts for faster launch configuration
+// Associated license configuration
+// Launch template configuration
+// Set launch template default version
+// us-east-1
+// -
+// Configured in storage options
+// -
+// -
+// -
