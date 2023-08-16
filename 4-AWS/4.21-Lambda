@@ -160,6 +160,8 @@ LAMBDA Retries:
 default -> performs 2 retries 
 lambda waits 1 min before first retry, it waits 2 minutes before 2nd retry
 
+[DLQs and Destinations]
+
 Dead-Letter Queues (DLQs):
 save failed invocations for further processing 
 associated with a particular version of a function 
@@ -174,6 +176,21 @@ lambda --invocation_success-->SQS-->queue for review
 lambda --invocation_failure-->SNS-->mail or sms
 lambda --invocation_failure-->lambda-->trigger another function
 
+LAB
+create function 
+create SNS topic -> add subscription -> add email
+configuration -> destinations -> ASYNC & Condition & Destination Type
+$ aws lambda invoke --function-name myfunction --invocation-type Event response.json
+you will receive an email from SNS
+// {"version":"1.0","timestamp":"2023-08-15T19:56:55.223Z","requestContext":{"requestId":"0d2b2356-82c9-4380-8fbf-ef268102c8e4","functionArn":"arn:aws:lambda:us-east-1:145794000460:function:myFunction1:$LATEST","condition":"Success","approximateInvokeCount":1},"requestPayload":{},"responseContext":{"statusCode":200,"executedVersion":"$LATEST"},"responsePayload":{"statusCode": 200, "body": "\"Hello from Lambda!\""}}
+useful information
+
+Now delete this destination 
+
+go to configuration -> asynchronous invocation & enable SNS for DeadLetterQueue
+you will receive an email from DLQ
+// {}
+No useful information for us but it let lambda know that there was failed invocation
 ---------------------------------------------------------------------------
 LAMBDA DEPLOYMENT PACKAGE
 when you paste code in lambda, lambda automatically creates a deployment package for you in .zip which includes your code and dependencies.
@@ -208,3 +225,123 @@ three factors to reduce latency:
 e.g. dont import entire aws-sdk if your code can run on just one or two services 
 instead of (aws-sdk), import (aws-sdk/clients/dynamodb)
 ---------------------------------------------------------------------------
+
+
+API GATEWAYS (ADVANCED)
+
+SOAP - legacy protocol - returns a response in XML format instead of JSON
+        came out in 1990s - you can configure API Gateway as a SOAP web service passthrough - how?
+        https://www.rubix.nl/blogs/how-configure-amazon-api-gatewaysoap-        webservice-passthrough-minutes
+REST - Latest protocol
+
+IMPORT APIs
+You can use the API Gateway Import API feature to import an API from an
+external definition file into API Gateway. Currently, the Import API feature supports Swagger v2.0 definition files.
+With the Import API, you can either create a new API by submitting
+a POST request that includes a Swagger definition in the payload and
+endpoint configuration, or you can update an existing API by using a PUT
+request that contains a Swagger definition in the payload. You can update
+an API by overwriting it with a new definition, or merge a definition with an
+existing API. You specify the options using a mode query parameter in the
+request URL .
+Import
+
+
+API THROTTLING
+By default, API Gateway limits the steady-state request rate to
+10,000 requests per second (rps).
+The maximum concurrent requests is 5000 requests across all
+APIs within an AWS account.
+If you go over 10,000 requests per second or 5000 concurrent
+requests you will receive a 429 Too Many Request error
+response.
+API
+Import API’s using Swagger 2.0 definition files
+• API Gateway can be throttled
+• Default limits are 10,000 RPS or 5000 concurrently
+• You can configure API Gateway as a SOAP Webservice   
+passthrough
+--------------------------------------------------
+API GATEWAY MOCK ENDPOINTS
+Create, Test, Debug
+backend is not ready yet but you want to test some new website features
+e.g. cart,payment
+allows team to continue development without depending on backend to be build
+API GATEWAY RESPONSE - 
+You definee the response 
+status code and message 
+forms the mock integration response 
+---------------------------------------------------
+API GATEWAY STAGEs 
+references the lifecycle state of the API e.g. dev,prod 
+Each stage can be associated with a different endpoint e.g. dev,prod
+each stage has a unique invoke url e.g. 
+https://dwncjrevn.execute-api.us-east-1.amazonaws.com/dev 
+https://dwncjrevn.execute-api.us-east-1.amazonaws.com/prod
+        API ID                                      Stage name
+
+if we have 2 lambda functions, dev&prod, we can create API gateway with dev&prod stage 
+
+
+LAB Creating Stages 
+Create 2 functions stageDevevFunction,stageProdFunction with following code 
+// export const handler = async (event) => {
+//   // TODO implement
+//   const response = {
+//     statusCode: 200,
+//     body: JSON.stringify('This is my Prod/Dev function'),
+//   };
+//   return response;
+// };
+goto API Gateway
+BUILD REST API --> NewAPI & name=MyAPI -> Create API
+ACTION->CREATE METHOD->"GET"->Lambda Function = ${stageVariables.lmbfunction}->
+it gives you a command to run in cloudshell 
+// aws lambda add-permission --function-name "arn:aws:lambda:us-east-1:965329023955:function:myprod/devfunction" --source-arn "arn:aws:execute-api:us-east-1:965329023955:nzxaisdv5m/*/GET/" --principal apigateway.amazonaws.com --statement-id 0e68dff5-42c2-4116-81f7-a26a4ae2a2bc --action lambda:InvokeFunction
+save 
+ACTION->DEPLOY API->newstage(test)
+CREATE->prod 
+STAGE VARIABLE->key=lmbfunction value=stageProdFunction
+CREATE->dev
+STAGE VARIABLE->key=lmbfunction value=stageDevFunction
+-----------------------------------------------------
+API RESPONSE TRANSFORMATIONS
+AppFrontend->APIRequest->  APIGateway  ->APIRequest->AppBackend
+                          modify Request
+
+AppFrontend<-APIResponse<-  APIGateway  <-APIResponse<-AppBackend
+                          modify Response
+
+HTTP APIs:
+parameter mapping is used to modify API requests and responses
+we can change the Header, Query String, Request Path in API Request
+we can change the Header, Status Code,               in API Response
+-----------------------------------------------------
+API GATEWAY CACHING:
+CACHES your endpoints response (this reduces no. of calls made to endpoint)
+TTL (when u enable caching, api gateway caches responses from endpoints for a specified TTL, default is 300 seconds)
+API GATEWAY returns cached response to new requests, instead of making new request to endpoint. 
+THIS REDUCES LATENCY
+
+API GATEWAY THROTTLING is to prevent your API from being overwhelmed by too many requests
+by-default, API Gateway limits the steady-state request rate to 10,000 requests per second,per region.
+by-default, API Gateway limits the concurrent request to 5,000 across all APIs per second,per region.
+if you exceed any of these limits, you get 429 ERROR (Too Many Requests)
+
+Throttling Example 
+5,000 requests in 1st millisecond 
+5,000 requests evenly spread across 999 milliseconds
+this is within limits of 10,000 req per second and 5,000 concurrent request
+this will happen without any errors
+
+------------------------------------------------------
+X-Ray
+X-Ray [Service Map] provides end-to-end view of API requests as they travel through your application
+X-Ray can be integrated with EC2, ECS, Lambda, EB, SNS, SQS, DynamoDB, ELB, API Gateway
+X-Ray can be integrated with with your own application written in java, node.js, .net, go, ruby, python
+X-Ray SDK automatically captures metadata for API calls made to AWS services using AWS SDK
+
+Procedure:
+Install X-Ray Agent on EC2 instance
+Instrument your application using X-Ray SDK (sdk has libraries)
+X-Ray sdk gathers informationfrom request and response headers, the code in your application and metadata about aws resources on which it runs and send this trace data to X-Ray e.g. HTTP requests, error codes, latency data
