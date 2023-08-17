@@ -117,10 +117,12 @@ To make Lambda Persistent -> make it interact with a data store.
 /tmp = by default 512mb, configurable upto 10GB (but NON_PERSISTENT)
 /tmp = used while function is executing
 /tmp = like a cached file system
+/tmp = shared within execution environments
 
 Storing Lambda Libraries - can be included with the code as zip file 
 LAYERS                     but it makes deployment heavy
 LAYERS = limit 50mb zipped, 250mb unzipped
+LAYERS = shared across execution environments
 - Best Practice (Add libraries & SDKs as layers)
     (However, if you want to change version of a library included)
     (you can''t update it dynamically)
@@ -236,7 +238,7 @@ REST - Latest protocol
 
 IMPORT APIs
 You can use the API Gateway Import API feature to import an API from an
-external definition file into API Gateway. Currently, the Import API feature supports Swagger v2.0 definition files.
+external definition file into API Gateway. Currently, the Import API feature supports Swagger v2.0 definition files. aka OpenAPI
 With the Import API, you can either create a new API by submitting
 a POST request that includes a Swagger definition in the payload and
 endpoint configuration, or you can update an existing API by using a PUT
@@ -337,7 +339,7 @@ this will happen without any errors
 ------------------------------------------------------
 X-Ray
 X-Ray [Service Map] provides end-to-end view of API requests as they travel through your application
-X-Ray can be integrated with EC2, ECS, Lambda, EB, SNS, SQS, DynamoDB, ELB, API Gateway
+X-Ray can be integrated with EC2, ECS, Lambda, EB, SNS, SQS, DynamoDB, ELB, API Gateway, S3
 X-Ray can be integrated with with your own application written in java, node.js, .net, go, ruby, python
 X-Ray SDK automatically captures metadata for API calls made to AWS services using AWS SDK
 
@@ -345,3 +347,33 @@ Procedure:
 Install X-Ray Agent on EC2 instance
 Instrument your application using X-Ray SDK (sdk has libraries)
 X-Ray sdk gathers informationfrom request and response headers, the code in your application and metadata about aws resources on which it runs and send this trace data to X-Ray e.g. HTTP requests, error codes, latency data
+
+You need instrument(configure) both the X-Ray SDK and X-Ray Daemon on your systems
+sdk sends data to daemon, which uploads them to X-Ray in batches
+
+for docker container, install X-Ray daemon in its own docker container, and your application in its own container, all in same ECS cluster
+
+
+
+---------------------------------------------------------------------------
+You are a developer for a busy real estate company, and you want to enable other real estate agents to have the ability to show properties on your books, but skinned so that it looks like their own website. You decide the most efficient way to do this is to expose your API to the public using API Gateway. The project works well, but one of your competitors starts abusing this by sending your API tens of thousands of requests per second. This generates an HTTP 429 error. Each agent connects to your API using individual API keys. What actions can you take to stop this behavior?
+
+Choose 2
+
+
+Place an AWS Web Application Firewall (AWS WAF) in front of API Gateway and filter the requests
+
+
+Deploy multiple API Gateways and give the agent access to another API Gateway
+
+
+Use AWS Shield Advanced API protection to block the requests
+
+
+Throttle the agent's API access using the individual API Keys
+
+Good work!
+AWS WAF helps protect your web applications or APIs against common web exploits that could impact availability, compromise security, or consume excessive resources.
+
+To prevent your API from being overwhelmed by too many requests, Amazon API Gateway throttles requests to your API using the token bucket algorithm, where a token counts for a request. You can enable usage plans to restrict client request submissions to within specified request rates and quotas. This restricts the overall request submissions so that they don't go significantly past the account-level throttling limits in a Region. Amazon API Gateway provides Per-client throttling limits that are applied to clients that use API keys associated with your usage policy as client identifier.
+

@@ -1,0 +1,331 @@
+Low-Latency NoSQL database 
+serverless, integrates well with lambda, autoscales
+performance is good with SSD storage 
+resiliance is good, spread across 3 distinct data centers
+supports both document and key-value data models.
+supported formats are JSON, HTML, XML
+item = row 
+attribute = column
+
+CONSISTENCY MODELS:
+->Eventually Consistent-default
+(consistancy across all copies of data = 1sec)
+best for read performance
+->Strongly Consistent 
+(always reflects all successfull writes across 3 locations at once)
+best for read consistency
+->DynamoDB Transactions -> supports ACID Transactions
+Atomic (all or nothing transaction,if my money is deducted,urs is toppd up)
+Consistant (consistant with data validation rules)
+Isolated (transactions must happen in isolation,independent of one another)
+Durable (they dont disappear if a system crashes)
+
+PRIMARY KEYS:
+allows us to query the data 
+dynamoDB stores and retrieves data based on a primary key
+2 types -
+Partition Key - unique attribute, e.g. customer id, email id, car reg. no.
+->value of the partition key is input to an internal hash function,
+    which determines the partition or physical location on which,
+    the data is stored.
+->if u using partition key as ur prmary key, no 2 items can have same,
+    partition key
+Composite Key (partition key + sort key)
+-> you use composite key, when your partition key is not necessarily unique within your table
+e.g. a forum where users are posting multiple comments,
+here, user id will not be a unique identifier to retrieve data.
+so you user user id + a sort key(timestamp) to save data 
+it gives you unique combination required for a primary key in table
+-> all items with same partition key are stored together and are then sorted according to the sort key value.
+
+LAB
+create a user with access keys
+launch an instance 
+login
+install git 
+run command 
+aws dynamodb create-table --table-name ProductCatalog --attribute-definitions \
+AttributeName=Id,AttributeType=N --key-schema \
+AttributeName=Id,KeyType=HASH \ (*hash=primaryKey)
+--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+
+then
+3  git clone https://github.com/ACloudGuru-Resources/course-aws-certified-developer-associate.git
+    4  ls
+    5  cd course-aws-certified-developer-associate/
+    6  ll
+    7  cd Create_A_DynamoDB_Table_Demo/
+    8  ll
+    
+or
+curl -O https://raw.githubusercontent.com/ACloudGuru-Resources/course-aws-certified-developer-associate/main/Create_A_DynamoDB_Table_Demo/items.json
+
+9  aws dynamodb batch-write-item --request-items file://items.json
+
+
+[ec2-user@ip-172-31-36-129 ~]$ aws dynamodb get-item --table-name ProductCatalog --key '{"Id":{"N":"403"}}'
+{
+    "Item": {
+        "Description": {
+            "S": "Womens Cycling Helmet"
+        },
+        "Color": {
+            "S": "Black"
+        },
+        "Price": {
+            "S": "99"
+        },
+        "ProductCategory": {
+            "S": "Helmet"
+        },
+        "Id": {
+            "N": "403"
+        },
+        "Size": {
+            "S": "Small"
+        }
+    }
+}
+
+DynamoDB ACCESS CONTROL 
+fine-grained Access Control with IAM 
+IAM Condition parameter dynamodb:LeadingKeys 
+--->allow users to access only the items where partition key value matches their user-id 
+e.g. game scoreboard and points. user can only see their own profile
+
+DynamoDB Secondary Indexes 
+allow you to query based on attribute that is not the primary key
+using global secondary indexes and local seconday indexes
+you select the columns you want included in the index and run your searches on the index, rather than on the entire dataset
+
+LOCAL Secondary Index
+How-> same partition key as your original table, diff sort key.
+-> gives you diff view of your data organized acc to alt sort key 
+-> faster queries using index rather than main table  
+Limitation->can only be created when you are creating the table
+GLOBAL Secondary Index 
+much flexible, create anytime 
+allows you to pick different partition key and diff sort key to main table
+
+
+SCAN vs QUERY API Calls
+QUERY:
+A query finds items in a table based on the primary key attribute and a dinstinct value to search for
+refine your query using your sort key.
+Query results are always sorted by the sort key 
+you can use "ProjectionExpression" parameter to refine the results
+e.g. if you only want to see id and email, not all attributes
+if sort key is numeric,it returns data in ascending numeric order bydefault
+if you want to reverse the order, set the "ScanIndexForward" to false
+by default, query are eventually Consistent
+you need to explicitly set the query to be strongly consistent
+SCAN:
+it examines all the items in the table, by default, it returns all data attributes
+you can use "ProjectionExpression" parameter to refine the results
+e.g. if you only want to see id and email, not all attributes
+
+Query is more Efficient than Scan 
+A Scan Operation on a large table can use up the provisioned throughput for a large table in a single operation
+SCAN is sequential by default
+can be done in parrallel by logically dividing the table or index into segments and scanning each sagment in parrellel
+but its best to avoid parrallel scan if your table/index is heavy
+
+Improve performance by reducing page size , limit to 40 items 
+Avoid scans, design tables in a way that you can use Query,Get or 
+BatchGetItem APIs
+
+-----------------------------------------------------------------------
+DynamoDB API CALLS (programatically)
+
+CLI:            API:
+create-table    CreateTable
+put-item        PutItem
+get-item        GetItem
+update-item     UpdateItem
+update-table    UpdateTable
+list-table      ListTables
+describe-table  DescribeTable
+scan            Scan
+query           Query
+delete-item     DeleteItem
+delete-table    DeleteTable
+
+if a user...
+run put-item cli command runs PutItem API call on the database
+They will need IAM permissions to call PutItem
+
+[cloudshell-user@ip-10-4-79-87 ~]$ aws dynamodb describe-table --table-name ProductCatalog
+{
+    "Table": {
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "Id",
+                "AttributeType": "N"
+            }
+        ],
+        "TableName": "ProductCatalog",
+        "KeySchema": [
+            {
+                "AttributeName": "Id",
+                "KeyType": "HASH"
+            }
+        ],
+        "TableStatus": "ACTIVE",
+        "CreationDateTime": "2023-08-16T21:44:00.344000+00:00",
+        "ProvisionedThroughput": {
+            "NumberOfDecreasesToday": 0,
+            "ReadCapacityUnits": 5,
+            "WriteCapacityUnits": 5
+        },
+        "TableSizeBytes": 0,
+        "ItemCount": 0,
+        "TableArn": "arn:aws:dynamodb:us-east-1:077794698366:table/ProductCatalog",
+        "TableId": "ca15d5ff-8519-4a23-85af-55a5ce76fc1f",
+        "DeletionProtectionEnabled": false
+    }
+}
+(END)
+
+---------------------------------------------------------------------------
+DynamoDB Provisioned Throughput
+while creating table, specify...
+1 write capacity unit = 1 x 1KB write per second
+1 read capacity unit = 1 x 4KB read per second (strongly consistent)
+or
+1 read capacity unit = 2 x 4KB read per second (eventually consistent)
+default
+e.g. your app needs to read 80 items per second 
+    each item is 3kb in size 
+        you need strongly consistent reads
+How many read capacity units will you need? 
+size of each item / 4kb = 3 / 4 = 0.75 = 1
+3kb/4kb = 0.75 rounded to 1kb ,so need 80 units (sc) and 40 units (ec)
+
+e.g. you need to write 100 items per sec. each item is 512byte 
+how many write capacity units you require?
+size of each item / 1kb = 512 / 1024 = 0.5 rounded to 1
+so we need 100 capacity units
+use it when....
+capacity can be forecasted 
+predictable application traffic 
+traffic is consistent 
+you will hav more control over costs
+
+DynamoDB on-Demand Capacity 
+charges apply on reading,writing and storing data
+use it when...you have 
+unknown workloads 
+unpredictable application traffic 
+spiky, short-lived peaks 
+a pay-per-use model is desired
+more difficult to predict the cost b/c db will scale up n down
+
+
+------------------------------------------------------------------------
+DynamDB Accelerator DAX:
+DAX is a fully managed clustered in-memory cache for DynamoDB
+Deliver upto 10x read performance 
+microsecond performance for millions of requests per second
+e.g. black friday sale, big promotion day
+how it works?......
+DAX is a write-through caching servince. Data is written to the cache and the backend store at same time
+
+instead of quering your db, your app can query DAX Cluster first
+it item you are looking for is in the cache (cache hit). DAX returns the result
+if CacheMiss -> DAX do GetItem from DB -> stores it in cache
+So it gets the item out of DynamoDB, it writes into its cache,
+and it also hands it back to the application.
+
+
+when DAX is not Suitable?......
+it caters for eventually consistent reads only.
+So it's not going to be suitable for applications that require strongly
+consistent reads.
+It's also not really suitable for write-intensive applications.
+So youre not going to get a benefit from using DAX because it only helps with read operations. 
+Also,
+applications that dont perform that many read operations are
+not really going to see a benefit from configuring DAX,
+and the same goes for applications that dont require microsecond response
+times. Theres no point in configuring it if you dont need that low latency.
+
+---------------------------------------------------------------------------
+DynamoDB TTL 
+expressed as unix/posix/Epoch time, sec elapsed since Jan 1st, 1970, 12am
+1544023618...
+defines an expiry time for your data
+helps reduce cost and makes db fast
+e.g. session data, event logs, old data, tmp data
+
+when the current time is greater than the TTL,
+the item is going to be expired and it gets marked for deletion.
+And then within the next 48 hours, it's actually going to be deleted.
+So that's actually quite a long window between being marked for deletion and
+actually getting deleted. So in order to cater for that,
+you can actually filter out any expired items from your queries and scans.
+
+---------------------------------------------------------------------------
+DynamoDB Streams (versions like)
+Time Ordered Sequence of Modifications
+is a time-ordered sequence, or stream,
+and it records any modifications that are made to the items
+in your DynamoDB table. So that's any time there's an insert, update,
+or delete operation,
+
+Logs - encrypted at rest and stored for 24 hours
+Dedicated Endpoint - Accessed using a dedicated endpoint 
+By Default, Primary Key is recorded
+Before and after Images can be captured 
+Uses:
+Audit or Archive transactions 
+trigger an event based on a particular transaction 
+replicate data across multiple tables 
+
+Application--aws sdk--db api---> DynamoDB Endpoint 
+Application--aws sdk--db streams api---> DynamoDB Streams Endpoint 
+NEAR REAL_TIME 
+Apps can take action based on contents of the stream
+STREAMS is a great Event Source for Lambda
+
+
+e.g. 
+And in this example,
+we have an invoicing and payment system,
+which is recording invoice data into a DynamoDB table.
+And each time a new invoice entry
+is made into the DynamoDB table,
+there is a Lambda function which reads the DynamoDB stream
+to check for new transactions.
+And then when it sees a new event,
+it's sending a notification using SNS,
+which in turn creates a message in an SNS queue.
+And you can then have your payments application
+polling that SQS queue, processing the message.
+And let's say maybe it performs various tasks
+like generating a payment request
+or adding an item to a customer's bill, etc.
+So you can see that this is a really powerful way
+to generate triggers to Lambda,
+to trigger your application
+to take actions based on the changing contents
+of your DynamoDB table.
+
+---------------------------------------------------------------------------'
+EXPONENTIAL BACKOFF - when provisioned throughput exceeds 
+ProvisionedThroughputExceeded Error
+ProvisionedThroughputExceededException
+if you are using aws sdk , it will automallically retries
+aws sdks use Exponential backoff by default
+means - progressivly longer waits b/w consecutive retries for imp workflow
+if you are not using aws sdk, you need to configure app to do 1 or 2 things
+1- you can reduce the request frequency
+2-implement exponential backoff...
+
+DB<-failed request<-50 ms<-retry<-100 ms wait<-retry<-200ms<-retry<-400ms
+this keeps on going until Request is successful
+
+if it does not successfully happen within 1 min, it means request size may be exceeding throughput of read/write capacity
+after improving capacity, if it still fails 
+then use DAX / Elasticache
+
+"exp backoff is a feature of all aws sdk, not limited to dynamodb"
