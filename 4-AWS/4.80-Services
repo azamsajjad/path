@@ -573,3 +573,51 @@ Migrating Applications to Elastic Beanstalk
 for .net apps -> Windows Web Application Migration Assistant for EB
 interactive powershell utility migrate website from windows servers to aws
 open-source tool available on github
+
+
+
+
+---------------------------------------------------------------------------
+Q
+Which Amazon service can you use in conjunction with SQS to "fan out" SQS messages to multiple queues?
+SNS
+Create two SQS queues — one for premium members, and one for free members. Program your EC2 fleet to poll the premium queue first and, if empty, to then poll your free members SQS queue.
+
+q
+you can use SNS in conjunction with SQS to fan a single message out to multiple SQS queues.
+False
+True
+
+Good work!
+Using Amazon SNS and Amazon SQS together, messages can be delivered to applications that require immediate notification of an event, and also persisted in an Amazon SQS queue for other applications to process at a later time. Fanout to Amazon SQS queues
+
+Q
+You are designing a new application that processes payments and delivers promotional emails to customers. You need to ensure that the payment process takes priority over the creation and delivery of emails. How might you use SQS to achieve this?
+
+Use 2 SQS queues for the platform. Have the EC2 fleet poll the payment SQS queue first. If this queue is empty, then poll the promotional emails queue.
+
+
+A Delay Queue is a queue that lets you postpone the delivery of new messages for a number of seconds or minutes.
+
+
+q
+Your EC2 instances download jobs from an SQS queue. However, they are taking too long to process the messages. What API call can you use to extend the length of time to process the jobs?
+
+SetMessageVisibility
+ChangeMessageVisibility
+AlterMessageTime
+ExtendMessageTime
+
+Sorry!
+Correct Answer
+Changes the visibility timeout of a specified message in a queue to a new value. The maximum allowed timeout value is 12 hours.
+
+
+
+q 
+You can subscribe endpoints that vary by protocol (http, email, sms, etc.) to an Amazon SNS topic.
+True
+False
+
+Correct Answer
+Amazon SNS supports a number of protocols, e.g. HTTP, HTTPS, email, email-json, etc. --> Amazon SNS API Reference
