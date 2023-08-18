@@ -1,0 +1,126 @@
+CI/CD 
+Small incremental changes
+it all starts with 
+CI Shared Code Repository: CodeCommit (Private Source and Version Control)
+CDEL Automated Build: CodeBuild (produces packages)
+Automated Test:
+Code is Merged
+Prepared for Deployment:
+CD Continous Delivery - Manual Delivery:
+CD Continous Deployment - Automated Delivery: CodeDeploy (on EC2,Lambda)
+CDEP Managing Entire Workflow: CodePipeline (end-to-end)
+
+"CodeCommit" Repository:
+store source code, binaries, libraries - allows input from multiple sources
+same as git 
+create user to use as [aws configure] - with CodeCommitFullAccess
+create access key IAM
+    $aws configure
+create git key from IAM to be used for 
+    $aws codecommit create-repository --repository-name devopsfromcli
+    username:
+    password:
+---------------------------------------------------------------------------
+"CodeDeploy":
+2 deployment approaches -
+in-place deployment : rolling update - app stopped on each instance one by one and is updated.
+if you change your mind after deployment, no easy fix, redeploy old version
+no lambda support
+
+blue-green deployment : new release installed on new instances 
+blue(active) 
+green(new release)
+u pay for 2 environments - old and new uptil you switch and delete old
+CodeDeploy install the new verion as "REVISION"
+
+CodeDeploy AppSpec File 
+configuration file with parameters which will be used during CodeDeploy deployment
+for EC2 and on-premise systems - YAML only 
+Lambda based deployment with ec2 - YAML or JSON
+AppSpec file structure 
+   - version 
+   - OS
+   - files (define location of app files)
+   - hooks (lifecycle event hoosts) (scripts) e.g. unzip, run tests, to deal with re-register and re-register instances with a load balancer
+Typical Folder Setup (root)
+appspec.yml     /Scripts   /Config     /Source
+---
+version: 0.0
+os: linux 
+files: 
+    - source: Config/config.txt 
+      destination: /webapps/config
+    - source: Source
+      destination: /webapps/myApp
+hooks:
+  BeforeInstall:
+    - location: Scripts/unzipresourcebundle
+    - location: Scripts/unzipdatabundle
+  AfterInstall:
+    - location: Scripts/unzipdatabundle
+      timeout: 100
+  ApplicationStart:
+    - location: Scripts/runFunctionTest.sh 
+      timeout: 3600
+  ValidateService:
+    - location: Scripts/unzipdatabundle
+      timeout: 3600
+      runas: codedeployuser
+...
+
+LifecycleEventHooks:
+run in specific order (RUN-ORDER)
+BeforeBlockTraffic
+phase1 : de-register instances from a Load Balancer - BlockTraffic
+AfterBlockTraffic
+phase2 : real nuts and bolts of application deployment - ApplicationStop
+DownloadBundle
+BeforeInstall
+Install 
+AfterInstall 
+ApplicationStart
+ValidateService
+BeforeAllowTraffic
+phase3 : re-register instances from a Load Balancer - AllowTraffic 
+AfterAllowTraffic
+
+---------------------------------------------------------------------------
+"CodePipeline" CI/CD Service
+Workflow is defined 
+workflow begins when there is a change detected in your source code 
+automatic trigger pipeline 
+integrates with aws and 3rd party tools such as jenkins 
+
+LAB 
+1) To create your EC2 instance using CloudFormation, first save CF_Template.json to your own S3 bucket, 
+then update the command below to reference your bucket as well as the name of a Key pair that you own in the 
+region that you are working in. 
+
+WINDOWS users will need to use ^ (Shift + 6) instead of \ for line continuation.
+
+aws cloudformation create-stack --stack-name CodeDeployDemoStack \
+--template-url https://cloudformation12329.s3.amazonaws.com/CF_Template.json \
+--parameters ParameterKey=InstanceCount,ParameterValue=1 \
+ParameterKey=InstanceType,ParameterValue=t2.micro \
+ParameterKey=KeyPairName,ParameterValue=azam \
+ParameterKey=OperatingSystem,ParameterValue=Linux \
+ParameterKey=SSHLocation,ParameterValue=0.0.0.0/0 \
+ParameterKey=TagKey,ParameterValue=Name \
+ParameterKey=TagValue,ParameterValue=CodeDeployDemo \
+--capabilities CAPABILITY_IAM
+
+2) Verify that the Cloud Formation stack has completed using: 
+aws cloudformation describe-stacks --stack-name CodeDeployDemoStack --query "Stacks[0].StackStatus" --output text
+
+3) Log in to your instance (created by CF) and check that the CodeDeploy agent has correctly installed:  
+sudo service codedeploy-agent status
+or
+sudo systemctl status codedeploy-agent
+
+4) Create another S3 bucket and upload version 1 of your code 
+dont forget to enable Versioning on your S3 bucket
+5) go to codedeploy and deploy your code stored in s3 bucket 
+6) go to codepipeline and create a pipeline 
+7) uploaded version 2 of code to s3 -> automatically deployed by pipeline 
+
+
