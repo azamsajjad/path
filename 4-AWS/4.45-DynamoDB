@@ -198,7 +198,7 @@ e.g. your app needs to read 80 items per second
     each item is 3kb in size 
         you need strongly consistent reads
 How many read capacity units will you need? 
-size of each item / 4kb = 3 / 4 = 0.75 = 1
+size of each item / 4kb = 3 / 4 = 0.75 = 1 x 80
 3kb/4kb = 0.75 rounded to 1kb ,so need 80 units (sc) and 40 units (ec)
 
 e.g. you need to write 100 items per sec. each item is 512byte 
@@ -220,7 +220,22 @@ spiky, short-lived peaks
 a pay-per-use model is desired
 more difficult to predict the cost b/c db will scale up n down
 
+You have an application that needs to read 25 items per second and each item is 13KB in size. Your application uses eventually consistent reads. What should you set the read throughput to?
+50 RCU
+25 RCU
+100 RCU
+10 RCU
+Sorry!
+Correct Answer
+Each Read Capacity unit represents 1 x 4KB Strongly Consistent Read. 13KB / 4KB = 3.25 rounded up to 4 multiply by 25 = 100 which gives you the figure for Strongly consistent reads. Divide that by 2 for Eventually consistent. So the answer is 50 RCU.
 
+You have a motion sensor which writes 600 items of data every minute. Each item consists of 5KB. What should you set the write throughput to?
+20
+40
+10
+50
+Sorry!
+One write request unit represents one write for an item up to 1 KB in size. If you write 600 items every minute, it means 10 items are written per second ( 600 / 60 ). The total number of write capacity units required depends on the item size. If your item size is 5 KB, just multiply 10 items by 5 KB, so you require 50 write capacity units to sustain one write request. Read/Write Capacity Mode.
 ------------------------------------------------------------------------
 DynamDB Accelerator DAX:
 DAX is a fully managed clustered in-memory cache for DynamoDB
@@ -329,3 +344,71 @@ after improving capacity, if it still fails
 then use DAX / Elasticache
 
 "exp backoff is a feature of all aws sdk, not limited to dynamodb"
+
+---------------------------------------------------------------------------
+Your low latency web application needs to store its session state in a scalable way so that it can be accessed quickly. Which service do you recommend?
+
+
+In memory on your EC2 instance
+
+
+Elastic File Store
+
+
+RDS
+
+
+DynamoDB
+
+Good work!
+Using DynamoDB for session storage alleviates issues that occur with session handling in a distributed web application by moving sessions off of the local file system and into a shared location. Amazon DynamoDB provides an effective solution for sharing session state across web servers without incurring drawbacks. Reference: Managing ASP.NET Session State with Amazon DynamoDB.
+
+
+
+
+----------------------------------------------------
+Using the AWS Console, you are trying to scale DynamoDB past its pre-configured maximums. Which service limits can you increase by raising a ticket to AWS support?
+
+Choose 2
+
+13/
+Local Secondary Indexes
+
+
+Global Secondary Indexes per table
+
+
+Provisioned throughput limits
+
+
+Item Sizes
+
+Sorry!
+You can define a maximum of 5 local secondary indexes. Reference: Service, Account, and Table Quotas in Amazon DynamoDB
+
+Correct Answer
+There is an initial quota of 20 global secondary indexes per table. To request a service quota increase, see https://aws.amazon.com/support. Reference: Service, Account, and Table Quotas in Amazon DynamoDB
+
+AWS places some default quotas on the throughput you can provision. These are the quotas unless you request a higher amount. To request a service quota increase, see https://aws.amazon.com/support. Reference: Service, Account, and Table Quotas in Amazon DynamoDB
+
+------------------------------------------------------------
+
+What is the difference between a Global Secondary Index and a Local Secondary Index
+
+Choose 2
+
+
+You can delete a Global Secondary Index at any time
+
+
+You can create a Local Secondary Index at any time but you can only create a Global Secondary Index at table creation time
+
+
+You can delete a Local Secondary Index at any time
+
+
+You can create a Global Secondary Index at any time but you can only create a Local Secondary Index at table creation time
+
+Sorry!
+Correct Answer
+Only Global secondary Indexes can be created or deleted at anytime. Local Secondary Indexes must be created when you first create the table and they cannot be modified or deleted.

@@ -1,0 +1,74 @@
+KMS - Key Management Service 
+use KMS whenver you are dealing with sensitive data
+S3, RDS, DynamoDB, Lambda, EBS, EFS, CloudTrail, DeveloperTools
+CMK? Customer Master Key = encrypt/decrypt data upto 4kb 
+Generate / Encrypt / Decrypt the Data Key 
+using that Data Key to encrypt/d your data is EnvelopeEncryption
+
+
+aws kms encrypt --key-id YOURKEYIDHERE --plaintext fileb://secret.txt --output text --query CiphertextBlob | base64 --decode > encryptedsecret.txt
+
+aws kms decrypt --ciphertext-blob fileb://encryptedsecret.txt --output text --query Plaintext | base64 --decode > decryptedsecret.txt
+
+aws kms re-encrypt --destination-key-id YOURKEYIDHERE --ciphertext-blob fileb://encryptedsecret.txt | base64 > newencryption.txt 
+(use re-encrypt command to encrypt a file with a different CMK)
+(manual rotation)
+
+aws kms enable-key-rotation --key-id YOURKEYIDHERE
+(auto key rotation) once per 365 days
+
+aws kms get-key-rotation-status --key-id YOURKEYIDHERE
+
+aws kms generate-data-key --key-id YOURKEYIDHERE --key-spec AES_256
+(use it if data is larger than 4kb)
+this command creates a data key a.k.a Envelope Key 
+CMK encrypts the-> Data/Envelope Key-> is then used to Encrypt the DATA
+Encrypted copy of Data Key is stored with the data - no separate location
+
+for Decryption:
+CMK decrypts Data Key into plain format, 
+then Plain Data Key is used to decrypt data
+So then at the end of the process,
+the data has been decrypted and the plain text key is deleted from
+memory,
+
+
+Why Envelpe Encryption?......
+
+the main reason is for "network performance" because when you encrypt that
+data directly with KMS, that data needs to be transferred over the network into the KMS service and with envelopes encryption,
+only the data key goes over the network and not your data and then the data key is used locally in your application or AWS service,
+avoiding the need to transfer lots of data over the network to
+KMS. So if we're talking about gigabytes or terabytes of data,
+we don't want to send that over the network to KMS.
+Even if it's going over the Amazon network,
+it's just not going to be efficient or performance.
+So instead with envelope encryption,
+it's only the data key that gets sent over the network to KMS and your data
+doesn't move anywhere.
+
+
+AWS Certificate Manager 
+SSL/TLS 
+However, one thing to be aware
+of if you are using AWS Certificate Manager with CloudFront
+then you must create the certificate
+in the US East one region
+
+--------------------------------------------------------------------------
+You are working on a project which requires a key management solution. Your security architect has confirmed that a multi-tenant solution is fine. Which solution do you recommend?
+
+
+S3 encryption
+
+
+Client-side encryption
+
+
+CloudHSM
+
+
+KMS
+
+Good work!
+KMS is multi-tenant, whereas CloudHSM is dedicated hardware. S3 encryption and client-side encryption are not key management solutions.
