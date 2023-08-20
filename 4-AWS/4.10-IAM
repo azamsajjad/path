@@ -1,0 +1,568 @@
+https://aws.amazon.com/iam/features/
+
+IAM allows you to manage users and also manage their level of
+access to the AWS console.
+
+It gives you centralized control over your AWS account.
+It also gives you shared access to your AWS account.
+It gives you granular permissions.
+So this means you can enable different levels of access to different users
+within your organization. It enables identity federation.
+So this means that it can enable users to log in using credentials stored in
+active directory, Facebook, or LinkedIn.
+"It allows multifactor authentication."
+And this is where a user is granted access only after successfully completing multiple independent authentication mechanisms.
+So for example,
+providing a username and password as one authentication mechanism,
+and then providing a software token.
+So that could be via a token generator like Google authenticator as
+the second authentication mechanism.
+
+It also provides "temporary access for users or devices and services"
+as necessary. So for example,
+if you developed a web or mobile phone application,
+you can configure identity access management to enable users to have temporary
+access to AWS resources within your account.
+For example,
+to enable access to store or retrieve data located in an S3
+bucket or within a DynamoDB database.
+It allows you to set up your own password rotation policy.
+It integrates with many different AWS services and it
+supports PCI DSS compliance for any applications
+associated with the payment card industry.
+So there are some core concepts that you need to understand before going into
+the exam. So first of all, we have users,
+so this is the end users and just think people.
+So these are the people logging in to the AWS console and also
+interacting with AWS by running API commands.
+We then have groups which are collections of users grouped together with a
+common set of permissions. So for example,
+your marketing team might need access to read and write certain files
+stored in an S3 bucket, and that might be logos or images,
+et cetera.
+And theyre going to need a specific set of permissions to allow them to do
+this.
+So it makes sense to create a group with the required permissions.
+And then all you need to do is add the relevant users into that group.
+And they will all have permissions to read your S3 bucket. And similarly,
+you might have a database administrations team and they need to create DynamoDB
+tables and run queries on the database. So in that case,
+you can create a group with the relevant permissions for DynamoDB,
+and then add all of your database admins into that group.
+
+
+Roles
+Now you can create roles and then assign them to AWS resources.
+So a role is used to define a set of permissions, for example,
+S3 bucket access.
+And then that role can be assumed by either users or AWS services
+such as EC2.
+So you might have an EC2 instance which needs to query a database or access
+files in S3, and you can configure that using a role. And finally,
+we have policies and a policy is a document that defines either one or
+more permissions. And a policy can be attached to either a user,
+a group, or a role. And when we attach a policy, the user, group,
+or role will then have the permissions defined within that policy.
+And it's possible for a user, group, and role to all share the same policy'
+----------------------------------------------------------------------
+Permissions
+Explicit Deny will over-ride any Allow
+e.g. Explicit Deny for a user to S3 bucket will over-ride Allow of his group permission to use S3
+
+All permissions are implicitly Denied until you grant them explicitly
+Principle of Least Privilege when assigning Permissions
+
+IAM Policy Simulator:
+to validate a policy works as expected
+https://policysim.aws.amazon.com
+
+New users have no permission when created
+
+--------------------------------------------------------------
+Q 
+Which IAM entity can you use to delegate access to trusted entities such as IAM users, applications, or AWS services such as EC2?
+
+
+IAM Group
+IAM User
+IAM Web Identity Federation
+IAM Role
+
+Good work!
+You can use IAM roles to delegate access to IAM users managed within your account, to IAM users under a different AWS account, to a web service offered by AWS such as Amazon Elastic Compute Cloud (Amazon EC2), or to an external user authenticated by an external identity provider (IdP) service that is compatible with SAML 2.0 or OpenID Connect, or a custom-built identity broker.
+----------------------------------------------------------------
+AMAZON COGNITO
+
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html
+Web Identity Federation: Amazon Cognito: (Identity Broker)
+web identity federation simplifies authentication for mobile & web applications
+and authorization for web applications.
+And it gives users access to AWS resources
+after successfully authenticating
+with a web-based identity provider
+like Facebook, Amazon, or Google.
+
+users will receive an authentication code
+from the web identity provider,
+and they can trade this authentication code
+for temporary AWS security credentials,
+authorizing access to AWS resources.
+And there's a service called Amazon Cognito,
+which provides web identity federation,
+including sign-up and sign-in functionality
+for your applications and access for guest users as well.
+So Cognito acts as an identity broker,
+and this means that it manages the authentication
+between your application and the web identity provider
+like Facebook, for example.
+So you don't need to write any additional code
+to allow your users to sign up or sign in to your
+application using their Facebook account.
+And Cognito supports multiple devices,
+and it will even synchronize user data
+across multiple different devices,
+
+Cognito provides Temporary Credentials that map to an IAM role
+Cognito->
+    User Pools - user dirs used to managed sign-in functionality 4 apps
+     users can sign-in directly to user pool using fb,g+
+    Identity Pools - temporary aws credentials with access to ec2/s3
+STEPS
+1- user logs into fb, then cognito brokers sign-up/in (USER POOL)
+2- after successful sign-in -> fb will return a JWT Token (JSON Web Token)
+3- JWT Token is replaced by aws Credentials by cognito (IDENTITY POOL)
+4- aws credentials map to IAM role which grants users access to resources
+
+COGNITO PUSH SYNCHRONIZATION
+push updates and synchronize user data across multiple devices
+under the hood, its using SNS notifications to all devices associated with a user
+
+----------------------------------------------------------
+COGNITO SET UP:
+in 
+Advanced app client settings
+We have populated suggested authentication flows, OAuth 2.0 grant types, and OIDC scopes based on the selections you made earlier.
+->
+1- Identity providersInfo
+Select the identity providers that will be available to this app client.
+Select identity providers
+->Cognito user pool
+Users can sign in to Cognito using an email, phone number, or username.
+
+
+2- OAuth 2.0 grant typesInfo
+Choose at least one OAuth grant type to configure how Cognito will deliver tokens to this app. We have populated suggested options based on the app type you selected.
+--->
+Select OAuth 2.0 grant types
+Authorization code grant
+Provides an authorization code as the response
+--->
+Implicit grant
+Specifies that the client should get the access token (and, optionally, ID token, based on scopes) directly
+
+3- OpenID Connect scopesInfo
+Choose at least one OpenID Connect (OIDC) scope to specify the attributes this app client can retrieve for access tokens. We have populated suggested options based on the application type and required attributes you selected.
+Select OIDC scopes
+OpenID
+-->
+Phone
+Requires OpenID to be selected
+-->
+Email
+Requires OpenID to be selected
+-->
+aws.cognito.signin.user.admin
+-->
+Profile
+Requires OpenID to be selected
+
+
+CREATE 
+
+---------------------------
+GOTO 
+Amazon Cognito > User pools > MyUserPool > Edit Hosted UI customization
+Add your logo to customize
+
+GOTO 
+Amazon Cognito > User pools > MyUserPool > App client: myappclient
+Hosted UI
+See your login page
+---------------------------------------------------------------------------
+LAB
+1- create DynamoDB 
+2- create EC2 instance 
+3- Create Cognito Identity Pool and IAM Role 
+4- Configure Website - add details of our Cognito Identity pool to website
+
+
+
+Cognito Identity Pool Demo Commands
+PART 1:
+
+1.	Using the CloudShell, create the facts table:
+
+aws dynamodb create-table --table-name facts --attribute-definitions \
+AttributeName=fact_id,AttributeType=N --key-schema \
+AttributeName=fact_id,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+
+2.	 Populate the table with items:
+
+wget https://raw.githubusercontent.com/ACloudGuru-Resources/course-aws-certified-developer-associate/main/Cognito_Demo/items.json
+
+aws dynamodb batch-write-item --request-items file://items.json
+
+3.	Launch an EC2 instance, enable HTTP access on port 80, and add the following user data script:
+
+#!/bin/bash
+dnf update -y
+dnf install git -y
+dnf install -y httpd
+systemctl start httpd
+systemctl enable httpd
+
+(For Linux 2023, dnf is the new package manager and yum is going be deprecated eventually. )
+
+4.	Test that the web server is running. Using the public IP address.
+
+5. 	Connect to the instance, and copy the website files from GitHub:
+
+sudo -su
+git clone https://github.com/ACloudGuru-Resources/course-aws-certified-developer-associate
+
+cd course-aws-certified-developer-associate/Cognito_Demo
+cp index.html fact.jpg /var/www/html
+
+PART 2:
+
+6.	In the CloudShell, create new identity pool, named DynamoPool, allow unauthenticated entities:
+
+aws cognito-identity create-identity-pool \
+    --identity-pool-name DynamoPool \
+    --allow-unauthenticated-identities \
+    --output json
+
+
+us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5
+7. Download the permissions policy for the role we are going to create. 
+
+wget https://raw.githubusercontent.com/ACloudGuru-Resources/course-aws-certified-developer-associate/main/Cognito_Demo/myCognitoPolicy.json
+
+Copy the ID of the identity pool. Then update the myCognitoPolicy.json with the ID of the identity pool you just created. 
+
+8.	Create an IAM role named Cognito_DynamoPoolUnauth:
+
+aws iam create-role --role-name Cognito_DynamoPoolUnauth --assume-role-policy-document file://myCognitoPolicy.json --output json
+
+9.	Grant the Cognito_DynamoPoolUnauth role read access to DynamoDB by attaching a managed policy (AmazonDynamoDBReadOnlyAccess).
+
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess --role-name Cognito_DynamoPoolUnauth
+
+10. 	Get the IAM role Amazon Resource Name (ARN).
+aws iam get-role --role-name Cognito_DynamoPoolUnauth --output json
+
+11.	Add our role to the Cognito Identity Pool. Replace the identity pool ID with your own identity pool ID and use the role ARN from the previous step.
+
+aws cognito-identity set-identity-pool-roles --identity-pool-id "us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5" \
+--roles unauthenticated=arn:aws:iam::282485216722:role/Cognito_DynamoPoolUnauth --output json
+
+12.	Double check it worked - Replace the identity pool ID with your own identity pool ID: 
+
+aws cognito-identity get-identity-pool-roles  --identity-pool-id "us-east-1:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+
+// [cloudshell-user@ip-10-6-11-26 ~]$ aws cognito-identity get-identity-pool-roles --identity-pool-id "us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5"
+// {
+//     "IdentityPoolId": "us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5",
+//     "Roles": {
+//         "unauthenticated": "arn:aws:iam::282485216722:role/Cognito_DynamoPoolUnauth"
+//     }
+// }
+
+13. 	We can now specify the Cognito credentials in our application - i.e. in the JavaScript section of our webpage!
+Replace the identity pool ID with your own and the role ARN with your own role ARN. 
+We are going to add this snippet to our index.html:
+
+
+sudo vi /var/www/html
+
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+IdentityPoolId: "us-east-1:2344c8f8-bc7d-4bf8-9836-c8be99916812",
+RoleArn: "arn:aws:iam::xxxxxxxxxxxx:role/Cognito_DynamoPoolUnauth"
+});
+
+
+
+---------------------------------------------------------------------------
+
+"Three Types of AWS Policies"
+AWS MANAGED POLICIES 
+AmazonEC2ReadOnlyAccess
+AmazonDynamoDBFullAccess
+AWSCodeCommitPowerUser
+you cannot chhange permissions defined inn an AWS Managed Policy
+Reusable
+
+CUSTOMER MANAGED POLICIES
+you can copy aws managed policy and customize it 
+Reusable
+
+INLINE POLICY 
+there is 1:1 relationship b/w entity and inline policy 
+when you delete entity, policy gets deleted too
+aws recommends using any MANAGED policy over INLINE
+there is an option to add inline policy in user,group,role section
+Not REusable
+
+
+--------------------------------------------------------------------------
+https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html
+
+STS - AssumeRoleWithWebIdentity
+
+it's an API, which is provided by STS,
+which is the Security Token Service,
+and it returns temporary security credentials
+for users which have been authenticated by either a mobile
+or web application using a web identity provider
+like Amazon, Facebook, or Google.
+And of course for mobile phone applications,
+they recommend Cognito, and underneath Cognito
+is actually making the STS assume-role-with-web-identity
+calls on your behalf.
+So when you use Cognito you don't explicitly
+need to use this API.
+However, for regular web applications,
+where you're not using Cognito
+you can use this STS assume-role-with-web-identity-API.'
+
+
+user------------------------>faceebook (for login)
+user<-----JWT token----------facebook
+user---JWT---assume-role-with-web-identity----->STS
+user<-------aws credentials---------------------STS
+user----------can now access------>S3,DynamoDB
+
+Part of the Security Token Service
+• Allows users who have authenticated with a Web Identity provider to
+access AWS resources
+• Once the user has authenticated, the application makes the assume-rolewith-
+web-identity API call
+• If successful, STS will return temporary credentials enabling access to
+AWS resources
+• AssumedRoleUser ARN and AssumedRoleID - are used to programatically
+reference the temporary credentials - not an IAM role or user
+They are simply ARNs used to programmatically reference
+the credentials.
+
+"Sample Response"
+<AssumedRoleUser>
+<Arn>arn:aws:sts::123456789012:assumed-role/FederatedWebIdentityRole/app1</Arn>
+<AssumedRoleId>AROACLKWSDQRAOEXAMPLE:app1</AssumedRoleId>
+</AssumedRoleUser>
+
+<Credentials>
+<SessionToken>AQoDYXdzEE0a8ANXXXXXXXXNO1ewxE5TijQyp+IEXAMPLE</SessionToken>
+<SecretAccessKey>wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY</SecretAccessKey>
+<Expiration>2014-10-24T23:00:23Z</Expiration>
+<AccessKeyId>ASgeIAIOSFODNN7EXAMPLE</AccessKeyId>
+
+
+---------------------------------------------------------------------------
+
+
+https://aws.amazon.com/blogs/security/how-to-enable-cross-account-access-to-the-aws-management-console/
+"Configuring Cross Account Access"
+
+it's all about delegating access
+to resources in different AWS accounts that you own,
+and it allows you to share resources
+in 1 AWS account with users in a different AWS account.
+And the way that we set it up
+is by using Identity And Access Management roles.
+So we create a role in 1 account to allow the access
+and then grant permission to users
+in a different account so that they can assume that role.
+And the really cool thing is that you can switch roles
+within the AWS Management Console itself.
+So you can switch to a role
+that grants you the permissions you need
+in a different account and no password is required. Now
+you might be wondering, "when would I actually use this?"
+Well, imagine you've got a development account
+and a production account,
+and you want to give your developers access
+to the management console
+and a single S3 bucket in your production account.
+So maybe your development team
+are doing some development and testing
+and they need some historical production data to work with.
+And this is quite a common use case for a lot of companies.
+Well, it's actually really easy
+to set this up, and I'm going to show you how to do it.
+
+
+
+
+
+Cross-share ROLE will be created on the account whose resources will be shared
+
+prod account        dev account
+S3 Bucket           developer IAM Group
+IAM Policy          IAM Policy
+IAM Role -------------^
+
+Giving developers access to prod account's S3 Bucket'
+
+-----------------------------STEPS-------------------------------------
+--------------------------PROD ACCOUNT---------------------------------
+1- create S3 Bucket 
+2- IAM -> Create Policy -> name = developer-read-write
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListAllMyBuckets",
+      "Resource": "arn:aws:s3:::*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+       ],
+      "Resource": "arn:aws:s3:::productionapp"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::productionapp/*"
+    }
+  ]
+}
+
+3- Attach This policy to a Role
+Trusted Entity Type = AWS Account 
+Another AWS Account = *********
+Attach Policy = developer-read-write
+Role Name = MyDeveloperAccess
+
+--------------------------DEV ACCOUNT---------------------------------
+
+1- Create Group with Administrative Access policy 
+2- Add User 
+3- IAM -> Groups -> Developers -> Create Inline Policy
+JSON
+policy.json
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Action": "sts:AssumeRole",
+    "Resource": "arn:aws:iam::PRODUCTION-ACCOUNT-ID:role/MyDeveloperAccess"
+    }
+}
+
+
+4- Now Sign in as anna 
+top right - switch role under account dropdown
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+How can you allow a user from one AWS account to access and manage resources in another AWS account?
+
+
+Configure cross-account access
+Configure Cognito
+Configure cross-origin resource sharing
+Configure web identity federation
+
+Sorry!
+Incorrect. Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact with resources in a different domain.
+
+Correct Answer
+Correct. By setting up cross-account access, you can delegate access to resources that are in different AWS accounts, and you don't need to create individual IAM users in each account. Reference: IAM Tutorial: Delegate access across AWS accounts using IAM roles.
+
+
+--------------------------------------------------------------------------'
+When using Web Identity Federation to allow a user to access an AWS service (such as an S3 bucket), which of the following is the correct order of steps?
+
+Users cannot use Facebook credentials to access the AWS platform.
+
+A user authenticates with Facebook first. They are then given an ID token by Facebook, which they can then trade for temporary security credentials.
+
+A user logs in to the AWS platform using their Facebook credentials. AWS authenticate with Facebook to check the credentials. Temporary Security Access is granted to AWS.
+
+A user makes the AssumeRoleWithWebIdentity API Call. The user is then redirected to Facebook to authenticate. Once authenticated, the user is given an ID token. The user is then granted temporary access to the AWS platform.
+
+Sorry!
+Incorrect. The user needs to authenticate with Facebook first, that will return a web identity token. Then AWS STS is called and passes the web identity token as input. AWS STS authorizes the call and provides temporary AWS access credentials. The user is allowed to assume an IAM role and access AWS resources in accordance with the role's security policy.
+
+Correct Answer
+Correct. The user needs to authenticate with Facebook first, that will return a web identity token. Then AWS STS is called and passes the web identity token as input. AWS STS authorizes the call and provides temporary AWS access credentials. The user is allowed to assume an IAM role and access AWS resources in accordance with the role's security policy.
+
+---------------------------------------------------------------------------
+Amazon Cognito provides Web Identity Federation with which of the following features?
+
+Choose 3
+
+
+Single sign-on for Active Directory users
+Multi-Factor Authentication
+Synchronization of user data across multiple device types
+Sign-up and sign-in to your applications
+
+Good work!
+With Amazon Cognito, you can add Multi-Factor Authentication (MFA) to a User Pool. Reference: Adding Multi-Factor Authentication (MFA) to a User Pool.
+
+Cognito enables developers to sync data across devices, platforms, and applications.
+
+Amazon Cognito User Pools provide sign-up and sign-in services.
+
+-------------------------------------------------------------------------
+Which Amazon Cognito component enables you to provide user temporary credentials to grant access only to allowed AWS services?
+
+
+IAM Users
+User Pools
+Identity Pools
+IAM Groups
+
+Good work!
+Amazon Cognito identity pools enable you to create unique identities for your users and authenticate them with identity providers. With an identity, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. Amazon Cognito identity pools support public identity providers—Amazon, Apple, Facebook, and Google—as well as unauthenticated identities. It also supports developer authenticated identities, which let you register and authenticate users via your own back-end authentication process. Think of User Pools as providing authentication, and Identity Pools as providing authorization.
+
+--------------------------------------------------------------------------
+You are working on a mobile phone app for an online retailer that stores customer data in DynamoDB. You would like to allow new users to sign-up using their Facebook credentials. What is the recommended approach?
+
+
+After the user has successfully logged in to Facebook and received an authentication token, Cognito should be used to exchange the token for temporary access to DynamoDB
+
+
+Embed encrypted AWS credentials into the application code, so that the application can access DynamoDB on the user's behalf'.
+
+
+Write your own custom code which allows the user to log in via Facebook and receive an authentication token, then calls the AssumeRoleWithWebIdentity API and exchanges the authentication tokens for temporary access to DynamoDB
+
+
+After the user has authenticated with Facebook, allow them to download encrypted AWS credentials to their device so that the mobile app can access DynamoDB
+
+Sorry!
+Incorrect. AWS recommends Amazon Cognito, so you can focus on creating great app experiences instead of worrying about building, securing, and scaling a solution to handle user management, authentication, and sync across platforms and devices.
+
+Correct Answer
+Correct. Amazon Cognito works with external identity providers that support SAML or OpenID Connect, social identity providers (such as Facebook, Twitter, Amazon) and you can also integrate your own identity provider.

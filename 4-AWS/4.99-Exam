@@ -1,0 +1,17 @@
+https://aws.amazon.com/faqs/
+
+Well, for the Developer Associate Exam,
+it's all about Serverless,
+so make sure you read the FAQs for these services.
+When it comes to the developer tools,
+focus on CodeCommit, CodePipeline,
+CodeDeploy, and CodeBuild.
+For security, it's identity and access management,
+Cognito, and KMS as well.
+When it comes to automation and monitoring,
+focus on CloudFormation, AWS SAM, CloudWatch, and X-Ray.
+For Containers, make sure you read ECS and ECR.
+And for messaging and streaming, it's SQS and Kinesis.
+
+
+https://aws.amazon.com/whitepapers
