@@ -1,0 +1,477 @@
+CloudWatch
+
+IAM>roles>attach policy
+CloudWatchAgentServerPolicy (permission to use CW agent on EC2)
+>create role
+Create instance with this attached role 
+
+1. Bootstrap script: 
+#!/bin/bash	
+dnf update -y	
+
+2. Log in to the instance and install rsyslog, which will generate a readable text file of the operating system messages in /var/log/messages. 
+
+sudo su  
+dnf install rsyslog
+systemctl start rsyslog
+systemctl enable rsyslog
+
+3. Install the CW Agent: 
+dnf install amazon-cloudwatch-agent -y
+
+4. Configure the CW agent: 
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+
+****Say no to monitoring CollectD****
+Monitor /var/log/messages
+
+5. View the CloudWatch agent config file:
+cd /opt/aws/amazon-cloudwatch-agent/bin
+cat config.json
+
+6. Start the CloudWatch Agent
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+7. Generate some activity on our system by installing stress:
+dnf install stress -y
+stress --cpu 1
+
+
+
+----------------------------------------------
+[root@ip-172-31-37-171 ec2-user]# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+================================================================
+= Welcome to the Amazon CloudWatch Agent Configuration Manager =
+=                                                              =
+= CloudWatch Agent allows you to collect metrics and logs from =
+= your host and send them to CloudWatch. Additional CloudWatch =
+= charges may apply.                                           =
+================================================================
+On which OS are you planning to use the agent?
+1. linux
+2. windows
+3. darwin
+default choice: [1]:
+
+Trying to fetch the default region based on ec2 metadata...
+Are you using EC2 or On-Premises hosts?
+1. EC2
+2. On-Premises
+default choice: [1]:
+
+Which user are you planning to run the agent?
+1. root
+2. cwagent
+3. others
+default choice: [1]:
+
+Do you want to turn on StatsD daemon?
+1. yes
+2. no
+default choice: [1]:
+
+Which port do you want StatsD daemon to listen to?
+default choice: [8125]
+
+What is the collect interval for StatsD daemon?
+1. 10s
+2. 30s
+3. 60s
+default choice: [1]:
+
+What is the aggregation interval for metrics collected by StatsD daemon?
+1. Do not aggregate
+2. 10s
+3. 30s
+4. 60s
+default choice: [4]:
+2
+Do you want to monitor metrics from CollectD? WARNING: CollectD must be installed or the Agent will fail to start
+1. yes
+2. no
+default choice: [1]:
+2
+Do you want to monitor any host metrics? e.g. CPU, memory, etc.
+1. yes
+2. no
+default choice: [1]:
+
+Do you want to monitor cpu metrics per core?
+1. yes
+2. no
+default choice: [1]:
+
+Do you want to add ec2 dimensions (ImageId, InstanceId, InstanceType, AutoScalingGroupName) into all of your metrics if the info is available?
+1. yes
+2. no
+default choice: [1]:
+
+Do you want to aggregate ec2 dimensions (InstanceId)?
+1. yes
+2. no
+default choice: [1]:
+
+Would you like to collect your metrics at high resolution (sub-minute resolution)? This enables sub-minute resolution for all metrics, but you can customize for specific metrics in the output json file.
+1. 1s
+2. 10s
+3. 30s
+4. 60s
+default choice: [4]:
+1
+Which default metrics config do you want?
+1. Basic
+2. Standard
+3. Advanced
+4. None
+default choice: [1]:
+2
+
+
+Are you satisfied with the above config? Note: it can be manually customized after the wizard completes to add additional items.
+1. yes
+2. no
+default choice: [1]:
+1
+Do you have any existing CloudWatch Log Agent (http://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AgentReference.html) configuration file to import for migration?
+1. yes
+2. no
+default choice: [2]:
+2
+Do you want to monitor any log files?
+1. yes
+2. no
+default choice: [1]:
+
+Log file path:
+/var/log/messages
+Log group name:
+default choice: [messages]
+
+Log stream name:
+default choice: [{instance_id}]
+
+Log Group Retention in days
+1. -1
+2. 1
+3. 3
+4. 5
+5. 7
+6. 14
+7. 30
+8. 60
+9. 90
+10. 120
+11. 150
+12. 180
+13. 365
+14. 400
+15. 545
+16. 731
+17. 1096
+18. 1827
+19. 2192
+20. 2557
+21. 2922
+22. 3288
+23. 3653
+default choice: [1]:
+2
+Do you want to specify any additional log files to monitor?
+1. yes
+2. no
+default choice: [1]:
+2
+Saved config file to /opt/aws/amazon-cloudwatch-agent/bin/config.json successfully.
+
+
+[root@ip-172-31-37-171 ec2-user]# cd /opt/aws/amazon-cloudwatch-agent/
+bin/  doc/  etc/  logs/ var/  
+[root@ip-172-31-37-171 ec2-user]# cd /opt/aws/amazon-cloudwatch-agent/bin
+[root@ip-172-31-37-171 bin]# ll
+total 348668
+-rw-r--r--. 1 root root        11 Jul 18 21:53 CWAGENT_VERSION
+-rwxr-xr-x. 1 root root 122814024 Jul 18 21:53 amazon-cloudwatch-agent
+-rwxr-xr-x. 1 root root  12153768 Jul amazon-cloudwatch-agent-config-wizard
+-rwxr-xr-x. 1 root root     14107 Jul 18 21:53 amazon-cloudwatch-agent-ctl
+-rwxr-xr-x. 1 root root  11584824 Jul 18 21:53 config-downloader
+-rwxr-xr-x. 1 root root 109939464 Jul 18 21:53 config-translator
+-rw-r--r--. 1 root root      1512 Aug 19 22:23 config.json
+-rwxr-xr-x. 1 root root 100508040 Jul 18 21:53 start-aws-cloudwatch-agent
+[root@ip-172-31-37-171 bin]# cat config.json 
+
+
+------------------------------------------------------------------------
+CloudWatch Metrics
+CloudWatch Namespaces
+CloudWatch Dimensions 
+CloudWatch Dashboard
+allows you to add multi-region resources 
+remember to save
+
+
+CloudWatch Metrics
+A metric is a variable to monitor
+CloudWatch metrics consists
+of a time-ordered sequence of values or data points,
+which are published to CloudWatch.
+Each data point in a metric has a timestamp
+and optionally, a unit of measurement.
+For example, think about the CPU usage on an EC2 instance
+and the unit of measurement will be a percentage.
+
+
+CloudWatch Namespaces
+CloudWatch metrics are uniquely defined by a name,
+a namespace, and zero or more dimensions.
+So what do we mean by that?
+Well, a namespace is simply a container
+for CloudWatch metrics.
+For example, EC2 uses the AWS/EC2 namespace.
+And you can create your own namespaces
+to publish custom metric data.
+So when you want to publish custom metric data,
+you must specify the namespace for each data point or value
+that you want to publish to CloudWatch.
+And you specify the name of the namespace
+when you create the metric,
+and metrics from different namespaces are
+completely isolated from each other.
+So they are not aggregated.
+So metrics from different applications are not aggregated
+into the same set of statistics.
+So this means that you can keep all the metrics
+that relate to a specific application in its own namespace.
+
+CloudWatch Dimensions 
+and a CloudWatch dimension is just like a filter
+and its a name/value pair that can be used
+to filter your CloudWatch data.
+For example, you can use the "InstanceId dimension"
+to search for metrics relating to a specific EC2 instance.
+And CloudWatch can also aggregate data
+across dimensions for some services.
+For example, you can review the EC2 metrics
+across all of your instances.
+So from the console,
+if you search for CPU metrics in the AWS/EC2 namespace,
+without specifying a dimension,
+CloudWatch can provide aggregate data
+across all the instances
+
+---------------------------------------------------------------------
+CloudTrail
+user-activity
+CloudTrail is all about recording API calls
+for your AWS account, so it's going to have
+an API activity history, related to the creation,
+deletion, and modification of AWS resources,
+and it will also record any failed logins as well.
+So ask yourself, do you need an audit log
+of user activity in your AWS account?
+And if the answer is yes then it's CloudTrail.
+So just remember that CloudWatch is all about performance
+and CloudTrail is an audit trail.
+
+
+-----------------------------------------------------------------------
+CloudWatch Actions 
+Actions allow you to publish, monitor and alert a variety of metrics
+PutMetricData
+PutMetricAlarm
+
+
+dummy error to create alarms
+#!/bin/bash
+# update the timestamp to today's date and an appropriate time using the following format YYYY-MM-DD HH:MM:SS
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:05:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:06:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:07:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:08:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:09:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:10:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:11:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:12:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:13:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:14:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:15:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:16:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:17:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:18:00.000Z 
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:19:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:20:00.000Z
+aws cloudwatch put-metric-data --metric-name CriticalError --namespace MyService --value 1 --timestamp 2023-08-19T11:21:00.000Z
+
+'After modifying and running the script, create an alarm that will be triggered if more than 1 CriticalError data point is received by CloudWatch within any time period of 5 minutes:
+
+aws cloudwatch put-metric-data \
+--metric-name PageViewCount \
+--namespace MyService \
+--value 25 \
+--timestamp 2022-01-10T12:00:00.000Z
+
+# pageviewcount exceeds a threshold of 50 with 300seconds
+aws cloudwatch put-metric-alarm \
+--alarm-name PageViewMon \
+--alarm-description "PageView Monitor" \
+--metric-name PageViewCount \
+--namespace Myservice \
+--statistic Average \
+--period 300 \
+--threshold 50 \
+--comparison-operator GreaterThanThreshold \
+--evaluation-periods 1
+
+# pageviewcount exceeds a threshold of 1 within 300seconds
+aws cloudwatch put-metric-alarm \
+--alarm-name CriticalErrorMon \
+--alarm-description "CriticalError Monitor" \
+--metric-name CriticalError \
+--namespace MyService \
+--statistic SampleCount \
+--period 300 \
+--threshold 1 \ 
+--comparison-operator GreaterThanThreshold \
+--evaluation-periods 1
+
+
+---------------------------------------------------------------------------
+CloudWatch Logs Insight 
+1- Create a Basic Lambda Function:
+a new log group is automatically created, enabling it to send logs to cloudwatch
+
+we can use CloudWatch Logs Insights
+to interactively query and analyze our data
+that is stored in CloudWatch Logs.
+We can query the logs directly
+and we can also generate visualizations like bar graphs,
+line graphs, pie charts, and stacked areas as well.
+And they also give you loads of cool example queries.
+For instance,
+you can display the 25 most recently added log events.
+Search your VPC flow logs
+to find out which IP addresses are using a specific protocol
+or even find the most expensive Lambda requests.
+
+---------------------------------------------------------------------------
+Receiving Notifications with CloudWatch
+1- launch EC2 instance 
+2- Create CloudWatch Alarm 
+3- Configure Email Alert 
+4- Max Out CPU
+
+cpu utilization 99% script
+for i in 1 2 3 4; do while : ; do : ; done & done
+
+
+---------------------------------------------------------------------------
+EventBridge
+easily configure event-driven systems
+Eventbridge is all about event-bridge architecture
+An event is a change in state
+
+AwsConfig -events-> EventBridge (Rules) (Target) ->Actions-> SNS email
+CloudTrail -events-> EventBridge (Rules) (Target) ->Actions-> triggerLambda
+CloudWatch -events-> EventBridge (Rules) (Target) ->Actions-> Shutdown EC2
+
+
+Scheduled Events: 
+EventBridge rules can also run on a schedule
+e.g. once a hour or day, or using a cron expression,
+we can set a rule to run at the same time on a specified day,week,month
+
+similar to CloudWatch Events 
+but AWS recommends using EventBridge 
+both use same underlying service and API but EventBridge has more features
+
+Changes you make in either CloudWatch or EventBridge will appear in each console
+
+
+configure event 
+
+                        Event pattern
+                        Event source
+                        AWS service or EventBridge partner as source
+
+                        AWS services
+                        AWS service
+                        The name of the AWS service as the event source
+
+                        EC2
+                        Event type
+                        The type of events as the source of the matching pattern
+
+                        EC2 Instance State-change Notification
+                        Event Type Specification 1
+                        Any state
+                        Specific state(s)
+                        
+
+                        Event Type Specification 2
+                        Any instance
+                        Specific instance Id(s)
+
+---------------------------------------------------------------------------
+Common error codes HTTP/s 
+Client-Side Errors 
+4xx
+400 - access denied exception
+403 - missing authentication token - req didnt contain valid x.509 certtificate or AWS access key ID 
+404 - malformed query string - syntax error in query string 
+object doesnt exist or file not found
+Always Your Fault - user
+
+
+Server-side Errors 
+5xx
+500- internal failure - req failed due to unknown error, failure, exception
+503- service unavailable - temporary failure of the server 
+b/c of high traffic on website or internal failure
+
+---------------------------------------------------------------------------
+Common SDK Exceptions when using DynamoDB 
+SDK Exception? -> 
+A response to an error that occured when processing SDK or API Request
+
+Common Exceptions with BatchGetItems?
+BatchGetItems is limited to 16mb of data and upto 100 items
+or request exceeded the provisioned throughput of the table
+if dynamoDB cant return all items, it returns partial result, alongwith exception
+Example errors for BatchGetItems:
+    ValidationException - too many items requested
+    UnprocessedKeys-when 1 item was processed successfully, reduce req size
+    ProvisionedThroughputExceededException - no items processed 
+    then add capacity e.g. add DAX
+
+Common Exceptions with BatchWriteItems?
+BatchWriteItems is limited to 16mb of data & upto 25 put/delete operations
+Example errors for BatchWriteItems:
+    UnprocessedItems - some operations failed, retry unprocessed items
+    ProvisionedThroughputExceededException - no items processed 
+    then add write capacity units
+
+
+
+--------------------------------------------------------------------
+Which of the following CloudWatch actions enables you to publish metric data points to CloudWatch?
+
+
+PutMetricData
+
+
+PutDashboard
+
+
+PublishMetricData
+
+
+PutMetricAlarm
+
+Good work!
+PutMetricData publishes metric data points to CloudWatch.
+
+
+-----------------------
+An application support team would like to receive an email notification whenever a particular server experiences CPU utilization exceeding 85% for 5 minutes or more. How can you configure this?
+
+
+Create a CloudWatch alarm that will trigger if the CPU Utilization metric exceeds the threshold for 5 minutes. Configure CloudWatch to send an SNS notification if the alarm is triggered. 

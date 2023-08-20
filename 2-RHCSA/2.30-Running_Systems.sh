@@ -1,3 +1,6 @@
+cpu utilization 99% script
+for i in 1 2 3 4; do while : ; do : ; done & done
+
 3-Operate running systems
 Boot, reboot, and shut down a system normally
 Boot systems into different targets manually

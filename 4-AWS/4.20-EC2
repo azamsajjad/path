@@ -1,4 +1,7 @@
 
+cpu utilization 99% script
+for i in 1 2 3 4; do while : ; do : ; done & done
+
 EC2 is a virtual machine
 4 pricing options
 ON-DEMAND - pay by the hour
