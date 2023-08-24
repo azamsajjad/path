@@ -1,0 +1,111 @@
+===============================================================
+=     Auto Scaling Group 
+=
+=
+= -----------------------------------------------------------
+= |                       ECS CLUSTER                       |
+= |    _____________________    _____________________       |
+= |   |    EC2 Container    |  |   EC2 Container     |      |
+= |   | task1 task2 service |  |  service1 service2  |      |
+= |   |_____________________|  |_____________________|      |
+= |---------------------------------------------------------|
+=
+=
+===============================================================
+Cluster = Multiple EC2 instances which will house docker containers
+Task Definition = JSON file tht defines configuration of upto 10 containers
+EC2 Container = EC2 Instances with mulriple Docker Containers
+Tasks = one-off job ( just like BuildFile in EB)
+Service = Long-running jobs (like ProcFile)
+Container Agent = Binary on each EC2 which monitors, start & stop tasks 
+
+CLUSTER TYPES: 
+1-ECS Clusters
+2-Fargate (serverless and you can create empty cluster)
+
+OPTIONS:
+Spot or on Demand
+EC2 Instance Type 
+No. of Instances 
+EBS Storage Volumes
+EC2 can be aws Linux 1 or 2
+VPC, IAM Role, CloudWatch, Key Pair , SSH into container is not rec. by aws
+
+
+
+
+==========================================
+IAM
+"ecsInstanceRole" with policy:
+AmazonEC2ContainerServiceforEC2Role
+==========================================
+Task execution IAM role
+This role is required by tasks to pull container images and publish container logs to Amazon CloudWatch on your behalf. If you do not have the ecsTaskExecutionRole already, we can create one for you.
+
+Use cases for other AWS services:
+
+Elastic Container Service
+Allows ECS to create and manage AWS resources on your behalf.
+
+
+---->Elastic Container Service Task
+Allows ECS tasks to call AWS services on your behalf.
+
+AmazonECSTaskExecutionRolePolicy
+===========================================
+IAM -> CloudShell
+aws iam create-service-linked-role --aws-service-name ecs.amazonaws.com
+===========================================
+IAM -> CloudShell
+aws iam create-service-linked-role --aws-service-name autoscaling.amazonaws.com
+===========================================
+IAM
+'ECS CodeDeploy Role: Before you can use the CodeDeploy blue/green deployment type with Amazon ECS, the CodeDeploy service needs permissions to update your Amazon ECS service on your behalf. These permissions are provided by the CodeDeploy IAM role.
+
+To create the ecsCodeDeployRole IAM role
+
+Open the IAM console 
+In the navigation pane, choose Roles, Create role.
+Choose the AWS service role type, and then choose CodeDeploy.
+Choose the CodeDeploy use case and then Next: Permissions.
+For Role Name, type ecsCodeDeployRole and choose Create role.
+Open ecsCodeDeployRole` role again from IAM console , to add the required additional permissions.
+Choose Attach policies.
+To narrow the available policies to attach, for Filter, type AWSCodeDeployRoleForECS
+Check the box to the left of the AWS managed policy and choose Attach policy and Update.'
+===========================================
+Error in Creating Task Definition
+IAM
+IAM Create Policy and attach it to Rupert
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*"
+        }
+    ]
+}
+=============================================
+Create Cluster
+Create Task Definition = JSON file tht defines configuration of upto 10 containers
+Create Container
+Create Service on the Container
+------------------------------------------------------------
+
+FARGATE 
+you have VPC and subnet in Fargate (serverless) too
+Same as EC2, apply Security Group at Task Level
+You can apply IAM role at Task level too
+
+
+                FARGATE         vs          LAMBDA      
+Cold Starts     yes(shorter)                yes 
+Duration        As long as you want         15 min (max)
+Memory          upto 30gb                   upto 3gb 
+Containers      you provide ur own cont     limited to standard cont 
+Integrations    More Manual Labour          seamless integration with aws
+Pricing         atleast 1 min and every     pay per 100ms
+                additional second   

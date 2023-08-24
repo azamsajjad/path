@@ -1,4 +1,8 @@
-KMS - Key Management Service 
+KMS 
+ACM 
+Route 53
+-----------------------------------------------------------------
+------------------------------KMS - Key Management Service 
 use KMS whenver you are dealing with sensitive data
 S3, RDS, DynamoDB, Lambda, EBS, EFS, CloudTrail, DeveloperTools
 CMK? Customer Master Key = encrypt/decrypt data upto 4kb 
@@ -72,3 +76,105 @@ KMS
 
 Good work!
 KMS is multi-tenant, whereas CloudHSM is dedicated hardware. S3 encryption and client-side encryption are not key management solutions.
+
+---------------------------------------------------------------------------
+---------------------------AWS Certificate Manager
+
+ACM handles complexity of creating and managing public SSL/TLS certificates for your aws based websites and applications 
+
+ACM handles two kinds of certificates 
+1- PUBLIC - free provided by ACM (including Lets encrypt)
+2- PRIVATE - certificates you import ($400 / month)
+
+ACM can handle multiple subdomains and wildcard domains (*)
+dhamaps.com 
+*.dhamaps.com 
+
+ACM can only be attached too:
+````````````ELASTIC LOAD BALANCER
+````````````CloudFront
+````````````API Gateway
+````````````Elastic Beanstalk (through Elastic Load Balancer)
+
+Cannot be attached to individual EC2 instances
+
+TERMINATING SSL at the Load Balancer 
+                                ACM
+                                 |
+internet-------->Route 53-----> ALB-------->multiple EC2 instances
+- - - - encrypted - -  - - - - - --  not encrypted
+
+                                            let's encrypt
+                                                |
+internet-------->Route 53-----> ALB-------->multiple EC2 instances
+- - - - encrypted - -  - - - - - -- - - - - - - - --encrypted
+manual set up .complex. dnt need you private environment encrypted anyway'
+
+--------------------------------------------------------------------------
+----------------------------Route 53 
+[ROUTE 53]
+amazons DNS service
+Maps ip,s3 bucket, load balancer to domain name
+Hosted Zone - container for DNS records for your domain
+Alias - allows you to route traffic to top of DNS Namespace dhamaps.com
+
+                 |---app.pro.com ---------> ELB
+                 |---ami.pro.com ---------> EC2 instance
+Route 53--------->---api.pro.com ---------> API Gateway
+                 |---www.pro.com ---------> CloudFront
+                 |___minecraft.pro.com  --> elastic IP 2.213.54.67
+
+You create custom subdomains by CREATING RECORD SETS (Alias)
+Aliases are SMART, they can detect change in public IP of AWS Resource and keep that endpoint pointed to the correct resource
+Always use Alias
+e.g. we can point www subdomain using an A record to point to specific IP
+
+Routing Policies:
+7 Types of Routing Policies 
+1- Simple R - multiple addresses result in random selection
+2- Weighted R - route traffic based on weighted values to split traffic
+3- Latency-based R - route traffic to region resource with lowest latency
+4- Failover R - route traffic if primary endpoint is unhealthy
+5- Geolocation R - route based on location of your users
+6- Geo-Proximity R - route based on location of your resources,busy to idle
+7- Multi-value Answer R respond to DNS queries with upto eight healthy records selected at random - exactly like Simple R but with health checks
+
+Create Sophisticated Routing Policies based on Visuals 
+==== Route-53-Traffic-Flow
+$50 per policy record / month
+supports versioning so you can roll out or roll back updates
+
+
+6- Geo-Proximity R - route based on location of your resources,busy to idle
+Only be created through Traffic-flow  visualized 
+boudary based, 
+you create boundaries between regions through selecting as much as regions
+you give them a bias rating, from -99 to 99
+you can also provide custom cordinates over region
+
+
+
+Route 53 Health Checks 
+$0.50 per health check per month for aws endpoints 
+$0.750 per health check per month for non aws endpoints 
+for extra features: $1 / month (https, string matching, fast interval, latency measurement)
+can create upto 50 health checks for aws endpoints within or linked to same aws account
+health checks every 30s by default, can be reduce to every 10s 
+a health check can initialize a failover if status is returned unhealthy 
+a cloudwatch alrm can be created to alert you 
+a health check can monitor other health checks to create a chain of reactions
+
+
+Route 53 Resolver  (formerly known as .2 resolver)
+DNS resolution for Hybrid Environments (on-premise and cloud)
+A regional service that lets you route DNS queries b/w ur VPC and ur Network
+Direction of Queries:
+inbound and outbound - 
+       configure endpoints that allow DNS queries both to and from your VPC
+       aws vpc<-> local network
+inbound 
+       configure an endpoint that allows DNS queries to your VPC from your network or another VPC 
+       aws vpc<- local network
+outbound
+       configure an endpoint that allows DNS queries from your VPC from your network or another VPC
+       aws vpc-> local network

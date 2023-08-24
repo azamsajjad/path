@@ -1,0 +1,413 @@
+"ELASTIC BEANSTALK"
+Platform as a Service
+create infrastructure for you
+its handles:
+infrastructure 
+capacity provisioning
+load balancing
+auto-scaling
+application platform and updates 
+you still have complete admin control
+You can run Containers on EB, either in single-container or multi-container, these containers are running on ECS instead of EC2
+
+ENVIRONMENTS:
+    Web Environments:
+        Single-Instance:
+        Load-Balanced: launch EC2s behind an ELB managed by an ASG (autosc)
+    Worker Environment:
+        Creates an SQS Queue, install the SQS daemon on the EC2 instances.
+        Has ASG scaling policy which will add or remove instances based on queue size
+
+
+
+no additional charges for beanstalk, only charged for resources you use
+"Deployment Updates"
+All At Once: involves service interruption, good for testing environment
+rolling back requires a further all at once update 
+
+Rolling: reduced capacity during deployment, deploys upgrade in batches
+rolling back requires a further rolling update 
+
+Rolling With Additional Batch: maintains full capacity, new updated batch of instances is created, traffic shifts and another batch is updated
+rolling back requires a further rolling update -it takes time
+not for critical application
+
+Immutable: maintain full capacity, preferred for mission critical systems
+rolling back requires deleting new instance
+
+Traffic Splitting: performs immutable deployments and splits traffic b/w old and new deployment, enabling canary Testing (coalmines, CO canary bird)
+
+Blue/green deployment is at DNS level, not EB level.
+       ================= EB Environment
+      =       __ec2    =
+      =      |         =
+      =      |         =
+r53 --= elb--^--rds    =    This is in-place immutable
+      =      |         =
+      =      |         =
+      =      ----ec2   =
+      =                =
+       =================
+Deciding factor is mainly the database. if you are running db in an instance inside ENV, it will be terminated too. So, its better to go with blue/green deploy with your database outside of it in rds
+
+            ================= EB Environment
+            =       __ec2    =
+     rds    =      |         =
+      |     =      |         =
+r53 --X-----= elb--^         =  This is blue/green
+      |      =                = swap ENV URL
+      |      =                =
+      |      =                =
+      |      =                =
+      |       =================
+      |
+      |     ================= EB Environment
+      |     =       __ec2    =
+      |     =      |         =
+      |     =      |         =
+r53 --------= elb--^         =
+            =                =
+            =                =
+            =                =
+            =                =
+             =================
+
+Advanced Elastic Beanstalk Update Setting:
+"for instances using Amazon Linux 1":
+create .ebextensions folder in root dir of source code 
+files you want to run along with code must have .config extension 
+
+"for instances running Amazon Linux 2":
+Create a BuildFile for scripts (yaml/json)
+in the root directory of your application source
+for commands that exit upon completion like shells scripts.
+Example Buildfile
+                    make: ./build.sh
+If you want to provide custom build steps, we recommend that you use predeploy platform hooks for anything but the simplest commands, instead of a Buildfile. Platform hooks allow richer scripts and better error handling. Platform hooks are described in the next section.
+------------------------------------
+Create a ProcFile for long running processes.
+For example, custom commands to start up your application.
+Use a Procfile for long-running application processes that shouldn't exit. Elastic Beanstalk expects processes run from the Procfile to run continuously. Elastic Beanstalk monitors these processes and restarts any process that terminates.'
+
+All paths in the Procfile are relative to the root of the source bundle. The following example Procfile defines three processes. The first one, called web in the example, is the main web application.
+
+Example Procfile
+web: bin/myserver
+cache: bin/mycache
+foo: bin/fooapp
+Elastic Beanstalk configures the proxy server to forward requests to your main web application on port 5000, and you can configure this port number. A common use for a Procfile is to pass this port number to your application as a command argument. 
+------------------------------------
+Create PlatformHooks for custom scripts or executables
+that run at various stages
+when your EC2 instances are being provisioned,
+and use a folder structure like this
+            .platform/hooks/prebuild
+            .platform/hooks/predeploy
+            .platform/hooks/postdeploy
+to organize and store your scripts.
+
+-------------------------------------
+You can
+launch RDS within Elastic Beanstalk 
+issue: if you terminate your environment, your database is also gone 
+    good tfor test environment 
+
+launch RDS outside Elastic Beanstalk 
+preferred approach for production systems 
+how: 
+1-add an additional security group to your env AutoScaling group to allow EC2 instances to communite with DB on relevant port e.g. 3306 for mySQL 
+
+2-provide connection string information to your app servers using EB env properties
+ARN for RDS database and db password (min) added to .....
+EB->ENV->configuration->Env Properties->add DB connection parameters
+key             value 
+RDS_HOSTNAME    mysql-instance324324324.us-east-1.rds.amazonaws.com
+
+-----------------------------------
+Migrating Applications to Elastic Beanstalk 
+for .net apps -> Windows Web Application Migration Assistant for EB
+interactive powershell utility migrate website from windows servers to aws
+open-source tool available on github
+
+
+2.1. Clone this repository
+Use the following:
+
+git clone https://github.com/aws/aws-elastic-beanstalk-cli-setup.git
+2.2. Install/Upgrade the EB CLI
+MacOS/Linux
+On Bash or Zsh:
+
+python ./aws-elastic-beanstalk-cli-setup/scripts/ebcli_installer.py
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+-------------BIG LAB with Cloud 9------------------------------------------
+Make a Project
+https://github.com/ExamProCo/TheFreeAWSDeveloperAssociate/tree/master/study-sync-000
+
+Cloud9 -> Create Environment
+
+
+npm i c9 -g
+    4  c9 README.md 
+    5  mkdir ~/environment/study-sync
+    6  cd study-sync/
+    7  npm init -y
+    8  npm i express --save
+    9  touch index.html index.js app.js style.css
+   11  curl -s http://169.254.169.254/latest/meta-data
+   12  curl -s http://169.254.169.254/latest/meta-data/mac
+   13  curl -s http://169.254.169.254/latest/meta-data/network
+   17  curl -s http://169.254.169.254/latest/meta-data/network/interfaces
+   18  curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs
+   19  curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/06:e1:d0:d1:ed:7c
+   curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/06:e1:d0:d1:ed:7c/security-group-ids                                                 
+   24  aws ec2 authorize-security-group-ingress help
+   25  aws ec2 authorize-security-group-ingress --group-id sg-063e5deb3f09c6e44 --port 8080 --protocol tcp --cidr 119.73.100.57/32
+   30  aws ec2 describe-security-groups --group-ids sg-063e5deb3f09c6e44 --output text
+
+ 35  curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+   36  PORT=8080 npm start
+   37  touch .gitignore
+   38  ls -alh
+   39  c9 .gitignore 
+   40  git init
+   41  ls -la
+   42  git status
+   43  git add .
+   44  git status
+   45  git commit -m "initial Commit"
+   46  cd ..
+   47  git clone https://github.com/aws/aws-elastic-beanstalk-cli-setup.git
+   48  ll
+# install elastic beanstalk to our instance
+   50  python ./aws-elastic-beanstalk-cli-setup/scripts/ebcli_installer.py
+   51  eb
+   52  echo 'export PATH="/home/ec2-user/.ebcli-virtual-env/executables:$PATH"' >> ~/.bash_profile && source ~/.bash_profile
+   53  eb
+   54  ls -la
+   55  rm -rf aws-elastic-beanstalk-cli-setup/
+   58  cd study-sync/
+   66  mkdir .ebextensions
+   67  touch .ebextensions/001_envar.config
+   68  touch .ebextensions/002_node_command.config
+
+   001_envar.config
+option_settings:
+    aws:elasticbeanstalk:application:environment:
+        PORT: 8081
+        NODE_ENV: production
+
+
+002_node_command.config
+option_settings:
+    aws:elasticbeanstalk:container:nodejs:
+        NodeCommand: "npm start"
+        NodeVersion: 16.20.2
+
+
+# Got Error - This is legacy way 
+# new way of telling Elastic Beanstalk what to do with our application 
+
+   75  touch ProcFile   --> web: npm start
+   76  git add .
+   77  git status
+   78  git add .
+   79  git commit -m "ProcFile"
+   80  git push
+   81  eb create --single
+Starts Creating EB Environment 
+got error = The instance profile aws-elasticbeanstalk-ec2-role associated with the environment does not exist.
+
+solution
+If someone don't want or can't to create the role using the aws elb web console, you just need to create the role manually and add these policies:
+Open IAM Console → In the navigation pane of the console, choose Roles and then create role → Under Trusted entity type, choose AWS service → Under Use case, choose EC2 → Choose Next → Attach- AWSElasticBeanstalkWebTier, AWSElasticBeanstalkWorkerTier, AWSElasticBeanstalkMulticontainerDocker → Choose Next → Enter a name for the role - aws-elasticbeanstalk-ec2-role → Choose Create role.
+
+If you already have an instance profile, make sure you have below-required policies. To meet the default use cases for an environment, these policies must be attached to the role for the EC2 instance profile:-
+
+Role name: aws-elasticbeanstalk-ec2-role
+
+Permission policies attached:-
+
+AWSElasticBeanstalkWebTier
+AWSElasticBeanstalkWorkerTier
+AWSElasticBeanstalkMulticontainerDocker
+Trust relationship policy for EC2:-
+
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+other inline policies for rupert
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "Stmt1482712489000",
+			"Effect": "Allow",
+			"Action": [
+				"iam:CreateRole",
+				"iam:AttachRolePolicy",
+				"iam:ListInstanceProfilesForRole",
+				"iam:ListInstanceProfiles",
+				"iam:CreateInstanceProfile",
+				"iam:AddRoleToInstanceProfile"
+			],
+			"Resource": [
+				"*"
+			]
+		}
+	]
+}
+
+NOW all policies for Developer group
+
+AmazonEC2FullAccess	AWS managed
+AmazonS3FullAccess	AWS managed	
+AmazonSSMFullAccess	AWS managed	
+AWSCodeCommitFullAccess	AWS managed	
+AWSElasticBeanstalkWebTier	AWS managed	
+Provide the instances in your web server environment access to upload log files to Amazon S3.
+AWSElasticBeanstalkWorkerTier	AWS managed	
+Provide the instances in your worker environment access to upload log files to Amazon S3, to use Amazon SQS to monitor your application's job queue, to use Amazon DynamoDB to perform leader election, and to Amazon CloudWatch to publish metrics for health monitoring.'
+
+AWSElasticBeanstalkMulticontainerDocker	AWS managed	
+Provide the instances in your multicontainer Docker environment access to use the Amazon EC2 Container Service to manage container deployment tasks.
+
+AWSCloud9Administrator	AWS managed	
+Provides administrator access to AWS Cloud9.
+
+AWSCloud9SSMInstanceProfile	AWS managed	
+This policy will be used to attach a role on a InstanceProfile which will allow Cloud9 to use the SSM Session Manager to connect to the instance
+
+AdministratorAccess-AWSElasticBeanstalk	AWS managed	
+Grants account administrative permissions. Explicitly allows developers and administrators to gain direct access to resources they need to manage AWS Elastic Beanstalk applications
+
+
+$ eb status
+
+from 
+https://docs.aws.amazon.com/elastic-beanstalk/index.html
+To perform an immutable update for each deployment with a health check threshold of Warning, and proceed with the deployment even if instances in a batch don't pass health checks within a timeout of 15 minutes, specify the following options and values.'
+
+Example .ebextensions/immutable-ignorehealth.config
+option_settings:
+  aws:elasticbeanstalk:command:
+    DeploymentPolicy: Immutable
+    HealthCheckSuccessThreshold: Warning
+    IgnoreHealthCheck: true
+    Timeout: "900"
+
+---------------------------------------------------------
+Blue/green deployments
+
+$ eb clone (clone and starts a new environment)
+  109  eb clone
+  118  eb swap study-sync-prod --destination_name study-sync-prod-clone
+  120  eb swap -h
+  121  eb terminate study-sync-prod
+  122  eb terminate study-sync-prod-clone
+
+--------------------------------------------------------
+  128  touch Dockerfile
+  130  touch .dockerignore
+  134  eb platform select
+  135  docker build --tag study-sync:1.0 .
+  136  docker images
+  139  curl -s http://169.254.169.254/latest/meta-data
+  140  curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+
+eb platform select
+Build an image from your Dockerfile
+To build you docker image, run the following command in your cloud9 terminal:
+
+docker build --tag study-sync:1.0 .
+It will build your image with the commands defined in your Dockerfile and assign a tag to it.
+
+To confirm your image, run the following command:
+
+docker images
+Run locally your container
+Now your image is created you can locally run your container with the command:
+
+
+
+docker run --env PORT=8080 --publish 8080:8080 study-sync:1.0
+
+
+
+
+Dockerfile 
+# we'll use 10 since its same as Amazon Linux 1 default node version
+FROM node:10
+# where our app will be located in the image
+RUN mkdir -p /app
+WORKDIR /app
+# move all source code
+COPY . .
+RUN npm install
+CMD [ "npm", "start" ]
+EXPOSE 8080
+'
+.dockerignore
+node_modules
+
+
+----------------------------------------------------------------
+Working with Elastic Container Registry on AWS 
+ 149  aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 767665886117.dkr.ecr.us-east-1.amazonaws.com 
+
+====================================
+IAM > (rupert via developer)
+AmazonEC2ContainerRegistryFullAccess 
+====================================
+
+aws->ecr->createrepository->study-sync
+ $ docker images
+ Usage:  docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+ $ docker tag 4ec7e703029a 767665886117.dkr.ecr.us-east-1.amazonaws.com/study-sync
+ $ docker push 767665886117.dkr.ecr.us-east-1.amazonaws.com/study-sync
+
+
+----------------------------------------------------------------------
+
+Running same Application as new with Dockerrun.aws.json instead of Dockerfile . from saved image in ECR 
+
+
+mkdir ~/environment/study-syn-external
+mkdir ~/environment/study-sync-external/.ebextensions/... (copypaste)
+touch .gitignore 
+touch ~/environment/study-syn-external/Dockerrun.aws.json
+
+
+// 1 for single container, version=1 for multi-container
+{
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+        "Name": "767665886117.dkr.ecr.us-east-1.amazonaws.com/study-sync"
+    },
+    "Ports": {[
+        "ContainerPort": 8080,
+        "HostPort": 8080
+        ]}
+}
+
+git init 
+add commit
+eb init 
+git push 
+eb create --single
