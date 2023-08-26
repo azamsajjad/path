@@ -6,28 +6,114 @@ supports both document and key-value data models.
 supported formats are JSON, HTML, XML
 item = row 
 attribute = column
+PARTITION KEY is also called HASH  .
+SORT KEY is also called RANGE .
+DynamoDB is a no SQL key/value and Document Store database
+key/value = {Title: "S01E019 DS9 Duet"}
+Document Store: nested data structure
+{
+    Series: "DS9",
+    Episodes: [{
+        Season: 1,
+        Episodes: 19,
+        Title: "Duet"
+    }]
+}
+DynamoDB is AWS Flagship database:
+Fully managed
+Multi-region
+Multi-master
+Durable
+Built-in security
+Backup and restore
+in-memory caching 
 
+rows = items 
+columns = attributes 
+keys = identifying names of your data 
+values = the actual data itself
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+DYNAMODB READ CONSISTANCY:
+data is saved to 3 locations AZs(data centers) at once on SSDs
+
+it is possible for data to be inconsistant when reading from a copy which has yet to be updated
+solution:---------
 CONSISTENCY MODELS:
+
 ->Eventually Consistent-default
 (consistancy across all copies of data = 1sec)
 best for read performance
-->Strongly Consistent 
-(always reflects all successfull writes across 3 locations at once)
+all copies of data eventually become generally consistant within 1sec
+Reads are fast but no guarentee of consistancy
+
+->Strongly Consistent
+Reads are slower but with guarentee of consistancy (high latency)
+use it when consistant data is crucial for your business logic
 best for read consistency
+==========================================================================
+TRANSACTIONS (at no additional cost)
+DDB offers ALL or NOTHING changes to multiple items both WITHIN & ACROSS tables
 ->DynamoDB Transactions -> supports ACID Transactions
 Atomic (all or nothing transaction,if my money is deducted,urs is toppd up)
 Consistant (consistant with data validation rules)
 Isolated (transactions must happen in isolation,independent of one another)
 Durable (they dont disappear if a system crashes)
+if any of the steps fail, rollback db as if nothing initiated 
+e.g. 
+`````````````Transaction start`````````````````````
+Create new payee 
+Verify email in correct format  X (wrong format so it rolls back)
+remove $100 from our account 
+`````````````Transaction end`````````````````````
+all this happens in DynamoDB using 2 functions:
+            TransactWriteItems
+            TransactGetItems
+DDB performs TWO underlying READS or WRITES of evry item in the transaction
+            one to Prepare the Transaction 
+            one to Commit the Transaction
+These underlying R/W operations are visible in your CloudWatch Metrics
+U can also do conditional check with DDB transactions to check if item Exist/Specific Attribute can also be checked
+            ConditionCheck
 
+---------------------------------------------------------------------------
+DynamoDB TTL 
+DDB doesnt have a DateTime datatype
+expressed as unix/posix/Epoch time, sec elapsed since Jan 1st, 1970, 12am
+1544023618...
+defines an expiry time for your data
+helps reduce cost and makes db fast
+e.g. session data, event logs, old data, tmp data
+
+when the current time is greater than the TTL,
+the item is going to be expired and it gets marked for deletion.
+And then within the next 48 hours, it's actually going to be deleted.
+So that's actually quite a long window between being marked for deletion and
+actually getting deleted. So in order to cater for that,
+you can actually filter out any expired items from your queries and scans.
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+
+PARTITIONS:
+A partition is hwen you slice your table up into smaller chunks of data (a partition) it speeds up reads for very large tables by logically grouping similar data together
+it makes Table FASTER
+DynamoDB automatically creates partitions for you as your Data grows
+How it works?
+you start off with single partition
+DynamoDB adds partition when:
+    ----- exceed 10GB of data
+    ----- exceed RCUs / WCUs for single partition 
+          each partition has maximum of 3000 RCUs and 1000 WCUs
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 PRIMARY KEYS:
 allows us to query the data 
+can be set only once - CANNOT BE CHANGED LATER
 dynamoDB stores and retrieves data based on a primary key
 2 types -
 Partition Key - unique attribute, e.g. customer id, email id, car reg. no.
 ->value of the partition key is input to an internal hash function,
     which determines the partition or physical location on which,
-    the data is stored.
+    the data is stored. (nobody knows inner workings of hash algorithm)
 ->if u using partition key as ur prmary key, no 2 items can have same,
     partition key
 Composite Key (partition key + sort key)
@@ -37,6 +123,8 @@ here, user id will not be a unique identifier to retrieve data.
 so you user user id + a sort key(timestamp) to save data 
 it gives you unique combination required for a primary key in table
 -> all items with same partition key are stored together and are then sorted according to the sort key value.
+
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 LAB
 create a user with access keys
@@ -86,7 +174,9 @@ curl -O https://raw.githubusercontent.com/ACloudGuru-Resources/course-aws-certif
         }
     }
 }
-
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+INDEXES - for efficient Sorting
+a database index is a copy of selected columns of data which is used to quickly sort
 DynamoDB ACCESS CONTROL 
 fine-grained Access Control with IAM 
 IAM Condition parameter dynamodb:LeadingKeys 
@@ -99,17 +189,31 @@ using global secondary indexes and local seconday indexes
 you select the columns you want included in the index and run your searches on the index, rather than on the entire dataset
 
 LOCAL Secondary Index
-How-> same partition key as your original table, diff sort key.
--> gives you diff view of your data organized acc to alt sort key 
--> faster queries using index rather than main table  
+How-> same partition key as your original table, diff sort key. COMPOSITE
+    -> needs both partition and sort key
+-> gives you diff view of your data organized acc to alt sort key
+-> cannot be added, modified or deleted after creation 
+-> faster queries using index rather than main table 
+-> provide strong CONSISTENCY 
+-> shares provisioned throughput settings of table RCU/WCU
 Limitation->can only be created when you are creating the table
+          ->total size of indexed items for any one partition key value cant exceed 10GB 
+          ->limited to 5 per table
+          
 GLOBAL Secondary Index 
+AWS recommends using Global indexes
+-> no size restrictions
+-> have their own provisioned throughput settingslimited to 20 per table
 much flexible, create anytime 
 allows you to pick different partition key and diff sort key to main table
-
+or same partition key and different sort key
+SIMPLE+COMPOSITE --^
+Cannot provide strong CONSISTENCY
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 SCAN vs QUERY API Calls
 QUERY:
+By Default, reads as "EventuallyConsistant", even if Str Cons is in settings
 A query finds items in a table based on the primary key attribute and a dinstinct value to search for
 refine your query using your sort key.
 Query results are always sorted by the sort key 
@@ -131,8 +235,9 @@ can be done in parrallel by logically dividing the table or index into segments 
 but its best to avoid parrallel scan if your table/index is heavy
 
 Improve performance by reducing page size , limit to 40 items 
-Avoid scans, design tables in a way that you can use Query,Get or 
-BatchGetItem APIs
+"Avoid scans, design tables in a way that you can use Query,Get or 
+BatchGetItem APIs"
+A large Table can eat your ProvisionedThroughput in a single Scan
 
 -----------------------------------------------------------------------
 DynamoDB API CALLS (programatically)
@@ -188,6 +293,8 @@ They will need IAM permissions to call PutItem
 
 ---------------------------------------------------------------------------
 DynamoDB Provisioned Throughput
+5 write capacity unit ---$2.91/month
+5 read capacity unit  ---^
 while creating table, specify...
 1 write capacity unit = 1 x 1KB write per second
 1 read capacity unit = 1 x 4KB read per second (strongly consistent)
@@ -227,7 +334,10 @@ You have an application that needs to read 25 items per second and each item is 
 10 RCU
 Sorry!
 Correct Answer
-Each Read Capacity unit represents 1 x 4KB Strongly Consistent Read. 13KB / 4KB = 3.25 rounded up to 4 multiply by 25 = 100 which gives you the figure for Strongly consistent reads. Divide that by 2 for Eventually consistent. So the answer is 50 RCU.
+Each Read Capacity unit represents 1 x 4KB Strongly Consistent Read. 13KB / 4KB = 3.25 rounded up to 4 multiply by 25 = 100 
+each items eats --^ 4kb so 25 items = 100RCU StronglyC
+& 100/2=50RCU EventuallyC
+which gives you the figure for Strongly consistent reads. Divide that by 2 for Eventually consistent. So the answer is 50 RCU.
 
 You have a motion sensor which writes 600 items of data every minute. Each item consists of 5KB. What should you set the write throughput to?
 20
@@ -236,6 +346,16 @@ You have a motion sensor which writes 600 items of data every minute. Each item 
 50
 Sorry!
 One write request unit represents one write for an item up to 1 KB in size. If you write 600 items every minute, it means 10 items are written per second ( 600 / 60 ). The total number of write capacity units required depends on the item size. If your item size is 5 KB, just multiply 10 items by 5 KB, so you require 50 write capacity units to sustain one write request. Read/Write Capacity Mode.
+------------------------------------------------------------------------
+DYNAMODB GLOBAL TABLES 
+provide a fully managed solution for deploying a multi-region, multi-master database, without having to build and maintain your own replication solution
+
+To create Global Tables: you need to.....
+1- use KMS CMK
+2- Enable Streams 
+3- Stream Type of New and Old Image
+then add region 
+then add replica to global table
 ------------------------------------------------------------------------
 DynamDB Accelerator DAX:
 DAX is a fully managed clustered in-memory cache for DynamoDB
@@ -251,11 +371,29 @@ if CacheMiss -> DAX do GetItem from DB -> stores it in cache
 So it gets the item out of DynamoDB, it writes into its cache,
 and it also hands it back to the application.
 
+|---------------------------------------|
+|VPC                                    |
+|    ____________        _____________  |
+|   |Your APP   |       |cache | cache| |
+|   |     ^     | <->   |cache | cache| | <-> DynamoDB Table
+|   |     |     |       |             | |
+|   |DAX Client |       |             | |
+|   |___________|       |_____________| |
+|      EC2                DAX Cluster   |
+|                           4 nodes     |
+|_______________________________________|
+incoming requests are evenly distributed across all nodes in the cluster
+one of the node serves as the primary node in the cluster 
+additional nodes (if present) serve as Read Replicas
+Each node runs its own INSTANCE of the DAX CACHING SOFTWARE .
+app can access DAX by using endpoint for DAX cluster
+    DAX CLIENT software works with Cluster  endpoint to perform INTELLIGENT LOAD BALANCING and ROUTING .
 
 when DAX is not Suitable?......
 it caters for eventually consistent reads only.
 So it's not going to be suitable for applications that require strongly
-consistent reads.
+consistent reads. so if you done want DAX, use ELASTICACHE .
+
 It's also not really suitable for write-intensive applications.
 So youre not going to get a benefit from using DAX because it only helps with read operations. 
 Also,
@@ -264,20 +402,6 @@ not really going to see a benefit from configuring DAX,
 and the same goes for applications that dont require microsecond response
 times. Theres no point in configuring it if you dont need that low latency.
 
----------------------------------------------------------------------------
-DynamoDB TTL 
-expressed as unix/posix/Epoch time, sec elapsed since Jan 1st, 1970, 12am
-1544023618...
-defines an expiry time for your data
-helps reduce cost and makes db fast
-e.g. session data, event logs, old data, tmp data
-
-when the current time is greater than the TTL,
-the item is going to be expired and it gets marked for deletion.
-And then within the next 48 hours, it's actually going to be deleted.
-So that's actually quite a long window between being marked for deletion and
-actually getting deleted. So in order to cater for that,
-you can actually filter out any expired items from your queries and scans.
 
 ---------------------------------------------------------------------------
 DynamoDB Streams (versions like)
@@ -285,7 +409,9 @@ Time Ordered Sequence of Modifications
 is a time-ordered sequence, or stream,
 and it records any modifications that are made to the items
 in your DynamoDB table. So that's any time there's an insert, update,
-or delete operation,
+or delete operation, you can send that change to lambda
+
+For each item that is modified, the stream records appear in the same sequence as the actual modifications
 
 Logs - encrypted at rest and stored for 24 hours
 Dedicated Endpoint - Accessed using a dedicated endpoint 
@@ -301,6 +427,7 @@ Application--aws sdk--db streams api---> DynamoDB Streams Endpoint
 NEAR REAL_TIME 
 Apps can take action based on contents of the stream
 STREAMS is a great Event Source for Lambda
+
 
 
 e.g. 

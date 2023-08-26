@@ -1,7 +1,89 @@
+PARAMETER STORE
+SECRETS MANAGER 
 KMS 
 ACM 
 Route 53
 -----------------------------------------------------------------
+AWS SYSTEMS MANAGER - PARAMETER STORE 
+    safe place to store licence keys, passwords, database connection strings,  in plain text or encrypted
+    you can reference your parameters using parameter name e.g. in a script
+    its integrated to be used with ec2, cloudformation, lambda, codebuild, codepipeline, codedeploy
+
+AWS SECRETS MANAGER 
+    secrets are encrypted using AWS KMS key
+    CMK customer master key holds key material to encrypt data. CMKs can encrypt upto 4kb of data
+    Secret Rotation is done through lambda function
+
+
+AWS SYSTEMS MANAGER - PARAMETER STORE 
+PARAMETER POLICIES
+helpful in updating or deleting passwords 
+you can assign multiple policies to a parameter 
+3 Policies 
+-Expiration
+       deletes the parameter after specified date and time
+{       
+       "Type":"Expiration",
+       "Version":"1.0",
+       "Attributes":{
+              "Timestamp":"2023-12-21T21:34:22.000Z"
+       }
+}
+-ExpirationNotification
+       notifies you about upcoming expiration via CloudWatch Events
+{       
+       "Type":"ExpirationNotification",
+       "Version":"1.0",
+       "Attributes":{
+              "Before":"15",
+              "Unit":"Days"
+       }
+}
+-NoChangeNotification - 
+       policy triggers an event in CloudWatch if a parameter has not been modifiedfor a specified period of time
+{       
+       "Type":"NoChangeNotification",
+       "Version":"1.0",
+       "Attributes":{
+              "After":"15",
+              "Unit":"Days"
+       }
+}
+CLI: (put parameter)
+aws ssm put-parameter --name "/planet/popultion" --value 4.9B --type String
+aws ssm put-parameter --name "/planet/gravity" --value 1.4G --type String
+aws ssm put-parameter --name "/planet/class" --value M --type String
+
+aws ssm get-parameters-by-path --path /planets
+-----------------------------------------------------------------
+AWS SECRETS MANAGER 
+secrets are encrypted using AWS KMS key
+    CMK customer master key holds key material to encrypt data. CMKs can encrypt upto 4kb of data
+    Secret Rotation is done through lambda function
+
+RDS,Redshift,DocumentDB,otherDB,key/value
+e.g. for postgreSQL
+Server address:
+Database name:
+Port: 
+
+Enforced Encrypton with kms 
+$0.40 per secret per month 
+$0.05 per 10k API calls 
+good value why: automatic rotation
+       rotation interval
+       30 days to 1 year
+workaround: use lambda with parameter store to rotate secrets - free 
+
+CloudTrail can monitor credentials access in case you need to audit secrets
+
+CLI:
+$ aws secretsmanager describe-secret --secret-id enterprize/shipdatabase
+$ aws secretsmanager get-secret-value --secret-id enterprize/shipdatabase --version-stage AWSCURRENT
+
+
+-----------------------------------------------------------------
+KMS is upto FIPS 140-2 Level 2 Complient
 ------------------------------KMS - Key Management Service 
 use KMS whenver you are dealing with sensitive data
 S3, RDS, DynamoDB, Lambda, EBS, EFS, CloudTrail, DeveloperTools
@@ -9,7 +91,7 @@ CMK? Customer Master Key = encrypt/decrypt data upto 4kb
 Generate / Encrypt / Decrypt the Data Key 
 using that Data Key to encrypt/d your data is EnvelopeEncryption
 
-
+aws kms create-key 
 aws kms encrypt --key-id YOURKEYIDHERE --plaintext fileb://secret.txt --output text --query CiphertextBlob | base64 --decode > encryptedsecret.txt
 
 aws kms decrypt --ciphertext-blob fileb://encryptedsecret.txt --output text --query Plaintext | base64 --decode > decryptedsecret.txt

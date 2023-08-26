@@ -1,0 +1,146 @@
+Which of the following statements are true regarding the concept of blue/green deployment when it comes to the development and deployment of your application?
+
+"It allows you to shift traffic between two identical environments that are running different versions of your application.
+
+    With blue/green deployment, you can shift traffic between two identical environments that are running different versions of your application. It allows you to easily deploy changes to your application and rollback on changes very quickly."
+
+Reference: Blue/Green Deployments on AWS
+
+Selected
+The green environment represents the production environment.
+
+No, the green environment does not represent the production environment.
+
+Reference: Blue/Green Deployments on AWS
+
+Selected
+"The green environment is staged running a different version of your application.
+
+    Yes, the green environment is staged running a different version of your application."  
+
+Reference: Blue/Green Deployments on AWS
+
+The blue environment is staged running a different version of your application.
+
+"The blue environment represents the current application version serving production traffic.
+
+    Yes, the blue environment does represent the current application version serving production traffic."
+
+Reference: Blue/Green Deployments on AWS
+---------------------------------------------------------------------------
+ou are building a serverless web application that will serve both static and dynamic content. Which of the following services would you use to create your application?
+
+EC2
+
+ElastiCache
+
+"API Gateway
+
+    API Gateway is a managed service which makes APIs available to your user base in a secure way, so it is a great option for a serverless application. Reference: Serverless on AWS"
+
+"Lambda
+
+    Lambda lets you run code without provisioning servers, so it is a great option for a serverless application."
+
+Reference: Serverless on AWS
+
+Selected
+RDS
+
+RDS is not suitable for this application because it is not serverless.
+
+Selected
+"S3
+
+    S3 can be used to serve static web content, so it is a great option for a serverless application."
+---------------------------------------------------------------------------
+You are working on a web application that needs somewhere to store user session state across a fleet of instances. Which of the following options could you use to deal with user session state?
+
+Store session state locally on the EC2 instance.
+
+Store session state in memory.
+
+Storing session state in memory is not a good option because you cant share data at high speed across a fleet of instances.
+
+Selected
+"Store session state in DynamoDB.
+
+    DynamoDB is not optimal, but could be used for storing session state."
+
+Reference: Managing ASP.NET Session State with Amazon DynamoDB
+
+"Use an ElastiCache cluster.
+
+    ElastiCache is the best option for storing session state as it is scalable, highly available, and can be accessed by multiple web servers."
+---------------------------------------------------------------------------
+You are deploying an application that runs in Lambda and processes messages from a Simple Queue Service (SQS) queue. During testing, you discover that occasionally the same SQS messages are received multiple times, causing Lambda to process the same message multiple times and creating problems for the application support team. Which of the following should you do to prevent duplicate messages from being processed?
+
+Disable the automated retry for your function to prevent it from re-processing messages that are already processed.
+
+"Create a DynamoDB table to store the SQS message IDs of the messages that have been successfully processed. Configure the Lambda function to check the DynamoDB table to see if a message has already been successfully processed and only process messages that are not already processed.
+
+    If you are receiving multiple messages with the same message ID, you can use DynamoDB to record the message IDs of messages that were already successfully processed and have your Lambda function check the DynamoDB table before processing each message."
+
+Reference: How Can I Prevent an Amazon SQS Message from Invoking My Lambda Function More than Once?
+
+Configure a dead-letter queue to prevent your function from processing messages that are already processed.
+
+    A dead-letter queue is used to save discarded events for further processing. It will not prevent your function from processing duplicate messages received from SQS.
+
+Selected
+Configure an on-failure destination to prevent your function from processing messages that are already processed.
+---------------------------------------------------------------------------
+You are building a simple banking system using serverless technologies. The workflow to authorize a new bank account includes two Lambda functions: one that confirms the customer identity and another that confirms the customer address. Together, these processes should complete in under five minutes. You would like to execute these tasks independently and, in parallel, you also need the ability to handle errors and retries. After the checks are successfully completed, the customer will be approved for a new bank account and a second workflow will be invoked to create the account and inform the customer. You would like to orchestrate everything using Step Functions. Which of the following workflows would be the most suitable?
+
+"Synchronous Express workflow
+
+    Synchronous Express workflows start a workflow, wait until it completes, and then return the result. Synchronous Express workflows can be used to orchestrate microservices and allow you to develop applications without the need to develop additional code to handle errors and retries or execute parallel tasks.
+"
+Asynchronous Express workflow
+
+Asynchronous Express workflows return confirmation that the workflow was started, but does not wait for the workflow to complete.
+
+Selected
+Standard workflow
+
+Step Functions workflow
+---------------------------------------------------------------------------
+Your application needs to process a large amount of job requests. You need to ensure that they are processed in order and that each request is processed only once. How would you deploy Amazon Simple Queue Service (SQS) to achieve this end?
+
+Convert your standard queue to a First-In-First-Out (FIFO) queue by renaming your standard queue with the .fifo suffix.
+
+Configure First-In-First-Out (FIFO) delivery in a standard SQS queue.
+
+Amazon SQS standard queues provide the highest scalability and throughput; however, the order that messages are processed is not guaranteed and duplicates might occur. You cant configure FIFO delivery in a standard queue.
+
+Selected
+"Use an SQS First-In-First-Out (FIFO) queue to process the jobs.
+
+    FIFO queues offer First-In-First-Out (FIFO) delivery and exactly-once processing. The order in which messages are sent and received is strictly preserved and a message is delivered once and remains available until a consumer processes and deletes it. Duplicates are not introduced into the queue."
+---------------------------------------------------------------------------
+You are developing a web application that has been deployed using Lambda. Today, you updated the code and uploaded the new version of your code to the Lambda console. Your test team has begun their testing, and has reported that the application seems to still be using the original code. What could be the reason for this?
+
+Your application is referencing the function using $LATEST.
+
+"Your application is referencing the function using an alias that points to a previous version of the code.
+
+    The problem could be that the application is referencing the function using an alias pointing to a previous version of the code. When you use versioning in AWS Lambda, you can publish one or more versions of your function so that you can use different variations of your Lambda function in your development workflow, such as development, beta, and production. Lambda also supports creating aliases for each of your Lambda function versions. Conceptually, an AWS Lambda alias is a pointer to a specific Lambda function version. You can update aliases to point to different versions of functions."
+
+Reference: Lambda Function Aliases Reference: Lambda Function Versions
+
+Selected
+Your application is referencing the function using an unqualified ARN.
+
+After deploying the function, there is usually a delay in which the new function is initialized. During this time, the application is directed to the previous version of the function.
+---------------------------------------------------------------------------
+You have three separate environments in your AWS account and three corresponding stages in the API Gateway. You are using the API Gateway as a HTTP proxy to a backend endpoint. How do you direct traffic for each environment without creating separate API Gateways?
+
+Use custom authorizers for each stage.
+
+Update the integration response to update the backend endpoints.
+
+Use a request transformation to transform the backend endpoint responses.
+
+"Use stage variables and configure the stage variables in the HTTP integration request to interact with different backend endpoints.
+
+    You can use API Gateway stage variables to access the HTTP and Lambda backends for different API deployment stages."

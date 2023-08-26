@@ -1,10 +1,19 @@
 SQS 
 SES 
 SNS 
-Kinesis 
-Elastic Beanstalk 
-
+Kinesis  
+-------------------------------------------------------------------------
+"AWS Application Integration Services:
+Step Functions, EventBridge, SQS, MQ, SNS, SWF"
 SQS:
+SQS is for Connecting Applications (Application Integration)
+
+PERIODS
+msgs are ketp in queue from 1 minute to 14 days
+Default msg retention is 4 days
+default is 30 sec, min is 0 sec max is 12 hours (visibility timeout)
+FIFO maintains order of messages with a 300 limit
+
 Distributed msg queueing system
 SQS is Pull Based System for messaging b/w Application Components 
 SNS is Push Based
@@ -22,6 +31,7 @@ SQS act as a buffer b/w
 The Queue resolves issues that arise if the producer is producing work faster than the consumer can process it, or 
 if the producer or consumer are only intermitently connected to the network
 msgs are ketp in queue from 1 minute to 14 days
+Default msg retention is 4 days
 
 
 e.g. 
@@ -52,7 +62,7 @@ after a reader or a consumer picks up that message.
 dy default, this timeout is 30 Sec, 
 means a server which picks up the msg has 30 seconds to complete it, msg is hidden from other servers for 30 seconds while it is being processed by the server
 CHANGe the visibility timeout if the task requires more time to complete.
-default is 30 sec, max is 12 hours
+default is 30 sec, min is 0 sec max is 12 hours
 
 long pooling is always preferable
 LONG POLLING VS SHORT POLLING:
@@ -308,7 +318,25 @@ It's inexpensive with a pay as you go pricing model and no upfront costs.
 Easy to configure using the AWS management
 console, with the simplicity of a point-and-click interface.'
 
+Application as Subscriber:
+send push notification msgs directly to apps on mobile devices 
+Publisher       SNSTopic (msg filter and fanout)    Subscribers
+AWS SDK         SNSTopic (msg filter and fanout)    lambda 
+AWS CLI         SNSTopic (msg filter and fanout)    SQS 
+CloudWatch      SNSTopic (msg filter and fanout)    Email / https 
+AWS Services    SNSTopic (msg filter and fanout)    Mobile Push <----------
 
+Mobile Push: (Platform Application Endpoint)
+ADM amazon device msging 
+APNs Apple push notification service 
+Baidu Baidu cloud push 
+FCM Firebase Cloud msging 
+MPNs microsoft push notification service for windows phone 
+WNS windows push notification service 
+
+ALL MSGs published to SNS are stored redundantly across multiple AVL Zones 
+
+You can ENCRYPT Topic with KMS 
 ---------------------------------------------------------------------------
 SES
 unlike sns, And it is not subscription-based
@@ -351,7 +379,8 @@ and an email address is all that's required to
 start sending messages using SES.
 
 ---------------------------------------------------------------------------
-KINESIS 
+KINESIS - just like apache kafka
+STREAMING vs Queueing(SQS)
 it's a family of services
 that enables you to collect, process,
 and analyze streaming data in real time.
@@ -383,6 +412,8 @@ for analysis and processing.
 And this is all about high-throughput information.
 
 
+DATA can persist from 24 hours (default) to 168 hours in stream
+
 "Kinesis Streams"
 2 types:
 1-Kinesis Data Streams
@@ -412,8 +443,18 @@ Data capacity of a Kinesis stream is determined by the number of shards it has.
 
 Order of Records is always maintained
 
+2-Kinesis Video Streams,
+ingest video and audio encoded data from various devices e.g. security cam
+output data to HLS-basedVideoPlayback,TensorFlow,SageMaker,Rekognition,etc (Video Processing Services)
+no shard system
+
+
+
 
 "Kinesis Data Firehose"
+NOT PERSISTANT - DATA IMMEDIATELY DISAPPEARS as it is CONSUMED
+YOU CHOOSE ONE CONSUMER FROM LIST
+YOU PAY ONLY FOR THE DATA INGESTED
 and this allows you to capture, transform,
 and load data streams into AWS data stores
 to enable near real-time analytics
@@ -477,7 +518,8 @@ And it goes on to store the processed data
 in an AWS data store,
 like S3, Redshift, or OpenSearch.'
 
-
+Input Stream ---> DATA ANALYTICS ---> Output Stream
+input & output streams can be kinesis data streams or firehose
 
 "Kinesis Client Libraries"
 Kinesis install KCL on Consumers
@@ -492,6 +534,9 @@ You must ensure that no. of instances(consumers) dont exceed no. of shards
 
 Best PRactice: use an Auto Scaling Group and base scaling decisions on CPU load. use CPU utilization as a metric to decide if you need more instances
 
+
+KPL (Kinesis Producer Library) is a Java Library to write data to a stream 
+you can write data to stream using AWS SDK, but KPL is more efficient
 ---------------------------------------------------------------------------
 
 

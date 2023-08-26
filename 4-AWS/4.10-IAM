@@ -102,6 +102,10 @@ after successfully authenticating
 with a web-based identity provider
 like Facebook, Amazon, or Google.
 
+Types of Identity Providers:
+SAML - Security Assertion Markup Language (SAML) Single-Sign-on
+OPENID - OAUTH Web Identity Federation - OpenID Connect (OIDC)
+
 users will receive an authentication code
 from the web identity provider,
 and they can trade this authentication code

@@ -92,6 +92,13 @@ Default output format [None]: json
 
 or create a role with s3FullAccess and attach it to EC2 
 This is recommended way to allow an instance to manage s3 buckets
+--------------------------------------------------------------------------
+AWS SDK 
+
+A software development kit is a set of tools and libraries that you can use to create applications for a specific software package
+
+AWS SDK is a set of API libraries that let you integrate aws services into your applications.the SDK is available for following languages:
+C++,Java,Go,JS,NodeJS,.net,php,Python,Ruby
 
 ---------------------------------------------------------------------------
 

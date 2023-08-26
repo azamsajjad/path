@@ -1,0 +1,146 @@
+You are developing an online banking website that will be accessed by a global customer base. You are planning to use CloudFront to ensure users experience good performance regardless of their location. The security architect working on the project asks you to ensure that all requests to CloudFront are encrypted using HTTPS. How can you configure this?
+
+"Set the viewer protocol policy to redirect HTTP to HTTPS.
+
+    Viewer protocol policy defines the protocols that can be used to access CloudFront content."
+
+Reference: Requiring HTTPS for Communication between Viewers and CloudFront
+
+Set the request protocol policy to redirect HTTP to HTTPS.
+
+In CloudFront, you cannot set a request protocol policy to redirect HTTP requests to HTTPS.
+
+Selected
+Set the session protocol policy to redirect HTTP to HTTPS.
+
+Set the user protocol policy to redirect HTTP to HTTPS.
+---------------------------------------------------------------------------
+You are working as a developer for an online retailer. Your security architect has requested that any files stored in S3 must be encrypted. However, some teams are continuing to upload their files without encrypting them. Which of the following will ensure that only encrypted data is uploaded?
+
+Select the Encrypted Files Only checkbox in the S3 Permissions tab in the AWS console.
+
+Tell all team members to include the x-amz-encryption parameter in the request header.
+
+"Use a bucket policy that only allows PUT operations, which include the x-amz-server-side-encryption parameter in the request header.
+
+    There are a few different ways to enforce encryption; however, from the provided options, the use of a bucket policy to reject requests that do not include encryption in their header is the best answer."
+
+Reference: How to Prevent Uploads of Unencrypted Objects to Amazon S3
+
+Create a bucket ACL that only allows PUT operations, which include the x-amz-encryption parameter in the request header.
+
+Using an ACL is not the recommended approach, and x-amz-encryption is not the correct way to specify S3 server-side encryption.
+---------------------------------------------------------------------------
+What does the following snippet from an IAM policy do?
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource":   [
+            "arn:aws:s3:::mycustomerdata/*”,
+            "arn:aws:s3:::mycustomerdata/”
+    ]
+        },
+     {
+            "Sid": "DenyS3Logs",
+            "Effect": "Deny",
+            "Action": "s3:DeleteObject",
+            "Resource": "arn:aws:s3:::mycustomerdata/*log*”
+        }
+    ]
+}"
+Allows the ability to delete any objects with log in the name from the mycustomerdata bucket.
+
+"Denies the ability to delete any objects with log in the name from the mycustomerdata bucket.
+
+    The policy denies the s3:DeleteObject action for files with log in the name that are stored in the bucket named mycustomerdata."
+
+Selected
+Denies the ability to read objects contained in the bucket named mycustomerdata.
+
+??????"Allows read access for all objects contained in the bucket named mycustomerdata.
+
+    The policy allows read access for all objects contained in the bucket named mycustomerdata."
+
+???????Allows full access to the bucket named mycustomerdata, including the objects it contains.
+
+The policy does not allow full access to the bucket named mycustomerdata, including the objects it contains.
+---------------------------------------------------------------------------
+Your company is storing a large amount of data in S3, including data relating to customers and their credit card information. How can you ensure that any personally identifiable information (PII) that is stored in your companys S3 buckets is identified so that it can be encrypted using encryption keys that are managed by you and are automatically rotated?
+
+Use Macie to identify objects that contain PII. Use SSE-S3 with automatic key rotation enabled to encrypt the files.
+
+Use a Lambda function to identify objects that contain PII. Use SSE-S3 with automatic key rotation enabled to encrypt the files.
+
+It is not necessary to write a Lambda function to identify S3 objects that contain PII. SSE-S3 is the default encryption mechanism, with encryption keys that are managed internally by S3. It does not allow you to configure automatic key rotation.
+
+Selected
+"Use Macie to identify objects that contain PII. Use an SSE-KMS key with automatic key rotation enabled to encrypt the files.
+
+    Macie can be used to identify objects that contain PII. SSE-KMS supports automatic key rotation."
+
+Use a Lambda function to identify objects that contain PII. Use SSE-C with automatic key rotation enabled to encrypt the files.
+---------------------------------------------------------------------------
+A cloud engineer is working on deploying a new CloudFront distribution for the subdomain learn.acloud.guru. They have been instructed to enforce HTTPS connections using a custom TLS certificate. After researching, they have decided to leverage AWS ACM for the certificate management portion. What else should the engineer do to make use of the certificate within CloudFront?
+
+"Create the certificate in the us-east-1 (N. Virginia) Region.
+
+    All TLS certificates used with Amazon CloudFront distributions via AWS ACM must exist in the us-east-1 Region."
+
+Reference: CloudFront TLS Regions
+
+Use ACM to create the certificate in the Region where the majority of your customers are located.
+
+Use ACM to create the certificate in the Region where the CloudFront origin is located.
+
+When using ACM to host certificates used by CloudFront, it is not supported to use a certificate wherever the origin is located.
+
+Selected
+Use ACM to create the certificate in a Region of your choice.
+---------------------------------------------------------------------------
+Which of the following is required in order to enable an existing Lambda function to access EC2 instances that are located in a private VPC?
+
+Update the permissions in your VPC to allow Lambda to access the EC2 instances.
+
+Configure the function policy to allow EC2 to invoke the function.
+
+"Modify the function configuration, and choose the correct subnets and security groups.
+
+    To configure private VPC access for an existing function, you will need to modify the function configuration, and select the correct subnets and security groups."
+
+Reference: Configuring a Lambda Function to Access Resources in a VPC
+
+Configure the Lambda function's execution role to match the role applied to your EC2 instances.
+
+It is not necessary to configure the Lambda function's execution role to match the role applied to your EC2 instances. This will not enable private VPC access for the function.
+---------------------------------------------------------------------------
+You are working on a mobile phone app for an online retailer that stores its customer data in DynamoDB. You would like to enable new users to sign up using Facebook or Google credentials. What is the recommended approach?
+
+Embed encrypted AWS credentials into the application code, so that the application can access DynamoDB on the users behalf.
+
+Write your own custom code that allows the user to log in via a web identity provider and receive an authentication token, which then calls the AssumeRoleWithWebIdentity API and exchanges the authentication tokens for temporary access to DynamoDB.
+
+After the user has authenticated with Facebook, allow them to download encrypted AWS credentials to their device so that the mobile app can access DynamoDB.
+
+"Once the user has logged in to the web identity provider, use Cognito to exchange the authentication tokens for temporary access to DynamoDB.
+
+    Using Cognito is the recommended approach to federating with web ID providers for mobile applications."
+---------------------------------------------------------------------------
+Your mobile application needs to read data from DynamoDB. What is the AWS-recommended way to give mobile devices permissions to read from DynamoDB?
+
+Connect your application to an EC2 instance with permission to read from DynamoDB.
+
+Create an IAM role for your users.
+
+"Create an IAM role that can be assumed by an app that allows federated users.
+
+    Web identity federation removes the need for creating individual IAM users. Instead, users can sign in to an identity provider and then obtain temporary security credentials from the AWS Security Token Service."
+
+Reference: Using Web Identity Federation
+
+Selected
+Issue an access key and secret access key to each user.
+---------------------------------------------------------------------------
