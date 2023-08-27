@@ -7,6 +7,8 @@ supported formats are JSON, HTML, XML
 item = row 
 attribute = column
 PARTITION KEY is also called HASH  .
+        A GOOD PARTITION KEY IS SHIP CLASS in STARSHIP TABLE because ITs a GROUPING OF THINGS - and as long as you have a unique value with combination of partition and sort key, it is ok
+        3 ships have same ship class, etc but 
 SORT KEY is also called RANGE .
 DynamoDB is a no SQL key/value and Document Store database
 key/value = {Title: "S01E019 DS9 Duet"}
@@ -243,11 +245,20 @@ A large Table can eat your ProvisionedThroughput in a single Scan
 DynamoDB API CALLS (programatically)
 
 CLI:            API:
-create-table    CreateTable
+create-table    CreateTable table name must be unique within each Region .
 put-item        PutItem
 get-item        GetItem
+transact-get-item =
+                synchronous op, retrieve multiple items from 1ormore table (but not indexes) in a single account and region. can contain upto 25 objects. aggregate size of items < 4 MB
+batch-get-item  single operation = limit upto 16 MB of data, max 100 items
+batch-write-item = limit 16 MB of data, 25 put/del req, each item max 400kb
+transact-write-item = 
+                synchronous write operationthat groups upto 25 action requests. these actions can target items in d/f tables, but not in d/f AWS accounts or regions, and no two actions can target the same item
+
 update-item     UpdateItem
-update-table    UpdateTable
+update-table    UpdateTable modifies provisioned throughput of a table
+                                     global secondary indexes 
+                                     DynamoDB Streams settings
 list-table      ListTables
 describe-table  DescribeTable
 scan            Scan

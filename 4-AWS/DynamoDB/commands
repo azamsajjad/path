@@ -1,0 +1,152 @@
+aws dynamodb create-table \
+  --attribute-definitions \
+    AttributeName=ShipClass,AttributeType=S \
+    AttributeName=Registry,AttributeType=S \
+  --key-schema \
+    AttributeName=ShipClass,KeyType=HASH \
+    AttributeName=Registry,KeyType=RANGE \
+  --provisioned-throughput \
+    ReadCapacityUnits=1,WriteCapacityUnits=1 \
+  --region us-east-1 \
+  --table-name Starships
+
+aws dynamodb describe-table --table-name Starships
+aws dynamodb describe-table --table-name Starships --output table
+
+
+#Batch-write-items
+aws dynamodb batch-write-item --request-items file://batches/batch-000.json
+aws dynamodb batch-write-item --request-items file://batches/batch-001.json
+aws dynamodb batch-write-item --request-items file://batches/batch-002.json
+aws dynamodb batch-write-item --request-items file://batches/batch-003.json
+aws dynamodb batch-write-item --request-items file://batches/batch-004.json
+aws dynamodb batch-write-item --request-items file://batches/batch-005.json
+aws dynamodb batch-write-item --request-items file://batches/batch-006.json
+aws dynamodb batch-write-item --request-items file://batches/batch-007.json
+aws dynamodb batch-write-item --request-items file://batches/batch-008.json
+aws dynamodb batch-write-item --request-items file://batches/batch-009.json
+aws dynamodb batch-write-item --request-items file://batches/batch-010.json
+aws dynamodb batch-write-item --request-items file://batches/batch-011.json
+aws dynamodb batch-write-item --request-items file://batches/batch-012.json
+
+#Get-item
+
+aws dynamodb get-item \
+    --table-name Starships \
+    --key file://key.json
+    
+#Batch-get-item
+
+aws dynamodb batch-get-item \
+    --request-items file://request-items.json
+    
+#Put-item
+aws dynamodb put-item \
+    --table-name Starships \
+    --item file://item.json \
+    --return-consumed-capacity TOTAL
+
+aws dynamodb update-item \
+    --table-name Starships \
+    --key file://key.json \
+    --update-expression "SET #D = :d" \
+    --expression-attribute-names file://expression-attribute-names.json \
+    --expression-attribute-values file://expression-attribute-values.json  \
+    --return-values ALL_NEW \
+    --return-consumed-capacity TOTAL \
+    --return-item-collection-metrics SIZE
+    
+    
+    
+    
+aws dynamodb update-item \
+    --table-name Starships \
+    --key file://key.json \
+    --update-expression "SET #Y = :y, #AT = :t" \
+    --expression-attribute-names file://expression-attribute-names.json \
+    --expression-attribute-values file://expression-attribute-values.json  \
+    --return-values ALL_NEW \
+    --return-consumed-capacity TOTAL \
+    --return-item-collection-metrics SIZE
+
+
+ 
+# SCAN    
+aws dynamodb scan \
+    --table-name MusicCollection \
+    --filter-expression "Artist = :a" \
+    --projection-expression "#ST, #AT" \
+    --expression-attribute-names file://expression-attribute-names.json \
+    --expression-attribute-values file://expression-attribute-values.json
+    
+aws dynamodb scan \
+    --table-name Starships \
+    --filter-expression "begins_with(Description, :D)" \
+    --expression-attribute-values '{":D": {"S": "Destroyed"}}'
+    
+# Query
+# projection expression = SORT KEY
+
+aws dynamodb query \
+    --table-name MusicCollection \
+    --projection-expression "SongTitle" \
+    --key-condition-expression "Artist = :v1" \
+    --expression-attribute-values file://expression-attributes.json \
+    --return-consumed-capacity TOTAL
+    
+aws dynamodb query \
+    --table-name Starships \
+    --projection-expression "Registry" \
+    --key-condition-expression "ShipClass = :C" \
+    --expression-attribute-values '{":C": {"S": "Galaxy"}}' \
+    --output text
+    
+                rupert:~/environment/dynamodb-playground (master) $ aws dynamodb query \
+            >     --table-name Starships \
+            >     --projection-expression "Registry" \
+            >     --key-condition-expression "ShipClass = :C" \
+            >     --expression-attribute-values '{":C": {"S": "Galaxy"}}' \
+            >     --output text
+            None    16      16
+            REGISTRY        NCC-1701-D
+            REGISTRY        NCC-2012-C
+            REGISTRY        NCC-26517-A
+            REGISTRY        NCC-31347
+            REGISTRY        NCC-69480
+            REGISTRY        NCC-70637
+            REGISTRY        NCC-71099
+            REGISTRY        NCC-71807
+            REGISTRY        NCC-71809
+            REGISTRY        NCC-71832
+            REGISTRY        NCC-71842
+            REGISTRY        NCC-71854
+            REGISTRY        NCC-71867
+            REGISTRY        NCC-71879
+            REGISTRY        NCC-72075
+            REGISTRY        NCC-78012
+aws dynamodb query \
+    --table-name Starships \
+    --projection-expression "Registry" \
+    --key-condition-expression "ShipClass = :C" \
+    --expression-attribute-values '{":C": {"S": "Galaxy"}}' \
+    --output text \
+    --scan-index-forward
+ 
+# Query reverse order   
+aws dynamodb query \
+    --table-name Starships \
+    --projection-expression "Registry" \
+    --key-condition-expression "ShipClass = :C" \
+    --expression-attribute-values '{":C": {"S": "Galaxy"}}' \
+    --output text \
+    --no-scan-index-forward
+    
+Transact-get-item
+Transact-write-item
+# useful for operations across tables, two or more with conditions 
+# if any operation fail, roll back. dont commit changes in just one table
+
+# Delete-table
+
+aws dynamodb delete-table \
+    --table-name Starships
