@@ -1,6 +1,7 @@
 CodeCommit
 CodeDeploy
 CodePipeline
+CodeBuild
 CodeArtifact
 Elastic Container Service 
 CloudFormation 
@@ -9,6 +10,12 @@ CloudFormation
 Cloud Development Kit 
 Amplify 
 
+
+---------------------------------------
+CODE  >   BUILD   >   INTEGRATE   >   TEST  >   RELEASE   >   DEPLOY .
+^---CI-automatically reviews code-------^
+^---CDelivery-auto preparing code 4 release--------^
+^---CDeployment-auto deploy code as soon as pushed---------------^
 ----------------------------------------
 
 CI/CD 
@@ -61,11 +68,17 @@ appspec.yml     /Scripts   /Config     /Source
 version: 0.0
 os: linux 
 files: 
-    - source: Config/config.txt 
-      destination: /webapps/config
-    - source: Source
-      destination: /webapps/myApp
+    - source: /
+      destination: /home/ec2-user/app
+permissions:
+    - object: /home/ec2-user/app 
+      owner: ec2-user
+      group: ec2-user
 hooks:
+  ApplicationStop: 
+    - location: aws/deployment/application_stop/stop_app.sh
+      timeout: 20
+      runas: ec2-user
   BeforeInstall:
     - location: Scripts/unzipresourcebundle
     - location: Scripts/unzipdatabundle
@@ -73,12 +86,13 @@ hooks:
     - location: Scripts/unzipdatabundle
       timeout: 100
   ApplicationStart:
-    - location: Scripts/runFunctionTest.sh 
-      timeout: 3600
+    - location: aws/deployment/application_start/start_app.sh
+      timeout: 20
+      runas: ec2-user
   ValidateService:
     - location: Scripts/unzipdatabundle
       timeout: 3600
-      runas: codedeployuser
+      runas: ec2-user
 ...
 
 LifecycleEventHooks:
@@ -97,6 +111,111 @@ BeforeAllowTraffic
 phase3 : re-register instances from a Load Balancer - AllowTraffic 
 AfterAllowTraffic
 
+
+
+All hooks are available for in-place deployment instances
+B/G deployment - original: before,blockTraffic,after AVL only
+B/G deployment - replaced: before,blockTraffic,after NOT but all
+
+B/G deployment rollback - original: before,AllowTraffic,after AVL only
+B/G deployment rollback - replaced: before,BlockTraffic,after AVL only
+
+
+
+To Set Up CodeDeploy:
+you need CodeDeploy Agent and ServiceRole on your EC2 Instance 
+CD Agent: so EC2 can report back to CodeDeploy 
+CD Srole: create a CodeDeploy ServiceRole based on your deployment strategy
+
+
+
+
+CREATE AN EC2 instance with following role -have access to Sessions Manager
+SSMEC2ServiceRole with policy AmazonEC2RoleforSSM
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            }
+        }
+    ]
+}
+
+
+USERDATA:
+#!/bin/bash
+su ec2-user
+sudo yum install httpd -y 
+sudo chown ec2-user:ec2-user -R /var/www
+cat > /var/www/html/index.html <<EOL
+<html>
+<head>
+<title>My Code Deploy App</title>
+</head>
+<body>
+<h1>My Code Deploy App</h1>
+</body>
+</html>
+EOL
+sudo systemctl --enable now httpd
+
+
+
+
+version: 0.0
+os: linux
+files:
+    - source: /
+      destination: /var/www/html
+permissions:
+    - object: /var/www
+      owner: ec2-user
+      group: ec2-user 
+hooks:
+  AfterInstall:
+    - location: /update_app.sh 
+      timeout: 6
+      runas: ec2-user
+  ApplicationStart: 
+    - location: /restart_app.sh 
+      timeout: 6
+      runas: ec2-user
+
+restart_app.sh
+sudo systemctl restart /usr/sbin/httpd
+update_app.sh     
+rm /var/www/html/index.html
+cp /revision/index.html /var/www/html/index.html
+
+
+
+ 184  git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/my-code-deploy-app
+  185  cd my-code-deploy-app/
+  186  which zip
+  187  zip revision-v2.zip appspec.yml index.html restart_app.sh update_app.sh 
+  188  aws s3api create-bucket --bucket-name my-code-deploy-329 --region us-east-1
+  189  aws s3api create-bucket --bucket my-code-deploy-329 --region us-east-1
+  190  aws s3 cp revision.zip s3://my-code-deploy-329/revisions/v2.zip
+  191  aws s3 cp revision-v2.zip s3://my-code-deploy-329/revisions/v2.zip
+
+
+CodeDeploy -> Create Application -> Create Deployment
+attach this role in Create Deployment (first create it)
+AWSCodeDeployRole
+with Policy
+AWSCodeDeployRole	AWS managed	Permissions policy
+create deployment 
+
+
+lab failed b/c i didnt install codedeploy agent on the instance
 ---------------------------------------------------------------------------
 "CodePipeline" CI/CD Service
 Workflow is defined 
@@ -172,6 +291,66 @@ webpage/ - this directory contains static web assets used by your website
 index.html - this file contains the sample website
 template.yml - this file contains the description of AWS resources used by AWS CloudFormation to deploy your infrastructure
 template-configuration.json - this file contains the project ARN with placeholders used for tagging resources with the project ID
+
+---------------------------------------------------------------------------
+CODEBUILD - use for code testing
+- A fully managed build service in the cloud 
+- Compiles your source code, runs unit tests, produces artifacts that are ready to deploy 
+- eliminates the need to provision, manage, and scale your own build servers 
+- provides pre-packaged build environments for popular programming languages and build tools such as Apache Maven, Gradle, and more 
+- scales automatically to meet peak build requests 
+
+- BUILDSPEC.YML CAN BE OVER-RIDDEN WITH CLI COMMANDS .
+                                        Source Provider
+                                        buildspec.yml
+AWS Console                        |--------------------|
+AWS CLI          --> CodeBuild --> | Build Project      |--> Build Artifact
+AWS SDK                            |====================|--> notify SNS
+AWS CodePipeline                   | Build Environment  |
+                                   |____________________|
+                                    build environments uses 
+                                    docker.
+                                    you can use AWS Managed images
+                                    or
+                                    your own Custom Docker Image      
+Common UseCase1:
+A website built with Gatsby needs to render out static pages and delivery for S3 static website hosting
+AWS Console -> CodeCommit -> CodeBuild -> Render Static Files -> S3 Bucket
+                Gatsby                           Gatsby
+
+
+Common UseCase2:
+A developer needs to ensure their code passes all tests before being allowed to make a pull request 
+Github -> Github Webhook -> Lambda using AWS SDK -> CodeBuild -> Testing
+ Ruby app                                                      run RSPEC
+
+
+"Buildspec.yml file" needs to be at root - provides build instructions
+
+version: 0.2
+phases: 
+  install:
+    commands: 
+      - bundle install 
+  pre_build:
+    commands:
+      - service postgresql start 
+      - export DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true 
+      - export RAILS_ENV=test 
+  build:
+    commands:
+      - bundle exec rake db:create 
+      - bundle exec rake db:schema:load 
+      - bundle exec rake db:migrate
+  post_build:
+    commands:
+      - bundle exec rspec 
+      - bundle exec cucumber
+= = = = = = = = = = == = = = = = = = = = = = = = = = = = = = = = == = = =
+version 0.1 runs each build command in a separate instance 
+0.2 runs in the same instance
+
+
 
 ---------------------------------------------------------------------------
 CodeArtifact

@@ -322,7 +322,7 @@ Not REusable
 
 --------------------------------------------------------------------------
 https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html
-
+Security Token Service
 STS - AssumeRoleWithWebIdentity
 
 it's an API, which is provided by STS,
@@ -341,7 +341,7 @@ However, for regular web applications,
 where you're not using Cognito
 you can use this STS assume-role-with-web-identity-API.'
 
-
+*jwt=javascriptwebtoken
 user------------------------>faceebook (for login)
 user<-----JWT token----------facebook
 user---JWT---assume-role-with-web-identity----->STS
@@ -374,7 +374,7 @@ the credentials.
 
 
 ---------------------------------------------------------------------------
-
+CROSS ACCOUNT ROLES
 
 https://aws.amazon.com/blogs/security/how-to-enable-cross-account-access-to-the-aws-management-console/
 "Configuring Cross Account Access"
@@ -483,10 +483,29 @@ top right - switch role under account dropdown
 
 
 
+---------------------------------------------------------------------------
+CLOUDTRAIL 
+when you need to know who to blame 
+CT is a service that enables governance, compliance, operational auditing, risk auditing of your AWS account
+
+easily identify which users/accounts made calls to aws
+where - source ip address 
+when - EventTime 
+who - User,UserAgent 
+what - Region,Resource,Action
 
 
+default log history = 90 days 
+create a custom trail if you want logs more than 90 days
+  catch: then no gui, use S3 and athena
 
-
+* A trail can be set to all regions , across all accounts 
+* you can encrypt your logs SSE-KMS server side encryption 
+* you can configure CT to CloudWatch logs 
+* 2 types of events 
+  management (default on) &   Data event
+  90%                         S3 & Lambda
+  cant be turned off          off by default
 ---------------------------------------------------------------------------
 How can you allow a user from one AWS account to access and manage resources in another AWS account?
 

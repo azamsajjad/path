@@ -148,6 +148,36 @@ GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE (if your users need read & write ac
    DELETE (also write action) = deleting your email address
    OPTIONS (receive a list of supported HTTP methods)
 
+LAMBDA@EDGE--------------- 
+to override behavior of request and responses 
+4 avl functions 
+1-Viewer request -when cloudfront receives a request from the viewer
+2-Origin request -before cloudfront forwards a request to the origin
+3-Origin response -when cloudfront receives a response from the origin
+4-Viewer response -before cloudfront returns the response to the viewer
+
+--> Viewer request -->          --> Origin request -->
+                        CF
+<-- Viewer response <--         <-- Origin response <--
+
+    Usecase: you have protected content, paid content
+    you can authenticate with cognito
+    A to B testing website 
+
+CLOUDFRONT_PROTECTION-------------------(Use signed URLs)
+Access to Cached content can be protected via signed urls/signed cookies
+by default a distribution allows everyone to have access 
+Original Access Identity: OAI 
+A virtual user identity that will be used to give your cloudfront distribution permission to fetch a private object 
+
+IN-ORDER TO USE SIGNED URLS OR SIGNED COOKIES, YOU NEED TO HAVE OAI .
+Signed URLs: not same as S3 pre-signed url
+A url that provides temporary access to cached objects 
+Signed Cookies:
+A cookie which is passed along with the request to cloudfront, 
+adv- provide access to restricted files e.g. Video Streaming
+
+once a signed url passes a cookie, you can have access for as long as cookie is valid
 --------------------------------------------------------------------------
 ATHENA
 interactive query service using standard SQL

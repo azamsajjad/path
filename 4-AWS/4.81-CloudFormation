@@ -199,6 +199,35 @@ Resources:
         # Give Lambda basic execution Permission to the helloFromLambda
         - AWSLambdaBasicExecutionRole'
 
+
+---------------------------------------------------------------------------
+CLOUDFORMATION - PREVENT STACK UPDATES 
+you may want certain resources not to be updated.
+preventing a stack-update could be to prevent data loss or interruption to service.
+How? generate StackPolicy
+StackPolicy:
+A stack policy is a json document that defines the update actions that can be performed on designated resources.
+
+{
+  Statement : [
+    {
+      Effect : Deny,
+      Action : Update:Replace,
+      Principal: *,
+      Condition : {
+        StringEquals : {
+          ResourceType : [AWS::DynamoDB::Table]
+        }
+      }
+    },
+    {
+      Effect : Allow,
+      Action : Update:*,
+      Principal: *,
+      Resource : *
+    }
+  ]
+}
 ---------------------------------------------------------------------------
 CF Nested Stacks 
 nested stacks
@@ -214,3 +243,435 @@ defining the resource that you want to create,
 store in S3 and then you can reference it
 from the resources section of any CloudFormation template
 using the stack resource type.
+
+1-create modular templates (reusability)
+2-assemble large templates (reduce complexity)
+
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  myStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/my-cfn/s3_bucket.template
+      TimeoutInMinutes: '60'
+
+---------------------------------------------------------------------------
+CloudFormation Drift Detection 
+Stack Actions -> Detect Drift 
+what is drift?
+drift is when your stack's actual configuration differs (has drifted) by what CF expects' 
+when it happens?
+when developer starts making manual ad-hoc changes to the stack (most common example is deleting resources manually which CF created)
+
+DELETED, MODIFIED, NOT_CHECKED, IN_SYNC
+
+---------------------------------------------------------------------------
+CloudFormation Rollbacks
+CF will attempt to rollback in case of an error put your stack to previous state.
+Rollbacks are turned on by default. 
+You can ignore rollbacks by using --ignore-rollback flag via AWS CLI
+
+Sometimes, rollbacks can fail. then u have to investigate and change resource configuration or possibly need to reach out to 'paid aws support to resolve the failed rollback'
+
+ROLLBACK_IN_PROGRESS
+UPDATE_ROLLBACK_COMPLETE
+UPDATE_ROLLBACK_FAILED
+
+---------------------------------------------------------------------------
+CloudFormation Psuedo Parameters 
+parameters that are predefined by aws cloudformation 
+you do not declare them in your template
+
+use them the same way as you would a parameter, as the argument for the Ref function 
+
+Outputs:
+  MyStacksRegion:
+    value: !Ref "AWS::Region"
+
+AWS::Paertition returns the partition that resource is in
+AWS::Region returns aws region in which resource is being created
+AWS::StackId returns ID of stack as specified with aws CF 'create-stack'
+AWS::StackName returns name of stack as specified wth aws CF 'create-stack'
+AWS::URLSuffix  returns the suffix for the domain
+
+---------------------------------------------------------------------------
+CloudFormation Resource Attributes 
+
+Creation Policy:
+prevent stack status from reaching create complete until AWS cloudformation receives a specified number of success signals or the timeout period is exceeded 
+---
+Resources:
+  Type: AWS::AutoScaling::AutoScalingGroup
+  CreationPolicy:
+    ResourceSignal:
+      Count: 3
+      Timeout: PT15M
+
+
+Deletion Policy:
+reserve or (in some cases) backup a resource when its stack is deleted 
+Deleted, Retain, or Snapshot 
+---
+Resources:
+  MyDbInstance:
+    Type: AWS::RDS::DBInstance 
+    DeletionPolicy: Snapshot
+
+
+Update Policy:
+How to handle an update for ASG, ElastiCache, Domain, or Lambda Alias
+---
+UpdatePolicy:
+  AutoScalingReplacingUpdate:
+    WillReplace: True
+
+
+UpdateReplacePolicy:
+what will happen when you update a stack, will it delete, retain or snapshot the existing resource instance 
+Resources:
+  MyDbInstance:
+    Type: AWS::RDS::DBInstance 
+    UpdateReplacePolicy: Retain
+
+DependsOn:
+the resource is created only after the creation of the resource specified in the DependsOn attribute 
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance 
+    DependsOn: MyDbInstance 
+  MyDbInstance:
+    Type: AWS::RDS::DBInstance
+
+
+---------------------------------------------------------------------------
+CloudFormation Intrinsic Functions 
+use intrinsic functions in your templates to assign values to properties that are not available until runtime 
+MOST IMPORTANT:
+Fn::GetAtt returns the value of an attribute from a resource in template
+Ref returns the value of a specified parameter or resource 
+OTHERS:
+Fn::Base64 - returns base64 representation of the input string 
+Fn::Cidr - returns an array of CIDR address blocks 
+*Condition Functons - Fn::And Fn::Or Fn::If Fn::Equals Fn::Not 
+Fn::FindInMap - returns value corresponding to keys in a two-level map that is declared in the Mappings Section 
+Fn::Transform - used with SAM, macro to perform custom processing on part of stack template 
+Fn::GetAZs - returns an array that lists AZs for a specified region 
+Fn::ImportValue - returns value of output exported by another stack 
+Fn::Join - appends a set of values into a single value, separated by the specified delimiter
+Fn::Split - split a string into a list of string values so that you can select an element from the resulting string list 
+Fn::Select - returns a single object from a list of objects by index 
+Fn::Sub - substitute variables in an input string with values that you specify
+
+- - - - - - - - - - - - - - - - - - - - -
+Ref & GetAtt
+Ref returns different things for different resources 
+yo need to lookup each resource in AWS Docs to see what it returns 
+e.g. ARN, Resource Name, Physical ID
+Ref can reference parameters or other defined resources 
+When you need a value for a resource and can't get it from Ref,
+    you can get it from Fn::GetAtt'
+---
+Resources:
+  SecurityGroup: *
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VPCId: !Ref VpcId
+      GroupDescription: Enable HTTP and SSH access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref LocationHTTP
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref LocationSSH
+  WebServer:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      Monitoring: false
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName 
+      IamInstanceProfile: !Ref InstanceProfile 
+      SecurityGroupIds:
+        - !GetAtt SecurityGroup.GroupId **
+
+* here is the resource we want to get value from 
+** to get GroupId we use GetAtt on the resource
+---------------------------------------------------------------------------
+CloudFormation Wait Conditions 
+wait conditions wait for a condition 
+They are used in 2 cases:
+1- to coordinate stack resource creation with configuration actions that are external to the stack creation 
+2- to track the status of a configuration process 
+
+WaitCondition is very similar to CreationPolicy-
+AWS recommends using CreationPolicy for EC2 and ASG 
+
+- CreationPolicy waits on the dependent resource 
+- WaitCondition waits on the wait condition (external)
+
+WebServerGroup:
+  Type: AWS::AutoScaling:AutoScalingGroup
+  Properties:
+    AvailabilityZones:
+      Fn::GetAZs: ""
+    LaunchConfigurationName:
+      Ref: "LaunchConfig"
+    MinSize: "1"
+    MaxSize: "5"
+    DesiredCapacity:
+      Ref: "WebServerCapacity"
+    LoadBalancerNames:
+      Ref: "ElasticLoadBalancer"
+
+WaitHandle:
+  Type: AWS::CloudFormation::WaitConditionHandle
+WaitCondition:
+  Type: AWS::CloudFormation::WaitCondition
+  Dependson: "WebServerGroup"
+  Properties:
+    Handle:
+      Ref: "WaitHandle"
+    Timeout: "300"
+    Count: 
+      Ref: "WebServerCapacity"
+
+--------------------------------------------------------------------------
+
+WRITE TEMPLATE 
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Infrastructure for StudySync
+Parameters:
+  ImageId:
+    Description: AMI to use
+    Default: ami-0f409bae3775dc8e5
+    Type: String
+  VpcID:
+    Description: the VPC used by SG
+    Default: vpc-0a58795060b0ac716
+    Type: String
+Resources:
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref ImageId
+      SecurityGroupIds: 
+        - !GetAtt SecurityGroup.GroupId  
+        //this is how you connect Instance with security group
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcID
+      GroupDescription: "open port 80"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+          
+
+
+npm i cfn-lint -g
+rupert:~/environment/cloudformation $ cfn-lint validate template.yaml 
+0 infos
+0 warn
+0 crit
+Template valid!
+
+
+AUTOMATE - update.sh
+#!/bin/bash
+aws s3 cp template.yaml s3://reasoncf329/template.yaml
+aws cloudformation update-stack \
+--region us-east-1 \
+--stack-name studysync \
+--template-url https://reasoncf329.s3.amazonaws.com/template.yaml \
+--parameters \
+ParameterKey=VpcID,ParameterValue=vpc-0a58795060b0ac716
+
+
+rupert:~/environment/cloudformation $ aws cloudformation list-stack-resources --stack-name StudySync
+{
+    "StackResourceSummaries": [
+        {
+            "LogicalResourceId": "SecurityGroup",
+            "PhysicalResourceId": "sg-03c28b7e4902ff1d5",
+            "ResourceType": "AWS::EC2::SecurityGroup",
+            "LastUpdatedTimestamp": "2023-08-31T16:41:05.449000+00:00",
+            "ResourceStatus": "CREATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "LogicalResourceId": "WebServer",
+            "PhysicalResourceId": "i-00d118c5182393ea4",
+            "ResourceType": "AWS::EC2::Instance",
+            "LastUpdatedTimestamp": "2023-08-31T17:43:57.563000+00:00",
+            "ResourceStatus": "UPDATE_COMPLETE",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        }
+    ]
+}
+rupert:~/environment/cloudformation $ 
+
+rupert:~/environment/cloudformation $ aws ec2 describe-instances --instance-ids i-00d118c5182393ea4
+   "SecurityGroups": [
+                        {
+                            "GroupName": "StudySync-SecurityGroup-12TZEI0B5T9X7",
+                            "GroupId": "sg-03c28b7e4902ff1d5"
+                        }
+                    ],
+
+it matches!
+
+
+now to install webserver on the instance, provide a script as UserData
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Infrastructure for StudySync
+Parameters:
+  ImageId:
+    Description: AMI to use
+    Default: ami-0f409bae3775dc8e5
+    Type: String
+  VpcID:
+    Description: the VPC used by SG
+    Default: vpc-0a58795060b0ac716
+    Type: String
+Resources:
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !Ref ImageId
+      SecurityGroupIds: 
+        - !GetAtt SecurityGroup.GroupId
+      UserData:
+        'Fn::Base64':
+          !Sub |
+          #!/usr/bin/env bash
+          yum update -y
+          su ec2-user
+          sudo yum install httpd -y
+          sudo systemctl enable --now httpd
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VpcID
+      GroupDescription: "open port 80"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+Outputs:
+  PublicIps:
+    Value: !GetAtt WebServer.PublicIp
+
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+
+AWS CLOUDFORMATION SAM
+
+SAM is both an AWS CLI tool and a cloudformation Macro which makes it effortless to define and deploy serverless application 
+
+
+What is Macro?
+A Macro allows you to change the rules on how code works, allowing you to embed a language with a language.
+Macros serve to make code more human readable or allow to write less code.
+Creating a language within another language is called a DSL (Domain Specific Language) and by using Macros, you are creating a DSL
+
+CloudFormation allows you to specify Macros through the Transform attribute. This is how SAM is used
+
+Transform: 'AWS::Serverless-2016-10-31'
+
+SAM gives you new resource types 
+AWS::Serverless::Function 
+AWS::Serverless::API
+AWS::Serverless::SimpleTable
+
+You write atleast 50% less Code with SAM
+--- --- --- --- --- --- --- --- --- ---
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api 
+    Properties:
+      Name: MyApi 
+      StageName: prod 
+      EndpointConfiguration: REGIONAL 
+      Cors:
+        AllowMethods: "'Get,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+  ArticlesIndex: 
+    Type: 'AWS::serverless::Function'
+    Properties:
+      Runtime: nodejs16.x
+      Handler: index.handler 
+      CodeUri: s3://my-app/functions/articles.index.zip 
+      MemorySize: 128
+      Timeout: 10
+      AutoPublishAlias: live 
+      DeploymentPreference: 
+        Type: AllAtOnce 
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /
+            Method: Get 
+            RestApiId:
+              Ref: MyApi 
+      Policies: 
+        - AWSLambdaExecute //managed policy 
+        - AWSLambdaVPCAccessExecutionRole 
+        - Version: '2012-10-17' //policy-document 
+          Statement:
+            - Effect: Allow 
+              Action:
+                - secretsmanager:GetSecretValue 
+                - secretsmanager:PutResourcePolicy
+                - secretsmanager:PutSecretValue
+                - secretsmanager:DeleteSecret 
+                - secretsmanager:DescribeSecret 
+                - secretsmanagers:TagResource 
+                - secretsmanager:CreateSecret 
+                - secretsmanager:ListSecret 
+                - secretsmanager:GetRandomPassword
+                - tag:GetResources
+                - rds-data:BatchExecutionStatement
+                - rds-data:BeginTransaction
+                - rds-data:CommitTransaction
+                - rds-data:ExecuteStatement
+                - rds-data:RollbackTransaction
+
+
+SAM CLI -----
+sam build - prepare lambda source code to be deployed by packaging it
+sam deploy - upload lambda package code 
+sam init - initialize a new serverless project
+sam local generate-event 
+sam local invoke - run a single lambda locally
+sam local start-api -- run your serverless application locally for testing
+sam local start-lambda -- run a single lambda locally
+sam logs 
+sam package - packages aws SAM application
+sam publish - publishes your packaged SAM application 
+sam validate - validates aws SAM template 

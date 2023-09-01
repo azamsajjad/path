@@ -27,15 +27,95 @@ EBS SNAPSHOTS
 point in time copy of EBS Volume
 if you create new EBS volume from an encrypted snapshot, you will get an encrypted volume - same for unencrypted 
 Create a snapshot of the EC2 volume. Then create a copy of the snapshot, checking the box to enable encryption. Create an AMI of the copied snapshot and then redeploy the EC2 instance using the encrypted AMI. Delete the old EC2 instance.
-
+--------------------------------------------------------------------------
 [Elastic LOAD Balancer]
+
 Application Load Balancers - for http/s, routes to specific webserver based on type of request e.g. car dealer website 
+ALB operates on layer 7 of OSI model - application layer
+(6-presentation,5-session,4-transport,3-network,2-data link,1-physical)
+ALB has a feature called Request Routing which allows you to add routing rules to yuor listeners based on the HTTP protocol
+WAF (web application firewall) can be attached to ALB 
+Great for Web Applications 
+
+    `request-routing: apply rules to incoming requests and then forward or redirect traffic 
+    based on - host header, source ip, http header, http header method, query string, path
+
 Network Load Balancer - for TCP - traffic manager - expensive
-Classic Load Balancers - http/s & TCP 
+operate at layer 4-Transport 
+can handle millions of request maintaining extremely low latency 
+can perform Cross-Zone Load balancing
+Great for Multiplayer Video Games
+
+
+Classic Load Balancers - http/s & TCP  (No Target Groups)
+legacy aws load balancer -
+can run on both Layer 7 & 4
+can balance both http/s, and tcp but not both at the same time
+layer-7 specific features such as Sticky Sessions
+it will respond with a 504 error(timeout) if underlying application is not responding at web-server or database layer 
+can perform Cross-Zone Load balancing
+NOT RECOMMENDED TO USE, 
+    
+    `sticky sessions: only for classic and ALB
+    -allows you to bind a user's session to a specific EC2 instance'
+    -ensures all requests are sent to same instance 
+    -typically used with classic load balancer 
+    -can be enabled for ALB, but only be set to Target Groups, not individual EC2 instances
+    -Cookies are used to remember which EC2 instance 
+    -useful when specific information is only stored locally on a single instance
+
+    `cross-zone load balancing: only for classic and NLB
+    -requests are distributed evenly across instances in all enabled AZs 
+    when disabled-requests are distributed evenly across instances in 1 AZ
 Gateway Load Balancers - provides load balancing for 3rd-party virtual appliances
 
 X-Forwarded-For - if you need ipv4 address of your end user, look for XForwardedFor HTTP Header
 504 Error - Gateway Timeout - application is not responding within timeout period - troubleshoot application or database server
+
+
+---------------------------------------------------------------------------
+
+AUTO SCALING GROUPS
+
+TRIGGERS:
+a-EC2 Health Check Type:
+ASG will perform a health check on EC2 instances to determine if there is a software or hardware issue. This is based on the EC2 status checks.
+If an instance is considered unhealthy, ASG will terminate and launch a new instance. 
+
+b-ELB Health Check Type:
+ASG will perform a health check on EC2 instances based on ELB health check 
+by pinging an HTTP(S) endpoint with an expected response. If ELB determines a instance is unhealthy it forwards this information to ASG which will terminate the instance and launch new one
+    how to associate ASG with ELB?
+    Classic load balancer: associated directly to ELB 
+    App and Network load balancer: associated indirectly to ELB via their 
+                                    Target Group
+                                    Health checks as InService or OutofService .
+    ELB doesnot kill unhealthy instances, it will just route traffic to healthy instances
+
+c-SCALING Policies:
+    Scaling out: Adding more instances 
+    Scaling in: Removing instances 
+    Scaling up: increase size of an instance e.g. updating Launch Config with larger size
+
+    1-Target Tracking Scaling Policy: 
+        maintains a specific metric at a target value 
+        e.g. if average CPU utilization exceeds 75% then add another server 
+    2-Simple Scaling Policy: 
+        scales when an alarm is breached 
+        not recommended - legacy policy 
+    3-Scaling Policies With Steps:
+        when an alarm is breached, can escalates based on alarm value changing
+        e.g. add x instances when value of alarm is this, y for that
+
+LAUNCH CONFIGURATION:
+is an instance configuration template that an autoscaling group uses to launch EC2 instances.
+same process as launching an instance, but it justs saves it 
+once set, launch configurations cannot be editted 
+Launch Templates are Launch Configurations with Versioning (not too value)
+but everyone still uses Launch Configurations
+
+
+
 
 
 [ROUTE 53]
@@ -223,3 +303,6 @@ Step 4: Distribution settings
 // -
 // -
 // -
+
+
+---------------------------------------------------------------------------
