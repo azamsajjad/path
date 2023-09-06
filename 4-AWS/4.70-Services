@@ -3,6 +3,18 @@ SES
 SNS 
 Kinesis  
 -------------------------------------------------------------------------
+SNS,SQS vs Kinesis
+
+Messaging SNS,SQS:
+The core entity is an individual message, and message rates vary.
+Messages are deleted when they’ve been consumed.
+Configure retries and dead-letter queues for failures.
+
+Streaming Kinesis:
+You look at the stream of messages together, and the stream is generally continuous.
+Data remains on the stream for a period of time. Consumers must maintain a pointer.
+A message is retried until it succeeds or expires. You must build error handling into your function to bypass a record.
+---------------------------------------------------------------------------
 "AWS Application Integration Services:
 Step Functions, EventBridge, SQS, MQ, SNS, SWF"
 SQS:
@@ -539,7 +551,25 @@ KPL (Kinesis Producer Library) is a Java Library to write data to a stream
 you can write data to stream using AWS SDK, but KPL is more efficient
 ---------------------------------------------------------------------------
 
+Which of the following are scenarios where you might select Amazon Kinesis Data Firehose for data processing? (Select THREE.)
 
+
+"You want to ingest a very high volume of data and store it to Amazon Redshift."
+
+Correctly checked
+You want to ingest a very high volume of data in a single stream that must be processed by three consumer applications.
+
+Correctly unchecked
+You want to ingest a very high volume of data, transform its format, and store it to an Amazon Aurora database.
+
+Correctly unchecked
+You must respond to individual messages as they are received.
+
+"Correctly checked
+You want to ingest a very high volume of data, transform its format, and store it to Amazon S3."
+
+"Correctly checked
+You want to simplify retry handling on streaming data, and the order of records in the stream is not critical."
 ---------------------------------------------------------------------------
 Q
 Which Amazon service can you use in conjunction with SQS to "fan out" SQS messages to multiple queues?

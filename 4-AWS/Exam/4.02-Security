@@ -4,32 +4,32 @@ You are developing an online banking website that will be accessed by a global c
 
     Viewer protocol policy defines the protocols that can be used to access CloudFront content."
 
-Reference: Requiring HTTPS for Communication between Viewers and CloudFront
+// Reference: Requiring HTTPS for Communication between Viewers and CloudFront
 
-Set the request protocol policy to redirect HTTP to HTTPS.
+// Set the request protocol policy to redirect HTTP to HTTPS.
 
-In CloudFront, you cannot set a request protocol policy to redirect HTTP requests to HTTPS.
+// In CloudFront, you cannot set a request protocol policy to redirect HTTP requests to HTTPS.
 
-Selected
-Set the session protocol policy to redirect HTTP to HTTPS.
+// Selected
+// Set the session protocol policy to redirect HTTP to HTTPS.
 
 Set the user protocol policy to redirect HTTP to HTTPS.
 ---------------------------------------------------------------------------
 You are working as a developer for an online retailer. Your security architect has requested that any files stored in S3 must be encrypted. However, some teams are continuing to upload their files without encrypting them. Which of the following will ensure that only encrypted data is uploaded?
 
-Select the Encrypted Files Only checkbox in the S3 Permissions tab in the AWS console.
+// Select the Encrypted Files Only checkbox in the S3 Permissions tab in the AWS console.
 
-Tell all team members to include the x-amz-encryption parameter in the request header.
+// Tell all team members to include the x-amz-encryption parameter in the request header.
 
 "Use a bucket policy that only allows PUT operations, which include the x-amz-server-side-encryption parameter in the request header.
 
     There are a few different ways to enforce encryption; however, from the provided options, the use of a bucket policy to reject requests that do not include encryption in their header is the best answer."
 
-Reference: How to Prevent Uploads of Unencrypted Objects to Amazon S3
+// Reference: How to Prevent Uploads of Unencrypted Objects to Amazon S3
 
-Create a bucket ACL that only allows PUT operations, which include the x-amz-encryption parameter in the request header.
+// Create a bucket ACL that only allows PUT operations, which include the x-amz-encryption parameter in the request header.
 
-Using an ACL is not the recommended approach, and x-amz-encryption is not the correct way to specify S3 server-side encryption.
+// Using an ACL is not the recommended approach, and x-amz-encryption is not the correct way to specify S3 server-side encryption.
 ---------------------------------------------------------------------------
 What does the following snippet from an IAM policy do?
 
@@ -58,31 +58,31 @@ Allows the ability to delete any objects with log in the name from the mycustome
 
     The policy denies the s3:DeleteObject action for files with log in the name that are stored in the bucket named mycustomerdata."
 
-Selected
-Denies the ability to read objects contained in the bucket named mycustomerdata.
+// Selected
+// Denies the ability to read objects contained in the bucket named mycustomerdata.
 
 ??????"Allows read access for all objects contained in the bucket named mycustomerdata.
 
     The policy allows read access for all objects contained in the bucket named mycustomerdata."
 
-???????Allows full access to the bucket named mycustomerdata, including the objects it contains.
+// ???????Allows full access to the bucket named mycustomerdata, including the objects it contains.
 
-The policy does not allow full access to the bucket named mycustomerdata, including the objects it contains.
+// The policy does not allow full access to the bucket named mycustomerdata, including the objects it contains.
 ---------------------------------------------------------------------------
 Your company is storing a large amount of data in S3, including data relating to customers and their credit card information. How can you ensure that any personally identifiable information (PII) that is stored in your companys S3 buckets is identified so that it can be encrypted using encryption keys that are managed by you and are automatically rotated?
 
-Use Macie to identify objects that contain PII. Use SSE-S3 with automatic key rotation enabled to encrypt the files.
+// Use Macie to identify objects that contain PII. Use SSE-S3 with automatic key rotation enabled to encrypt the files.
 
-Use a Lambda function to identify objects that contain PII. Use SSE-S3 with automatic key rotation enabled to encrypt the files.
+// Use a Lambda function to identify objects that contain PII. Use SSE-S3 with automatic key rotation enabled to encrypt the files.
 
-It is not necessary to write a Lambda function to identify S3 objects that contain PII. SSE-S3 is the default encryption mechanism, with encryption keys that are managed internally by S3. It does not allow you to configure automatic key rotation.
+// It is not necessary to write a Lambda function to identify S3 objects that contain PII. SSE-S3 is the default encryption mechanism, with encryption keys that are managed internally by S3. It does not allow you to configure automatic key rotation.
 
 Selected
 "Use Macie to identify objects that contain PII. Use an SSE-KMS key with automatic key rotation enabled to encrypt the files.
 
     Macie can be used to identify objects that contain PII. SSE-KMS supports automatic key rotation."
 
-Use a Lambda function to identify objects that contain PII. Use SSE-C with automatic key rotation enabled to encrypt the files.
+// Use a Lambda function to identify objects that contain PII. Use SSE-C with automatic key rotation enabled to encrypt the files.
 ---------------------------------------------------------------------------
 A cloud engineer is working on deploying a new CloudFront distribution for the subdomain learn.acloud.guru. They have been instructed to enforce HTTPS connections using a custom TLS certificate. After researching, they have decided to leverage AWS ACM for the certificate management portion. What else should the engineer do to make use of the certificate within CloudFront?
 
@@ -90,40 +90,40 @@ A cloud engineer is working on deploying a new CloudFront distribution for the s
 
     All TLS certificates used with Amazon CloudFront distributions via AWS ACM must exist in the us-east-1 Region."
 
-Reference: CloudFront TLS Regions
+// Reference: CloudFront TLS Regions
 
-Use ACM to create the certificate in the Region where the majority of your customers are located.
+// Use ACM to create the certificate in the Region where the majority of your customers are located.
 
-Use ACM to create the certificate in the Region where the CloudFront origin is located.
+// Use ACM to create the certificate in the Region where the CloudFront origin is located.
 
-When using ACM to host certificates used by CloudFront, it is not supported to use a certificate wherever the origin is located.
+// When using ACM to host certificates used by CloudFront, it is not supported to use a certificate wherever the origin is located.
 
-Selected
-Use ACM to create the certificate in a Region of your choice.
+// Selected
+// Use ACM to create the certificate in a Region of your choice.
 ---------------------------------------------------------------------------
 Which of the following is required in order to enable an existing Lambda function to access EC2 instances that are located in a private VPC?
 
-Update the permissions in your VPC to allow Lambda to access the EC2 instances.
+// Update the permissions in your VPC to allow Lambda to access the EC2 instances.
 
-Configure the function policy to allow EC2 to invoke the function.
+// Configure the function policy to allow EC2 to invoke the function.
 
 "Modify the function configuration, and choose the correct subnets and security groups.
 
     To configure private VPC access for an existing function, you will need to modify the function configuration, and select the correct subnets and security groups."
 
-Reference: Configuring a Lambda Function to Access Resources in a VPC
+// Reference: Configuring a Lambda Function to Access Resources in a VPC
 
-Configure the Lambda function's execution role to match the role applied to your EC2 instances.
+// Configure the Lambda function's execution role to match the role applied to your EC2 instances.
 
-It is not necessary to configure the Lambda function's execution role to match the role applied to your EC2 instances. This will not enable private VPC access for the function.
+// It is not necessary to configure the Lambda function's execution role to match the role applied to your EC2 instances. This will not enable private VPC access for the function.
 ---------------------------------------------------------------------------
 You are working on a mobile phone app for an online retailer that stores its customer data in DynamoDB. You would like to enable new users to sign up using Facebook or Google credentials. What is the recommended approach?
 
-Embed encrypted AWS credentials into the application code, so that the application can access DynamoDB on the users behalf.
+// Embed encrypted AWS credentials into the application code, so that the application can access DynamoDB on the users behalf.
 
-Write your own custom code that allows the user to log in via a web identity provider and receive an authentication token, which then calls the AssumeRoleWithWebIdentity API and exchanges the authentication tokens for temporary access to DynamoDB.
+// Write your own custom code that allows the user to log in via a web identity provider and receive an authentication token, which then calls the AssumeRoleWithWebIdentity API and exchanges the authentication tokens for temporary access to DynamoDB.
 
-After the user has authenticated with Facebook, allow them to download encrypted AWS credentials to their device so that the mobile app can access DynamoDB.
+// After the user has authenticated with Facebook, allow them to download encrypted AWS credentials to their device so that the mobile app can access DynamoDB.
 
 "Once the user has logged in to the web identity provider, use Cognito to exchange the authentication tokens for temporary access to DynamoDB.
 
@@ -131,16 +131,111 @@ After the user has authenticated with Facebook, allow them to download encrypted
 ---------------------------------------------------------------------------
 Your mobile application needs to read data from DynamoDB. What is the AWS-recommended way to give mobile devices permissions to read from DynamoDB?
 
-Connect your application to an EC2 instance with permission to read from DynamoDB.
+// Connect your application to an EC2 instance with permission to read from DynamoDB.
 
-Create an IAM role for your users.
+// Create an IAM role for your users.
 
 "Create an IAM role that can be assumed by an app that allows federated users.
 
     Web identity federation removes the need for creating individual IAM users. Instead, users can sign in to an identity provider and then obtain temporary security credentials from the AWS Security Token Service."
 
-Reference: Using Web Identity Federation
+// Reference: Using Web Identity Federation
 
-Selected
-Issue an access key and secret access key to each user.
+// Selected
+// Issue an access key and secret access key to each user.
+---------------------------------------------------------------------------
+2
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+Your e-commerce application needs to use database connection strings to access an RDS database containing product and customer data. Which of the following is a secure and scalable way to manage this?
+
+"Store the credentials in Parameter Store.
+
+Using secure string parameters in Parameter Store is an appropriate way to avoid hard-coding a password in your template code. This ensures that sensitive runtime parameters are kept as secure as you keep other secrets, while also keeping them separate from your deployment code. Reference: Systems Manager - Parameter Store Using AWS Systems Manager Parameter Store Secure String parameters"
+
+// Add encrypted IAM credentials to the application server and use an IAM role to access the database.
+
+// Although this could work, it would be dependent on IAM credentials, which, if leaked, could cause a potential security risk.
+
+// Selected
+// Hard-code the connection strings in the application code.
+
+// Store the encrypted credentials in an S3 bucket.
+---------------------------------------------------------------------------
+You are developing a mobile web application using Lambda and API Gateway, which stores persistent data in a DynamoDB table. You want to configure the application to allow new users to sign up to your website using their Google credentials. Which is the best approach?
+
+// Configure AD federation with Google as the reliant party.
+
+"Configure a Cognito user pool to handle new user sign-up.
+
+Cognito is the recommended approach for user sign-up and sign-in for mobile applications, which allow access to users with Facebook, Google or Amazon.com credentials. User pools are user directories that provide sign-up and sign-in options for your app users. Reference: What Is Cognito?
+"
+// Write custom code to act as an identity broker to federate with Google.
+
+// Use a Cognito identity pool to handle new user sign-up.
+
+// Cognito is the recommended approach for user sign-up and sign-in for mobile applications which allow access to users with Facebook, Google or Amazon credentials. Identity pools enable you to grant your users access to other AWS services. Reference: What Is Cognito?
+---------------------------------------------------------------------------
+When using the AWS REST API to upload an object to S3, which of the following request headers will ensure that your data must be encrypted using SSE?
+
+// s3-amz-server-side-encryption
+
+// s3-amz-server-side-encryption is not the correct request header to ensure that your data is encrypted using SSE.Reference: Protecting Data Using Server-Side Encryption
+
+"Selected
+x-amz-server-side-encryption
+
+To request server-side encryption using the object creation REST APIs, provide the x-amz-server-side-encryption request header. Reference: Protecting Data Using Server-Side Encryption"
+
+// x-s3-server-side-encryption
+
+// amz-s3-server-side-encryption
+---------------------------------------------------------------------------
+Your application runs on a fleet of EC2 instances behind an Elastic load Balancer. Due to security compliance, your organization wants any secret strings used in the application must be encrypted to avoid exposing secrets in clear text. The security architect has requested that all decryption activities are audited so that any API calls to decrypt the secrets can be traced. How can this be achieved?
+
+"Audit the API calls using CloudTrail.
+
+CloudTrail is the correct service to use to track API calls to AWS resources in your account."
+
+// Audit the API calls using CloudWatch Logs.
+
+// Use Parameter Store to store any secrets in plain text.
+
+"Use KMS server side encryption to encrypt the secrets before storing them in Parameter Store.
+
+It is not necessary to encrypt the secrets before storing them. Parameter Store integrates with KMS to encrypt and decrypt data.
+"
+// Selected
+// Use Parameter Store to store any secrets as a SecureString.
+
+// By using Parameter Store to store any secrets as a SecureString, the secrets are encrypted and not stored in plain text.
+---------------------------------------------------------------------------
+You are developing an e-commerce application that will run on an autoscaling group of EC2 instances. The application processes incoming transactions from a third-party payment provider. Occasionally, the third-party provider sends a transaction that is not valid. When that happens, the application must send an instant message to your fulfillment team using a proprietary API. To send the message, the application needs to retrieve the access token to authenticate by using the proprietary API. You have been asked to implement a secure solution to store the access token in an encrypted format so that the application can send instant messages. The access token must also be accessible from other AWS accounts. Which solution will meet these requirements with the LEAST management overhead?
+
+// Use KMS to encrypt the access token. Store the encrypted access token in DynamoDB. Add a resource-based policy to the secret to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access DynamoDB and KMS. Use the decrypted access token to send the messages.
+
+// Storing access tokens in DynamoDB is not best practice. AWS provides services that enable you to store and share sensitive data like access tokens.
+
+"Selected
+Use Secrets Manager with a KMS key to store the access token. Add a resource-based policy to the secret to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Secrets Manager. Retrieve the token from Secrets Manager to send the messages.
+
+Secrets Manager is designed to store secrets like access tokens, passwords and other sensitive data, enabling the data to be seamlessly encrypted and decrypted."
+
+// Encrypt the access token using KMS. Store the access token in an encrypted S3 bucket. Add a bucket policy enabling access for the EC2 instances and the other accounts. Update the IAM role of the EC2 instances with permissions to access the S3 bucket and the KMS key. Retrieve the token from the S3 bucket. Decrypt the token using KMS on the EC2 instances, use the decrypted access token to send the messages.
+
+// Use Parameter Store to create a SecureString parameter that uses a KMS key to encrypt the access token. Add a resource-based policy to the parameter to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Parameter Store. Use a Lambda function to retrieve the token from Parameter Store with the decrypt flag enabled. Use the decrypted access token to send the messages.
+---------------------------------------------------------------------------
+
 ---------------------------------------------------------------------------

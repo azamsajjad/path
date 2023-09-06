@@ -1,0 +1,234 @@
+---------------------------------------------------------------------------
+You have deployed a MySQL RDS database cluster to store customer transaction data that needs to be queried and updated by a recommendation engine application for an online retailer. Each week, the recommendation engine runs extensive queries on the customer transaction data to identify products that should be marketed to customers, based on their shopping habits. The product owner has asked you to find a solution to improve performance of the weekly queries, including the ability to rank and sort the data to quickly identify the most relevant data for a given query. Which of the following solutions do you recommend?
+
+Use ElastiCache for Memcached to improve read performance and sort and rank the relevant data.
+
+ElastiCache for Memcached can be used to improve read performance of databases; however, it does not have the ability to sort and rank query results.
+
+Selected
+Scale your RDS instances to improve read performance, and refine the SQL query so that the data is properly sorted and ranked for relevance.
+
+Use ElastiCache for Redis to improve read performance and sort and rank the results.
+
+"ElastiCache for Redis can be used to improve read performance of databases, and it also has the ability to sort and rank query results.
+
+    Use RDS Proxy connection pooling to improve read performance, and sort and rank the relevant data."
+---------------------------------------------------------------------------
+You have developed a Lambda function, which is not running as performant as expected. Which of the following approaches can improve the performance of your function?
+
+Package all dependencies with your deployment package.
+
+Your deployment package includes your application code and its dependencies. This is the standard way to configure your function; it is not a way of improving performance.
+
+Selected
+"Only include the libraries you need to minimize the size of your deployment package.
+
+    Only including the libraries you need will minimize the time taken for Lambda to unpack the deployment package. For Java functions, you can also use AWS Lambda SnapStart."
+
+Selected
+Store environment variables outside the function.
+
+"Establish your database connections from within the Lambda execution environment to enable connection reuse.
+
+    Establishing connections within the execution environment allows them to be reused the next time the function is invoked, which saves time. On a new technology note, AWS Lambda SnapStart is a great option for Java functions."
+---------------------------------------------------------------------------
+You are developing a Java application that runs in Lambda. However, you are experiencing performance issues, particularly when the function initializes. In order to work properly, your application depends on a number of library files that are contained in the AWS SDK library. You need to find a way to reduce the deployment footprint so that you can decrease the time it takes for your function to complete the static initialization phase. Which of the following can you do to improve the performance of this function?
+
+Cache the required libraries in /tmp.
+
+Add the libraries as a Lambda layer.
+
+Even if the libraries are added as a layer, they still contribute to the size of the deployment package, so this will not reduce the size of the package.
+
+Selected
+Create a .zip file containing the deployment package to reduce its size.
+
+"Only include the libraries that are necessary in order for the function to run, instead of the entire AWS SDK library.
+
+    It is best practice to minimize your deployment package size to only include runtime necessities. This will help reduce the size of the deployment package and the amount of time that it takes for the deployment package to be downloaded and unpacked ahead of invocation, during the static initialization phase."
+---------------------------------------------------------------------------
+You are developing a new database-intensive application that runs on multiple EC2 instances that connect to an existing shared RDS cluster. A typical workflow requires many database connections to be opened and closed, and each time the application re-establishes a connection to the database, additional latency is added while the connection is established. You are also concerned that the application will not scale well due to the number of connections that are frequently being opened and closed. What can you do to improve the time taken to establish the connections and improve the performance and scalability of the application?
+
+Use RDS Multi-AZ to improve database performance.
+
+Use ElastiCache to cache frequently accessed data in memory.
+
+ElastiCache is used to improve read performance by caching frequently accessed database reads in memory; however, it wont improve write performance or issues caused by many database connections being opened and closed,
+
+Selected
+Modify the RDS instance clas to use an instance with greater CPU and memory capacity.
+
+"Use RDS Proxy to pool the connections.
+
+    Connection pooling allows applications to share a pool of database connections, which reduces the need to open and close individual database connections that are no longer needed. This improves the performance of database-intensive applications by reducing the amount of time and resources required to establish database connections. RDS Proxy can help prevent connection timeouts during periods of high traffic, which can cause application outages, and can also reduce the cost of scaling an application by allowing multiple applications to share the same database connection pool."
+---------------------------------------------------------------------------
+
+
+
+
+
+2
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+When developing in a Lambda, you discover that your function is experiencing performance issues that are causing your application to run very slowly. Which of the following actions can you take to improve the performance of a function that is running slowly?
+
+"Include large libraries and function dependencies as a layer, and associate the layer with your function.
+
+Including large libraries and function dependencies as a layer is preferred because it helps to keep the deployment package small, allowing your function to initialize faster."
+
+// Include large libraries and dependencies in the Lambda deployment package.
+
+// It is best practice to keep the Lambda deployment package as small as possible; this allows your function to initialize faster. Including large libraries in the deployment package will increase the size of the deployment package, making the function slower to initialize.
+
+// Selected
+// Include large libraries and dependencies in /tmp.
+
+"Increase the function memory.
+
+If a function is CPU or memory bound, increasing the memory allocation will improve the performance of the function."
+
+// Selected
+// Increase the CPU allocation.
+---------------------------------------------------------------------------
+You are in a development team working on a popular serverless web application that allows users to book late availability flights and hotels at a significant discount. You occasionally receive complaints that the website is running slowly. After some investigation, you notice that at the time of the complaints, DynamoDB reported a ProvisionedThroughputExceededException error. Which of the following approaches is a recommended way to handle this error?
+
+// Increase the read/write capacity of the DynamoDB table.
+
+// Increasing the capacity on the DynamoDB table could be considered but only if the problem persists.
+
+Selected
+"Ensure your application is using exponential backoff.
+
+As the error only appears occasionally, the first thing to do is to ensure that the application is using exponential backoff to improve flow control. The ProvisionedThroughputExceededException exception is okay to retry, so you can submit the same request again. AWS recommends reducing the frequency of requests using error retries and exponential backoff. Reference: Error Retries and Exponential Backoff."
+
+// Increase the RAM capacity of the Lambda function.
+
+// Increase the CPU capacity of the Lambda function.
+---------------------------------------------------------------------------
+You are using CodeBuild to build the source code for your new application and would like to reference a large number of environment variables in buildspec.yml. However, when you try to run the build, you see an error telling you that the parameters you have specified have exceeded the number of characters allowed by the buildspec file. You need to find an alternative way to store these parameters. Which of the following options would you recommend?
+
+// Store the variables as key-value pairs in S3.
+
+"Use Systems Manager Parameter Store.
+
+Use Amazon Systems Manager Parameter Store to store large environment variables and then retrieve them from your buildspec file. Amazon EC2 Systems Manager Parameter Store can store an individual environment variable (i.e., name and value added together) that is a combined 4,096 characters or less."
+
+// Reference: Troubleshooting CodeBuild Build Specification Reference for CodeBuild
+
+// Store the variables as dependencies within the application code.
+
+// Store the variables as key-value pairs in DynamoDB.
+
+// It is not necessary to create a DynamoDB table to store these parameters. There is another AWS service that is designed for this use case.
+---------------------------------------------------------------------------
+You are developing a meme-sharing application that runs business login on a fleet of EC2 instances behind an Application Load Balancer. Your website is served by a CloudFront distribution. The security architect has asked you to decouple the user authentication process from the application servers, enable users to easily sign up and sign in to the website and use proper Identity and Access Management controls to allow access to a number of S3 buckets where they can upload images. Which of the following solutions would you recommend to address this use-case?
+
+// Use IAM for sign-up and use Cognito to manage user permissions.
+
+"Use Cognito for sign-up and use IAM to manage user permissions.
+
+Cognito can be used for sign-up and sign-in functionality. It integrates with IAM to control access to AWS resources."
+
+// Use MFA for sign-up and sign-in, and use IAM to manage user permissions.
+
+// Use Cognito for sign-up, and use resource policies to manage user permissions.
+
+// Resource policies can be used to define access to certain resources in AWS, but they are not a substitute for proper IAM access controls.
+---------------------------------------------------------------------------
+You are developing a Lambda function that processes data from a Kinesis stream, then writes the results to a DynamoDB table. Customers have lately been complaining about general performance issues, and your support team has recently observed slow processing of the data records, as well as occasional ProvisionedThroughputExceeded errors. After investigating, you also notice that the function is taking longer than expected to complete processing. Which actions should you take to increase the processing speed of the application?
+
+// Increase the timeout of the Lambda function.
+
+// Increasing the function timeout will not enable the function to run faster.
+
+// Selected
+// Decrease the number of shards of the Kinesis Data Stream.
+
+Increase the memory that is allocated to the Lambda function.
+
+Increasing function memory will also increase the CPU capacity. This usually enables a function to run faster.
+
+// Selected
+// Decrease the timeout of the Lambda function.
+
+// Increase the number of shards of the Kinesis Data Stream.
+
+// Increasing the number of shards will increase capacity of the Kinesis stream, enabling it to handle more records.
+
+
+---------------------------------------------------------------------------
+You are developing a leaderboard application that sorts and ranks online gamers according to the number of hours played and high scores. Your application runs in Lambda and stores data in S3 and RDS. Your two most popular games have recently gone viral, causing your user base to double over the past month. This has caused some performance issues in your application. You are looking for a solution that will improve the performance of database reads, and also provide sorting and ranking of the data. Which of the following solutions do you recommend?
+
+// Configure an RDS read replica. Point the Lambda function at the read replica.
+
+// Configure MemoryDB for Redis. Point the Lambda function at the MemoryDB cluster.
+
+// MemoryDB for Redis is used to store an entire dataset in memory, instead of on disk. It is designed for applications that need ultra-fast performance. Unless there is a requirement for microsecond read latency, and single-digit millisecond write latency, MemoryDB is probably not the most suitable option.
+
+"Selected
+Configure ElastiCache for Redis. Point the Lambda function at the ElastiCache cluster.
+
+ElastiCache for Redis can be used to improve performance by caching frequently accessed data. It supports sorting and ranking of data."
+
+// Reference: ElastiCache Use Cases
+
+// Configure ElastiCache for Memcached. Point the Lambda function at the ElastiCache cluster.
+---------------------------------------------------------------------------
+You are designing an application that is going to run in Lambda. You need to configure the ability to change the behavior of a Lambda function dynamically to deliver a different message string, without requiring you to update code and redeploy the function. Which of the following can be used to change the function behavior in this way?
+
+// Lambda deployment package
+
+// Lambda versions.
+
+"Environment variables.
+
+Environment variables can be used to change the behavior of a Lambda function without requiring you to update code and re-deploy the function.
+"
+// Lambda alias.
+
+// Lambda allows you to create aliases that are associated with a specific version of a function. They are not a method of changing the behavior of a particular function.
+---------------------------------------------------------------------------
+An online training company is using a Lambda function behind API Gateway as its web application tier. To process customer orders during checkout, the application calls a POST API from the web frontend. The POST API invokes a Lambda function asynchronously, which makes a further API call to a third-party payment service. Occasionally, the application fails to process customer transactions; how could you design your Lambda function so that it can handle errors that occur as the result of a failed invocation?
+
+// Increase the function memory to give it more capacity.
+
+// Adding more memory would help if the issue was a capacity issue; however, there is no indication that there is a capacity issue. Increasing capacity will not help your function to handle errors that occur as the result of a failed invocation.
+
+"Selected
+Use a dead-letter queue to store the failed invocations so they can be re-processed.
+
+For asynchronous invocations, a dead-letter queue can be used to track failed invocations so they can be re-processed."
+
+Reference: Asynchronous Invocation and DLQs
+
+// Selected
+// Inspect the Lambda logs in Amazon CloudWatch for possible errors. Fix the errors.
+
+// Inspect the frontend logs for API failures.
+
+"Configure a Lambda destination to receive invocation records for any failed invocations.
+
+Lambda Destinations allows you to route asynchronous function results as an invocation record to a destination resource without writing additional code. An execution record contains details about the request and response in JSON format including version, timestamp, request context, request payload, response context, and response payload. For each execution status, such as Success or Failure, you can choose one of four destinations: another Lambda function, SNS, SQS, or EventBridge. Lambda can also be configured to route different execution results to different destinations."
+---------------------------------------------------------------------------
+
+You are a developer working on a brand new serverless application that teaches the world to cloud. You have performed your initial deployment using Lambda and API Gateway and would like to work toward adding API Gateway stages and associate them with your prod, dev, and test environments. Your stages will need to match a Lambda function variant that is different for each of the environments, allowing you to test across different stages of the software lifecycle. Which of the following features must you add to achieve this?
+
+"Stage variables
+
+With deployment stages in API Gateway, you can manage multiple release stages for each API, such as dev, test, and production. Using stage variables, you can configure an API deployment stage to interact with different backend endpoints. Reference: API Gateway Stage Variables
+"
+// Lambda versions
+
+// Lambda layers
+
+"Lambda aliases
+
+A Lambda alias is like a pointer to a specific function version. Users can access the function version using the alias Amazon Resource Name (ARN)."
+
+API Gateway methods

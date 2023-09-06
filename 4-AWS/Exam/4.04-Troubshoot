@@ -178,3 +178,103 @@ Retry the operation immediately.
 "Reshard your stream.
 
     Resharding your stream to increase the number of shards in the stream allows you to adjust the number of shards in your stream to adapt to changes in the rate of data flow through the stream."
+---------------------------------------------------------------------------
+
+
+
+
+2
+---------------------------------------------------------------------------
+
+
+
+
+
+---------------------------------------------------------------------------
+You are troubleshooting a major incident that resulted in data loss in your application. Your manager asks if you can provide a time-ordered sequence of any modifications that happened to the items in your DynamoDB table over the past 24 hours so that you can work out what happened. Provided any pre-configuration that was completed, which service could you use to most efficiently provide this?
+
+Kinesis Data Streams
+
+CloudTrail
+
+CloudTrail could be used to help identify the API calls made to DynamoDB; however, this is not the most efficient way to gather this data. CloudTrail is not designed to enable you to provide a time-ordered sequence of any modifications that happened to the items in your DynamoDB table.
+
+Selected
+"DynamoDB Streams
+
+DynamoDB Streams captures a time-ordered sequence of item-level modifications in a DynamoDB table and durably stores the information for up to 24 hours."
+---------------------------------------------------------------------------
+You are trying to diagnose a performance problem with your serverless application, which uses Lambda, API Gateway, S3, and DynamoDB. Your DynamoDB table is performing well, and you suspect that your Lambda function is taking too long to execute. Which of the following could you use to investigate the source of the issue?
+
+// Lambda invocations sum metric in CloudWatch
+
+// Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+// Selected
+// API Gateway latency metric in CloudWatch
+
+// API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client.
+
+Selected
+"AWS X-Ray
+
+AWS X-Ray can be used to display a histogram showing the latency of your Lambda function. Latency is the amount of time between when a request starts and when it completes. API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend. API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call."
+
+Reference:
+
+"API Gateway CloudWatch Metrics
+Lambda CloudWatch Metrics
+X-Ray FAQs
+Using Latency Histograms in the AWS X-Ray Console
+API Gateway integration latency metric in CloudWatch
+
+AWS X-Ray can be used to display a histogram showing the latency of your Lambda function. Latency is the amount of time between when a request starts and when it completes. API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend. API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call."
+---------------------------------------------------------------------------
+You have a distributed application that is made up of a number of different Lambda functions as well as API Gateway endpoints and DynamoDB tables. You have noticed that the application is running unusually slow today. Which of the following tools would be the best choice to help identify what is going on?
+
+VPC Flow Logs
+
+VPC Flow Logs cannot be used to identify performance issues in distributed serverless applications.
+
+Selected
+CloudTrail
+
+CloudWatch
+
+"X-Ray
+
+AWS X-Ray helps developers analyze and debug production, distributed applications, such as those built using a microservice architecture. With X-Ray, you can understand how your application and its underlying services are performing to identify and troubleshoot the root cause of performance issues and errors."
+---------------------------------------------------------------------------
+
+Your API Gateway endpoint is experiencing server errors indicated by a 5xx HTTP response code. How can you increase the reliability of the application while reducing operational costs?
+
+"Configure your application to use retry logic with exponential backoff.
+
+Server errors are indicated by a 5xx HTTP response code and need to be resolved by Amazon. You can resubmit or retry the request until it succeeds. Numerous components on a network, such as DNS servers, switches, load balancers, and others can generate errors anywhere in the life of a given request. The usual technique for dealing with these error responses in a networked environment is to implement retries in the client application. Each AWS SDK implements automatic retry logic with an exponential backoff algorithm for better flow control. If you are not using an AWS SDK, you should retry original requests that receive server (i.e., 5xx) or throttling errors. However, client errors (i.e., 4xx) indicate that you need to revise the request to correct the problem before trying again."
+
+Reference: Error Retries and Exponential Backoff in AWS.
+
+Distribute the load by adding an Elastic Load Balancer in front of the API Gateway.
+
+Increase capacity by scaling the backend of your API.
+
+This indicates an internal problem with your API. Fix the issue in your API and try the request again.
+
+This does not indicate an internal problem with your API.
+
+---------------------------------------------------------------------------
+
+You are supporting a legacy application that runs on a virtual machine running RedHat Linux in your own data center. Your CTO asks you to ensure that all RedHat instances in the legacy data center are monitored using CloudWatch. You also need to ensure that the support team is notified by email if an error message appears in the application log file. Which of the following do you recommend?
+
+Configure a Lambda function that periodically connects to the application servers and monitors the application log file. Use a CloudWatch alarm to trigger an SNS notification if an error appears in the application log file.
+
+"Install the CloudWatch agent on the Linux servers. Configure the agent to monitor the application log file. Use a CloudWatch alarm to trigger an SNS notification if an error appears in the application log file."
+
+You will need to install the CloudWatch agent on each of the on-premises servers. You can configure the CloudWatch agent to collect the log data that you want to monitor, and send it to CloudWatch Logs. CloudWatch alarms can be used to monitor the log data and alert the team using SNS when something goes wrong.
+
+Install the CloudWatch agent on the Linux servers. Configure the agent to monitor the operating system messages file. Use a CloudWatch alarm to trigger an SNS notification if an error appears in the messages file.
+
+CloudWatch should trigger the alarm if an error message appears in the application log file, not the operating system messages file.
+
+Selected
+Update your application code to send application log data to CloudWatch logs. Use a CloudWatch alarm to trigger an SNS notification if an error appears in the application log file.

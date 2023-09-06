@@ -144,3 +144,75 @@ Use a request transformation to transform the backend endpoint responses.
 "Use stage variables and configure the stage variables in the HTTP integration request to interact with different backend endpoints.
 
     You can use API Gateway stage variables to access the HTTP and Lambda backends for different API deployment stages."
+
+---------------------------------------------------------------------------
+
+
+
+2
+---------------------------------------------------------------------------
+
+
+
+
+
+---------------------------------------------------------------------------
+Which DynamoDB feature allows you to set an expiry on table items so that they can automatically be deleted to reduce storage costs?
+
+// DynamoDB lifecycle rules
+
+// Lifecycle rules are a feature of S3, not DynamoDB.
+
+// Selected
+// DynamoDB Streams
+
+// DynamoDB provisioned throughput
+
+"DynamoDB TTL
+
+Time To Live (TTL) allows you to define when items in a table expire. This means that they can be automatically deleted from the database, enabling you to reduce storage usage by deleting data that is no longer relevant to your application."
+---------------------------------------------------------------------------
+You are using CloudFormation to build a number of different application environments to host development, test, UAT, pre-production, and production stacks. Your application is comprised of web servers, load balancers, application servers, and databases. Each web server, load balancer, and database needs to be configured identically across all environments. You would also like to reduce the duplication of code to avoid mistakes caused by human error. How can you achieve this with CloudFormation?
+
+"Use a CloudFormation nested stack.
+
+Nested stacks provide the ability to configure multiple elements within your environment while reducing duplication of code. As your infrastructure grows, common patterns can emerge in which you declare the same components in multiple templates. You can separate out these common components and create dedicated templates for them. Then, use the resource in your template to reference other templates, creating nested stacks."
+
+// Reference: Nested Stacks to Create Reusable Templates
+
+// Copy and paste the configuration code that you want to reuse into the CloudFormation template for each environment.
+
+// Use environment variables.
+
+// Use the Mappings section of the template to reference the code you want to reuse.
+
+// The Mappings section of a CloudFormation template is used to match a key to a corresponding set of named values. For example, if you want to set values based on a Region, you can create a mapping that uses the Region name as a key and contains the values you want to specify for each specific Region. Mappings cannot be used to reduce the duplication of code when you need to provision components like web servers, load balancers, application servers, and databases that need to be configured identically across all environments.
+---------------------------------------------------------------------------
+You are building an application that collects all the lifecycle events of EC2 instances across multiple AWS accounts. The application needs to store the lifecycle events in a single Amazon Simple Queue Service (Amazon SQS) queue in your companys main AWS account for further processing. Which of the following will best meet these requirements?
+
+// Use the resource policies of the SQS queue in the main account to give each account permissions to write to the SQS queue. Add to the EventBridge event bus of each account an EventBridge rule that matches all EC2 instance lifecycle events. Add the SQS queue in the main account as a target of the rule.
+
+// Adding an EventBridge rule that matches all EC2 instance lifecycle events will not enable EventBridge to send events to other AWS accounts.
+
+Selected
+"Configure the permissions on the main account event bus to receive events from all accounts. Create an EventBridge rule in each account to send all the EC2 instance lifecycle events to the main account event bus. Add an EventBridge rule to the main account event bus that matches all EC2 instance lifecycle events. Set the SQS queue as a target for the rule.
+
+You can easily configure EventBridge to send events to other AWS accounts. On the receiver account, edit the permissions on an event bus to allow specified AWS accounts, an organization, or all AWS accounts to send events to the receiver account. On the sender account, set up one or more rules that have the receiver accounts event bus as the target. Reference: Sending and Receiving Amazon EventBridge Events between AWS Accounts"
+
+// Configure EC2 to deliver the lifecycle events from all accounts to the EventBridge event bus of the main account. Add an EventBridge rule to the event bus of the main account that matches all EC2 instance lifecycle events. Add the SQS queue as a target of the rule.
+
+// Write a Lambda function that scans all EC2 instances in the company accounts to detect instance lifecycle changes. Configure the Lambda function to write a notification message to the SQS queue in the main account if the function detects an EC2 instance lifecycle change. Add an EventBridge scheduled rule that invokes the Lambda function every minute.
+---------------------------------------------------------------------------
+Which of the following AWS services enables you to capture a time-ordered sequence of any modifications that happened to the items in your DynamoDB table over the past 24 hours?
+
+// CloudTrail
+
+// CloudTrail is used to record an audit trail of all the user activity in your AWS account. It cannot be used to capture a time-ordered sequence of any modifications that happened to the items in your DynamoDB table.
+
+// Selected
+// DynamoDB TTL
+
+"DynamoDB Streams
+
+DynamoDB Streams captures a time-ordered sequence of modifications that are made to items in a DynamoDB table. It stores the information for a maximum of 24 hours."
+---------------------------------------------------------------------------
