@@ -55,6 +55,39 @@ aws ssm put-parameter --name "/planet/gravity" --value 1.4G --type String
 aws ssm put-parameter --name "/planet/class" --value M --type String
 
 aws ssm get-parameters-by-path --path /planets
+
+
+AWS Systems Manager Parameter Store 
+
+AWS Systems Manager has an additional capability called Parameter Store that provides you with secure, hierarchical storage for configuration data management and secrets management. You can store data such as passwords, database strings, Amazon Machine Image (AMI) IDs, and license codes as parameter values.  In addition, Parameter Store includes the following:
+
+
+bullet
+Free, fully managed, centralized storage system for configuration data and secret management.
+
+
+bullet
+Data can be stored in plain text or also encrypted with AWS Key Management System (AWS KMS).
+
+
+bullet
+Parameter Store tracks all parameter changes through versioning, so if you need to roll back your deployment, you can also choose to use an earlier version of your configuration data.
+
+Parameter Store: Hierarchical key storage
+
+Parameter Store provides hierarchical key-value storage. You can create a hierarchy for each of your environments (dev, stage, and prod), and then have the API keys that you need for each environment.
+
+
+This diagram shows that you can access an API key in a development environment without exposing the staging or production API keys.
+
+Depending on the environment you’re in, you can pull the correct key without exposing your other keys.
+
+
+===============================================
+Pulling configuration data from Parameter Store might increase latency when you call your Lambda function. How can you reduce this latency, while maintaining security best practices?
+
+
+Pull configuration data from Parameter Store and store it in a global variable. Use function code to check if you need to pull or update the parameter.
 -----------------------------------------------------------------
 AWS SECRETS MANAGER 
 secrets are encrypted using AWS KMS key
@@ -260,3 +293,37 @@ inbound
 outbound
        configure an endpoint that allows DNS queries from your VPC from your network or another VPC
        aws vpc-> local network
+
+
+
+Comparison of alias and CNAME records
+Alias records are similar to CNAME records, but there are some important differences. The following list compares alias records and CNAME records.
+
+Resources that you can redirect queries to
+Alias records
+An alias record can only redirect queries to selected AWS resources, such as the following:
+
+Amazon S3 buckets
+
+CloudFront distributions
+
+Another record in the same Route 53 hosted zone
+
+For example, you can create an alias record named acme.example.com that redirects queries to an Amazon S3 bucket that is also named acme.example.com. You can also create an acme.example.com alias record that redirects queries to a record named zenith.example.com in the example.com hosted zone.
+
+CNAME records
+A CNAME record can redirect DNS queries to any DNS record. For example, you can create a CNAME record that redirects queries from acme.example.com to zenith.example.com or to acme.example.org. You don't need to use Route 53 as the DNS service for the domain that you're redirecting queries to.
+
+Creating records that have the same name as the domain (records at the zone apex)
+Alias records
+In most configurations, you can create an alias record that has the same name as the hosted zone (the zone apex). The one exception is when you want to redirect queries from the zone apex (such as example.com) to a record in the same hosted zone that has a type of CNAME (such as zenith.example.com). The alias record must have the same type as the record you're routing traffic to, and creating a CNAME record for the zone apex isn't supported even for an alias record.
+
+CNAME records
+You can't create a CNAME record that has the same name as the hosted zone (the zone apex). This is true both for hosted zones for domain names (example.com) and for hosted zones for subdomains (zenith.example.com).
+
+Pricing for DNS queries
+Alias records
+Route 53 doesn't charge for alias queries to AWS resources. For more information, see Amazon Route 53 Pricing.
+
+CNAME records
+Route 53 charges for CNAME queries.

@@ -1,0 +1,823 @@
+Question Category	Total questions	Total score
+Getting into the Serverless Mindset	14	85.71 %
+Designing Event-Driven Architectures	10	75 %
+Architecting Serverless Applications	8	100 %
+Scaling Serverless Architectures	4	75 %
+Security and Observability for Serverless Applications	6	58.33 %
+Deploying Serverless Applications	5	80 %
+Amazon API Gateway for Serverless Applications	3	100 %
+
+wrong 
+2
+14
+22
+23 half wrong- no sqs 
+24
+set Lambda provisioned concurrency to a value that meets your cost target
+Comments: Provisioned concurrency provides warm Lambda functions but does not reduce cost as the number of Lambda function invocations is not reduced
+26
+Use caching on Amazon API Gateway.
+Comments: Caching on API Gateway would only help for read only endpoints. However question mentions that the application has both read and write endpoints
+User reserve concurrency for the lambda functions and set the concurrency to a lower value.
+Comments: Setting lower concurrency would throttle request and hence would not be advisable.
+27
+wrong - 
+Utilize VPC enabled Lambda functions which can be invoked privately from resources in the VPC. XXXXX
+29
+Enable HTTPS for your Amazon API Gateway to ensure all customer, and payment details sent from the application are encrypted in transit.
+Comments: API Gateway only supports HTTPS. As a managed service Amazon are responsible for maintaining the security of all public endpoints.
+33
+Publish business level metrics as custom metrics from lambda function using CloudWatch PutMetricData API
+Comments: Control plane API call and quota is much lower (500 RPS). For high traffic, you will hit the quota.
+38
+Increase the timeout limit in the API Gateway. If the invocation request returns invocation errors, Lambda retries that request two more times by default. You can configure this retry value between 0 and 2.
+
+1
+A hotel booking application's backend has been built with micro-services using AWS Lambda. Many of these micro-services require access to a common database. The developers have asked you what is the best way to store the database connection string and username/password to allow each service to connect. The connection parameters will vary based on which environment (Dev/Test/Prod) that the micro-services are deployed. What is the best method to store the common configuration?
+
+What is the best method to store the common configuration?
+
+
+Application source code
+
+AWS Config
+
+AWS AppConfig
+
+"AWS Systems Manager Parameter Store"
+
+AWS Lambda Environment Variables
+
+------------
+
+2
+You manage an application that uses an Amazon API Gateway REST API and an AWS Lambda function that needs read and write access to DynamoDB.
+
+Which of the following grants the function access to DynamoDB in the MOST secure manner?
+
+
+Create a function resource-based policy with DynamoDB read and write operations to access specific DynamoDB tables.
+
+//"Create an IAM policy with DynamoDB read and write operations to access all DynamoDB tables. Add the policy to the function execution role."
+
+Create a function resource-based policy with DynamoDB read and write operations to access all DynamoDB tables.
+
+"Create an IAM policy with DynamoDB read and write operations to access specific DynamoDB tables. Add the policy to the function execution role."
+
+----------
+
+3
+An architect is designing a real-time chat module for a new online game platform and wants to use the WebSocket API capabilities within Amazon API Gateway. An important requirement for this chat system is the ability to track the current number of active users on the platform.
+
+Which of the options below could help implement this functionality?
+
+
+Use the `active-connections` command on the @connections API to periodically retrieve the total number of active connections and store this as a count in a DynamoDB table.
+
+Use the $default route to trigger a Lambda function that increments an active user count in DynamoDB.
+
+"Use the $connect and $disconnect predefined routes to trigger a Lambda Function which increments and decrements an active user counter in DynamoDB respectively."
+
+Use the predefined $active route when a connection is activated to trigger a Lambda function that updates an active users counter stored in a DynamoDB table.
+
+-----------------
+
+4
+A company will be modernizing their application which is currently running on Amazon Elastic Cloud Compute (EC2) instances. They have experience with scaling this infrastructure using Amazon EC2 Autoscaling. They want to move to serverless infrastructure consisting of an Amazon API Gateway that triggers Lambda functions. They are consulting you about scaling this new infrastructure.
+
+What should the company consider in order to make sure the serverless infrastructure scales to their needs?
+
+
+Throttle Lambda functions by configuring reserved concurrency, sending the excess traffic to Dead Letter Queues (DLQ) that will be handled when the request volume reduces.
+
+Enable Auto Scaling Groups for AWS Lambda to ensure that enough Lambda functions are ready to handle the incoming requests
+
+Do nothing. API Gateway and AWS Lambda are managed services that have built-in horizontal scaling, security, and high availability to handle unlimited amount of requests
+
+"Look at service limits for Amazon API Gateway and Lambda functions used in order to identify potential bottlenecks and balance performance requirements, costs, and business impact"
+
+-----------------
+
+5
+A large company is planning to adopt serverless. To begin, they want to migrate a maintenance script written in Python that is run nightly.
+
+ 
+
+Which of the following services could they use as part of the migration? (Select TWO)
+
+AWS Batch
+"Amazon EventBridge"
+Amazon SNS
+Amazon Simple Queue Service
+"AWS Lambda"
+
+------------
+
+6
+What are the primary benefits and features of using AWS Serverless services? (Select THREE)
+
+"High availability"Serverless applications are difficult to scaleHigh costPay for idle compute capacity"Reduced time to market"
+"No server provisioning"
+
+--------------
+
+7
+Single Choice
+7)
+As a Solutions Architect for an e-commerce company, you are asked to improve the overall performance of an application that is behind Amazon API Gateway. You also need to protect the backend system and the application from traffic spikes.
+
+What is the optimal solution that you would recommend?
+
+
+Enable API Gateway to automatically scale and set throttling limits
+
+Enable caching and WAF (Web Application Firewall)
+
+"Enable caching and set throttling limits."
+
+Enable caching and scale API gateway services.
+
+----------
+
+8
+Single Choice
+8)
+You are a developer and you are starting to work on a new project. It is your employer's policy to include automated deployment strategy with every new application to follow DevOps best practices. Based on your research, you found out that AWS Serverless Application Model (AWS SAM) is capable of creating CI/CD pipelines from scratch using SAM CLI.
+
+Which sequence of SAM CLI commands will allow you to initialize and deploy your pipeline?
+
+
+sam pipeline init, sam build, sam deploy
+
+sam pipeline init, sam deploy
+
+sam pipeline bootstrap, sam pipeline build, sam pipeline deploy
+
+"sam pipeline init --bootstrap, sam deploy"
+
+---------------
+
+9
+Single Choice
+9)
+Your company wants to offer an audio service to the customer uploaded documents. Your application writes the data to Amazon S3 and the S3 put events are stored in Amazon Simple Queue Service (SQS) queue for further processing. A document goes through various stages of processing to extract the text and convert the text file to audio. As the amount of time for each operation is dependent up on the size of the uploaded document, your architect recommended to use a meta data store that will support key-value format.
+
+Which one of the following AWS managed services support the recommended data store?
+
+
+Amazon Neptune. It is a managed Graph DB service and supports persistent data store.
+
+"Amazon DynamoDB. It is a managed No SQL DB service and supports persistent data store."
+
+Amazon Simple Storage Service (Amazon S3). It is a managed Object storage service and supports persistent data store.
+
+Amazon Aurora database. It is a managed Amazon Relational Database Service (Amazon RDS) database service and supports persistent data store.
+
+---------------
+
+10
+Single Choice
+10)
+As a senior developer in your team, you were asked by your manager to review deployment options that may be applicable to the serverless application your team is currently working on. Since the application will be under constant heavy load, when it is pushed to production, the deployment process needs to be capable of monitoring the application during the deployment while the traffic is being shifted into the new version in 10 minute increments. Your application predominantly consists of Lambda functions, which process the business logic.
+
+
+Which of the following options would be most suitable deployment option for your Lambda functions considering the above criteria?
+
+
+Canary10Percent10Minutes
+
+"Linear10PercentEvery10Minutes"
+
+BlueGreen10Percent10Minutes
+
+AllAtOnce
+
+------------
+
+11
+Single Choice
+11)
+You have written a custom hash function in AWS Lambda. You are able to invoke the function in your account. You need to grant access to invoke the function to all member accounts of an AWS Organization.
+
+Which of the following actions meet this requirement?
+
+
+"Create a resource policy and attach it to your Lambda function. Specify the Principal as '*' and use a condition to specify the organization's PrincipalOrgID."
+
+Create an execution role in each of the organizations member accounts and attach it to the Lambda function.
+
+Define the Lambda function as a global public function.
+
+Create an SCP at the organization level that allows all member accounts to access the Lambda function.
+
+--------------
+
+12
+Single Choice
+12)
+An organization developed serverless applications by using an event driven architecture (Amazon API Gateway, AWS Lambda). When launched in production, customers complained about slow response during the morning peak hours. Developers pointed out it is related to AWS Lambda cold starts. On average, the development team estimated there will be 100 concurrent users.
+
+How do you mitigate the AWS Lambda cold starts?
+
+
+Prevent AWS Lambda cold starts by increasing the service limits.
+
+Prevent AWS Lambda cold starts with Lambda reserved concurrency.
+
+Prevent AWS Lambda cold start with the Amazon CloudWatch Metrics to schedule events on morning hours.
+
+"Prevent AWS Lambda cold starts with Lambda provisioned concurrency."
+
+-------------
+
+13
+Single Choice
+13)
+Your company wants to expose their services to external developers as public APIs. They want to do this for monetization, visibility and engagement that results in growth. They also want to throttle requests to those APIs based on defined limits and quotas.
+
+What service would you suggest to meet the requirements?
+
+
+"Amazon API Gateway"
+
+AWS AppSync
+
+Lambda Function URL
+
+Application Load Balancer
+
+-------------
+
+14
+Single Choice
+14)
+You are a developer that is getting started on a new serverless application in AWS. As you research AWS capabilities supporting development activity, you learn about CodeBuild, CodeDeploy, CodePipeline, and the Serverless Application Model.
+
+Starting from existing code, which AWS feature will help your team automate the creation of an initial CI/CD environment?
+
+
+AWS CodeBuild
+
+"AWS CodePipeline"
+
+AWS SAM Pipelines
+
+AWS CodeDeploy
+
+--------------
+
+15
+Single Choice
+15)
+You are a cloud architect working on modernizing an application for a customer. You decide to use managed services from AWS as a part of the application design.
+
+How would you explain managed services from AWS to your customer?
+
+
+A service managed and supported by the open source community.
+
+A service managed by the operations team in your company.
+
+A service managed by an AWS Partner.
+
+"A service managed by AWS."
+
+---------------
+
+16
+Multiple Choice
+16)
+You are creating AWS Lambda functions to handle events from an online ordering system.
+
+What are some best practices you should follow when writing Lambda functions? (Select TWO)
+
+Store state information within your function, but outside the function handler.
+"Limit the use of function dependencies to only what is required."
+Store complex business logic within the function handler.
+"Split complex business logic into separate modular functions outside of the function handler."
+Store database credentials directly in variables in the function.
+
+
+-------------
+
+17
+Which of the following invocation methods does AWS Lambda support?
+
+
+Poll, Batch, Asynchronous based Invocations
+
+"Poll, Synchronous, Asynchronous based Invocations"
+
+Poll, Stream, Synchronous based Invocations
+
+Poll, Batch, Synchronous based Invocations
+
+-----------
+
+18
+A development team is tasked with updating their e-commerce website to handle the recent surge in online orders. The increases in orders is coming from new promotions that occur on ad-hoc basis. The current site is using synchronous REST APIs, which send requests to Lambda Functions and ultimately orders are stored in DynamoDB. During promotions, the APIs are timing out and losing orders, which is causing a lot of headaches for customers.
+
+What pattern would be the most effective and easiest way to ensure all orders are eventually processed during these peak periods?
+
+
+Increase the provisioned capacity of Lambda functions
+
+Swap the REST API for AppSync and refactor the APIs to use GraphQL
+
+"Insert an Amazon Simple Queue Service (SQS) queue in front of your Lambda function, store orders in the queue and process them via your Lambda functions."
+
+Implement retry logic and exponential backoff when calling APIs
+
+--------------
+
+19
+A retailer is planning to migrate their eCommerce application from a monolithic application to serverless. Theyve done some experimentation with serverless by moving some of their cron jobs to AWS Lambda.
+
+What should be their next step in planning their migration?
+
+
+"Understand what the application does, what each component does, and how each component interacts."
+
+Choose the right data store for different microservices.
+
+Start breaking the application into microservices.
+
+Decouple the control plane’s transactional data requirements from the data plane’s query operations.
+
+----------------
+
+20
+You are a lead engineer at an e-commerce company. Youve designed a new architecture for your flagship product using Amazon API Gateway, Amazon DynamoDB, and AWS Lambda. After presenting the solution to your team, they express concern about how they would develop, test, and iterate the application quickly and safely when they have traditionally run applications locally on their machines. Which of the following tool would alleviate their concerns by allowing them to run the application locally, use Infrastructure as Code, quickly package and deploy the application, as well as roll back bad deployments?
+
+
+AWS Console
+
+AWS Lambda UpdateFunctionCode API
+
+AWS CloudFormation
+
+"AWS Serverless Application Model (SAM)"
+
+----------
+
+21
+You are a tech lead for a team responsible for launching a new location services API for a contact management system, the location data is stored in a relational database running on Amazon RDS.
+Your security team requires that credentials used to connect to databases must be encrypted at rest and rotated automatically every 90 days. All the activities associated with secrets rotation must be logged.
+
+Which AWS service would allow you to implement this requirement with the least amount of overhead?
+
+
+
+"AWS Secrets Manager"
+
+AWS Systems Manager Parameter store
+
+AWS Lambda Environment Variables
+
+AWS Config Rule secretsmanager-secret-periodic-rotation
+
+----------------
+
+22
+As a Solution Architect working for an online gaming company, you have been informed the player feedback system is slow to respond during peak periods. The feedback is reviewed weekly by the game developers. The current system submits the feedback to an Amazon API Gateway which invokes a Lambda function to first validate and then store the review in a Amazon DynamoDB table. This table has been configured with provisioned capacity.
+
+What suggestion would you offer to remove the players wait time?
+
+
+Enable API caching and payload compression in Amazon API Gateway
+
+"Change Amazon DynamoDB from provisioned capacity to on-demand allowing the table to scale up to handle any increases in demand."
+
+Insert an Amazon Simple Queue Service queue between the API Gateway and Lambda function. Use Lambdas native SQS poller to read off the queue. Refactor the Lambda function to handle the new event object.
+
+Increase the Lambda functions memory configuration so that it can process each client request faster.
+
+---------------
+
+23
+An application that is processing customer requests has to also distribute the message to a number of downstream applications.
+
+What AWS services can the application use to distribute the request messages to the downstream applications? (Select TWO)
+
+"Amazon Simple Queue Service" Amazon Aurora Database Activity Streams"Amazon Simple Notification Service"Amazon AppFlowAmazon EventBridge
+
+--------------
+
+24
+You are consulting for a company that promotes large musical events. They are going to announce a concert of a well known artist and expect a 10 fold increase in requests to their service. The service is based on API Gateway triggering a series of Lambda functions and an Amazon Relational Database Service (Amazon RDS) Database for persistent storage.
+
+What suggestions would you make for cost effective scaling?
+
+
+Use API Keys to rate limit incoming user requests
+
+Scale the Amazon RDS instance up during the peak request period
+
+"Set Lambda provisioned concurrency to a value that meets your cost target"
+
+Enable API Gateway caching to reduce backend invocations
+
+---------------
+
+25
+You are an application developer that is tasked to extend an existing backend application with a serverless API behind an Amazon API Gateway. Frontend clients will interact with the API of the existing application and the new serverless API via REST calls. Requests to both APIs are authenticated using a token in the HTTP header verified by the existing IAM solution.
+
+How can you use the existing auth mechanism to secure access to the API Gateway with the least amount of work?
+
+
+Create an Amazon Cognito User Pool and established a managed synchronization between your existing IAM solution and Cognito. Use the native integration of Cognito with Amazon API Gateway for authentication
+
+Create an Amazon Cognito Identity Pool and add your custom solutions as a federated identity provider. Use the native integration of Cognito with API Gateway for authentication
+
+Use a Lambda Extension to augment your Lambda functions with functionality to interact with your existing IAM solution. Configure the function to run for every Lambda and cancel code executions when auth fails
+
+"Use a AWS Lambda authorizer to validate tokens at the existing IAM solution. Connect the Lambda function that serves as your authorizer to a VPC to allow private connectivity to the existing IAM solution"
+
+---------------
+
+26
+Your company has a serverless application with Amazon API Gateway and AWS Lambda having both read, as well as, write APIs. The developers make frequent changes to the Lambda code and run load tests on the application after every change. The regular load testing has resulted in a spike in the cost.
+
+What are the best practices and cost savings options available on their Lambda compute usage? (Select TWO)
+
+"Use caching on Amazon API Gateway."
+"User reserve concurrency for the lambda functions and set the concurrency to a lower value."
+Use Amazon EC2 instead of lambda.Use compute savings plan for lambda (discounted Savings Plans rates of up to 17% for a 1 or 3 year term, up to the commitment level.)Changing Lambda code does not necessarily require load testing. Unit and integration tests are sufficient.
+
+--------------
+
+27
+You have enabled several of your AWS Lambda functions for an Amazon VPC connection. You defined security groups that allow inbound and outbound access to resources in private subnets of the VPC. An Amazon EC2 instance in one of the defined subnets is running an application that needs to invoke one of your VPC enabled functions.
+
+What options would allow access from a private subnet to your VPC enabled Lambda function? (Select TWO)
+
+Create a Network Load Balancer (NLB), set the Lambda function as its target and invoke the Lambda function from the EC2 instance by sending request to the NLB.Create a NAT Gateway in the public subnet of the VPC and route private traffic through it to the public internet to invoke the Lambda function.Create a Gateway VPC endpoint for the Lambda service and access the Lambda function through AWS network.
+"Utilize VPC enabled Lambda functions which can be invoked privately from resources in the VPC."
+"Create an innterface VPC endpoint for the Lambda service."
+
+--------------
+
+28
+You are a senior application developer working on a serverless application that uses a REST API in Amazon API gateway, Lambda functions, and Amazon DynamoDB. You have been informed by your security team that your serverless application is
+vulnerable to parameter tampering attacks. You have been tasked to address this vulnerability before your applications go-live date.
+
+What Amazon API gateway feature can you use to help address this vulnerability?
+
+
+Use a Private API with a VPC endpoint policy to control access to the endpoint
+
+Configure a request parameter-based Lambda authorizer
+
+"Configure an Amazon API Gateway model along with a request validator"
+
+Configure a mapping template to reshape the incoming request payload
+
+-------------
+
+29
+You are a solutions architect designing a new music ticketing application. The application will access an Amazon API Gateway, which in turn invokes various Lambda functions to handle ticket purchases, customer signups, and account management. All customer information will be stored in Amazon DynamoDB.
+
+Which of the following security task are you responsible for in accordance with the shared responsibility model?
+
+
+"Enable HTTPS for your Amazon API Gateway to ensure all customer, and payment details sent from the application are encrypted in transit."
+
+Enabling encryption at rest for your Amazon DynamoDB table.
+
+Routinely updating all Lambda functions with the latest runtime versions to ensure the latest maintenance and security updates are deployed.
+
+Enable and schedule automated patching of the Lambda service within your AWS account.
+
+-----------------
+
+30
+Youre working on an existing application that writes its state data to an Amazon DynamoDB Table using the PutItem API. You want to build an asynchronous, event-driven observer mechanism that watches for item-level changes happening in this existing DynamoDB Table and invoke a Lambda function to publish a message to an Amazon Simple Notification Service (SNS) Topic of the change. What is the lowest cost solution while still using DynamoDB?
+
+
+Use Amazon Kinesis Firehose: as an item is written to the Amazon DynamoDB Table, Amazon Kinesis Firehose writes the data to Amazon S3 bucket. The Amazon S3 bucket is configured with an onCreate event to invoke a Lambda function that publishes a message to an Amazon SNS Topic.
+
+Creating an Amazon EventBridge rule that runs on a regular schedule which invokes a Lambda function. This Lambda function performs a scan operation of the Amazon DynamoDB Table, and performs a diff against its last invocation. If there's a difference, a message is published to an Amazon Simple Notification Service (SNS) Topic.
+
+"Use Amazon DynamoDB Streams: as an item is written to the Amazon DynamoDB Table, a new stream record is written to reflect the item-level change that has happened to the table. This new stream record invokes a Lambda function, reading the data from the stream record, and publishes a message to an Amazon Simple Notification Service (SNS) Topic."
+
+Update the existing applications implementation to write its state data to Amazon DynamoDB Table, then conditionally wait for a '200 OK' response from the PutItem API before invoking the Lambda function to publish a message to an Amazon Simple Notification Service SNS Topic.
+
+------------------
+
+31
+You are part of a team that is planning to migrate an application to serverless on AWS. The application uses workers that listen to a queue to run background processes. The queue is maintained in a RabbitMQ cluster, deployed on premises. The team thinks that this is an easy place to introduce an AWS serverless service to maintain the queue. Their priority is to move to a serverless over lift and shift approach.
+
+Which of the following services can be used to create a queue, without provisioning any servers?
+
+
+Amazon Simple Notification Service (SNS)
+
+Amazon EventBridge
+
+Amazon Managed Queue (MQ)
+
+"Amazon Simple Queue Service (SQS)"
+
+-------------
+
+32
+A banking organization is investigating how to migrate an existing system to serverless. This system is built using a monolithic architecture and is currently hosted in AWS on Amazon Elastic Compute Cloud (EC2) which is accessed by customers using an Application Load Balancer (ALB). The system has a number of critical components that are important to maintaining the integrity of customer banking transactions. However, a number of non-critical components have been identified as being suitable for the initial migration to serverless. The organization wants to migrate components as soon as possible in a gradual manner that reduces risk and disruption to its customers.
+
+What migration strategy would you recommend for this system?
+
+
+Adopt the Leapfrog pattern to completely rebuild and replace the whole current system with a new serverless cloud architecture and migrate to the new system in a single step.
+
+Use serverless to automate build tasks for the existing system and use this learning to migrate the complete existing application to a serverless cloud architecture.
+
+Refactor the system to use containers. Use the Organic migration strategy to lift-and-shift the complete containerized system to the Amazon Elastic Container Service (Amazon ECS) using AWS Fargate for the underlying compute to satisfy the serverless requirement.
+
+"Use the Strangler migration pattern to incrementally decompose the monolith and gradually migrate non-critical system components to serverless by routing non-critical routes in the Application Load Balancer (ALB) to serverless backends."
+
+-------------------
+
+33
+You have built a CloudWatch dashboard that consolidates system metrics from Lambda functions powering your serverless e-commerce backend. You also use CloudWatch logs for troubleshooting. The business would like insights into what is popular and has asked you provide metrics on orders placed by product category.
+
+What is the most scalable and easiest way to implement this?
+
+
+Use embedded metric format (EMF) to log
+
+Use metric filters to extract information from logs
+
+Write a CloudWatch logs insights query against logs and add to dashboard
+
+"Publish business level metrics as custom metrics from lambda function using CloudWatch PutMetricData API"
+
+------------
+
+34
+Your customer, who runs an online shopping platform with consistent and predictable traffic, is planning to incrementally migrate to serverless. They are looking to start with a microservice that returns available quantity for a product. This microservice is currently running as a container on premise and is continuously invoked. The development team is looking to lift and shift this service into serverless.
+
+Which of the following will be simplest option to lift and shift this container based microservice to serverless without making changes to the microservice?
+
+
+Create a Lambda function to fetch the quantity. Use Application Load Balancer to direct traffic for inventory check to this Lambda Function
+
+Create a Lambda function to fetch the quantity. Use API Gateway to direct traffic for inventory check to this Lambda Function.
+
+"Deploy the microservice as a container based app on AWS Fargate. Use Amazon API Gateway to direct traffic for inventory check to this microservice"
+
+Deploy the microservice as a container based app on Amazon Elastic Container Service (ECS). Use Application Load Balancer to direct traffic for inventory check to this microservice
+
+------------------
+
+35
+Your company is planning a migration journey to AWS cloud. As a solution architect you worked on the plan and suggested to migrate some of the processes as a lift and shift to Amazon Elastic Cloud Compute (EC2) instances, then create lightweight scheduled jobs to AWS Lambda. Finally, experiment with AWS serverless technologies to plan for migrating API workloads in the future.
+
+
+Which migration pattern describes this migration plan?
+
+
+Repurchasing
+
+//Strangler
+
+Leapfrog
+
+"Organic"
+
+-------------
+
+
+36
+A travel company is developing a new search engine that queries multiple airlines, hotels, and car rental services at one time. The company received feedback on their prototype that the search often resulted in timeout errors and that users could not tell if a search was still in progress. Using Amazon CloudWatch and AWS X-Ray, a developer found that while the Lambda function aggregating the search results was still running, the Amazon API Gateway REST API timed out after 30 seconds.
+
+Which changes could the company make to their design to (1) alleviate the timeout errors and (2) provide users with ongoing status of their search?
+
+
+"Replace the REST API with a WebSocket API. Push the search updates to the client via the WebSocket."
+
+Send the query to travel providers using SNS. Use Amazon EMR to perform a map-reduce to finalize the result.
+
+Register the client with an SNS Topic and publish updates to the topic.
+
+Update the client to poll the REST API every 5 seconds to check for updates.
+
+----------
+
+37
+You are refactoring an Amazon EC2 based application to use several AWS Lambda functions. During testing you realize some of the test events are failing. However, you are unsure which functions are failing and why.
+
+What services can you use to identify and troubleshoot the functions that are failing?
+
+
+"Use Amazon CloudWatch metrics to identify the failing functions and CloudWatch Logs to troubleshoot the function output."
+
+Use AWS CloudTrail metrics to identify the failing functions and CloudTrail logs to analyze the function output.
+
+Use AWS X-Ray to analyze the Amazon CloudWatch metrics and logs to identify and troubleshoot the failing functions.
+
+Use the Amazon CloudWatch Lambda Insights Multi-Function dashboard to identify and troubleshoot the failing functions.
+
+-------------
+
+38
+You are responsible for building an e-commerce site. In your development process you create a MVP (Minimum Viable Product) and deploy it in a TEST environment. Your architecture is made of an Amazon API Gateway that calls a Lambda function and an Amazon DynamoDB table. A member of the QA team reported that during testing a synchronous call broke the system causing a timeout error.
+
+What should you do to fix the error?
+
+
+"Increase the timeout limit in the API Gateway. If the invocation request returns invocation errors, Lambda retries that request two more times by default. You can configure this retry value between 0 and 2."
+
+Increase the timeout limit in the API Gateway. If the invocation request returns invocation errors, Lambda retries that invocation for up to 6 hours. You can decrease the default duration using the maximum age of event setting.
+
+Generate the SDK from the API stage, and use the backoff and retry mechanisms it provides.
+
+Do nothing. In a synchronous invocation, like between API Gateway and Lambda, Lambda provides built-in retry behaviors.
+
+----------
+
+39
+You are building a Lambda function that retrieves information from a DynamoDB table. You have configured both the function and table using AWS Serverless Application Model (AWS SAM).
+
+Which of the following is the best approach to pass the table name to your function code?
+
+
+Create a secret in AWS Secrets Manager and reference from your code.
+
+Add a configuration file and bundle with function code.
+
+"Use an environment variable, populate with the table name"
+
+Create a static variable in the function code with the table name
+
+-----------
+
+40
+You are working as a Solutions Architect for an e-commerce company. You have been tasked to review their order processing application. The application handles multiple steps for each order and it has become difficult to operate. Additionally the developers are struggling to add new features. Your review uncovers that business logic is mixed with logic around state tracking and complex error handling.
+
+How would you rearchitect the application in order to separate the business logic from state and error handling?
+
+
+Extract the business logic into several Lambda functions. Create an API Gateway with the corresponding routes for each function. Modify the applications clients to call the new API Gateway endpoint.
+
+"Create an AWS Step Function to model the order process and extract the business logic into Lambda functions."
+
+Create Lambda functions for the business logic and use Amazon SQS FIFO queues to connect them asynchronously.
+
+Create Lambda functions to implement the business logic. Use Amazon EventBridge to coordinate your functions and handle errors.
+
+---------
+
+41
+You are developing a Lambda function that gets requests from an API Gateway and handles updates of user profiles. These profiles include application preferences like notification options, user photo, user alias and more. The profile information is stored on an MS SQL RDS database on your VPC except for the photos which are stored in S3. The VPC has an Internet Gateway and a NAT Gateway.
+
+How can you configure your Lambda function to access S3 and the RDS database privately?
+
+
+Create a new NAT Gateway and Internet Gateway. Configure route table. Create an execution role that allows the Lambda function to write to the bucket.
+
+Create a service control policy that routes traffic from the Lambda service to the S3 services. Add a resource policy to allow write access.
+
+"Create a Lambda Execution Role that allows write permissions to the S3 bucket. Create a VPC Endpoint for S3."
+
+
+//Use a Lambda Resource Policy that allows write permissions to the S3 bucket. Create a VPC Endpoint for S3. Start the Lambda function on a private subnet and use the VPC Endpoint to access S3 privately.
+
+
+----------
+
+42
+A food and grocery delivery company is building a mobile application for their customers using AWS serverless services. As an architect you are asked to design the backend AWS solution architecture for the mobile app using event driven architecture. One of the features of the app is to provide real time updates to the user about the order delivery status.
+
+What would be the efficient design for this feature to enable bi-directional communication between the API backend and the app?
+
+
+Client polling an AWS Lambda API
+
+"Amazon API Gateway WebSockets"
+
+Webhooks with Amazon Simple Notification Service (Amazon SNS)
+
+Publish Subscribe model using message queue
+
+-----------
+
+43
+A retail company has asked you to improve their backend infrastructure. They are receiving customer complaints about their web store. On peak load hours, customers are seeing error messages from the backend when they submit purchase orders. The orders are lost unless the customers repeat the order process.
+
+How can you change the infrastructure to improve the customer experience and avoid losing orders?
+
+
+Use API Gateway throttling to avoid overwhelming the backend with too many requests avoiding the generation of errors.
+
+Create synchronous communication between the Amazon API Gateway and AWS Lambda and have Amazon API Gateway send failed requests to an Amazon Dead Letter Queue
+
+Create asynchronous communication between the API Gateway and Lambda using an Amazon Simple Notification Service (SNS) to store the orders until they are processed by Lambda.
+
+"Create asynchronous communication between the Amazon API Gateway and Amazon Lambda using an Amazon Simple Queue Service (SQS) queue to store incoming orders until they are processed by Lambda."
+
+--------
+
+44
+Your application recently experienced a large surge in usage that has led to higher costs than you estimated. The application uses Amazon Simple Notification Service (SNS) to publish customer profile changes to an AWS Lambda function. You have noticed that your Lambda costs are far higher than expected even though you return from the function immediately when the function does not need to process the change.
+
+How can you lower costs with minimal changes to the application code and/or architecture?
+
+
+"Use Amazon SNS attribute based message filtering to only send messages that need to be processed downstream to Lambda."
+
+Add an Amazon Simple Queue Service (SQS) queue and let the application send the messages to SQS. Spin up Amazon EC2 instance to filter the messages and post to Amazon Simple Notification Service (SNS) topic. As all the messages has valid data, no additional charges incurred at the Lambda layer.
+
+Before sending the messages to Amazon Simple Notification Service (SNS) topic filter the messages at the application level. As all the messages has valid data, no additional charges incurred at the Lambda layer.
+
+AWS Lambda is a serverless service and not meant for the high-volume traffic. Replace Lambda with Amazon EC2 based instance.
+
+-----------
+
+45
+A developer has just started using AWS Lambda to write an application and wants to ensure the code is well tested.
+
+What design best practice can help with testing Lambda function code?
+
+
+Minimize dependencies and packages used by the Lambda functions.
+
+"Separate business logic from Lambda-specific code"
+
+Avoid using recursive code within the Lambda functions.
+
+Take advantage of execution environment reuse.
+
+---------
+
+46
+A travel company is developing a new search engine that queries multiple airlines to find the best fares. Requests are sent to the airlines in parallel to minimize latency to customers and results are returned to the client as they arrive. The company has decided to use Amazon API Gateway REST APIs and airline partner have committed to a 15 second maximum SLA for search results.
+
+Which of the following approaches offers the most flexibility to add new airlines partners while orchestrating the requests.
+
+
+Proxy request to Lambda function. Using Node.js, send requests to all airlines and then use a Lambda Destination to aggregate results together before returning to client.
+
+"Proxy search results to an AWS Step Functions workflow. Use a parallel state to send synchronous requests to all airlines. When all responses are received, move to aggregate step and return."
+
+Proxy search requests to an SQS Queue. Use AWS Fargate to read messages from queue and send search parameters to airlines. Wait for results and then return to client.
+
+Proxy search requests to an SNS Topic that sends messages to airlines with search parameters. Subscribe a Lambda function to a second SNS Topic on which to receive and aggregate results.
+
+-----------
+
+47
+Your team is getting ready to build a new serverless application using AWS Lambda, Amazon DynamoDB, and Amazon API Gateway. You have been tasked with selecting the tool the team will use to build the serverless application. The developers need to be able to locally invoke and test functions and deploy resources in production and non-production environments in a consistent manner.
+
+
+AWS Cloud Development Kit (AWS CDK)
+
+"AWS Serverless Application Model (AWS SAM)"
+
+AWS CloudFormation
+
+AWS Cloud9
+
+--------------
+
+48
+As a developer, you are refactoring an existing AWS Lambda function. The function currently stores data in an Amazon DynamoDB table but the size of items sometimes exceeds 400KB, causing an error. You have decided to store one of the larger data fields in an Amazon Simple Storage Service (S3) bucket to reduce the item size in DynamoDB.
+
+What steps are required to allow the function to access the bucket in addition to the existing table?
+
+
+Update the Lambda execution role to include s3:PutObject permissions for all buckets.
+
+Update the Lambda execution role trust policy to include both the S3 bucket and the DynamoDB table.
+
+"Update the Lambda execution role to include s3:PutObject permissions for this bucket."
+
+Update the Lambda execution role to include s3:* on the bucket permissions.
+
+-----------
+
+49
+Company X has been operating a serverless application - using AWS Lambda, Amazon DynamoDB, Amazon API Gateway, and Amazon SQS - issue free for over 12 months. Two weeks ago, the customer service team started receiving increased reports of performance issues from end users during peak hours. Company X asked you to help troubleshoot the performance issues and identify any bottlenecks in the request paths. Which debugging and troubleshooting approach is the easiest way to help you locate bottlenecks in the application flow?
+
+
+"Use AWS X-Ray to trace requests and investigate latency between service interactions"
+
+Add debugging log statements to Lambda function code. Review function execution outputs in CloudWatch Logs to identify potential problems.
+
+Analyze dead-letter queues for errors and unhandled events.
+
+Review the Duration, Throttles, and Errors Lambda function metrics in Amazon CloudWatch to identify troublesome Lambda functions.
+
+-------------
+
+50
+You are maintaining a Lambda function that has a published version 1, as well as an alias named "LIVE". All requests are configured to route to the alias. The alias currently points to version 1. You updated the function code and want to send a portion of requests to the updated function.
+
+What is the MOST operationally efficient way to achieve this?
+
+
+Create a second alias and configure a routing configuration on version 1.
+
+"Publish function version 2 and configure a routing configuration on the alias."
+
+Publish function version 2 and use API Gateway to create a routing configuration for the two versions.
+
+Add the function version $LATEST to a routing configuration on the alias.

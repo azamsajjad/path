@@ -1,0 +1,637 @@
+SQS 
+SES 
+SNS 
+Kinesis  
+-------------------------------------------------------------------------
+SNS,SQS vs Kinesis
+
+Messaging SNS,SQS:
+The core entity is an individual message, and message rates vary.
+Messages are deleted when they’ve been consumed.
+Configure retries and dead-letter queues for failures.
+
+Streaming Kinesis:
+You look at the stream of messages together, and the stream is generally continuous.
+Data remains on the stream for a period of time. Consumers must maintain a pointer.
+A message is retried until it succeeds or expires. You must build error handling into your function to bypass a record.
+---------------------------------------------------------------------------
+"AWS Application Integration Services:
+Step Functions, EventBridge, SQS, MQ, SNS, SWF"
+SQS:
+SQS is for Connecting Applications (Application Integration)
+
+PERIODS
+msgs are ketp in queue from 1 minute to 14 days
+Default msg retention is 4 days
+default is 30 sec, min is 0 sec max is 12 hours (visibility timeout)
+FIFO maintains order of messages with a 300 limit
+
+Distributed msg queueing system
+SQS is Pull Based System for messaging b/w Application Components 
+SNS is Push Based
+A message Queue Service
+message can be of 256KB of text in any format
+Enables web service applications to quickly and reliably queue messages that one component in the application generates for another component to continue
+A Queue is a Temporary Repository for Messages Awaiting Processing
+SQS Gurentees that msgs will be processed atleast once
+
+SQS act as a buffer b/w 
+    component receiving the data for processing 
+    and
+    component producing and saving the data
+
+The Queue resolves issues that arise if the producer is producing work faster than the consumer can process it, or 
+if the producer or consumer are only intermitently connected to the network
+msgs are ketp in queue from 1 minute to 14 days
+Default msg retention is 4 days
+
+
+e.g. 
+a website that creates memes 
+1- upload photo to S3 -> Triggers Lambda Function -> 
+2- Lambda sends all data associated with this image -> SQS 
+(data might be text we want on image and its styling, etc)
+3- We have a fleet of EC2 instances looking for SQS messages(jobs)
+(look at SQS as a way of assigning jobs)
+4- EC2 work on the photo and save resulting meme to S3
+
+
+e.g.
+a travel destination website 
+1- user enters search criteria 
+2- EC2a picks up data, packages it and save it in a SQS Queue 
+3- Another EC2b pulls Queue messages and work on it to fullfil requirements
+    This EC2b starts sending queries to different Airlines to find best flights acc. to users search criteria
+    Once it receives response, it sends all the data back to EC2a
+
+Visibility Timeout:
+if in the meantime, any of the app servers crash, any msgs which are partially processed will not be deleted, and will go back into the queue
+during processing, msg ids marked invisible, so no other server can stop that msg process
+
+So Visibility Timeout is the amount of time that a message is
+invisible in the SQS queue,
+after a reader or a consumer picks up that message.
+dy default, this timeout is 30 Sec, 
+means a server which picks up the msg has 30 seconds to complete it, msg is hidden from other servers for 30 seconds while it is being processed by the server
+CHANGe the visibility timeout if the task requires more time to complete.
+default is 30 sec, min is 0 sec max is 12 hours
+
+long pooling is always preferable
+LONG POLLING VS SHORT POLLING:
+basically Short Polling returns a response
+immediately,
+even if the message queue being polled is empty. And the problem with this,
+is that it can result in a lot of empty responses if there's nothing in
+the queue, and you are still going to pay for these empty responses.
+So it's adding additional cost to your AWS bill.
+Even though there's nothing in the queue,
+you are still being charged for the empty responses.
+So what is the alternative? Well,
+the alternative is Long Polling
+and 
+
+with Long Polling your consumers periodically poll the queue,
+and Long Polling does not return a response until a message arrives
+in the message queue or until the long poll times out.
+So this can save you money, which is always a good thing.
+And in general, under most circumstances, Long Polling is,
+is preferable to Short Polling.
+
+So if you do see a question in the exam where they've got a scenario,
+and theyre asking you how to save money with SQS and how to avoid
+receiving empty responses,
+then the answer is to configure Long Polling,
+which periodically polls the queue,
+and it only returns a response when a message appears or the long poll times
+
+So, by using SQS, you are removing dependencies b/w app components
+this is called "DECOUPLING YOUR INFRASTRUCTURE"
+
+SQS Queue Types:
+types based on how they manage ordering of msgs....
+Standard - default - best effort ordering
+(unlimited transactions per sec)(guarenteed at-least once processing)
+FIFO - ordering of msgs is strictly preserved 
+(300 Transactions per sec)(guarenteed processing)
+no duplicates introduced
+"e.g. IDEAL FOR BANKING TRANSACTIONS"
+
+
+SQS DELAY QUEUES AND Managing Large Messages with SQS:
+SQS Delay Queues = Postpone Delivery of New Messages for a no. of seconds
+remain invisible to consumers for dela period 
+default delay is 0 seconds , maximum is 900 seconds
+
+when to use this?......
+large online retail application 
+For example, imagine an online retail application
+where you might want to introduce a delay of a few seconds,
+in order to allow for updates to a sales
+or stock control database,
+before sending out notifications to your customers
+confirming an online transaction.
+So for delay queues, the main thing that you need to know
+is what they are and what they can be used for.
+So just remember they can be used to delay or postpone
+the delivery of new messages in SQS.
+
+Managing Large Messages with SQS:
+for large msgs 256kb to 2gb in size 
+use S3 to store the messages
+and use 
+"Amazon SQS Extended Client Library for Java" to manage them
+(you will need AWS SDK for Java) 
+--->which provides an API for S3 bucket and object operations
+
+---------------------------------------------------------------------------
+LAB 
+create the Lambda function and configure it to trigger from SQS. We then use a Python script on an EC2 instance to send a high volume of messages to an SQS queue. We also verify the Lambda function is being invoked and the messages are being saved in DynamoDB.
+
+Create the Lambda Function
+Create the SQS Trigger
+Copy the Source Code into the Lambda Function
+Log In to the EC2 Instance and Test the Script
+Confirm Messages Were Inserted into the DynamoDB Table
+
+
+LAMBDA FUNCTION
+from datetime import datetime
+import json
+import os
+import boto3
+
+dynamodb = boto3.resource('dynamodb')
+
+def lambda_handler(event, context):
+    # Count items in the Lambda event 
+    no_messages = str(len(event['Records']))
+    print("Found " +no_messages +" messages to process.")
+
+    for message in event['Records']:
+
+        print(message)
+
+        # Write message to DynamoDB
+        table = dynamodb.Table('Message')
+
+        response = table.put_item(
+            Item={
+                'MessageId': message['messageId'],
+                'Body': message['body'],
+                'Timestamp': datetime.now().isoformat()
+            }
+        )
+        print("Wrote message to DynamoDB:", json.dumps(response))
+
+
+
+
+
+EC2 SCRIPT
+[cloud_user@ip-10-1-10-42 ~]$ cat send_message.py 
+#!/usr/bin/env python3.7
+# -*- coding: utf-8 -*-
+import argparse
+import logging
+import sys
+from time import sleep
+import boto3
+from faker import Faker
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--queue-name", "-q", required=True,
+                    help="SQS queue name")
+parser.add_argument("--interval", "-i", required=True,
+                    help="timer interval", type=float)
+parser.add_argument("--message", "-m", help="message to send")
+parser.add_argument("--log", "-l", default="INFO",
+                    help="logging level")
+args = parser.parse_args()
+
+if args.log:
+    logging.basicConfig(
+        format='[%(levelname)s] %(message)s', level=args.log)
+else:
+    parser.print_help(sys.stderr)
+
+sqs = boto3.client('sqs')
+
+response = sqs.get_queue_url(QueueName=args.queue_name)
+
+queue_url = response['QueueUrl']
+
+logging.info(queue_url)
+
+while True:
+    message = args.message
+    if not args.message:
+        fake = Faker()
+        message = fake.text()
+
+    logging.info('Sending message: ' + message)
+
+    response = sqs.send_message(
+        QueueUrl=queue_url, MessageBody=message)
+
+    logging.info('MessageId: ' + response['MessageId'])
+    sleep(args.interval)
+
+[cloud_user@ip-10-1-10-42 ~]$ ./send_message.py -q Messages -i 0.1
+
+---------------------------------------------------------------------------
+SNS 
+Amazon Simple Notification Service, or SNS,
+is a web service, which makes it easy to set up,
+operate and send notifications from the cloud, and
+messages sent from an application can be immediately delivered
+to subscribers or other applications.
+So it's basically a notification service and you can use
+it to create push notifications, for example,
+to mobile devices, like a smartphone or tablet,
+and they support Apple, Google, Fire OS, Windows, and
+Android devices. And when I think of push notifications,
+I think of those messages that you sometimes see on your iPhone telling you that
+there's a new software update available,
+or you might receive a notification from UPS, for example,
+telling you that your delivery is coming today.
+You can also use SNS to send SMS text messages,
+and emails,
+and you can even send these messages to Amazon SQS or
+any HTTP endpoint. So it's a really,
+really flexible service. 
+
+
+SNS -> LAMBDA
+And finally,
+you can even use SNS to trigger a Lambda function.
+So you can trigger a Lambda function to process the information in the message,
+publish to another SNS topic,
+or send the message to another AWS service.
+So Lambda can process the payload of the message,
+and then publish the results to another SNS topic,
+or send the message on somewhere else. So how does it work?
+
+SNS uses what is known as a pub-sub model,
+which is a publish and subscribe model, but what does that actually mean? Well,
+with SNS,
+applications can publish or push messages to what's known as a
+topic and subscribers can subscribe to
+receive messages from the topic,
+
+
+
+So here is my example application,
+and this is an online banking app.
+So its dealing with online mortgage applications,
+credit card payments and savings accounts.
+So you might want to send out notifications, for example,
+when a loan is approved or when a new credit card statement is ready,
+or if a payment has been missed.
+So these notifications get sent to an SNS queue and within
+SNS,
+you can set up different topics where the messages will be grouped together,
+and then the subscribers subscribe to the relevant topic
+to receive the notifications, rather like subscribing to an email list.
+So in this example,
+weve got subscribers like Lambda and SQS,
+as well as email subscribers and mobile devices.
+So these are all of our subscribers.
+So then if theres a notification about a missed payment, for example,
+that could be sent into Lambda and SQS to trigger an appropriate
+workflow.
+
+And if we want to send a notification to our users about a new credit card deal
+or a change in mortgage or savings interest rates,
+then we can use SNS to send an email or a notification that our
+customers can receive on their mobile device.
+And notifications are delivered using a push mechanism.
+So that eliminates the need for periodically checking or polling for
+new information and updates.
+
+SNS TOPIC:
+it's really like an access point and it allows recipients to subscribe
+to a relevant topic,
+to receive identical copies of the same notification
+and SNS delivers appropriately formatted copies of the message to each
+subscriber, whether they're using an iOS or Android device,
+or whether they're using SMS or email, et cetera.
+
+Benefits of using SNS.
+Firstly, the messages are pretty much instantaneous.
+So it uses a push-based delivery,
+and as soon as a message is received by SNS,
+it is pushed out to subscribers.
+It's very simple to set up and use,
+with simple APIs and easy to integrate with other AWS
+services and applications. With SNS,
+you get flexible message delivery over multiple transport protocols.
+It's inexpensive with a pay as you go pricing model and no upfront costs.
+Easy to configure using the AWS management
+console, with the simplicity of a point-and-click interface.'
+
+Application as Subscriber:
+send push notification msgs directly to apps on mobile devices 
+Publisher       SNSTopic (msg filter and fanout)    Subscribers
+AWS SDK         SNSTopic (msg filter and fanout)    lambda 
+AWS CLI         SNSTopic (msg filter and fanout)    SQS 
+CloudWatch      SNSTopic (msg filter and fanout)    Email / https 
+AWS Services    SNSTopic (msg filter and fanout)    Mobile Push <----------
+
+Mobile Push: (Platform Application Endpoint)
+ADM amazon device msging 
+APNs Apple push notification service 
+Baidu Baidu cloud push 
+FCM Firebase Cloud msging 
+MPNs microsoft push notification service for windows phone 
+WNS windows push notification service 
+
+ALL MSGs published to SNS are stored redundantly across multiple AVL Zones 
+
+You can ENCRYPT Topic with KMS 
+---------------------------------------------------------------------------
+SES
+unlike sns, And it is not subscription-based
+unlike sns which supports multiple different formats,
+including SMS, text message, SQS, HTTP,
+and email. SES only supports email.
+Simple Email Service.
+So let's begin with SES. And SES,
+or Simple Email Service, is a scalable and highly available email service,
+and it's designed to help marketing teams and
+application developers, send marketing, notification,
+and transactional emails to their customers using a pay as you
+go model. And with SES, you can send,
+as well as receive email.
+So it can also be used to receive emails with incoming mails
+delivered to an S3 bucket.
+
+And you can also use SES to trigger Lambda and SNS.
+So incoming emails can be used to trigger Lambda functions and
+SNS notifications. 
+
+So when would we use SES?
+you can use it to send automated emails. For example,
+if you wanted to send a notification that there is a new post
+in a discussion forum that you moderate.
+You could also use it to send automated emails confirming online
+purchases, for example, purchase confirmations,
+shipping notifications, and order status updates.
+And another classic example is automated marketing
+communications. So advertising, newsletters,
+special offers, new products, and Black Friday deals.
+So at first it might seem like SES provides a fairly similar
+service to SNS'
+
+Setup
+So SES is an email messaging service, and it's only email,
+and it can be used to trigger a Lambda function or an SNS notification.
+It can be used for both incoming or outgoing email,
+and an email address is all that's required to
+start sending messages using SES.
+
+---------------------------------------------------------------------------
+KINESIS - just like apache kafka
+STREAMING vs Queueing(SQS)
+it's a family of services
+that enables you to collect, process,
+and analyze streaming data in real time.
+Kinesis deals with data that is in motion.
+So in other words, with streaming data rather than data that is static.
+For instance, stored in S3 or Elastic Block Store or in a database.
+So Kinesis is all about collecting and analyzing streaming data.
+But what do I mean by streaming data?
+Well, in this context, I mean data that is generated continuously
+by thousands of data sources, which typically send the data records simultaneously and in small sizes.
+So think in the order of kilobytes. And to give you a few examples,
+it's things like a stream of financial transactions.
+It could be stock prices,
+in-game data as the gamer plays,
+social media feeds,
+location tracking data
+(for example, Uber or Google Maps),
+IoT sensors
+(So think about sensors inside a factory,
+maybe detecting air temperature or air quality),
+clickstream data,
+and log files.
+So this is all fairly small amounts of data.
+It's often unstructured data.
+And you might want to collect
+and provide a constant supply,
+or stream, of this data into an application
+for analysis and processing.
+And this is all about high-throughput information.
+=============================================================
+Kinesis Data streams can take in up to 1 MB of data or 1,000 records per second, per shard from a producer. When you look at the volume of data you expect to produce, this will drive how many shards you need.
+
+For example, if you need the stream to take in 4,000 records or 4 MB of data per second, you’ll need four shards.
+
+When you use Lambda as a consumer of a stream, the Lambda service is handling some things behind the scenes. For example, it determines how frequently the stream is polled, and it uses a GetRecords API call to get data off the stream. "GetRecords" requests can only be made at five transactions per second, per shard.
+
+Each request can return a maximum of 2 MB of data. You can have up to five standard consumers on a stream, but all of them have to share the polling capacity and the data capacity.
+
+So, if you have five standard consumers, each one can poll each shard only once per second (verses five times) and each one is getting 1/5 of the data bandwidth. So, latency goes up, and throughput goes down.
+
+==========================================================
+Enhanced fan-out
+
+In 2018, the option for enhanced fan-out was introduced to address these limitations, and it also changes the model of how the consumers get data off the stream. Standard consumers poll the stream.
+
+Enhanced fan-out consumers subscribe to the stream. Once they are subscribed, data from the shard is pushed out to the consumer using an HTTP/2 request that can run for up to 5 minutes.
+
+Data will keep getting pushed out to the consumer as it comes in.
+
+This reduces the latency such that the delivery rate is more like 50 to 70 ms. Additionally, enhanced fan-out increases throughput. Any consumers that are using enhanced fan-out get their own pipe, so they’re getting the full 2 MB per shard.
+
+There is an additional cost to using enhanced fan-out, so consider what your traffic will look like, and whether the latency of a standard consumer is acceptable. Generally speaking, if you have three consumers or less, and latency isn’t critical, you probably want to use a standard stream to minimize the cost.
+DATA can persist from 24 hours (default) to 168 hours in stream
+========================================================
+"Kinesis Streams"
+2 types:
+1-Kinesis Data Streams
+which deals with data.
+2-Kinesis Video Streams,
+which is optimized for video data.
+Videos are used for analytics and machine learning
+Kinesis Streams retains the data by default for 24 hours,
+with a maximum of 365 days retention.
+And the data is stored in these things called shards.
+
+Producers-> Kinesis Streams ->  Consumers   ->  Storage(after processing)
+EC2         shard               ec2             dynamodb 
+iot         shard               ec2             s3 
+mobile      shard               lambda          EMR 
+laptop      shard               lambda          redshift
+
+each Shard is a sequence of 1 or more data records.
+And each shard provides a fixed unit of capacity.
+For example, with each shard,
+you get 5 reads per second
+with a maximum total read rate of 2 megabytes per second.
+And you also get 1,000 writes per second
+with a maximum total rate
+of 1 megabyte per second for writes.
+Data capacity of a Kinesis stream is determined by the number of shards it has.
+
+Order of Records is always maintained
+
+2-Kinesis Video Streams,
+ingest video and audio encoded data from various devices e.g. security cam
+output data to HLS-basedVideoPlayback,TensorFlow,SageMaker,Rekognition,etc (Video Processing Services)
+no shard system
+
+
+
+
+"Kinesis Data Firehose"
+NOT PERSISTANT - DATA IMMEDIATELY DISAPPEARS as it is CONSUMED
+YOU CHOOSE ONE CONSUMER FROM LIST
+YOU PAY ONLY FOR THE DATA INGESTED
+and this allows you to capture, transform,
+and load data streams into AWS data stores
+to enable near real-time analytics
+using business intelligence tools.
+So Firehose is all about capturing, transforming,
+and loading the data.So you can transform your raw data into another format,
+for instance, Apache Parquet format,
+and then load it into S3, Redshift, or OpenSearch
+it could be saved directly to Amazon OpenSearch,
+And Firehose is very much an automated setup.
+So you're using Lambda for any processing,
+and then you're saving the data
+straight to permanent storage,
+Producers-> Kinesis Firehose ->No Consumer ->  Storage(after processing)
+EC2         No Data Retention                  Opensearch 
+iot         Lambda inside firehose             s3 -> redshift 
+mobile      for immediate processing           
+
+
+"Kinesis Data Analytics"
+Kinesis Data Analytics is going to allow you
+to run SQL queries on your data
+as it comes in from Kinesis Data Firehose
+and Kinesis Data Streams.
+And then you can store the results of your query
+in S3,
+or Redshift,
+or Amazon OpenSearch.
+So it's a way of analyzing the data inside Kinesis
+using standard SQL queries.
+And it works with Kinesis Streams,
+as well as Firehose.'
+Producers-> Kinesis Streams ->  KinesisDataAnalytics/wSQL -> OpenSearch 
+EC2      -> Kinesis Streams ->  KinesisDataAnalytics/wSQL ->  dynamodb 
+iot      -> Kinesis Firehose -> KinesisDataAnalytics/wSQL -> s3 
+mobile   -> Kinesis Firehose -> KinesisDataAnalytics/wSQL -> Redshift 
+
+
+
+differences between these services.
+So we've got Kinesis Data Streams and Video Streams,
+which enable you to capture
+and store streaming video and data.
+And consumer applications can then process
+and analyze the data in real time.
+---------------vs-----------------
+We've then got Kinesis Data Firehose,
+which allows you to capture, transform,
+and load data continuously into AWS data stores.
+And your existing business intelligence applications
+and tools can then be used
+for near real-time analytics on the stored data.
+And then, finally, 
+----------------vs-----------------
+there's Kinesis Data Analytics,
+which provides real-time analytics
+using standard SQL queries
+on data received by Kinesis Data Streams
+and Kinesis Data Firehose.
+And it goes on to store the processed data
+in an AWS data store,
+like S3, Redshift, or OpenSearch.'
+
+Input Stream ---> DATA ANALYTICS ---> Output Stream
+input & output streams can be kinesis data streams or firehose
+
+"Kinesis Client Libraries"
+Kinesis install KCL on Consumers
+Kinesis Consumers has Kinesis Client Libraries (KCL)
+KCL track the number of shards in your stream 
+KCL discover new shards when you reshard
+KCL ensures that there is a Record Processor RP for every shard
+If u have 1 Consumer, KCL will create all RP in that consumer 
+If u have 2 Consumer, KCL will load balance, create half RP on 1, half on 2
+a single consumer can handle multiple shards
+You must ensure that no. of instances(consumers) dont exceed no. of shards
+
+Best PRactice: use an Auto Scaling Group and base scaling decisions on CPU load. use CPU utilization as a metric to decide if you need more instances
+
+
+KPL (Kinesis Producer Library) is a Java Library to write data to a stream 
+you can write data to stream using AWS SDK, but KPL is more efficient
+---------------------------------------------------------------------------
+
+Which of the following are scenarios where you might select Amazon Kinesis Data Firehose for data processing? (Select THREE.)
+
+
+"You want to ingest a very high volume of data and store it to Amazon Redshift."
+
+Correctly checked
+You want to ingest a very high volume of data in a single stream that must be processed by three consumer applications.
+
+Correctly unchecked
+You want to ingest a very high volume of data, transform its format, and store it to an Amazon Aurora database.
+
+Correctly unchecked
+You must respond to individual messages as they are received.
+
+"Correctly checked
+You want to ingest a very high volume of data, transform its format, and store it to Amazon S3."
+
+"Correctly checked
+You want to simplify retry handling on streaming data, and the order of records in the stream is not critical."
+---------------------------------------------------------------------------
+Q
+Which Amazon service can you use in conjunction with SQS to "fan out" SQS messages to multiple queues?
+SNS
+Create two SQS queues — one for premium members, and one for free members. Program your EC2 fleet to poll the premium queue first and, if empty, to then poll your free members SQS queue.
+
+q
+you can use SNS in conjunction with SQS to fan a single message out to multiple SQS queues.
+False
+True
+
+Good work!
+Using Amazon SNS and Amazon SQS together, messages can be delivered to applications that require immediate notification of an event, and also persisted in an Amazon SQS queue for other applications to process at a later time. Fanout to Amazon SQS queues
+
+Q
+You are designing a new application that processes payments and delivers promotional emails to customers. You need to ensure that the payment process takes priority over the creation and delivery of emails. How might you use SQS to achieve this?
+
+Use 2 SQS queues for the platform. Have the EC2 fleet poll the payment SQS queue first. If this queue is empty, then poll the promotional emails queue.
+
+
+A Delay Queue is a queue that lets you postpone the delivery of new messages for a number of seconds or minutes.
+
+
+q
+Your EC2 instances download jobs from an SQS queue. However, they are taking too long to process the messages. What API call can you use to extend the length of time to process the jobs?
+
+SetMessageVisibility
+ChangeMessageVisibility
+AlterMessageTime
+ExtendMessageTime
+
+Sorry!
+Correct Answer
+Changes the visibility timeout of a specified message in a queue to a new value. The maximum allowed timeout value is 12 hours.
+
+
+
+q 
+You can subscribe endpoints that vary by protocol (http, email, sms, etc.) to an Amazon SNS topic.
+True
+False
+
+Correct Answer
+Amazon SNS supports a number of protocols, e.g. HTTP, HTTPS, email, email-json, etc. --> Amazon SNS API Reference

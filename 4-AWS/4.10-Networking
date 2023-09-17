@@ -1,0 +1,335 @@
+EDGE NETWORKING .
+
+AWS edge networking services sit at the AWS global edge locations and are configured to connect and deliver data with single-digit millisecond AWS network latency. To learn more about the AWS networking service options, choose each of the three numbered markers. 
+
+Amazon Cloudfront 
+Amazon Route 53 
+AWS Global Accelerator
+
+
+There are also networking security services that sit at the edge too:
+
+AWS Shield Standard(opens in a new tab) defends traffic transmitted through an AWS edge location from distributed detail of service (DDoS) and malicious web attacks at no additional charge to you. 
+AWS WAF(opens in a new tab) adds application protection to integrate your own rules or by using Managed Rules for AWS WAF(opens in a new tab).
+
+--------------------------
+
+APPLICATION NETWORKING .
+Elastic Load Balancing, 
+AWS Global Accelerator, 
+Amazon API Gateway, 
+AWS App Mesh,
+AWS Cloud Map work together to solve your application networking needs.
+
+
+----------------------------
+
+SECURITY
+AWS Firewall Manager 
+AWS Shield - DDos
+AWS Network Firewall
+AWS WAF - Protects application against common web exploits
+
+
+----------------------------
+
+NETWORK DESIGN PATTERNS .
+
+When architecting systems using IP address-based networks, you must plan network topology in anticipation of possible failures, to accommodate future growth and integration with other systems and other networks. For topology designs in AWS, the underlying infrastructure for your Amazon VPC is designed to ensure no single point of failure. For communications between Amazon VPC, hub-and-spoke topologies(opens in a new tab) are preferred over many-to-many mesh(opens in a new tab).
+----------------------------
+
+PROTOCOLS
+
+In networking, there are three main types of network protocols:
+
+Network management protocols
+// HTTP – Hypertext transfer protocol (HTTP)(opens in a new tab) is an application layer protocol that allows the browser and server to communicate.
+// TCP – Transmission Control Protocol (TCP)(opens in a new tab) separates data into packets that can be shared over a network. These packets can then be sent by devices like switches and routers to the designated targets.
+// UDP – User Datagram Protocol (UDP)(opens in a new tab) works in a similar way to TCP, sending packets of data over the network. The key difference between the two is that TCP ensures that a connection is made between the application and server, but UDP does not.
+// IRC – Internet Relay Chat (IRC)(opens in a new tab) is a text-based communication protocol. Software clients are used to communicate with servers and send messages to other clients. This protocol works well on networks with a large number of distributed machines.
+Network communication protocols
+// Network management protocols define the policies and procedures used to monitor, manage, and maintain your network. This ensures stable communication and optimal performance for your network, and these protocols can be applied to all devices on your network (computers, switches, routers and servers).
+// Management protocols help to: 
+
+// Troubleshoot connections between host and client devices. 
+// Provide connection status, availability, packet or data loss, and so on related to the health of your network connection.
+// Common network management protocols:
+
+// SNMP – Simple Network Management Protocol (SNMP)(opens in a new tab) is used to monitor and manage network devices. This TCP-based protocol adds visibility and the ability to modify endpoints which alter behavior of devices across the network. SNMP relies on the use of agents to collect and send data to an overarching SNMP manager, which in turn queries agents and gets their responses.
+// ICMP – Internet Control Message Protocol (ICMP)(opens in a new tab) is primarily used for diagnostic purposes. Managed devices on the network can use this protocol to send error messages, providing information regarding network connectivity issues between devices.
+Network security protocols
+// SSL – A Secure Sockets Layer (SSL)(opens in a new tab) is a network security protocol primarily used for ensuring secure internet connections and protecting sensitive data. This protocol can allow for server/client communication as well as server/server communication. Data transferred with SSL is encrypted to prevent it from being readable.
+// SFTP – Secure File Transfer Protocol (SFTP)(opens in a new tab), as its name might suggest, is used to securely transfer files across a network. Data is encrypted and the client and server are authenticated.
+// HTTPS – Secure Hypertext Transfer Protocol(opens in a new tab) is the secure version of HTTP. Data sent between the browser and server are encrypted to ensure protection.
+AWS Protocols .
+// The internet infrastructure used Classfull addressing(opens in a new tab) which is a network addressing the Internet’s architecture from 1981 until Classless Inter-Domain Routing (CIDR)(opens in a new tab) was introduced in 1993.
+
+// The Internet Protocol (IP) is how devices communicate in AWS and over the internet. IP addresses use IP protocol for communication and to specify the technical format of the addressing and packets scheme. There are two versions of the Internet protocol: Internet Protocol version 4 (IPv4)and Internet Protocol version 6 (IPv6). The main difference between IPv4 and IPv6 is the address size of IP addresses.
+
+Every IP address has two parts: network and host.
+
+The first part of the address is used to identify the network part within the network.
+The second part of the address is used to specify a specific host within that network.
+
+// Class A network: With a Class A network, everything before the first period indicates the network part of the address. Everything after the first period specifies the device within that network. With 205.0.125.100 as an example, the network part is 205 and the host for the device is 0.125.100.
+
+// Class B network: With a Class B network, everything before the second period indicates the network part of the address. Again using 205.0.125.100 as an example, 205.0 indicates the network part and 125.100 indicates the host for the device.
+
+// Class C network: With a Class C network, everything before the third period indicates the network. Using the same example, 205.0.125 indicates the Class C network, and 100 indicates the device.
+IPV4 Private :
+There were also ranges created for private networks. These IP addresses cannot communicate over the internet and they are private. The private IPv4 addresses were also broken down into ranges.
+
+Class A is 10.0.0.0 - 10.255.255.255 one single Class A IP addresses.
+Class B is 172.16.0.0 - 172.31.255.255 providing 16 Class B IP addresses.
+Class C is 192.168.0.0 - 192.168.255.255   256 Class C IP addresses.
+The default Amazon VPC in AWS is configured using a Class B range.
+
+For private IP addresses to communicate with the internet, they have to use network address translation (NAT)
+
+
+
+Subnet mask
+
+// A subnet mask is used for internal usage within a network to determine if a host is on the local subnet or remote network. Subnets hold the range of available IP addresses. Subnet masks are important for IPv4 addresses because the IP address doesn't give any information on the network size. Class sizes are not the network sizes. You can determine the number and type of IP addresses any given local network requires based on its default subnet mask.
+
+// Routers use subnet masks to route data packets to the right place. Subnet masks are not indicated within data packets traversing the internet.
+
+------------------------
+Accessing data
+------------------------
+Network attached storage (NAS)(opens in a new tab) connects to a shared storage device across the entire network. This is usually kept in a data center and provides file-level access. In AWS, this would be Elastic File System (Amazon EFS)(opens in a new tab) or Amazon FSx(opens in a new tab). 
+
+Storage area network (SAN)(opens in a new tab) adds block-level access. In AWS, this is the Amazon Elastic Block Store (Amazon EBS)(opens in a new tab).
+
+------------------------
+OSI MODEL - Open Systems Interconnect
+// Routing is how your data moves across your network from device to device and provides the path to deliver network packets from the source to the destination. Routing is also how your data moves across the internet from your local network. This is global networking. Global networking moves your data across the internet through many interconnected networks. So that is why you need to first understand local routing before you move to global. Local networking takes that data that is broken up into multiple pieces for reliable transport. The data is segmented and uses sessions and ports to travel. And at the foundation of networking sits the Open Systems Interconnect model (OSI model)(opens in a new tab).
+1-Physical
+// Layer 1, the physical layer, helps the devices on your network communicate and provides transmission and reception of raw bit streams over a
+// physical medium.
+// Most people have on their local networks, mobile phones, laptops, tablets, and so on that are all connected to the same wifi network or are
+// connected using a physical network cable.
+// The physical cables are used to transmit unstructured data. There are specifications that define this transmission and reception of the raw bits or
+// streams of data, which are 1s and 0s, between the devices.
+// Layer 1 does not scale well. More devices can lead to more collisions and data corruptions, but layer 1 is crucial because it defines how devices
+// communicate at that physical level.
+// Layer 2 runs on top of layer 1 to add more function and intelligence and to provide device-to-device communication
+2-Data link
+// Layer 2, the data link layer, provides reliable transmission of data frames between two nodes connected by a physical layer.
+// Layer 2 introduces:
+        Frames which are a format for sending information and data over a layer 2 network. Frames at layer 2 act like a container and contain
+// different components.
+// Identifiable devices with unique hardware addresses known as the MAC addresses for all of your devices on your network.
+// Controlled access to the physical medium of layer 1.
+// Collision detection (CD) to reduce the collisions along with the improvements of carrier-sense-multiple-access (CSMA)
+3-Network
+// Layer 3, the network layer, is responsible for moving the data from the source to the destination. As your network grows, you need a
+// commonality along with structure and management for a network to communicate and move data between multiple different local networks
+// known as inter-networks.
+        Adding a layer 3 network adds an internet protocol (IP). This IP protocol assigns cross networking addresses to devices on your network. It then
+// use these IP addresses to communicate across networks using routing.
+// Inside the internet protocol are IP packets that are moved from source to destination through many intermediate networks and the data is
+// encapsulated in different frames along the way using switches or routers which are layer 3 devices.
+// Packets are the data units inside the IP protocol.
+// Routers move packets of data through networks, by reviewing packets and checking route tables.
+// Route tables help the transmission for the routers to forward packets
+4-Transport
+// Layer 4, the transport layer, adds the functionality to support the networking used on the internet. It provides structuring and managing of your
+// network, including addressing, routing, and traffic control.
+// Layer 3, the network layer, has no reliable method of ensuring packet delivery and packets often go missing or are delayed in their delivery from
+// network conditions and issues.
+Layer 4, the transport layer adds:
+        Ports
+        Segments, which are containers for your data. Your data in the segment is encapsulated into IP packets.
+        Error correction, which is a sequence number to ensure the order of the segments is maintained.
+        Retransmission: if a packet is lost in transit, the segment can be re-transmitted.
+        Flow control and a connection orientated architecture. This ensures that you can create a connection between the client and the server
+        using a three-way handshake. Both sides have to agree on specific fields before data can be sent and received.
+// It also adds two new protocols that run on top of the IP protocol: Transmission Control Protocol (TCP) and User Datagram Protocol (UDP).
+// This layer adds TCP/IP, which is running on top of the internet protocol (IP). TCP and UDP both use the IP protocol in Layer 3 for transit.
+5-Session
+// Layer 5, the session layer, manages communication sessions between two nodes.
+// Stateless firewalls do not understand the state of a connection. In layer 4, you have the two streams of traffic: the initiating traffic and the
+// response traffic.
+        Two rules for this traffic:
+        1. Outbound traffic leaving the client
+        2. Inbound or the response traffic leaving the server
+// However, a stateful firewall at layer 5 understands the state of the connection or the TCP segments. A stateful firewall understands the initial
+// traffic and the response traffic as one stream. If you allow the initial client connection to the server then you automatically allow the response
+// traffic back from the server.
+// Stateful firewalls understand layer 4, the transport layer, and the state of the traffic.
+// Layer 5 ensures we can create a stable communication that is bidirectional between a client and a server, or two devices
+6-Presentation
+// Layer 6, the presentation layer, adds features for the delivery and formatting of the information and further processing or display to the
+// application layer, layer 7.
+        Layer 6 provides a more limited and specific function than the other layers and is used less than the other layers. It:
+        Provides separation of different data representation.
+        Adds encryption.
+        Transforms the data from an application data format to a network format and back again.
+// Another reason why the presentation layer is sometimes not mentioned is that its functions might be performed as part of the application layer.
+// The fact that the translation job done by the presentation layer isn't always needed means that it is common for it to be skipped by actual
+// protocol stack implementations. This means that protocols at layer 7 may talk directly with those at layer 5.
+// The presentation layer is the layer that developers and programmers choose their data structure and presentation as opposed to just sending
+// application data as datagram or packets between communicating nodes.
+// The idea is that the application layer should be able to point at the data to be moved, and the presentation layer will deal with the rest.
+7-Application
+// Layer 7, the application layer, is the highest layer of the OSI model, and the closest to the end user. It supports communications for end-user
+// processes and applications, and the presentation of data for user-facing software applications.
+// It provides application-specific functions:
+        -Identifying communication partners and the quality of service between them
+        -Determining resource availability, considering privacy, and user authentication,
+        -Synchronizing communication
+        -Connecting the application to the lower levels of the OSI model
+        -Layer 7 provides application services for network software -services based on level 7 protocols:
+        -HTTP
+        -SMTP
+        -FTP
+        -Web browsing (Google, Chrome, Firefox, Safari, and so on)
+        -Top-level API calls and responses representational state transfer (REST)
+// Layer 7 adds direct interaction with the software applications and has full visibility into network data. This helps to add application-aware
+// networking because the application is aware of networking.
+// Both the OSI application layer and the user interact directly with the software application because the application layer is the OSI layer closest to
+// the end user and implements a communicating component.
+---------------------------------------------------------------------------
+The OSI model is a logical model and it was designed to describe the functions of the communication system by dividing the communication procedure into smaller and simpler components. The TCP/IP model was designed for standard protocols and is a subsection of the OSI model. It combines the seven layers of the OSI model into four layers.
+
+
+
+
+TCP/IP
+Transmission Control Protocol/Internet Protocol model
+
+
+"LINK - 1Physical,2DataLink"
+Defines the networking methods within the scope of the local network link on which hosts communicate without intervening routers.
+Media Access Control (MAC) addresses, ARP, Ethernet
+
+"INTERNET - 3Network"
+Has the responsibility of sending packets across network boundaries. Establishes basic data channels that applications use for task-specific data exchange. 
+Internet Protocol version 4 (IPv4)
+
+"TRANSPORT - 4Transport"
+Establishes basic data channels that applications use for task-specific data exchange.
+Transmission Control Protocol (TCP)
+
+"APPLICATION - 5Session,6Presentation,7Application"
+Provides end user service, like exchanging application data over the network connections established by the lower level protocols.
+Hypertext Transfer Protocol (HTTP)
+
+
+
+//  TCP/IP is a set of rules and procedures that function as an abstraction layer between internet applications and the routing and switching.
+
+The two main protocols in the IP suite serve specific functions:
+
+1
+TCP creates channels of communication across a network. It also manages how a message is assembled into packets before transmission and reassembled in the correct order at the destination IP address.
+
+2
+IP defines how to address and route each packet, ensuring that packets reach the correct destination. And each hop to the destination checks the IP address to determine which hop to forward the message.
+
+
+The TCP/IP protocols lay out standards on which the internet was created, while the OSI model provides guidelines on communication. 
+--------------------------------------------------------------------------
+
+AWS OSI MODEL 
+1- Physical: 
+AWS Direct Connect 
+2- Data Link: (some access through cli)
+AWS Direct Connect 
+
+3- Network: (software defined data center)
+AWS Direct Connect | AWS Cloud WAN |
+"Cloudfront 
+NACL
+AWS PrivateLink"
+Route Tables
+Transit Gateway (traffic flowing b/w on premise and aws VPC)
+
+4- Transport: (all aws software ec2,lambda,rds,ddb, nacl, sits here)
+AWS Direct Connect | AWS App Mesh | 
+"Cloudfront 
+NACL
+AWS PrivateLink"
+Global Accelerator
+Elastic Load Balancer ELB
+
+
+5-Session 
+6-Presentation
+7-Application (all combined)
+WAF, API Gateway, Cloudfront, Route 53, Global Accelerator, ELB
+
+
+
+---------------------------------------------------------------------------
+VPC BASICS 
+
+CIDR
+// There are five IP addresses in each subnet that are reserved and not for your use. 
+
+// The first address is the first address of each network 10.0.0.0.
+// The second address is the Network +1 address, and this is the first IP address after our network address. This IP address would be 10.0.0.1, and AWS uses this address for the Amazon VPC router.
+// The third IP address is called the Network +2 address, the second IP address after our network address, and AWS uses this IP address for DNS 10.0.0.2.
+// The fourth address is the Network +3 address, and it is reserved in case it is needed, 10.0.0.3.
+// The last address we cannot use is the broadcast address, which is the last IP in our subnet,10.0.255.254
+// If you have 16 IP address, then only 11 IP addresses can be used. This is important to remember for smaller Amazon VPC designs.
+
+Subnets
++
+
+Amazon Elastic Compute Cloud (Amazon EC2)
++
+
+Routing
+// An Amazon VPC router is highly available and moves traffic from somewhere to somewhere else. The Amazon VPC router runs in all your Availability Zones that your Amazon VPC uses. The router has a network interface in each subnet in your Amazon VPC and uses the Network +1 address. You never need to worry about this router, it just works, and it's managed by AWS to route traffic between subnets in your Amazon VPC. You can control this router by creating route tables with rules to allow traffic in and out of your subnet. When the route table and rules are created, associate the new route table with the subnets.
+
+Route tables
++
+
+Internet gateway
++
+
+Network access control list
++
+
+Security groups
+
+
+-------------------------------------------------
+There are seven AWS Networking Gateways.
+
+1-Internet gateway is an Amazon VPC component that allows communication between your computer and the internet. Applications include, Elastic Load Balancers, Amazon EC2 instances, Amazon S3, AWS Lambda and so on.
+2-Customer Gateway is a physical or software appliance that you own or manage in your on premises network. Applications include manages routing to and from your environment.
+3-VPN Gateway is the gateway on the AWS side of site-to-site VPN connection. Applications include Amazon EC2 instances, Amazon S3, Amazon RDS< Amazon Lambda, and so on.
+4-Direct Connect Gateway establishes connectivity that spans Amazon VPCs spread across multiple AWS Regions. Applications include Amazon EC2 instances, Amazon RDS, AWS Lambda, and so on.
+5-NAT Gateway is a network address translation service that enables instances in a private subnet to connect to services outside your VPC. Applications include Amazon EC2 instances, Amazon RDS, AWS Lambda, and so on.
+6-AWS Transit Gateway connects Amazon VPCs, AWS accounts, and on premises networks to a single gateway. Applications include Amazon VPC connections, AWS VPN connection, AWS Direct Connect.
+7-Virtual gateway allows resources that are outside of your mesh network to communicate to resources that are inside. Applications include Amazon EC2, Amazon ECS, and Amazon EKS.
+
+---------------------------------------------------------------------------
+VPC peering
+
+Now let's dive deeper into the Amazon VPC and discuss a foundation service in AWS that can add peering to provide communication between Amazon VPCs. VPC peering(opens in a new tab) is a way to link multiple Amazon VPCs together and allows direct communications between two isolated Amazon VPCs using their private IP addresses. VPC peers can span AWS accounts and also Regions. The data shared is encrypted using the AWS global infrastructure. To learn more, expand the following category.'
+
+VPC peering
+–
+VPC peering is great for:
+
+Shared services running in a single Amazon VPC to be accessible to other VPCs
+Vendor or partner systems that need to connect your Amazon VPC to access an application or in reverse 
+Security audits to give the needed access to your Amazon VPC
+Requirements to split an application into multiple isolated Amazon VPCs to limit the impact of a potential outage or application failure
+
+
+---------------------------------
+AWS Transit Gateway
+–
+AWS Transit Gateway creates a one-to-many peering connection through a central hub. Inter-Region peering connects AWS Transit Gateways together using the AWS global network. This adds automatic encryption for your data, and your data never travels over the public internet. Transit gateways adds scalability, connectivity, better visibility and control, and improved security over peering connections. Transit gateways can also be used to connect your AWS environment to your on premises infrastructure creating a hybrid network of AWS and physical networks. Transit gateway offers AWS Transit Gateway Network Manager, which adds a unique view over your entire network, even connecting to Software-Defined Wide Area Network (opens in a new tab)(SD-WAN) devices.
+----------------------------------
+AWS PrivateLink
+
+As you expand your environment globally, another part of your design should be secure private connections to AWS services. AWS PrivateLink(opens in a new tab) provides private connectivity between Amazon VPCs, AWS services, and your on premises networks, without exposing traffic to the public internet. Since your data does not get exposed to the internet, where it can be compromised, you can migrate and use more AWS services with the confidence and keep your traffic secure. PrivateLink makes it easy to connect services across different accounts and Amazon VPCs to significantly simplify your network architecture. You no longer have to choose between using a service and exposing your critical data to the Internet. To learn more, expand the following category.
+
+Interface VPC endpoints, powered by AWS PrivateLink, connect you to services hosted by AWS Partners and supported solutions available in AWS Marketplace. 
+Gateway Load Balancer endpoints, powered by AWS PrivateLink, brings the same level of security and performance to your virtual network appliances or custom traffic inspection logic.

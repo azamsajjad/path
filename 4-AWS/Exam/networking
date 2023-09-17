@@ -1,0 +1,856 @@
+========================================================================
+1
+Single Choice
+1)
+A logistics company has a web application hosted on an EC2 instance in VPC A. They want to securely access it from their own VPC B, so only the connections initiated from VPC B to VPC A are allowed.
+
+Which of the following options offers the BEST one-way access pattern?
+
+
+VPC Peering
+
+'AWS PrivateLink'
+
+XXXXXXXXXXXXXXXXX"Virtual Private Gateway"XXXXXXXXXXXXXXXXXX
+IT ALLOWS 2 WAY ACCESS
+
+Internet Gateway
+
+========================================================================
+2
+Multiple Choice
+2)
+You have deployed a VPC with a CIDR of 192.168.0.0/18, and have then created a subnet in an AZ with a CIDR of 192.168.32.0/20.
+
+
+Which are valid IP’s that you can use for an Amazon EC2 instance in the subnet? (Select TWO)
+
+192.168.48.10
+192.168.39.10````````
+192.168.1.10
+192.168.87.20
+192.168.32.10````````
+
+========================================================================
+3
+A network engineer is asked to configure AWS Client VPN for remote users so they can access applications hosted inside of the Amazon VPC. The connection should only be used to access the application, not the internet.
+
+What step should the network engineer take to achieve this requirement?
+
+
+Add a default route 0.0.0.0/0 in the Client VPN endpoints route table.
+
+"Enable split-tunnel during the creation process of AWS Client VPN endpoint."
+
+Enable split-tunnel for Internet Gateway attached to the Amazon VPC.
+
+Add a default route 0.0.0.0/0 in the VPCs default route table.
+
+========================================================================
+4
+You are in charge of creating two VPCs that will eventually be peered with each other. One VPC will require a minimum of 1500 addresses, and the second VPC will require at least 300 addresses.
+
+Without over-provisioning your VPC CIDR ranges, which of the following can be two valid CIDR ranges for your VPCs?
+
+
+10.138.32.0/21 and 10.138.48.0/24
+
+"10.150.16.0/21 and 10.150.24.0/23"
+
+10.150.16.0/21 and 10.150.23.0/24
+
+10.138.32.0/21 and 10.138.32.0/23
+========================================================================
+5
+A global company has a website with multiple languages and serves static content, such as articles, videos, and images, to users worldwide. They are experiencing slow loading times and want to improve the performance and delivery of their content to their users.
+
+
+Which AWS service should the company use to meet its goal?
+
+
+Amazon Route 53
+
+"Amazon CloudFront"
+
+AWS Global Accelerator
+
+Amazon Elastic Load Balancer
+========================================================================
+6
+AnyCompany has recently moved its workloads to the AWS cloud. It has implemented a 3-tier architecture with web servers configured in a public subnet and Database servers in a private subnet. Web servers are successfully rendering Anycompanys website. However, Database servers need to download patches from the Internet and cannot do so.
+
+Which option will allow the Database servers access to the Internet to download patches while preventing any inbound traffic to the Database servers originating from the Internet?
+
+
+"Create a NAT Gateway in the private subnet and add a default route in the Database route table to point to the newly created NAT Gateway."XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+'Comments: NAT Gateway needs to be created in the public subnet to meet the requirement of Database servers being able to initiate Internet-bound traffic but not the other way around.'
+
+Create a NAT Gateway in the public subnet and add a default route in the web server route table to point to the newly created NAT Gateway.
+
+"Create a NAT Gateway in the public subnet and add a default route in the Database route table to point to the newly created NAT Gateway."
+
+Create an IGW in the Database private subnet and add a default route in the Database route table to point to the newly created IGW.
+========================================================================
+7
+You are a new solutions architect working for AnyCompany and have been tasked with designing a secure environment to host a new application in AWS. You want to leverage the AWS Cloud Adoption Framework to inform your design.
+
+According to the Security Perspective, what is the first step you should take?
+
+
+Think about the geographical location where you will host the data.
+
+"Think about the data you are going to be protecting."
+
+Think about incident response requirements.
+
+Think about the required perimeter controls.
+========================================================================
+8
+A companys networking team has implemented AWS Client VPN for their remote users. As users start to use the AWS Client VPN for TCP workloads, they are complaining of slowness issues. The network team reviews and confirms that the AWS Client VPN is configured to use TCP as the transport protocol.
+
+What action should the network team take to resolve this issue?
+
+
+"Edit existing AWS Client VPN to use UDP for transport protocol."
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Comments: You can't modify an existing AWS Client VPN.'
+
+
+Edit existing AWS Client VPN to use TCP port 443 for transport protocol.
+
+'Delete and recreate AWS Client VPN with transport protocol as UDP.'
+
+Delete and recreate AWS Client VPN with transport protocol as TCP port 443.
+========================================================================
+9
+To follow the principle of least privilege, a cloud engineer is configuring a VPC. One subnet has resources assigned that do not need to access the Internet.
+
+What type of subnet should be used to ensure the least privilege design principle is followed?
+
+
+"Private subnet"
+
+Public subnet
+
+Security Group
+
+Public subnet configured with a NAT Gateway
+========================================================================
+10
+Single Choice
+10)
+You are a Solutions Architect at AnyCompany. Your users connect to www.anycompany.com. Following a service interruption for a website hosted on a single failed Amazon  EC2 instance, the web admin has provisioned additional copies of the application on Amazon EC2 instances across multiple AZs in the Amazon VPC. You have been tasked to update the environment to route traffic to healthy instances of the application.
+
+Which of the following service can you reconfigure to achieve this goal?
+
+
+Amazon VPC
+
+Internet Gateway
+
+NAT Gateway
+
+"Amazon Route 53 with health checks"
+
+========================================================================
+11
+Single Choice
+11)
+A customer application takes around 40 minutes to complete the request and is currently facing connection issues due to expiration of NLB idle timeout.
+
+Which is the most suitable workaround in this scenario?
+
+
+Migrate to an ALB since an NLB does not support long-lived connections.
+
+Idle timeout value can be set using cli - aws elb modify-load-balancer-attributes.
+
+Idle timeout value can be set from the Console.
+
+"Implement TCP keep-alives in the application"
+
+
+========================================================================
+12
+Single Choice
+12)
+You have an application that allows users to get the current top 50 song titles. You have tested the application and want to deploy it for users to access via the internet using a RESTful web service.
+
+What option would meet this requirement with the LEAST amount of operational overhead?
+
+
+"Deploy an Amazon API Gateway as the front-end to the serverless application."
+
+Deploy an EC2 instance, and run a webserver on this.
+
+Use an ELB.
+
+Move the whole application onto an EC2 instance and deploy it.
+
+========================================================================
+13
+Single Choice
+13)
+AnyCompany has three application environments: development, staging, and production. The security team has tasked a network engineer to design a network that provides isolation between the environments. Certain Amazon EC2 instances in each of the environments must be able to communicate with one another without traversing the public internet.
+
+Which design BEST meets the requirements?
+
+
+Create only a single VPC and a single subnet so that each environment can communicate. Use only security groups to segment resources.
+
+Configure three VPCs, one for each environment. Create one EC2 instance in each VPC running third-party software VPNs. Establish 3 VPN connections to ensure traffic remains encrypted between the VPCs.
+
+Configure three VPCs with unique CIDRs, one for each environment. Create two VPC peering connections and use NACLs and security groups to provide isolation.
+
+"Configure three VPCs with unique CIDRs, one for each environment. Create a VPC peering connection between each VPC (total of 3) and use NACLs and security groups to provide isolation."
+
+========================================================================
+14
+Single Choice
+14)
+AnyCompanys newly launched application needs to monitor all traffic on the instance hosting its application.
+
+How can it meet the requirement while minimizing the performance impact on the application?
+
+
+Deploy Amazon CloudWatch agent on the application server and push logs to cloudwatch log group.
+
+Run TCP dump on the application server and store the logs locally.
+
+"Use AWS Traffic mirroring service."
+
+Use Amazon CloudWatch metrics to monitor the application logs.
+
+========================================================================
+15
+Single Choice
+15)
+An organization runs several internal IT applications in its on-premises data center connected to AWS using an AWS Direct Connect (DX) connection. The CTO has mandated that the data must not traverse the internet. The organization has acquired another company that has a presence in AWS. There is a requirement to give the newly acquired companys VPC access to the internal IT applications.
+
+Which option from below will meet the requirement?
+
+
+Attach an internet gateway to the VPC and restrict the network access control and security group rules by allowing only require traffic.
+
+Create the VPC peering between the VPCs of the organization and that of the company.
+
+Create a VPC Endpoint Service to accept traffic behind an Application Load Balancer and target to the on-prem IP over the DX connection
+
+"Create a Network Load Balancer (NLB) with a service endpoint in the existing company VPC. Add on-premises application IP as targets behind the NLB. Create a private link interface endpoint in the new company VPC to communicate with the service endpoint."
+
+========================================================================
+16
+Single Choice
+16)
+Your company has many browser-based applications that your employees need to access remotely. You must ensure these connections are secure and follow a Zero Trust approach. You also need to make the user experience as simple and seamless as possible.
+
+Which AWS service is the best fit for this use case?
+
+
+AWS Cloud WAN
+
+AWS Direct Connect
+
+AWS Transit Gateway
+
+"AWS Verified Access (AVA)"
+
+========================================================================
+17
+Single Choice
+17)
+You have been asked to deploy a highly available, two-tier web application which consists of an application server and a database server across two availability zones. You do not want the two tiers in the same subnet to ensure a secure solution.
+
+How many subnets will you need to meet the requirement?
+
+
+1
+
+"4"
+
+2
+
+3
+
+========================================================================
+18
+Single Choice
+18)
+A gaming company hosts weekend gaming marathons for its customers. The game servers are hosted on multiple EC2 instances. As their cloud architect, you want to ensure an experience of minimal lag and effective distribution of the incoming network traffic across the various servers.
+
+Which of the following BEST describes the primary usage of a Network Load Balancer in AWS that would address this requirement?
+
+
+Caching static content from the web applications to reduce the load on the origin servers.
+
+"Distributing incoming network traffic across multiple EC2 instances for low latency and high throughput"
+
+Analyzing and monitoring application traffic for potential security threats.
+
+Managing session state of web applications by storing session cookies.
+
+========================================================================
+19
+AnyCompany has a global public application that is deployed in multiple AWS regions for resiliency and disaster recovery. Each region has its own endpoint and IP addresses. You have been tasked with finding the solution with the least operational complexity to ensure your customers connect to only healthy endpoints.
+
+What AWS service meets this requirement?
+
+
+Amazon CloudFront
+
+"AWS Global Accelerator"
+
+AWS Transit Gateway
+
+AWS DirectConnect
+
+========================================================================
+20
+A customer has configured a 10 GBps AWS Direct Connect Connection.
+
+Which parameter is unique to the creation of a private virtual interface?
+
+
+VLAN
+
+Virtual Interface Name
+
+AWS Direct Connect Connection Id
+
+"Virtual Private Gateway Id (VGW)"
+========================================================================
+21
+AnyCompany is a startup planning to launch a web-based application with anticipated heavy traffic and needs to handle it without performance degradation while ensuring data security and application availability. The application consists of web and application servers and a database.
+
+Which of the following deployment strategies will BEST handle these requirements?
+
+
+Set up a single VPC, and in each AZ create a public subnet for the web servers and a second public subnet for the application servers. Use Amazon DynamoDB as a serverless database to handle high traffic.
+
+Set up a single VPC, create a subnet per AZ, and put all components inside those subnets to maximize network performance. Use Auto Scaling for the web and application servers and Amazon RDS for the database server.
+
+Set up a single VPC, create one public subnet for web servers, and another public subnet for the application servers. Use Amazon RDS in a private subnet for the database.
+
+"Set up a single VPC and create a public subnet in each AZ for the web servers and a private subnet in each AZ for the application and database servers. Use Elastic Load Balancing to distribute traffic and AWS Auto Scaling to adjust the number of web and application servers as required."
+========================================================================
+22
+You have found that Amazon EC2 instance in a VPC is resolving to a different IP address for the domain name corp.anycompany.org compared to servers that are on-premises and using public DNS resolvers. The EC2 instance is using the Route 53 resolver.
+
+
+What could be the cause of this behavior?
+
+
+The Route 53 resolver is malfunctioning - contact AWS Support.
+
+The public hosted zone for corp.anycompany.org in Route 53 is using an incorrect NS record.
+
+"The VPC is configured with a Route 53 Private Hosted zone that has a record for corp.anycompany.org."
+
+The EC2 instance running the Route 53 resolver is misconfigured.
+
+
+why
+
+// The VPC is configured with a Route 53 Private Hosted zone that has a record for corp.anycompany.org.
+
+// Private hosted zones in Route 53 are associated with a specific VPC. When a private hosted zone is created in a VPC, it provides a mechanism for resolving domain names within that VPC.
+
+// If there is a private hosted zone for "corp.anycompany.org" within the VPC, the EC2 instance in that VPC would use this private hosted zone for DNS resolution. This might result in a different IP address being resolved compared to servers on-premises using public DNS resolvers.
+
+// Here's why the other options are not the likely cause:
+
+// The Route 53 resolver is malfunctioning - contact AWS Support: This is a less likely cause, as AWS services like Route 53 are highly reliable. It's more likely that the issue is related to the specific configuration of resources in the VPC.
+
+// The public hosted zone for corp.anycompany.org in Route 53 is using an incorrect NS record: This could potentially cause resolution issues for external DNS servers, but it wouldn't impact the resolution within the VPC itself.
+
+// The EC2 instance running the Route 53 resolver is misconfigured: This could be a possibility, but it's less likely compared to the presence of a private hosted zone in the VPC. A misconfiguration on the EC2 instance itself would affect all DNS resolutions, not just for specific domains.
+========================================================================
+23
+A customer is designing a new VPC with a requirement to maximize the size of the VPC in terms of IPv4 Addresses.
+
+What is the largest configurable IPv4 VPC CIDR that would satisfy the customers requirement?
+
+
+10.0.0.0/24
+
+10.0.0.0/8``````
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Comments: The allowed block size is between a /16 netmask (65,536 IP addresses) and- a /28 netmask (16 IP addresses).
+
+10.0.0.0/28
+
+'10.0.0.0/16'
+
+========================================================================
+24
+AnyCompany currently uses Amazon Route 53 for load-balancing across two AWS regions. The users are experiencing sub-optimal performance accessing their web applications due to DNS caching.
+
+Which AWS service routes the traffic to optimal AWS endpoints based on endpoint health, client locations, and user-configured weights?
+
+
+"AWS Global Accelerator"
+
+CloudFront
+
+IPSEC VPN
+
+DirectConnect
+
+// AWS Global Accelerator
+
+// AWS Global Accelerator is a networking service that uses static IP addresses (Anycast) to direct traffic over the AWS global network to optimal AWS endpoint locations. It takes into consideration factors like endpoint health, client locations, and user-configured weights to ensure that traffic is routed to the most suitable and healthy endpoints, improving the overall performance and availability of applications.
+
+// CloudFront, IPSEC VPN, and DirectConnect are not designed for the same purpose:
+
+// CloudFront is a content delivery network (CDN) service that accelerates the delivery of content to end-users. While it can improve performance, it doesn't offer the same level of control over routing and endpoint health as AWS Global Accelerator.
+
+// IPSEC VPN is used to establish a secure connection between an on-premises network and AWS, but it doesn't provide the traffic optimization and routing capabilities of AWS Global Accelerator.
+
+// DirectConnect is used to establish a dedicated network connection from an on-premises data center to AWS, but like IPSEC VPN, it doesn't have the same traffic optimization features as AWS Global Accelerator.
+========================================================================
+25
+You are deploying a private Software-as-a-Service (SaaS) database application to build highly scalable and secure service for your customers.
+
+What load balancer type should be used when creating an AWS PrivateLink endpoint service?
+
+
+Classic Load Balancer
+
+Gateway Load Balancer
+
+Application Load Balancer
+
+"Network Load Balancer"
+// Network Load Balancers (NLBs) are designed to handle TCP and UDP traffic at extremely high scale, making them well-suited for use with AWS PrivateLink. They are often used for scenarios where performance and scalability are critical, which aligns with the requirements for a highly scalable and secure service for your customers accessing the SaaS database application.
+========================================================================
+26
+The application team has recently deployed the new application on multiple Amazon EC2 Instances behind an Application Load Balancer (ALB). You have set up autoscaling to scale the EC2 instances and need to secure the application traffic with HTTPS. The solution needs to be deployed as quickly as possible.
+
+Which option would BEST meet the requirement?
+
+
+"Use AWS Certificate Manager (ACM) to generate and install an SSL certificate onto the ALB."
+
+Migrate the application to Amazon S3 to host the application security using HTTPS.
+
+Deploy the CloudFront distribution with an AWS Certificate Manager (ACM) certification. Make the ALB as the origin of the CloudFront to use HTTPS.
+
+Install AWS Certificate Manager (ACM) SSL certificates on each instance. Reconfigure the ALB to bypass the HTTPS traffic.
+========================================================================
+27
+You have been asked to make it easier to connect, secure, and monitor network communications between the services your developers are building, and you have decided to deploy AWS Lattice.
+
+As the network administrator, what is the first step in deploying Amazon VPC Lattice?
+
+
+Define target groups.
+
+Associate clients with services.
+
+"Create a service network."
+
+Define auth policies.
+========================================================================
+28
+You are tasked with inspecting traffic between two application VPCs using a fleet of 3rd party appliances that do Intrusion Detection and Prevention Systems and Deep Packet Inspection (DPI).
+
+Which load balancer type can you use to intercept the traffic for inspection?
+
+
+Network Load Balancer
+
+Application Load Balancer
+
+Classic Load Balancer
+
+"Gateway Load Balancer"
+========================================================================
+29
+Your company wants to move all its infrastructure to the AWS Cloud and has the domain name for its website registered with another registrar.
+
+
+Which AWS service will allow domain name registration and transfer?
+
+
+"Amazon Route 53"
+
+AWS Marketplace
+
+AWS CloudFront
+
+Amazon VPC
+========================================================================
+30
+Your company has an authoritative DNS domain for its domain name, anycompany.com in the US data center. As a network engineer, you are tasked to set up a new DNS server in Europe and manage a subdomain, eu.anycompany.com.
+
+What are the changes you need make to set up a DNS server in Europe? (Select TWO)
+
+"Create a new DNS zone and a SOA record for eu.anycompany.com in the DNS domain in Europe."
+Create a new MX record for eu.anycompany.com in the DNS domain in the US
+Create a new PTR record for eu.anycompany.com in the DNS domain in the US."Create a new NS record for eu.anycompany.com in the DNS domain in US."
+Create a new DNS zone and a CNAME record for eu.anycompany.com in the DNS domain in Europe.
+
+
+
+Create a new DNS zone and a SOA record for eu.anycompany.com in the DNS domain in Europe.
+
+This step involves creating a new DNS zone specifically for eu.anycompany.com in the DNS server located in Europe. The SOA (Start of Authority) record is a critical DNS record that provides authoritative information about the domain, including details about the primary DNS server and the domains administrators.
+
+Create a new NS record for eu.anycompany.com in the DNS domain in the US.
+
+This step involves adding a new NS (Name Server) record for eu.anycompany.com in the DNS domain located in the US. This NS record should point to the DNS server(s) in Europe that will be authoritative for the eu.anycompany.com subdomain.
+========================================================================
+31
+AnyCompany has a requirement to access all on-premises hosted applications from VPC using the remote application DNS names.
+
+How can they achieve this requirement?
+
+
+"Use Route 53 Resolver Outbound Endpoint and Forward Rules."
+
+Use Route 53 Geolocation routing feature to route traffic from VPC to on-premises.
+
+Use Route 53 Resolver Inbound Endpoint.
+
+Use Route53 Private hosted Zone.
+
+
+why 
+// Route 53 Resolver Outbound Endpoint: This enables forwarding DNS queries from the VPC to on-premises DNS servers. This allows the VPC to resolve DNS names for on-premises applications.
+
+// Forward Rules: Within the Route 53 Resolver Outbound Endpoint, forward rules can be configured to specify which DNS queries should be forwarded to on-premises DNS servers.
+
+// The other options are not suitable for achieving this specific requirement:
+
+// Route 53 Geolocation routing feature: This is used for directing traffic to different servers based on the geographic location of the user. It's not designed for accessing on-premises applications.
+
+// Route 53 Resolver Inbound Endpoint: This is used for receiving DNS queries from on-premises networks, not for forwarding queries from the VPC to on-premises DNS servers.
+
+// Route53 Private hosted Zone: This is used for resolving DNS queries between resources in a VPC, and it's not designed for forwarding queries to on-premises DNS servers.
+========================================================================
+32
+An application needs access to the companys database. This application is located in VPC A, while the database is located in VPC C. Two VPC peering connections have been created: VPC A to VPC B and VPC C to VPC B. Each VPC is within a unique AWS account.
+
+How can you ensure communication between the application and the database?
+
+
+'Create new VPC peering connections between VPC A and VPC C. In each VPC, add routes to the destination subnets using the target VPC peer.'
+
+Do nothing. Packets are automatically routed using transitive peering.
+
+In each VPC, add a route to the destination subnet using VPC B as the target peer.
+
+Use Amazon Direct Connect to create a cross-account connection between VPC A and VPC C.
+========================================================================
+33
+Your company decided to migrate its workloads to the AWS cloud. You are working with the Chief Operating officer and need to explain your companys responsibilities as part of the shared responsibility model.
+
+What are the responsibilities of customers in the AWS Cloud? (Select TWO)
+
+Physical hardware
+'Server-side encryption (file system and data)'
+'Patching operating System'
+Patching hypervisorPhysical network
+
+========================================================================
+34
+AnyCompany has a large user base and wishes to create a chat application for their community to collaborate. As a solutions architect, you are tasked with building this environment in AWS using serverless technologies. The browser-based chat client needs a persistent bi-directional link with the chat server, so the server can push new messages to the client over a connection the client initially established.
+
+Which AWS services could Anycompany use to create the chat application?
+
+
+Create a REST API in API Gateway for the incoming requests, and send outgoing chat messages to clients using Amazon SNS. Use Lambda as the compute backend and DynamoDB for application data storage.
+
+Create an HTTP API in API Gateway, use Lambda for the compute backend and DynamoDB for application data storage. Have the chat clients poll the API regularly for new messages.
+
+'Create a WebSocket API in API Gateway, use Lambda as the compute backend and DynamoDB for application data storage.'
+
+Create a REST API in API Gateway, use AWS Fargate for the compute backend and Aurora Serverless for application data storage.
+========================================================================
+35
+A customer is experiencing issues with their network application availability. Upon examination, the engineer notices that the virtual appliances malfunctioned and dropped out of the network. As a result, the end users are experiencing disconnects and loss of application availability.
+
+How do you improve the virtual appliance availability for the customer?
+
+
+Add new virtual appliances to the network and see if the availability improves for the customer.
+
+'Deploy a Gateway Load Balancer to reroute traffic from the unhealthy virtual appliance to a healthy instance through graceful failover.'
+
+Replace the current virtual appliances with new virtual appliances that are state of the art and would prevent the failures.
+
+Replace the virtual appliances with AWS Network Firewall.
+========================================================================
+36
+Anycompany shared service unit runs their application on a fleet of EC2 instances inside an AWS VPC. The instances are behind a Network Load Balancer. One of AnyCompany's customers wishes to consume the application from their own AWS VPC, but they currently need internet access in their VPC. The customer wish to avoid increasing their potential network exposure due to the sensitivity of their environment.
+
+How can AnyCompany allow the consumer to access the application without changing the security exposure of the consumer's environment?
+
+
+Peer both VPC together and access the application via VPC peering
+
+'Create a PrivateLink service backed by the NLB, and allow the consumer VPC to create a PrivateLink endpoint to connect to that service.'
+
+Have the consumer access the service using the public IP address of the NLB
+
+Create a Site-to-Site VPN between both VPCs and access the service privately and securely.
+========================================================================
+37
+AnyCompany wants to use a fleet of 3rd party firewalls in an Amazon VPC for traffic inspection. They have decided to use the AWS Gateway load balancer to improve the availability and scalability of the firewall appliances.
+
+Which protocol does the Gateway Load Balancer (GWLB) use to talk to the firewall appliances?
+
+
+IPSEC
+
+'Geneve'
+
+MACSEC
+
+GRE
+========================================================================
+38
+A companys networking team is required to monitor the VPC network traffic.
+
+Which AWS services can accomplish this task? (Select TWO)
+
+Security Groups
+AWS Private Link
+Amazon CloudFront
+'Amazon VPC Flow Logs'
+'Amazon CloudWatch'
+
+// Amazon VPC Flow Logs: This service allows you to capture information about the IP traffic going to and from network interfaces in a VPC. It provides insights into the traffic patterns and can be used for various purposes including security analysis, troubleshooting, and compliance.
+
+// Amazon CloudWatch: While CloudWatch primarily provides monitoring and observability for AWS resources and applications, it can also be used for monitoring network-related metrics. For example, it can be used to set up alarms based on VPC Flow Logs or other network-related metrics to get notified about unusual traffic patterns or issues.
+
+========================================================================
+39
+AnyCompany has an on-premises application that generates large volumes of real-time data that needs to be transferred to an application in their AWS VPC. The data volume is known and ramps up and down in predictable patterns daily, but the consuming application is sensitive to latency.
+
+Which AWS service would provide the consistent high-bandwidth, low-latency connectivity AnyCompany needs?
+
+
+AWS Global Accelerator
+
+AWS Transit Gateway
+
+AWS PrivateLink
+
+'AWS Direct Connect'
+========================================================================
+40
+You are the network engineer for a small company with a web application hosted on an Amazon EC2 instance. The web application communicates with a database hosted on an on-premises server. The company requires an AWS networking service to provide a private and reliable connection between the database and the web application. The security team has a requirement that the network traffic must not traverse the Internet.
+
+Which service would BEST meet the requirements?
+
+
+Amazon CloudFront
+
+'AWS Direct Connect'
+
+AWS VPC Peering
+
+AWS Site-to-Site VPN
+========================================================================
+41
+AnyCompany is deploying an application that will be accessible globally. But they are concerned about poor network performance from a different part of the world.
+
+Which service can help them reduce network latency and jitter?
+
+
+AWS Private Link
+
+'AWS Global Accelerator'
+
+AWS Transit Gateway
+
+Amazon API Gateway
+
+// AWS Global Accelerator is specifically designed to improve the availability and performance of applications by utilizing AWS's vast global network infrastructure. It routes traffic over the AWS global network to optimize the path from the client to the application endpoint, thus reducing latency and jitter.
+
+// AWS Private Link is used for accessing services over a private connection within an AWS network, but it doesn't directly address global network performance.
+
+// AWS Transit Gateway is a service for routing traffic between VPCs and VPN connections, but it doesn't specifically focus on optimizing global network performance.
+
+// Amazon API Gateway is a fully managed service for creating, publishing, maintaining, monitoring, and securing APIs. While it plays a crucial role in API management, it doesn't directly address network latency and jitter for global applications.
+
+
+
+
+
+========================================================================
+42
+As a network engineer you are designing a Web load-balancing solution in AWS. The internal users will be visiting Web site from remote offices using the public Internet. The users traffic must be encrypted end-to-end from their devices into AWS backend servers.
+
+Which of the following provides an architecture that meets the design requirements?
+
+
+Use Application Load Balancer with HTTP enabled on the user device and backend servers.
+
+'Use Use Application Load Balancer (ALB) and AWS Certificate Manager (ACM) to deploy a certificate on the ALB with HTTPS listeners. Perform end-to-end Transport layer security (TLS) encryption.'
+
+Use Network Load Balancer with HTTP enable on the user device and backend servers.
+
+Use Network Load Balancer (NLB) and AWS Certificate Manager (ACM) to deploy a certificate on the NLB with HTTPS listeners.
+
+
+
+Explanation:
+
+// Application Load Balancer (ALB): ALB is designed for routing traffic at the application layer (HTTP/HTTPS) and is suitable for web applications. It supports SSL/TLS termination, which allows you to encrypt traffic between the user and the ALB.
+
+// AWS Certificate Manager (ACM): ACM provides SSL/TLS certificates for secure connections. You can use ACM to deploy a certificate on the ALB, enabling HTTPS for end-to-end encryption.
+
+// Perform end-to-end Transport layer security (TLS) encryption: This means that the connection is encrypted from the user's device all the way to the backend servers. The ALB will terminate the SSL/TLS connection at the ALB, but it will establish a new encrypted connection to the backend servers.
+
+// The other options involve using HTTP, which doesn't provide the necessary encryption for securing the connection. Additionally, Network Load Balancer (NLB) operates at the transport layer (TCP/UDP) and doesn't support SSL/TLS termination, so it doesn't align with the requirement for end-to-end encryption.
+========================================================================
+43
+You are the network administrator in charge of the Amazon VPC Lattice service at your company. You are evaluating options for monitoring access to your services, and want to send information to monitoring destinations that you have already deployed.
+
+What are two places where you can send log data? (Select TWO)
+
+'Amazon CloudWatch'
+Amazon VPC Network Access Analyzer
+'Amazon Kinesis Firehose'
+AWS Cloud WAN network manager
+AWS Cloud Map
+========================================================================
+44
+You are a network administrator at an organization with many cloud developers. You have been asked to make it easier for developers to perform the common infrastructure and networking tasks required to get their applications running quickly.
+
+Which AWS service meets these needs?
+
+
+'Amazon VPC Lattice'
+
+Application Load Balancer (ALB)
+
+Amazon Route 53
+
+AWS Cloud WAN
+
+========================================================================
+45
+An organization configured EC2 instances serving web traffic for an application behind the Amazon Application Load Balancer(ALB). Each of the EC2's Availability Zone configurations align with the ALB's Availability zones, and it was observed that a single Amazon EC2 instance is getting overloaded, and traffic imbalance happens frequently. The ALB uses round robin routing algorithm to send requests to the target servers, assuming no issues on ALB and EC2 service.
+
+What could be the potential cause of such behavior?
+
+
+ALB uses content-based routing.
+
+It is an expected ALB behavior.
+
+ALB to backend connection uses HTTPS that will make a single EC2 server do more task.
+
+'Application Load balancer target group has ALB generated cookie setting enabled'
+
+// Explanation:
+
+// When the Application Load Balancer (ALB) has the "stickiness" feature enabled (achieved through ALB-generated cookies), it causes the ALB to consistently route requests from a specific client to the same EC2 instance. This can lead to an overload on that particular EC2 instance, especially if there is a high volume of traffic from the same client.
+
+// The ALB-generated cookie feature allows the ALB to bind a user's session to a specific instance. If a user's session is tied to an overloaded instance, it may result in traffic imbalance.
+
+// The other options are not the cause of the observed behavior:
+
+// ALB uses content-based routing: Content-based routing does not inherently cause traffic imbalance or overload on a specific instance.
+
+// It is an expected ALB behavior: While some level of traffic distribution variation is expected due to the nature of the round-robin algorithm, significant overload on a single instance is not expected.
+
+// ALB to backend connection uses HTTPS that will make a single EC2 server do more task: While HTTPS may introduce some additional processing overhead, it should not lead to significant overload on a single instance unless the traffic volume is extremely high.
+
+// The most likely cause of the behavior described is the ALB-generated cookie setting, which can lead to sessions being bound to a specific instance, potentially causing an imbalance in traffic distribution.
+========================================================================
+46
+You are responsible for deploying a fleet of 40 Amazon EC2 servers in a new subnet within an existing Amazon VPC. These servers will not require DNS resolution. The network 10.0.0.64/26 has been selected for the subnet.
+
+What is the range of IP addresses available for instances in the subnet?
+
+
+'10.0.0.68 - 10.0.0.126'
+
+10.0.0.67 - 10.0.0.125
+
+10.0.0.64 - 10.0.0.127
+
+10.0.0.65 - 10.0.0.126
+
+
+
+// 0.0: Network address.
+// 0.1: Reserved by AWS for the VPC router.
+// 0.2: Reserved by AWS. The IP address of the DNS server is the base of the VPC network range plus two. ...
+// 0.3: Reserved by AWS for future use.
+// 0.255: Network broadcast address.
+========================================================================
+47
+You are a network engineer for AnyCompany and have received feedback that users are experiencing heavy latency when accessing data, videos, and applications hosted in your VPC.
+
+Which edge networking services would you implement to provide lower latency and higher transfer speeds?
+
+
+AWS Site-to-Site VPN
+
+AWS PrivateLink
+
+AWS Global Accelerator
+
+Amazon CloudFront
+
+
+'Amazon CloudFront'
+
+// Amazon CloudFront is a content delivery network (CDN) service that caches content in multiple edge locations worldwide. By distributing content closer to the end-users, CloudFront reduces latency and improves transfer speeds.
+
+// The other services listed have different purposes:
+
+// AWS Site-to-Site VPN is used to establish secure connections between on-premises networks and AWS, but it doesn't specifically address latency or transfer speeds.
+
+// AWS PrivateLink allows you to access services over a private connection within an AWS network, but it's not focused on improving latency or transfer speeds.
+
+// AWS Global Accelerator is designed to improve the availability and performance of applications by utilizing AWS's vast global network infrastructure. While it can help with performance, it's not specifically designed for content caching and acceleration like CloudFront.
+========================================================================
+48
+Your company has recently deployed a new Amazon EC2 application running in an Amazon VPC. Users located at your main on-premises datacenter will need network connectivity to this application.
+
+Which services or features allow the on-premises users to connect to this application remotely? (Select TWO)
+
+'AWS Direct Connect
+AWS Site-to-Site VPN'
+Gateway VPC Endpoint
+AWS PrivateLink
+Amazon Connect
+========================================================================
+49
+Your organization is deploying Amazon VPC Lattice to make it easier for your developers to connect their services to other services.
+
+Which tool or service is used to provide authentication and authorization?
+
+
+Network Access Control Lists (NACL)
+
+Amazon VPC Network Access Analyzer
+
+'AWS Identity and Access Management (IAM)'
+
+AWS Verified Access
+
+
+
+
+auth policies in IAM
+========================================================================
+50
+Anycompany has a security policy that data should not traverse the public internet even when encrypted. They want to utilize Amazon S3 service and have set up buckets in AWS regions us-east-2 and us-west-1. The primary data center's closest AWS region is us-west-1. The application is sensitive to latency and the cost is an essential factor.
+
+Which design will achieve Anycompany's requirements?
+
+
+AWS Direct Connect connection to us-west-1 and a VPN connection to us-east-2
+
+AWS Direct Connect connection to us-east-2 and a second Direct Connect connection to us-west-1
+
+Establish a VPN connection from the Data Center to us-east-2 and us-west-1 AWS regions.
+
+'AWS Direct Connect Connection to us-west-1'

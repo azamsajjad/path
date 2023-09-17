@@ -15,8 +15,8 @@ Elastic block store - SSDs
 gp2 ssd - boot & gen - upto 16,000 IOPS per volume - 99.9% durable
 gp3 ssd - boot & gen - 3,000 - 16,000 IOPS per volume - 99.9% durable
 Provisioned IOPS:
-io1 - OLTP (latency-sensitive) 50IOPS/GB-upto 64,000 IOPS per volume - 99.9%
-io2 - OLTP (latency-sensitive) 500IOPS/GB-upto 64,000 IOPS per volume - 99.999%
+io1 -OLTP(latency-sensitive) 50IOPS/GB-upto 64,000 IOPS per volume - 99.9%
+io2 -OLTP(latency-sensitive) 500IOPS/GB-upto 64,000 IOPS per volume-99.999%
 io2 Block Express- Critical Apps SAP HANA,etc upto 64 TB, 500IOPS/GB - upto 256,000 IOPS per volume - 99.999%
 
 HDD Volumes - 
@@ -30,7 +30,7 @@ Create a snapshot of the EC2 volume. Then create a copy of the snapshot, checkin
 --------------------------------------------------------------------------
 [Elastic LOAD Balancer]
 
-Application Load Balancers - for http/s, routes to specific webserver based on type of request e.g. car dealer website 
+"Application Load Balancers "- for http/s, routes to specific webserver based on type of request e.g. car dealer website 
 ALB operates on layer 7 of OSI model - application layer
 (6-presentation,5-session,4-transport,3-network,2-data link,1-physical)
 ALB has a feature called Request Routing which allows you to add routing rules to yuor listeners based on the HTTP protocol
@@ -40,13 +40,157 @@ Great for Web Applications
     `request-routing: apply rules to incoming requests and then forward or redirect traffic 
     based on - host header, source ip, http header, http header method, query string, path
 
+Content Based Routing------------------------------------------------ .
+
+        One scenario is routing requests for different conditions to different target groups. For example, it can route traffic based on the incoming URL. If the incoming URL includes “/img,” Application Load Balancer routes traffic to a specific set of servers configured for images, as in the target group. If the URL includes “/video,” it can route that traffic to a different target group that's configured for videos. Therefore, you can construct an application with multiple microservices that can run and scale independently.'
+
+
+Redirection-----------------------------------------------------------
+–
+        Application Load Balancer uses listener rules to redirect HTTP requests to HTTPS. The largest demand for many web applications is to support HTTP-to-HTTPS redirection, to ensure all communication between an application and its users is encrypted. Before the launch of the redirection feature, users had to depend on the server application configuration to handle redirection. This feature provides redirect action on the listener rules to redirect client requests from one URL to another. You can configure redirect either as temporary (HTTP 302) or permanent (HTTP 301).
+
+Transport layer security (TLS) termination ----------------------------
++
+        TLS offloading is the process of removing the SSL-based encryption from incoming traffic to relieve a web server of the processing burden of decrypting or encrypting traffic sent via SSL. TLS is a memory-intensive process. Application Load Balancer can do most of the heavy lifting by supporting TLS offloading at the load balancer itself. Therefore, you do not have to install and configure the certificate on the web servers. This feature allows web servers to be unburdened from costly encryption and decryption overhead. 
+
+        
+
+        Sometimes, unencrypted communication to the servers isn't an acceptable option. This can be because of security or compliance requirements, or that the application only accepts a secure connection. For these applications, Application Load Balancer supports end-to-end SSL/TLS encryption. Server certificates can be managed using AWS Certificate Manager (ACM) or AWS Identity and Access Management (IAM).'
+
+ 
+
+Server name indication (SNI)-------------------------------------------
++
+        SNI is automatically activated when you associate more than one TLS certificate with the same secure listener on an Application Load Balancer. It uses a smart certificate selection algorithm with support for SNI. If the hostname provided by a client matches a single certificate in the certificate list, Application Load Balancer selects this certificate. If a hostname provided by a client matches multiple certificates in the certificate list, Application Load Balancer selects the best certificate that the client can support.
+
+
+Sticky sessions--------------------------------------------------------
++
+        Based on the Application Load Balancer managed cookies, the load balancer can direct subsequent traffic from a user session to the same server for processing. Application Load Balancer, by default, routes each request independently to a registered target based on the configured load-balancing algorithm. The cookie-based sticky session feature is useful when you want to keep a user session on the same server. To use sticky sessions, the client must support cookies.
+
+
+Integration with AWS Web Application Firewall (AWS WAF)----------------
+
+        Web applications are increasingly targets of malicious attacks. AWS WAF is a web application firewall that helps protect web applications or Amazon API Gateway against common web exploits and bots that may affect availability, compromise security, or consume excessive resources. Application Load Balancer uses AWS WAF to allow or block requests based on the rules in a web access control list (ACL).
+
+
+LOAD BALANCER CAPACITY UNITS----------------------------------------------
+Users are charged by usage. One Load Balancer Capacity Units (LCU) contains:
+
+25 new connections per second
+3,000 active connections per minute
+1 GB per hour for Amazon EC2 instances, containers, and IP addresses as targets, and 0.4 GB per hour for Lambda functions as targets
+1,000 rule evaluations per second
+
+
+ROUTING
+Routing in Application Load Balancer is performed independently for each target group, even when a target is registered with multiple target groups. Application Load Balancer uses both the round-robin load balancing algorithm and the least-outstanding-requests algorithm. Round-robin is the default routing algorithm, but you can also specify the least-outstanding-requests routing algorithm.
+
+    Listener: A listener on an Application Load Balancer checks for connection requests from clients using the port and protocol and determines how to route requests to registered targets.
+    Target group: Application Load Balancer routes requests to one or more registered targets (for example, Amazon EC2 instances) using the port and protocol that you configure. Traffic is forwarded to the target group that is specified in the listener rule.
+    Health check: Application Load Balancer uses health checks to measure the availability of target servers. The Application Load Balancer periodically sends requests to targets to check if they’re classified as healthy. 
+    Availability Zones: These are multiple, isolated locations within an AWS Region. You can increase the fault tolerance of your applications by configuring multiple Availability Zones for Application Load Balancer.
+    Cross zone: If cross-zone load balancing is turned on, each load balancer node distributes traffic across the registered targets in all configured Availability Zones. If cross-zone load balancing is turned off, each node distributes traffic across the registered targets in its Availability Zone only.
+
+What are typical use cases for Application Load Balancer?
+
+To learn more about the typical use cases for the Application Load Balancer, expand the following six sections:
+
+
+Authentication
++
+
+Websocket
++//Application Load Balancer provides native support for WebSocket using the ws:// and wss:// protocols. WebSocket is a communications protocol for a persistent, bidirectional, full duplex TCP connection from a user’s web browser to a server.
+
+HTTP/2
+// +Clients supporting HTTP/2 can connect to an Application Load Balancer over TLS. HTTP/2 is the major improvement to the HTTP protocol, aiming to help make applications faster, simpler, and more robust by improving many of the drawbacks of the first HTTP version. HTTP/2 is fully multiplexed, meaning that HTTP/2 can send multiple requests for data in parallel over a single TCP connection. HTTP/2 support is activated natively on an Application Load Balancer. 
+
+IP addresses as targets
++
+
+Lambda functions as targets
++
+
+Support for gRPC
+// +Application Load Balancer provides rich content-based routing features to inspect gRPC calls and route them to appropriate services. The gRPC framework is a popular choice for microservice integrations and client-server communications because it is a high-performance remote procedure call (RPC) framework using HTTP/2.  
+
+
+TLS certificate selection
+–
+// Application Load Balancer uses the certificates with matching hostname in the client request. If the request hostname matches multiple certificates, Application Load Balancer uses a smart selection algorithm to select the best certificate. 
+
+
+//  Certificate selection is based on the following criteria in the order listed:
+
+// Public key algorithm (prefer ECDSA over RSA)
+// Hashing algorithm (prefer SHA over MD5)
+// Key length (prefer the largest)
+// Validity period
+
+Request tracing
+–
+Application Load Balancer adds an “X-Amzn-Trace-Id” HTTP custom identifier header on all incoming requests from the client, which helps you to track requests.
+======================================================================
 Network Load Balancer - for TCP - traffic manager - expensive
 operate at layer 4-Transport 
 can handle millions of request maintaining extremely low latency 
 can perform Cross-Zone Load balancing
 Great for Multiplayer Video Games
 
+USE CASES:
 
+PRIVATE ACCESS TO SAAS APPS - see image
+// Using AWS PrivateLink, software-as-a-service (SaaS) providers can build highly scalable and secure services on AWS. Service providers can privately expose their service to thousands of customers on AWS. They can use a Network Load Balancer to target instances in their VPC using Amazon Virtual Private Cloud (Amazon VPC), which will represent their endpoint service. Customers in AWS can then be granted access to the endpoint service and create an interface VPC endpoint in their own Amazon VPC. This will be associated with the endpoint service. Therefore, customers can access the SaaS provider’s service privately from within their own Amazon VPC.
+PRESENTING MICROSERVICES
+// Network Load Balancers are well suited to microservices environments. A microservice is a variant of the service-oriented architecture that structures an application as a collection of loosely coupled services. Each service does one specialized job and does it well. Network Load Balancers can support dynamic port mapping. You can use this to run containerized applications such as Amazon ECS or Amazon EKS as a target behind a Network Load Balancer.
+MULTIPROTOCOL SUPPORT
+
+STATIC IP ADDRESSES
+
+
+
+What else should I keep in mind about Network Load Balancer?
+
+To learn about important things to consider, choose the appropriate tab.
+
+
+IDLE TIMEOUT
+// For each TCP request that a client makes through a Network Load Balancer, the state of that connection is tracked. If no data is sent through the connection by either the client or target for longer than the idle timeout, the connection is closed. If a client or a target sends data after the idle timeout period elapses, it receives a TCP reset (RST) packet to indicate that the connection is no longer valid. The load balancer sets the idle timeout value for TCP flows to 350 seconds. Clients or targets can use TCP keepalive packets to reset the idle timeout.
+
+// Although UDP is connectionless, the load balancer maintains UDP flow state based on the source and destination IP addresses and ports. The purpose is to make sure that packets that belong to the same flow are consistently sent to the same target. After the idle timeout period elapses, the load balancer considers the incoming UDP packet as a new flow and routes it to a new target. The load balancer sets the idle timeout value for UDP flows to 120 seconds. To establish a return path, EC2 instances must respond to a new request within 30 seconds.
+TLS CERTIFICATE SELECTION
+// A Network Load Balancer can support TLS offloading. You can upload multiple TLS certificates. The load balancer uses a smart certificate selection algorithm with support for SNI. If the hostname provided by a client matches a single certificate in the certificate list, the load balancer selects this certificate. If it matches multiple certificates, the load balancer selects the best certificate that the client can support. Certificate selection is based on the following criteria in the following order:
+
+// Public key algorithm: Prefer Elliptic Curve Digital Signature Algorithm (ECDSA) over Rivest–Shamir–Adleman (RSA)
+// Hashing algorithm: Prefer Secure Hash Algorithm (SHA) over Message Digest Algorithm 5 (MD5)
+// Key length: Prefer the largest
+// Validity period
+STICKINESS
+// Sticky sessions (source IP address affinity) are a mechanism to route requests from the same client to the same target. With a Network Load Balancer, you can turn on stickiness for each target group level. After the connection is established, and if the client IP, destination IP, and port are the same, traffic from the same client will be routed to the same target. If a target becomes unhealthy, the load balancer will route the request to a healthy target. However, a disadvantage of sticky sessions is that they can lead to an uneven distribution of connections and flows, which might affect the availability of your targets. For example, all clients behind the same NAT device have the same source IP address. Therefore, all traffic from these clients is routed to the same target.
+MONITORING AND LOGGING
+// You can use features such as CloudWatch metrics, access logs, and VPC flow logs to:
+
+// Monitor your Network Load Balancer.
+// Analyze traffic patterns.
+// Troubleshoot issues with load balancers and targets. 
+// You can use metrics to verify that your system is performing as expected. For example, you can create a CloudWatch alarm to monitor a specified metric and initiate an action if the metric goes outside what you consider to be an acceptable range. An example of an action is sending a notification to an email address.
+
+
+
+// If there are no requests flowing through the load balancer or no data for a metric, the metric is not reported. If you turn on access logging for your load balancer, the load balancer captures the logs as compressed files and stores them in the Amazon Simple Storage Service (Amazon S3) bucket that you specify. Access logs are created only if the load balancer has a TLS listener, and they contain information only about TLS requests.
+
+How do I manually create a Network Load Balancer instance in the AWS Management Console?
+
+// In the following demonstrations, you will set up the Amazon VPC and subnets needed to launch a Network Load Balancer, which will be configured in later demonstrations. You will create the following:
+
+// A VPC
+// An internet gateway
+// A NAT gateway
+// Two public subnets
+// Two private subnets
+// A routing table
+===========================================================================
 Classic Load Balancers - http/s & TCP  (No Target Groups)
 legacy aws load balancer -
 can run on both Layer 7 & 4
@@ -67,7 +211,129 @@ NOT RECOMMENDED TO USE,
     `cross-zone load balancing: only for classic and NLB
     -requests are distributed evenly across instances in all enabled AZs 
     when disabled-requests are distributed evenly across instances in 1 AZ
+===========================================================================
 Gateway Load Balancers - provides load balancing for 3rd-party virtual appliances
+What problems does Gateway Load Balancer solve?
+
+Customers and partners face several challenges while moving their workloads to the cloud. Customers would like to keep third-party services that they are comfortable with. Moving to any new service will affect their architecture and may require design change. With Gateway Load Balancer, you can deploy inline networking and security as a managed service in single and multi-tenant designs. This allows customers to consume third-party services in a cloud-native way, and save time and money, while also reducing risks.
+
+Lack of scaling
+–
+// Third-party virtual appliances, such as next-gen firewalls, intrusion detection or protection systems, and web application firewalls, have fixed performance (throughput, number of flows, flows per second, and so on) and can’t scale elastically. These factors limit deployment options in the cloud.
+
+
+Lack of high availability
++
+
+Complexity
+–
+// Current methods of scaling network appliances in the cloud require complex topology. This can include a “firewall sandwich,” virtual private network (VPN) overlays, source network address translation (NAT), additional instances, and configuration. This complexity increases the possibility of administrator error, accidental exfiltration of sensitive data, and inbound security attacks.
+
+
+Inconsistent security practices
++
+
+Addresses challenges
++
+Using Gateway Load Balancer endpoints, you can securely exchange traffic across VPC boundaries. This provides private connectivity between virtual appliances in a centralized VPC and the application servers in the service consumer VPC. You deploy Gateway Load Balancer in the same VPC as the virtual appliances. You can register and deploy the virtual appliance instances with a target group for the Gateway Load Balancer, making it highly scalable, and fault tolerant.
+
+
+
+What are the basic technical concepts of Gateway Load Balancer?
+
+The Gateway Load Balancer operates at the third layer of the Open Systems Interconnection (OSI) model, the network layer, or most commonly called Layer 3. 
+
+1
+
+1
+Listener: A listener is a process that checks for connection requests. Listeners for Gateway Load Balancers listen for all IP packets across all ports. You cannot specify a protocol or port when you create a listener for a Gateway Load Balancer.
+
+2
+
+2
+Target group: This is used to route requests to one or more registered targets. Traffic is forwarded to the target group that is specified in the listener rule.
+
+3
+
+3
+Target type: This determines the type of target in a target group (a possible target type is Geneve).
+
+4
+
+4
+Health check: The health check mechanism of the Gateway Load Balancer determines the status of a target in a target group by performing a Layer 4 or Layer 7 health check.
+
+5
+
+5
+Availability Zone: These are multiple isolated locations within an AWS Region. You can increase the fault tolerance of your applications by configuring multiple Availability Zones for your load balancer.
+
+6
+
+6
+Cross zone: If cross-zone load balancing is turned on, each load balancer node distributes traffic across the registered targets in all configured Availability Zones. If cross-zone load balancing is turned off, each node distributes traffic across the registered targets in its Availability Zone only.
+
+USE CASES .
+
+CENTRALIZING APPLIANCE FLEET
+
+NETWORK MONITORING
+// Because third-party virtual appliances deployed within Gateway Load Balancer sit in line with network traffic (known as a “bump-in-the-wire”), they are uniquely positioned for network logging and monitoring roles. These types of third-party analytics and monitoring appliances can help you diagnose problems, build more resilient applications, and run more effectively.
+
+PROTECTION SYSTEMS
+// You use intrusion detection and prevention devices, next-generation firewalls, and distributed denial of service (DDoS) protection systems as part of your defense in depth strategy.
+
+NETWORK ORCHESTRATION
+// Network orchestration helps you to provision and manage your network. Gateway Load Balancer can be deployed using orchestration tools from industry leaders—naturally fitting in to your operational processes and systems. In addition, Gateway Load Balancer works with AWS CloudFormation—a powerful tool for automating the deployment and management of AWS resources. Because Gateway Load Balancer replaces multiple layers of VPCs and load balancers with one central service, it helps you to write and maintain your CloudFormation templates.
+
+FEATURES
+Transparency for applications when traffic is being analyzed
++
+// The traffic that Gateway Load balancer analyzes remains intact. It does not modify the client packet headers and payload. By using transparent forwarding behavior, the Gateway Load Balancer encapsulates the original packet using Geneve encapsulation and sends and receives packets to and from appliance instances registered to it.
+
+// Appliance instances registered on its target groups need to decapsulate Geneve TLV pairs to process the original packet. The reason for using Geneve is that encapsulating the original packet into a new Layer 3 packet is the only feasible solution for routing packets between Gateway Load Balancer and appliances. That is because source and destination IPs on such packets will not be the same as the IPs on Gateway Load Balancer or appliances. Therefore, normal VPC routing based on those IPs will result in packets bypassing the Gateway Load Balancer or appliances.
+
+// In addition, to support multi-tenant appliances with overlapping classless inter-domain routing (CIDR), appliances need to know the source of the traffic. Gateway Load Balancer also needs to keep track of flows and avoid intermixing user traffic. Gateway Load Balancer can achieve this by sending extra information (such as Gateway Load Balancer ID, Attachment ID, and flow cookie) using TLV triplets for every packet to the appliance.
+// Scale your virtual appliance instances automatically
++
+Bring higher availability to your third-party virtual appliances
++
+// Gateway Load Balancer works with AWS Auto Scaling groups and lets you to set target usage levels for your virtual appliance instances. This ensures that you have the optimal number of resources available at all times. When traffic increases, additional instances are created and connected to the Gateway Load Balancer. When traffic returns to normal levels, those instances are terminated.
+Monitor continuous health and performance metrics
++
+// You can monitor Gateway Load Balancer using Amazon CloudWatch and publish metrics like ActiveFlowCount, HealthyHostCount, UnHealthyHostCount, NewFlowCount, and ProcessedBytes. AWS PrivateLink publishes data points to Amazon CloudWatch for the load balancer endpoint.
+Ensure private connectivity over the AWS network
++
+// Used by Gateway Load Balancer to connect to sources and destinations of network traffic, Gateway Load Balancer endpoints are a new type of Amazon VPC endpoint. Powered by PrivateLink technology, they connect internet gateways, Amazon VPCs, and other network resources over a private connection. Your traffic flows over the AWS network, and data is never exposed to the internet.
+Simplify deployment with AWS Marketplace
++
+STEPS to create GLB:
+Register a target to a target group.
+Create a load balancer.
+Create the Gateway Load Balancer service and endpoint.
+Configure routing.
+Delete the Gateway Load Balancer resources.
+
+To set up the Gateway Load Balancer environment, you need both a service consumer VPC and service provider VPC with the parameters outlined previously in the prerequisites. 
+
+
+
+That is, you must have a Gateway Load Balancer endpoint subnet with 10.0.2.0/24, an  application server with subnet 10.0.1.0/24, and a service consumer VPC and endpoint service with subnet 192.168.1.0 /24 in the service provider VPC. Add port UDP 6081 to both inbound and outbound rules on the security group of the appliance to accept Geneve traffic from the Gateway Load Balancer.
+
+
+Route Tables:
+InternetGateway Route Table:
+10.0.1.0/24 vpce-vpc endpoint glb
+10.0.0.0/16 local
+
+Application Servers Route Table:
+0.0.0.0/0 vpce-{vpc endpoint(glb)}
+10.0.0.0/16 local
+
+GatewayLoadBalancer Endpoint Route Tables:
+0.0.0.0/0 igw 
+10.0.0.0/16 local
+===========================================================================
 
 X-Forwarded-For - if you need ipv4 address of your end user, look for XForwardedFor HTTP Header
 504 Error - Gateway Timeout - application is not responding within timeout period - troubleshoot application or database server

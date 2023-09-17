@@ -1,0 +1,1664 @@
+Lambda Charges: (pay only when your code executes)
+1 - Based on Requests
+first million requests per month are free 
+$0.20 per month per 1 million requests 
+
+2- Duration 
+You are charged in millisecond increments 
+price depend on amount of memory you allocate to your lambda function 
+Price per GB-Second 
+$0.00001667 per GB-Second 
+A function that uses 512mb and runs for 100ms 
+0.5GB x 0.1s = 0.05 GB-Seconds 
+cost = $0.0000000083 
+First 400,000 GB-Seconds per month are free
+
+Lambda is Event-driven 
+Lambda is Independent - each event will trigger a single function
+Lambda is triggered by Events e.g. changes to s3 bucket/DB run function
+Lambda is also triggered by User Requests e.g. alexa
+
+LAMBDA TRIGGERS: (aws services)
+DynamoDB
+Kinesis 
+SQS 
+Application Load Balancer 
+API Gateway 
+Alexa 
+CloudFront 
+S3
+SNS 
+SES 
+CloudFormation 
+CloudWatch 
+CodeCommit 
+CodePipeline
+
+When building and testing a function, you must specify three primary configuration settings: memory, timeout, and concurrency. These settings are important in defining how each function performs. Deciding how to configure memory, timeout, and concurrency comes down to testing your function in real-world scenarios and against peak volume. As you monitor your functions, you must adjust the settings to optimize costs and ensure the desired customer experience with your application.
+
+
+Your Lambda function is billed based on runtime in 1-ms increments. Avoiding lengthy timeouts for functions can prevent you from being billed while a function is simply waiting to time out.
+
+Duration is calculated from the time your code begins running until it returns or otherwise terminates, rounded up to the nearest 1 ms. Price depends on the amount of memory you allocate to your function, not the amount of memory your function uses. If you allocate 10 GB to a function and the function only uses 2 GB, you are charged for the 10 GB. This is another reason to test your functions using different memory allocations to determine which is the most beneficial for the function and your budget. 
+
+The AWS Lambda Free Tier includes 1 million free requests per month and 400,000 GB-seconds of compute time per month.
+
+The balance between power and duration:
+
+Depending on the function, you might find that the higher memory level might actually cost less because the function can complete much more quickly than at a lower memory configuration.
+
+You can use an open-source tool called Lambda Power Tuning to find the best configuration for a function. The tool helps you to visualize and fine-tune the memory and power configurations of Lambda functions. The tool runs in your own AWS account—powered by AWS Step Functions—and supports three optimization strategies: cost, speed, and balance. It's language-agnostic so that you can optimize any Lambda functions in any of your languages. '
+
+Having more than one invocation running at the same time is the function's concurrency.'
+
+====================================================================
+================================
+================================
+================================
+
+API : Application Programming Interface 
+we use APIs to interact with web applications 
+Applications use APIs to communicate with each other
+APIs are mechanisms that facilitate two software components communicating with each other. APIs act as the front door for applications to access data, business logic, or functionality from backend services. 
+
+======================="API Gateway features"===========================
+
+----------------"Developer features in API Gateway"----------------------
+
+"Run multiple versions of an API at the same time"
+With API Gateway, you can run multiple versions of the same API simultaneously so that you can quickly iterate, test, and release new versions. You can make changes to your API and host multiple versions of it for different users also.
+
+"Quick SDK generation"
+If you’re using REST APIs, API Gateway can generate client Software Development Kits (SDKs) for several platforms, which you can use to quickly test new APIs from your applications and distribute SDKs to third-party developers. 
+The generated SDKs handle API keys and sign requests using AWS credentials. API Gateway can generate client SDKs for Java, JavaScript, Java for Android, Objective-C or Swift for iOS, and Ruby. You can use AWS Command Line Interface (AWS CLI) to generate and download an SDK of an API for a supported platform by calling the get-sdk command.
+
+"Transform or validate request-response data"
+With API Gateway, you can also transform and validate both incoming and outgoing requests. With this feature, you can use API Gateway as a fully managed environment for transforming requests as they come into your API before they are passed to your backend.
+
+-------------"Features for managing API access"------------------------
+
+There are also some important features for managing API access. To learn more, expand each of the following three categories.
+
+
+"Reduce latency and throttle traffic"
+API Gateway provides end users with the lowest possible latency for API requests and responses by taking advantage of the Amazon CloudFront global network of edge locations. With this service, you also can throttle traffic and authorize API calls to ensure that backend operations withstand traffic spikes and backend systems are not unnecessarily called.
+
+
+"Built-in, flexible authorization option"
+API Gateway gives you several options for authorization. You can authorize access to your APIs with AWS Identity and Access Management (IAM) and Amazon Cognito. If you use OAuth tokens, API Gateway also offers native OpenID Connect (OIDC) and OAuth 2 support. 
+To support custom authorization requirements, you can invoke a Lambda authorizer from Lambda. With a Lambda authorizer, you can develop your own authorization code using a custom Lambda function.
+
+"API keys for third-party developers"
+If you’re using REST APIs, API Gateway helps you manage the ecosystem of third-party developers accessing your APIs. You can create API keys on API Gateway, set fine-grained access permissions on each API key, and distribute them to third-party developers to access your APIs. API keys are not a primary authorization mechanism for your APIs, but provide you the ability to track usage for specific users or services.
+
+========================================================================
+REST APIs are intended for APIs that require API proxy functionality and API management features in a single solution. HTTP APIs are optimized for building APIs that proxy to Lambda functions or HTTP backends, making them ideal for serverless workloads. HTTP APIs are a cheaper and faster alternative to REST APIs, but they do not currently support API management functionality. Unlike a REST API, which receives and responds to requests, a WebSocket API supports two-way communication between client apps and your backend. The backend can send callback messages to connected clients.
+========================================================================
+WebSocket APIs are often used in real-time application use cases such as:
+
+Chat applications
+Streaming dashboards
+Real-time alerts and notifications
+Collaboration platforms
+Multiplayer games
+Financial trading platforms
+
+PRICING
+
+FLAT CHARGE
+WebSocket APIs for API Gateway charge for the messages you send and receive. You can send and receive messages up to 128 KB in size. Messages are metered in 32-KB increments, so a 33-KB message is charged as two messages.
+For WebSocket APIs, the API Gateway free tier currently includes one million messages (sent or received) and 750,000 connection minutes for up to 12 months.
+
+CONNECTION MINUTES
+In addition to paying for the messages you send and receive, you are also charged for the total number of connection minutes.
+
+ADDITIONAL CHARGES
+You may also incur additional charges if you use API Gateway in conjunction with other AWS services or transfer data out of AWS.
+========================================================================
+===========Maintaining connections to WebSocket APIs====================
+
+To understand how the WebSocket connections are maintained, you need to understand how the client connects, sends messages, and disconnects from the API. To learn more, expand each of the following three categories.
+
+
+Connect
+–
+The client apps connect to your WebSocket API by sending a WebSocket upgrade request. If the request succeeds, the $connect route is invoked while the connection is being established. Until the invocation of the integration you associated with the $connect route is completed, the upgrade request is pending and the actual connection will not be established. If the $connect request fails, the connection will not be made.
+
+
+Established connection
+–
+After the connection is established, your client's JSON messages can be routed to invoke a specific backend service based on message content. When a client sends a message over its WebSocket connection, this results in a route request to the WebSocket API. The request will be matched to the route with the corresponding route key in API Gateway. 
+
+
+Disconnect
+–
+The $disconnect route is invoked after the connection is closed. The connection can be closed by the server or by the client. As mentioned earlier in the lesson, since the connection is already closed when it is invoked, the $disconnect route is a best-effort event. API Gateway will try its best to deliver the $disconnect event to your integration, but it cannot guarantee delivery. The backend can initiate disconnection by using the @connections API. '
+-------------------------------------------------------------------------
+=====================TYPES REST APIs====================================
+Regional endpoint
+Provides lower latency for applications that invoke your API within the same AWS Region
+
+Edge-optimized endpoint
+Deploys a fully managed Amazon CloudFront distribution
+
+Private endpoint
+Requests are only routable within a single virtual private cloud (VPC) that you control
+
+
+Q
+Which of the following REST API endpoint type changes is not supported by API Gateway? Select the correct answer and choose SUBMIT. 
+From private to edge-optimized
+-----------------------------------------------------------------------
+You can also define usage  plans that set throttling and request quota limits for each API key. The use of API keys is optional.
+
+Using API Gateway as the front door for APIs
+
+Before diving into how to design and deploy APIs in API Gateway, you need to understand what API Gateway is. API Gateway is a service that facilitates the creation, publishing, maintenance, monitoring, and security of your APIs at any scale. API Gateway handles all your tasks around accepting and processing hundreds of thousands of concurrent API calls. This includes handling traffic management, Cross Origin Resource Sharing (CORS) support, authorization and access control, throttling, monitoring, and API version management. 
+
+
+
+API GATEWAY : is serverless, supports throttling, logged to CloudWatch
+API GATEWAY provides endpoints for your apps running in aws
+publish maintain and monitor APIs 
+API TYPES :
+RESTful APIs are optimized for stateless, serverless workloads
+REST=REpresentational State Transfer, supports JSON
+Websocket APIs are for real-time, two-way, stateful communication e.g. chat apps
+users -> API GATEWAY -> Lambda
+users -> API GATEWAY -> EC2
+users -> API GATEWAY -> DynamoDB
+
+$LATEST is the latest version of code you uploaded into lambda 
+how to version control 
+upload code > action > publish new version > create alias 
+(weighted traffic routing also supported between versions)
+
+Concurrent Execution Limit is 1000 functions per region per account
+HTTP status code 429
+you can also reserve some concurrency for critical lambda functions
+they will be prioritized
+but it also sets limit for that function.e.g if you reserve 500 simultaneous function execution for a particular function, it will never go beyond 500 concurrent runs
+
+LAMBDA and VPC Access 
+it is possible to enable lambda access resources that are inside private VPC
+these resources can be EC2/RDS/etc
+Lambda creates ENIs using IP from private subnets
+configuration > permissions > Execution role url
+AWSLambdaVPCAccessExecutionRole (add this policy for lambda to access VPC)
+
+
+---------------------------------------------------------------------------
+Severless Architectures are Event-Driven and Asynchronous
+->so an event may trigger an action, but no response is required/expected
+SQS allows you to queue messages
+EventBridge helps to handle events & route them to application components
+Characteristics of Event-Driven Architecture 
+        Event Source    --> Event Router -->    Event Destination
+            s3              EventBridge         Lambda
+            dynamoDB                            SNS
+                                                Lambda
+---------------------------------------------------------------------------
+STEP Functions: 
+provide visual interfac for serverless apps app is series of steps excuted in order as defined by your business logic
+Output of one step can be input of next step
+step functions also logs state of each step
+
+STEP Functions Workflows
+Standard Workflows: 
+     -> Long-Running (upto 1 year)
+     -> At-Most-Once Model  - (tasks are never executed more than once, unless explicitly specified by retry actions.)
+     -> Non-Idempotent Actions e.g. when processing payments, you want payment to be processed once
+     -> Change in State? a req is non-idempotent if it always change state
+
+Express Workflows:
+    -> Short-Lived (upto 5 minutes)
+    -> At-Least-Once 
+    -> Idempotent Actions
+    -> Identical Request - has no side effect
+    2 types of Express Workflows
+        -> Synchronous - begins workflow->wait till complete->return result
+            workflows hold u up until they are complete
+            e.g. job interview, successful payment b4 processing order
+        -> Asynchronous - begins->confirm that its started->cloudwatch logs
+            runs in the background
+            e.g. email to a colleage, messaging system
+
+---------------------------------------------------------------------------
+LAMBDA STORAGE PATTERNS:
+
+Lambda is stateless (you cannot permanently store any data in the function)
+Lambda is Ephemeral (not used for apps that need to run 4longer than 15min)
+To make Lambda Persistent -> make it interact with a data store.
+                            e.g. S3,EFS,DynamoDB or /tmp,layers
+
+/tmp , lambda layers = Native Lambda storage options
+/tmp = by default 512mb, configurable upto 10GB (but NON_PERSISTENT)
+/tmp = used while function is executing
+/tmp = like a cached file system
+/tmp = shared within execution environments
+
+Storing Lambda Libraries - can be included with the code as zip file 
+LAYERS                     but it makes deployment heavy
+LAYERS = limit 50mb zipped, 250mb unzipped
+LAYERS = shared across execution environments
+- Best Practice (Add libraries & SDKs as layers)
+    (However, if you want to change version of a library included)
+    (you can''t update it dynamically)
+    (you need to create a new layer & reference that)
+
+PERSISTENT_STORAGE:
+S3  -> elastic, means no size limit
+    -> but there are constraints, because S3 is object storage 
+    -> allows you to store & retrieve objects, not a file system 
+    -> Cannot Append data 
+    -> if you want to change data, you need to upload a new object
+better option = EFS ~ Shared file system 
+EFS = dynamically updated, no size limit
+    = mounted by the function when execution environment is created 
+    = can be shared across invocations 
+    = VPC-to use EFS, lambda function must be in same VPC as EFS file system
+
+---------------------------------------------------------------------------
+LAMBDA ENVIRONMENT VARIABLES 
+-> adjust your function behavior, without changing your code
+-> make your function behave differently in dev env. than it does in prod.
+-> key-value pairs (key=environment, value=development)
+ENV Variables are locked once the Version is published 
+ENV Variables are defined before Version is published
+USE-CASES = references S3 resources, SNS Topic, DynamoDB Table
+             BUCKET=my-bucket  SNSTOPIC=my-Topic  TABLE=my-table
+
+---------------------------------------------------------------------------
+LAMBDA INVOCATIONS 
+when invoking a function, you can invoke it synchronously or asynchronously
+SYNC Invocation -> lambda runs the function, wait for its response, returns the response
+                -> the service calling the function will know if the function completed successfully or not
+                -> e.g. API Gateway invoking a function and returning error code to the caller
+ASYNC Invocation -> No Acknowledgement to let you know invocation was successful
+                -> the service calling the function will not know if the function completed successfully or not
+LAMBDA Retries:
+default -> performs 2 retries 
+lambda waits 1 min before first retry, it waits 2 minutes before 2nd retry
+
+===========================================================
+===========================================================
+Error handling for synchronous and asynchronous events
+===========================================================
+In a synchronous invocation, like between API Gateway and Lambda, no retries are built in. You have to write code to handle errors and retries for all error types.  
+
+
+
+With asynchronous event sources, like Amazon S3, Lambda provides built-in retry behaviors. 
+
+When Lambda gets an asynchronous event, it handles it a lot like the SQS example we reviewed earlier. The Lambda service returns a success to the event source and puts the request in its own internal queue. Then it sends invocation requests from its queue to your function. 
+
+If the invocation request returns function errors, Lambda retries that request two more times by default. You can configure this retry value between 0 and 2. 
+
+
+
+If the invocation request returns invocation errors, Lambda retries that invocation for up to 6 hours. You can decrease the default duration using the maximum age of event setting. 
+
+To handle events that continue to fail beyond the retry or maximum age settings, you can configure a dead-letter queue on the Lambda function. 
+
+===========================================================
+===========================================================
+
+===========================================================================
+===========================================================================
+===========================================================================
+Error handling with Amazon SQS as an event source
+===========================================================================
+For polling event sources that aren’t stream based, for example Amazon SQS, if an invocation fails or times out, the message is available again when the visibility timeout period expires.
+
+Lambda keeps retrying that message until it is either successful or the queue’s Maxreceivecount limit has been exceeded. 
+
+As noted earlier, it’s a best practice to set up a dead-letter queue on the source queue to process the failed messages.
+
+When you’re building serverless applications, you need to execute performance tests, and adjust retries and timeouts to find the optimal combination that allows your processes to complete but doesn’t create bottlenecks that can cascade throughout the system.
+
+Let’s go back to the connection between an Amazon SQS queue and Lambda as an example of how you manage timeouts across services.
+
+You can set a timeout on your Lambda functions, and you can set the visibility timeout on SQS queues.
+
+You can also set the batch size for the queue from 1 to 10 messages per batch, which can impact both your function timeout and your visibility timeout configurations.
+
+You choose your Lambda timeout to allow the function to complete successfully under most circumstances.
+
+You also want to consider at what point to give up on individual invocation to avoid additional costs or prevent a bottleneck.
+
+A larger batch size can reduce polling costs and improve efficiency for fast workloads. But for longer running functions, you might need a lower batch size so that everything in the batch is processed before the function timeout expires.
+
+For example, a batch size of 10 would require fewer polling processes and fewer invocations than a batch size of 3. 
+
+If your function typically can process a message in 2 seconds, then a batch size of 10 would typically process in 20 seconds, and you might use a function timeout of 30 seconds. But if your function takes 2 minutes to process each message, then it would take 20 minutes to process a batch of 10.
+
+However, the maximum timeout for Lambda is 15 minutes, so that batch would fail without processing all of its messages, and any messages in that batch that weren’t deleted by your function would again be visible on the queue. Which brings us back to the visibility timeout setting on the queue.
+
+You need to configure the visibility timeout to allow enough time for your Lambda function to complete a message batch. So if we stick with the example of a batch size of 10 and a Lambda function that takes 20 seconds to process the batch, you need a visibility timeout that is greater than 20 seconds.
+
+You also need to leave some buffer in the visibility timeout to account for Lambda invocation retries when the function is getting throttled. You don’t want your visibility timeout to expire before those messages can be processed. The best practice is to set your visibility timeout to 6 times the timeout you configure for your function.
+
+You’ll find a summary table beneath the video, as well as links to the developer guide pages for each service’s relevant timeout features.
+===========================================================================
+===========================================================================
+===========================================================================
+Error handling for stream-based events
+===========================================================================
+A better way to manage failures is to modify the default behaviors using four configuration options introduced in 2019:
+
+Bisect batch on function error
+Maximum retry attempts
+Maximum record age
+On-failure destination
+Bisect batch on function error tells Lambda to split a failing batch into two and retry each batch separately.
+
+Maximum retry attempts and maximum record age let you limit the number or duration of retries on a failed batch.
+
+And on-failure destination lets you send failed records to an SNS topic or SQS queue to be handled offline without having to add additional logic into your function.
+
+Here’s an illustration of how these options work together. In this example, BisectOnFunctionError = True, MaximumRetryAttempts = 2, and DestinationConfig includes an OnFailure Destination that points to an SNS topic.
+
+Assume you have a batch of 10 records, and the third record in this batch of 10 returns a function error. When the function returns an error, Lambda splits the batch into two, and then sends those to your function separately, still maintaining record order. Lambda also resets the retry and max age values whenever it splits a batch.
+
+Now you’ve got two batches of five. Lambda sends the first batch of five and it fails. So the splitting process repeats. Lambda splits that failing batch yielding a batch of two and a batch of three records. Lambda resets the retry and max age values, and sends the first of those two batches for processing.
+
+This time, the batch of two records processes successfully. So Lambda sends the batch of three to the function. That batch fails. Lambda splits it, and now it has a batch with one record (the bad one) and another with two records.
+
+Lambda sends the batch with a bad record and it fails, but there’s nothing left to split.
+
+So now the max retry and max age settings come into play. In this example, the function retries the record twice, and when it continues to fail, sends it to the SNS topic configured for the on-failure destination.
+
+With the erroring record out of the way, Lambda works its way back through each of the smaller batches it created, always maintaining record order.
+
+So Lambda is going to process the unprocessed batch of two, then the unprocessed batch of five. At that point, the original batch of 10 is marked as successful, and Lambda moves the pointer on the stream to the start of the next batch of records.
+
+These options provide flexible error handling, but they also introduce the potential for a record to be processed multiple times. In the example, the first two records are processed before the function returns an error. Then they’re processed a second time in the smaller batch of five records, which also fails, and then they are processed a third time in their own batch.
+
+This means you have to handle idempotency in your function rather than assuming only-once record processing.
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+Failed-event destinations
+Use the Lambda destinations OnFailure option to send failures to another destination for processing. 
+========================================================================
+For both asynchronous and streaming event sources, you can specify an on-failure destination for a Lambda function. For asynchronous sources, you have the option of an SNS topic, SQS queue, EventBridge event bus, or another Lambda function. For streaming event sources, you can specify an SNS topic or an SQS queue.
+
+The previous video gave an example of using an on-failure destination on a stream. Let’s go back to the order submission example to illustrate where you might use an on-failure destination with an asynchronous event.
+
+The SendOrder Step Functions task kicks off the SNS fulfillment topic, whose subscribers handle additional fulfillment requirements. Let’s say that one of the subscribers is a Lambda function that decides if the order qualifies for a promotional gift. If it does, the function initiates steps to send the gift from a third-party system.
+
+To handle potential failures caused by the third-party system, set the function’s on-failure destination equal to the ARN of an SNS topic that notifies the team responsible for fulfillment.
+
+There are a couple of advantages to using an on-failure destination rather than using a dead-letter queue. First, the invocation record that is sent to the on-failure destination contains more data than the event object available to a dead-letter queue.
+
+Second, it provides more flexibility to change or modify the failure behaviors. A dead-letter queue is part of a function’s version-specific configuration.  
+
+You can also set on-success destinations to route successfully processed events without modifying your Lambda function code.
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+Step Functions for failure management
+========================================================================
+RETRY 
+What if the call to the DynamoDB table fails when trying to retrieve the connection ID? To address this, you should include a Retry field with exponential backoff to retry the connection.
+
+
+CATCH
+What if the Lambda function fails to write the execution ARN and WebSocket URL? In this case, a retry wouldn’t resolve it. So you could use a Catch field to catch the error and transition to a fallback state.
+
+
+LOOPING
+What if the Step Functions work completes before the client has connected via the WebSocket API? The notification step wouldn't find the connection ID in the DynamoDB table. To address this type of issue, you could nest a looping pattern within the GetConn task that uses a Lambda function to execute the GetItem API call to the database a set number of times before failing that step.'
+========================================================================
+Which of these statements about AWS Step Functions States Language are true? (Select THREE.)
+
+"
+Task and Parallel states can have a field named Retry. An individual retrier represents a certain number of retries."
+
+Correctly checked
+Choice states can have a field named Catch. When a state reports an error that cant be resolved by retriers, Step Functions scans through the catchers to find the error name in the ErrorEquals field.
+
+Correctly unchecked
+You cant use a Retry or Catch field to handle timeouts.
+
+"Correctly checked
+The Amazon States Language defines a set of built-in strings that name well-known errors, all beginning with the States. prefix."
+
+"Correctly checked
+The reserved name States.ALL is a wildcard that matches any error name."
+
+Correctly checked
+Choice states can have a field named Retry. An individual retrier represents a certain number of retries.
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+Dead-Letter Queues for failure management
+========================================================================
+It is a best practice to enable dedicated dead-letter queues for individual Lambda functions that are invoked asynchronously. You can use Amazon SNS or SQS as dead-letter queues for Lambda functions.
+
+You need to create the queue or SNS topic separately and then reference it on the function. Make sure that the Lambda execution role has permission to write to the topic or queue.
+
+When you use SQS as an event source, you configure the dead-letter queue on the source queue, not the Lambda function. The primary distinction between a dead-letter queue on the source queue versus on a Lambda function is that a dead-letter queue attached to the source queue is actually part of the queue policy.
+
+The policy describes how many times a message is retried before putting it on the dead-letter queue. This gives you visibility about the queue itself, regardless of its target. 
+
+In addition to configuring the dead-letter queue, you can use the ApproximateAgeOfOldestMessage CloudWatch metric to alarm on a backup in the queue, and publish to an Amazon SNS topic for notification. When the dead-letter queue is configured on a Lambda function, messages that error out after the two built-in retries are routed to the dead-letter queue, where you can investigate the failure.
+
+In either type of dead-letter queue, you need a mechanism to redrive the messages back to the original source.
+
+AWS Event Fork Pipelines—available from the Serverless Application Repository—can facilitate this without you having to recreate something from scratch.
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+Distributed tracing with AWS X-Ray
+
+Another important best practice for event-driven, decoupled applications is the use of distributed tracing to give you insight into issues or bottlenecks across your distributed architecture. 
+
+Example: AWS X-Ray service graph
+
+When X-Ray is enabled, it gets data from services as segments and groups them by request into traces. X-Ray then creates a service graph that gives you a visual representation of what’s happening at each service integration point, highlighting successful and failed service calls. To learn more, choose each numbered marker.
+
+SERVICE GRAPH
+Customers have reported issues using a service, and you need a quick sense of status.
+TRACES
+Youve identified failures at an integration point and want to review individual requests.
+SUBSEGMENTS
+You need a more granular breakout of the work done in a request to resolve the issue.
+ANNOTATIONS
+You want to be able to group traces across application operations to compare performance.
+========================================================================
+========================================================================
+========================================================================
+========================================================================
+[DLQs and Destinations]
+
+Dead-Letter Queues (DLQs):
+save failed invocations for further processing 
+associated with a particular version of a function 
+can be an event source for a function, allowing you to re-process events.
+handles failures only 
+SQS->holds failed events in the queue until they are retrieved 
+SNS->send notification about failed events to one or more destinations
+
+Lambda Destinations: optionally, configure lambda to send invocation records to another service 
+lambda --invocation_success-->EventBridge-->so successful inv are tracked
+lambda --invocation_success-->SQS-->queue for review
+lambda --invocation_failure-->SNS-->mail or sms
+lambda --invocation_failure-->lambda-->trigger another function
+
+LAB
+create function 
+create SNS topic -> add subscription -> add email
+configuration -> destinations -> ASYNC & Condition & Destination Type
+$ aws lambda invoke --function-name myfunction --invocation-type Event response.json
+you will receive an email from SNS
+// {"version":"1.0","timestamp":"2023-08-15T19:56:55.223Z","requestContext":{"requestId":"0d2b2356-82c9-4380-8fbf-ef268102c8e4","functionArn":"arn:aws:lambda:us-east-1:145794000460:function:myFunction1:$LATEST","condition":"Success","approximateInvokeCount":1},"requestPayload":{},"responseContext":{"statusCode":200,"executedVersion":"$LATEST"},"responsePayload":{"statusCode": 200, "body": "\"Hello from Lambda!\""}}
+useful information
+
+Now delete this destination 
+
+go to configuration -> asynchronous invocation & enable SNS for DeadLetterQueue
+you will receive an email from DLQ
+// {}
+No useful information for us but it let lambda know that there was failed invocation
+---------------------------------------------------------------------------
+LAMBDA DEPLOYMENT PACKAGE
+when you paste code in lambda, lambda automatically creates a deployment package for you in .zip which includes your code and dependencies.
+
+Other Method -> create deployment package yourself and upload zip file 
+             -> limit is 50 mb
+             -> if deployment package is greater than 50 mb 
+             -> upload it to S3 in same region as u create your function
+             -> then specify S3 object when u create your function 
+
+Other Method -> Lambda Layers
+             -> libraries, custon runtimes, etc 
+             -> a layer can be used by multiple functions 
+             -> helps reduce the size of deployment package 
+             -> BEST PRACTICE
+---------------------------------------------------------------------------
+LAMBDA PERFORMANCE TUNING 
+
+for SYNCHRONOUS & ASYNCHRONOUS INVOCATIONS
+CONCURRENCY = Request Rate x Average Duration
+            = 25/sec x 10sec(function runtime)
+            = 250 concurrent invocations
+if avl concurrency is less than 250, requests will be throtled
+no retry for synchronous
+
+for STREAMING INVOCATIONS
+limit of one concurrent invocation per shard
+AWS Lambda now supports a Parrallelization Factor for Streams to invoke more than one function per shard
+
+
+Memory assignment will impact how long your function runs and, at a larger scale, can impact when functions are throttled. For example, if your function lasts 10 seconds on average, and there are 25 requests per second, you need 250 concurrent invocations of that function. But if your function lasts only 5 seconds at the same request rate, you only need 125 concurrent invocations.
+
+
+
+SCALING
+
+Now let’s look at how those choices play into performance as things scale. Lambda defaults to using five parallel processes to get messages off the queue. These five parallel processes mean Lambda is invoking five concurrent instances of your Lambda function. To avoid your Lambda function getting throttled right out of the gate, make sure that the reserved concurrency on the function is at least five.
+If the Lambda service detects an increase in queue size, it will automatically increase how many batches it gets from the queue, each time. That means it will increase the number of concurrent Lambda functions it invokes.
+
+Lambda will continue to add additional processes every minute until the queue has slowed down, or it reaches maximum concurrency. Maximum concurrency is 1,000, unless the account or function limit is lower.
+
+If your Lambda function returns errors when processing messages, the Lambda service will decrease the number of processes polling the queue, assuming that the errors indicate too much pressure on downstream targets.
+
+SQS will continue to try a failed message up to the maximum receive count specified in the redrive policy, at which point, if a dead-letter queue is configured, the failed message will be put into the dead-letter queue and deleted from your SQS queue.
+
+
+memory 128 mb to 10,240 mb
+adding memory will improve function performance because with more memory, you get more cpu.
+adding memory may reduce duration the function runs for
+Steps:
+DOWNLOADS CODE ---> CONFIGURE ---> STATIC INITIALIZATION ---> FUNCTION CODE
+set ups execution   memory,         import libraries,sdks     tmp, re-use 
+environment         runtime          (ADDS LATENCY)           execution env
+                                                        for next function
+
+How to optimize STATIC INITIALIZATION
+three factors to reduce latency:
+1- code - the amount of code that needs to run during initialization phase 
+2- function package size 
+3- performance - libraries/other services that require connections to be set up e.g. connections to S3 or database
+e.g. dont import entire aws-sdk if your code can run on just one or two services 
+instead of (aws-sdk), import (aws-sdk/clients/dynamodb)
+---------------------------------------------------------------------------
+
+
+API GATEWAYS (ADVANCED)
+
+SOAP - legacy protocol - returns a response in XML format instead of JSON
+        came out in 1990s - you can configure API Gateway as a SOAP web service passthrough - how?
+        https://www.rubix.nl/blogs/how-configure-amazon-api-gatewaysoap-        webservice-passthrough-minutes
+REST - Latest protocol
+
+IMPORT APIs
+You can use the API Gateway Import API feature to import an API from an
+external definition file into API Gateway. Currently, the Import API feature supports Swagger v2.0 definition files. aka OpenAPI
+With the Import API, you can either create a new API by submitting
+a POST request that includes a Swagger definition in the payload and
+endpoint configuration, or you can update an existing API by using a PUT
+request that contains a Swagger definition in the payload. You can update
+an API by overwriting it with a new definition, or merge a definition with an
+existing API. You specify the options using a mode query parameter in the
+request URL .
+Import
+
+
+API THROTTLING
+By default, API Gateway limits the steady-state request rate to
+10,000 requests per second (rps).
+The maximum concurrent requests is 5000 requests across all
+APIs within an AWS account.
+If you go over 10,000 requests per second or 5000 concurrent
+requests you will receive a 429 Too Many Request error
+response.
+API
+Import API’s using Swagger 2.0 definition files
+• API Gateway can be throttled
+• Default limits are 10,000 RPS or 5000 concurrently
+• You can configure API Gateway as a SOAP Webservice   
+passthrough
+--------------------------------------------------
+API GATEWAY MOCK ENDPOINTS
+Create, Test, Debug
+backend is not ready yet but you want to test some new website features
+e.g. cart,payment
+allows team to continue development without depending on backend to be build
+API GATEWAY RESPONSE - 
+You definee the response 
+status code and message 
+forms the mock integration response 
+---------------------------------------------------
+API GATEWAY STAGEs 
+references the lifecycle state of the API e.g. dev,prod 
+Each stage can be associated with a different endpoint e.g. dev,prod
+each stage has a unique invoke url e.g. 
+https://dwncjrevn.execute-api.us-east-1.amazonaws.com/dev 
+https://dwncjrevn.execute-api.us-east-1.amazonaws.com/prod
+        API ID                                      Stage name
+
+if we have 2 lambda functions, dev&prod, we can create API gateway with dev&prod stage 
+
+
+LAB Creating Stages 
+Create 2 functions stageDevevFunction,stageProdFunction with following code 
+// export const handler = async (event) => {
+//   // TODO implement
+//   const response = {
+//     statusCode: 200,
+//     body: JSON.stringify('This is my Prod/Dev function'),
+//   };
+//   return response;
+// };
+goto API Gateway
+BUILD REST API --> NewAPI & name=MyAPI -> Create API
+ACTION->CREATE METHOD->"GET"->Lambda Function = ${stageVariables.lmbfunction}->
+it gives you a command to run in cloudshell 
+// aws lambda add-permission --function-name "arn:aws:lambda:us-east-1:965329023955:function:myprod/devfunction" --source-arn "arn:aws:execute-api:us-east-1:965329023955:nzxaisdv5m/*/GET/" --principal apigateway.amazonaws.com --statement-id 0e68dff5-42c2-4116-81f7-a26a4ae2a2bc --action lambda:InvokeFunction
+save 
+ACTION->DEPLOY API->newstage(test)
+CREATE->prod 
+STAGE VARIABLE->key=lmbfunction value=stageProdFunction
+CREATE->dev
+STAGE VARIABLE->key=lmbfunction value=stageDevFunction
+-----------------------------------------------------
+API RESPONSE TRANSFORMATIONS
+AppFrontend->APIRequest->  APIGateway  ->APIRequest->AppBackend
+                          modify Request
+
+AppFrontend<-APIResponse<-  APIGateway  <-APIResponse<-AppBackend
+                          modify Response
+
+HTTP APIs:
+parameter mapping is used to modify API requests and responses
+we can change the Header, Query String, Request Path in API Request
+we can change the Header, Status Code,               in API Response
+-----------------------------------------------------
+API GATEWAY CACHING:
+CACHES your endpoints response (this reduces no. of calls made to endpoint)
+TTL (when u enable caching, api gateway caches responses from endpoints for a specified TTL, default is 300 seconds)
+API GATEWAY returns cached response to new requests, instead of making new request to endpoint. 
+THIS REDUCES LATENCY
+
+API GATEWAY THROTTLING is to prevent your API from being overwhelmed by too many requests
+by-default, API Gateway limits the steady-state request rate to 10,000 requests per second,per region.
+by-default, API Gateway limits the concurrent request to 5,000 across all APIs per second,per region.
+if you exceed any of these limits, you get 429 ERROR (Too Many Requests)
+
+Throttling Example 
+5,000 requests in 1st millisecond 
+5,000 requests evenly spread across 999 milliseconds
+this is within limits of 10,000 req per second and 5,000 concurrent request
+this will happen without any errors
+
+------------------------------------------------------
+X-Ray
+X-Ray [Service Map] provides end-to-end view of API requests as they travel through your application
+X-Ray can be integrated with EC2, ECS, Lambda, EB, SNS, SQS, DynamoDB, ELB, API Gateway, S3
+X-Ray can be integrated with with your own application written in java, node.js, .net, go, ruby, python
+X-Ray SDK automatically captures metadata for API calls made to AWS services using AWS SDK
+
+Procedure:
+Install X-Ray Agent on EC2 instance
+Instrument your application using X-Ray SDK (sdk has libraries)
+X-Ray sdk gathers informationfrom request and response headers, the code in your application and metadata about aws resources on which it runs and send this trace data to X-Ray e.g. HTTP requests, error codes, latency data
+
+You need instrument(configure) both the X-Ray SDK and X-Ray Daemon on your systems
+sdk sends data to daemon, which uploads them to X-Ray in batches
+
+for docker container, install X-Ray daemon in its own docker container, and your application in its own container, all in same ECS cluster
+
+
+
+---------------------------------------------------------------------------
+You are a developer for a busy real estate company, and you want to enable other real estate agents to have the ability to show properties on your books, but skinned so that it looks like their own website. You decide the most efficient way to do this is to expose your API to the public using API Gateway. The project works well, but one of your competitors starts abusing this by sending your API tens of thousands of requests per second. This generates an HTTP 429 error. Each agent connects to your API using individual API keys. What actions can you take to stop this behavior?
+
+Choose 2
+
+
+Place an AWS Web Application Firewall (AWS WAF) in front of API Gateway and filter the requests
+
+
+Deploy multiple API Gateways and give the agent access to another API Gateway
+
+
+Use AWS Shield Advanced API protection to block the requests
+
+
+Throttle the agent's API access using the individual API Keys
+
+Good work!
+AWS WAF helps protect your web applications or APIs against common web exploits that could impact availability, compromise security, or consume excessive resources.
+
+To prevent your API from being overwhelmed by too many requests, Amazon API Gateway throttles requests to your API using the token bucket algorithm, where a token counts for a request. You can enable usage plans to restrict client request submissions to within specified request rates and quotas. This restricts the overall request submissions so that they don't go significantly past the account-level throttling limits in a Region. Amazon API Gateway provides Per-client throttling limits that are applied to clients that use API keys associated with your usage policy as client identifier.
+
+=======================================================================
+.
+Which of the following are true about Amazon Simple Queue Service (Amazon SQS) and AWS Lambda? (Select TWO.)
+
+If a Lambda function returns errors when processing messages, Lambda decreases the number of processes polling the queue.
+
+Lambda has a default of five parallel processes to get things off of a queue.
+=======================================================================
+
+Which of these patterns for communicating status updates do you use to get status information on a long-running transaction?
+
+WebSockets with AWS AppSync
+
+Client polling pattern
+
+Saga pattern with AWS Step Functions
+
+Webhooks with Amazon Simple Notification Service (Amazon SNS)
+
+
+Client polling is a common way to get status information on a long-running transaction. With the client polling, the client can use the ID returned from Amazon Simple Queue Service (Amazon SQS) to get the status of the request. 
+=======================================================================
+API Gateway (synchronous event source)
+–
+Timeout considerations – API Gateway has a 30-second timeout. If the Lambda function hasn't responded to the request within 30 seconds, an error is returned.
+Retries – There are no built-in retries if a function fails to execute successfully.
+Error handling – Generate the SDK from the API stage, and use the backoff and retry mechanisms it provides.'
+
+Amazon SNS (asynchronous event source)
+–
+'Timeout considerations – Asynchronous event sources do not wait for a response from the function's execution. Requests are handed off to Lambda, where they are queued and invoked by Lambda.
+Retries – Asynchronous event sources have built-in retries. If a failure is returned from a function's execution, Lambda will attempt that invocation two more times for a total of three attempts to execute the function with its event payload. You can use the Retry Attempts configuration to set the retries to 0 or 1 instead.
+
+If Lambda is unable to invoke the function (for example, if there is not enough concurrency available and requests are getting throttled), Lambda will continue to try to run the function again for up to 6 hours by default. You can modify this duration with Maximum Event Age.
+
+Amazon SNS has unique retry behaviors among asynchronous events based on its delivery policy for AWS Lambda(opens in a new tab). It will perform 3 immediate tries, 2 at 1 second apart, 10 backing off from 1 second to 20 seconds, and 100,000 at 20 seconds apart.
+Error handling – Use the Lambda destinations(opens in a new tab) OnFailure option to send failures to another destination for processing. Alternatively, move failed messages to a dead-letter queue on the function. When Amazon SNS is the event source, you also have the option to configure a dead-letter queue on the SNS subscription(opens in a new tab).'
+
+Kinesis Data Streams (polling a stream as an event source)
+–
+'Timeout considerations – When the retention period for a record expires, the record is no longer available to any consumer. The retention period is 24 hours by default. You can increase the retention period at a cost.
+
+As an event source for Lambda, you can configure Maximum Record Age to tell Lambda to skip processing a data record when it has reached its Maximum Record Age.
+Retries – By default, Lambda retries a failing batch until the retention period for a record expires. You can configure Maximum Retry Attempts so that your Lambda function will skip retrying a batch of records when it has reached the Maximum Retry Attempts (or it has reached the Maximum Record Age).
+Error handling – Configure an OnFailure destination on your Lambda function so that when a data record reaches the Maximum Retry Attempts or Maximum Record Age, you can send its metadata, such as shard ID and stream Amazon Resource Name (ARN), to an SQS queue or SNS topic for further investigation.
+
+Use BisectBatchOnFunctionError to tell Lambda to split a failed batch into two batches. Retry your function invocation with smaller batches to isolate bad records and work around timeout and retry issues.
+
+For more information on these error handling features, see the blog post AWS Lambda Supports Failure-Handling Features for Kinesis and DynamoDB Event Sources(opens in a new tab).'
+
+SQS queue (polling a queue as an event source)
+–
+'Timeout considerations – When the visibility timeout expires, messages become visible to other consumers on the queue. Set your visibility timeout to 6 times the timeout you configure for your function.
+Retries – Use the maxReceiveCount on the queues policy to limit the number of times Lambda will retry to process a failed execution.
+Error handling – Write your functions to delete each message as it is successfully processed. Move failed messages to a dead-letter queue configured on the source SQS queue.'
+
+
+
+AWS Fargate	
+Lift and shift with minimal rework
+Longer-running processes or larger deployment packages
+Predictable, consistent workload
+Need more than 3 GB of memory
+Application with a non-HTTP/S listener
+Run side cars with your service (agents only supported as side cars)
+Container image portability with Docker runtime
+AWS Lambda
+Tasks that run less than 15 minutes
+Spiky, unpredictable workloads
+Unknown demand
+Lighter-weight, application-focused stateless computing
+Simplified IT automation
+Real-time data processing
+Reduced complexity for development and operations
+
+
+"Amazon Simple Storage Service (Amazon S3)"
+
+Data lakes
+Economical state store
+Claim-check pattern
+Filter data retrieved by Lambda (S3 Select)
+Amazon DynamoDB Key-value data store with millisecond response time Capture changes with Amazon DynamoDB Streams and index to other data stores
+   
+
+
+"Amazon DynamoDB"
+
+Key-value data store with millisecond response time
+Capture changes with Amazon DynamoDB Streams and index to other data stores
+Store player game state for 300 million users while maintaining millisecond access
+
+Amazon ElastiCache for Redis Well suited for things like real-time leaderboards In-memory data store with sub-millisecond read and write latency
+A sorted leaderboard of top values requiring sub-millisecond read and write latencies
+"Amazon ElastiCache for Redis"
+
+Well suited for things like real-time leaderboards
+In-memory data store with sub-millisecond read and write latency
+
+
+
+"Amazon Quantum Ledger Database (Amazon QLDB)"
+
+Track the history of credits and debits in banking transactions in an organization
+Model state changes in a cryptographically provable manner
+Distributed ledger
+Amazon Aurora High-volume, high-throughput, and highly parallelized transactional data MySQL- and Postgres-compatible relational database built for faster performance at lower costs Aurora Serverless automatically starts up, scales, and shuts down based on traffic
+
+
+
+"Amazon Aurora"
+
+High-volume, high-throughput, and highly parallelized transactional data
+MySQL- and Postgres-compatible relational database built for faster performance at lower costs
+Aurora Serverless: automatically starts up, scales, and shuts down based on traffic
+
+
+
+
+"Amazon Relational Database Service (Amazon RDS)"
+
+Run familiar database engines with less administration
+
+---------------------------------------------------------------------------
+
+Which of these migrations patterns helps an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application?
+
+Leapfrog
+
+Correctly unselected
+Strangler
+
+Correctly selected
+Organic
+
+Correctly unselected
+Saga
+
+Correctly unselected
+Correct
+With the strangler pattern, an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application.
+
+
+
+Distinct API endpoints can point to old vs. new components, and safe deployment options (like canary deployments) let you point back to the legacy version with very little risk.
+
+
+
+To learn more about different migration patterns, review the Migrating to Serverless lesson.
+
+
+
+----------------------------------------------------------------------
+The best practices for serverless applications include:
+
+Don’t reinvent the wheel.
+Stay current.
+Prefer idempotent, stateless functions.
+Don’t just port your code. 
+Keep events inside AWS services for as long as possible.
+Verify the limits of all of the services involved.
+
+
+
+-----------------------------------------------------------------------
+Someone has made an update to an Amazon Simple Queue Service (Amazon SQS) source queue attached to an AWS Lambda function, which was also updated. Following this, you receive a report of an increased number of messages hitting the dead-letter queue. 
+
+A concurrency limit that is set too low could definitely cause an increase in messages hitting the dead-letter queue. Anything less than five will generate errors out of the gate because Lambda defaults to five processes pulling batches off the queue and invoking functions.
+
+
+
+If the time it takes Lambda to process a batch has increased to more than 15 minutes, Lambda will time out often, resulting in a higher number of messages that result in an error and thus are more likely to hit the dead-letter queue.
+
+
+
+The MaxReceiveCount on the redrive policy determines how many retries a message gets before it goes to the dead-letter queue. A decrease in the retry value could result in more messages in the dead-letter queue, but an increase would not.
+
+---------------------------------------------------------------------------
+Which statements reflect recommended approaches for working with databases in the context of serverless architectures? (Select TWO.)
+
+"Amazon DynamoDB on-demand mode is a good fit if you need to track the cost of individual transactions.
+
+Incorrectly unchecked
+Provisioned capacity might be the better choice if you have a very consistent, predictable workload."
+
+
+Amazon DynamoDB Accelerator (DAX) is a useful solution for offloading transactions that can withstand a higher latency.
+
+The best option for connecting to traditional relational databases is to use concurrency limits to limit the number of concurrent database connections that AWS Lambda can invoke.
+
+
+SUBMIT
+
+Incorrect
+DAX is a useful solution for transactions that require even lower latency than DynamoDB provides.
+
+Although you can use concurrency limits to limit database connections, this increases account management complexity and is difficult to estimate.
+
+The best practice is to implement an external mechanism for managing the connections.
+
+--------------------------------------------------------------------------
+Both AWS Step Functions and Amazon Simple Notification Service (Amazon SNS) can help you to scale your serverless applications. 
+
+What are some guidelines for using these services to support scaling your application? (Select THREE.)
+
+"Use wait states and callbacks in Step Functions to reduce costs when your workflow needs to wait for other tasks to complete."
+
+Remember that you cannot use Step Functions if your payload might grow beyond the limit for input and output data sizes in Step Functions.
+
+
+"End a Step Functions activity that is stuck waiting on a response when something has failed with TimeoutSeconds."
+
+"Correctly checked
+Use AWS Event Fork Pipeline applications to deploy pre-built applications that use Amazon SNS to run common tasks in parallel."
+---------------------------------------------------------------------------
+What is NOT a recommendation for testing serverless applications?
+
+"Iterate on your testing until you get an error-free result at your estimated peak load."
+
+Incorrectly unselected
+Test with access patterns that are similar to how the application will be used in production.
+
+Correctly unselected
+Don't try to mock services that you can't control.
+
+Correctly unselected
+Make trade-offs that support your business drivers.
+
+Incorrectly selected
+SUBMIT
+
+Incorrect
+You do want to iterate and test each integration point iteratively. However, you should look for trade-offs between business value and 100 percent error-free performance at any scale. Use your failure management mechanisms to handle errors that are outliers, and know the tolerance for different types of errors and at different loads.
+
+
+
+"Best practices for testing load"
+
+Use authentic data and access patterns.
+
+Address issues at each integration point end to end, and iterate.
+
+Remember the business drivers, and make trade-offs that support them.
+
+Know your "error budget," and validate your failure management mechanisms.
+
+
+
+
+
+=============================================
+What are some considerations for scaling AWS Lambda functions? (Select THREE.)
+
+"Burst behavior"
+
+Correctly checked
+Infrastructure maintenance
+
+Correctly unchecked
+"Memory configuration"
+
+Correctly checked
+"Concurrency limits"
+
+Correctly checked
+Code reusability
+
+Correctly unchecked
+Configuring auto scaling
+================================================
+FOR COST SAVINGS  USE
+Use wait states and callbacks in Step Functions.
+
+Use AWS Lambda Power Tuning.
+
+Use provisioned capacity for DynamoDB.
+===============================================
+Which statements reflect recommended approaches for scaling databases? (Select TWO.)
+
+Amazon DynamoDB on-demand mode is a good fit if you have a very consistent, predictable workload.
+
+Correctly unchecked
+"Amazon DynamoDB on-demand mode is a good fit if you need to track the cost of individual transactions.
+
+Correctly checked
+Provisioned capacity might be the better choice if you have a very consistent, predictable workload."
+
+Correctly checked
+Amazon DynamoDB Accelerator (DAX) is a useful solution for offloading transactions that can withstand a higher latency.
+
+Correctly unchecked
+The best option for connecting to traditional relational databases is to use concurrency limits to limit the number of concurrent database connections that AWS Lambda can invoke.
+
+
+
+===========================================================================
+
+===========================================================================
+
+===========================================================================
+
+
+===========================================================================
+
+
+===========================================================================
+
+LAMBDA SECURITY
+===========================================================================
+One benefit of serverless architectures is that when you leverage Amazon Web Services (AWS) managed services, you shift the burden of the shared responsibility model toward AWS.
+
+
+
+You have the same security issues, but AWS manages more of them on your behalf. For AWS Lambda specifically, you aren’t responsible for the operating system or network configuration where your functions run.
+
+
+
+AWS manages the platform where Lambda functions reside and are executed, so you are also freed from managing the runtimes, unless you develop custom runtimes. You can find more details about how security is implemented in Lambda in the Lambda security whitepaper, linked beneath the video.
+
+
+
+So let’s talk about three general best practices that you are responsible for: follow the principle of least privilege; protect data at rest and in transit; and audit your system for changes, unexpected access, unusual patterns, or errors. In other words, only let in people you invite, lock up private stuff, and make sure no one is doing anything unexpected while visiting. 
+
+
+
+Let’s look at these first two best practices in the context of the example order service. Amazon API Gateway is the front door to your application, so it’s a good place to start preventing unauthorized access to your APIs.
+
+
+
+You have three options for authorizing access to your APIs via API Gateway:
+Iam 
+-
+IAM is best for clients that are within your AWS environment or can otherwise retrieve IAM temporary credentials to access your environment.
+Amazon Cognito
+–
+Amazon Cognito gives you a managed service that can support sign-in/sign-up capabilities or act as an identity provider (IdP) in a federated identity scenario.
+Lambda authorizers
+–
+An API Gateway Lambda authorizer invokes a Lambda function to authenticate/validate a user against your existing IdP. This type of authorizer is useful for centralized authentication.
+
+
+AWS Identity and Access Management (IAM)
+Amazon Cognito
+Lambda authorizers
+Choose the model that makes the most sense for your existing authentication model and each workload. IAM is best for clients that are within your AWS environment, or can otherwise retrieve IAM temporary credentials to access your environment. 
+
+Add least privilege permissions to the respective IAM role to securely invoke your API and take advantage of the depth and breadth of security that AWS uses on its own services.
+
+If you want to use an existing identity provider (IdP), use an API Gateway Lambda authorizer that invokes a Lambda function to authenticate and validate a user against your IdP. 
+
+This is useful when you also want to perform additional logic as part of the authentication.
+
+You might also leverage Lambda authorizers to centralize API access across accounts. If you have one team that needs to own a centralized authentication, you should consider Lambda authorizers.
+
+
+
+But bear in mind, the larger the API landscape that uses this authorizer, the more concurrent invocations you have to support with that function. As noted earlier, you can use "auth caching" to reduce the number of invocations of a Lambda authorizer.
+
+
+If you don’t already have an IdP in place, Amazon Cognito is a good choice. Amazon Cognito gives you a managed service that can support sign-in/sign-up capabilities or act as an IdP in a federated identity scenario. The mobile application in the earlier module is an example of a good use case for Amazon Cognito. The API Gateway for Serverless course covers these options in more detail. There is a link to the relevant parts of the API Gateway Developer Guide beneath this video.
+
+
+There are a couple of other things you might need to do to stop folks at the door, depending on the scope of who you need to let in.
+
+
+If your Lambda function connects to a VPC or other external components, secure the network boundaries using AWS best practices like security groups or network access control lists. If you are building publicly available APIs, you might also want to implement AWS WAF in front of API Gateway.
+
+
+There are links to a blog post and a whitepaper about using AWS WAF beneath the video. When you configure API Gateway with an edge-optimized endpoint, you get a managed Amazon CloudFront distribution automatically. This gives you an edge network in front of your APIs and can help prevent denial of service attacks. If you use regional endpoints, you could also add your own CloudFront distributions.
+
+
+You can also use API Gateway to validate incoming requests. This can enforce the correctness of the data structure of a payload, addressing one of the more common OWASP vulnerabilities.
+
+Limit access to your APIs with API Gateway resource policies that restrict or allow access by account, IP range, or VPC endpoint. And regulate the volume of requests made by specific clients with API Gateway usage plans that throttle requests based on an API key. 
+
+
+
+But it’s important not to rely only on API keys for securing your APIs. By authenticating via API Gateway, and having API Gateway act as a proxy to other AWS services, you reduce the burden of securing your APIs from unauthorized clients and can take advantage of API Gateway features to limit access.
+================================================
+
+
+
+===============================================
+Encryption at Rest
+
+Amazon Simple Storage Service (Amazon S3)
+Configure server-side encryption using one of the following:
+Amazon S3-managed Keys (SSE-S3)
+AWS KMS keys stored in AWS KMS (SSE-KMS)
+Customer-provided keys (SSE-C)
+
+Amazon DynamoDB	
+All data isencrypted at rest using encryption keys stored in AWS KMS.
+Choose AWS service keys or customer managed keys when you create a table.
+
+Amazon ElastiCache for Redis	
+Apply optional encryption using either service-managed encryption at rest or customer-managed AWS KMS keys using AWS KMS.
+
+
+================================================
+
+Environment variables are specific to one AWS Lambda function.
+
+================================================
+Serverless data protection best practices 
+
+In addition to the three security best practices, there are also some serverless data protection best practices that you need to be aware of:
+
+1
+
+1
+Make yourself aware of how you can take advantage of AWS managed services to reduce your security management burden.
+
+2
+
+2
+Think about security end to end at each integration point in your distributed architecture.
+
+3
+
+3
+Use narrowly scoped IAM permissions and roles to protect access to your Lambda functions and other AWS services.
+
+4
+
+4
+Create smaller Lambda functions that perform scoped activities, and don’t share IAM roles between functions.
+
+5
+
+5
+To pass data in a Lambda function, use environment variables, AWS Systems Manager Parameter Store, or AWS Secrets Manager.
+
+
+
+SECURITY IN DEPTH (LAYERS)
+
+Users   ->    CloudFront    ->     API  ->    Lambda   ->    DB,S3,SQS
+        ^                   ^           ^               ^
+        WAF               COGNITO       IAM            KMS
+                                        1-resource
+                                        2-execution
+                                        roles
+
+
+
+VULNERABILITIES IN DEPTH (LAYERS)
+
+Users   ->    CloudFront    ->     API  ->    Lambda   ->    DB,S3,SQS
+        ^                   ^           ^               ^
+        DDoS               DDoS       IAM            KMS
+        XSS                CORs                
+SOLUTION:
+          ^WAF Filtering Rules^
+e.g.
+usOnly - allow only usa users
+noXSS - dont allow cross s scripting
+size1KB  - block large payloads 
+noSQLi   - block sql injections
+
+
+
+
+AWS Lambda authorizer
+A developer wants to secure their API using custom business logic.
+
+Amazon Cognito
+Users need to sign in to a website through a third-party application.
+
+AWS WAF
+A security team wants to block traffic from a specific country to it website.
+
+AWS Secrets Manager
+A security expert wants to share sensitive information across multiple AWS accounts.
+
+AWS Systems Manager Parameter Store
+A team wants to share secrets across its Amazon Lambda functions in a single AWS account.
+
+AWS Identity and Access Management (IAM)
+An admin wants to limit AWS Lambda function actions on an Amazon DynamoDB table.
+
+
+
+
+--------------------------------------------------------------------------
+The three pillars of observability
+
+When you’re operating your serverless applications at scale, you can’t afford to fly blind. You need to be able to answer important operational and business questions including the following:
+
+
+
+Is my decoupled service up or down?
+
+Is one of my services causing a performance bottleneck?
+
+Is my application fast or slow, as experienced by my end users?
+
+What key performance indicators (KPIs) and service level agreements (SLAs) should we establish, and how do we know if they’re being met?
+
+
+MONITOR 
+Metrics collected through monitoring provide data about the performance of your systems.
+TRACE 
+As you scale your application and the number of components grows, how do you identify where an error or a bottleneck might be occurring? 
+To do this, you can use a trace. A trace will follow requests as they travel through the individual services and resources that make up your application, providing an end-to-end view of how it is performing. You can use this trace to follow the path of an individual request as it passes through each service or tier in your application so that you can pinpoint where issues are occurring.
+LOG 
+Where metrics help you keep track of what is happening within your system, logs help you keep track of what already happened within your application or system. This helps you audit your configuration history, configuration changes, and all other API calls to facilitate security and governance in your serverless applications.
+Logs are time-stamped records of events that include failures, errors, state transformations, or even who accessed your system at a certain time.
+
+==========================================================================
+
+
+
+LAMBDA MONITORING 
+==========================================================================
+
+==========================================================================
+
+
+==========================================================================
+"CloudWatch metrics"
+
+As mentioned in the previous video, CloudWatch helps you to monitor your service health and to alarm on error cases.
+
+To learn about the different types of metrics that you need to consider, expand each of the following four categories:
+
+
+"Business metrics"
+–
+Business KPIs measure your application performance against business goals. It is extremely important to know when something is critically affecting your overall business (revenue wise or not).
+
+Examples: Orders placed, debit and credit card operations, flights purchased
+
+
+"Customer experience metrics"
+–
+Customer experience data indicates the overall effectiveness of the user interface/user experience (UI/UX). However, it also indicates whether changes or anomalies are affecting the customer experience in a particular section of your application. These metrics are often measured in percentiles, to prevent outliers, when trying to understand the impact over time and how widespread it is across your customer base.
+
+Examples: 
+
+Perceived latency
+Time it takes to add an item to a basket or checkout
+Page load times
+
+"System metrics"
+–
+Vendor and application metrics are important to underpin root causes. System metrics also tell you if your systems are healthy, at risk, or already affecting your customers.
+
+Examples: 
+
+Percentage of HTTP errors/success
+Memory utilization
+Function duration/error/throttling
+Queue length
+Stream records length
+Integration latency
+
+"Operational metrics"
+–
+Ops metrics are important to understand sustainability and maintenance of a given system and crucial to pinpoint how stability has progressed or degraded over time.
+
+Examples: 
+
+Number of tickets, such as successful and unsuccessful resolutions
+Number of times people on-call were paged
+Availability
+Continuous integration/continuous delivery (CI/CD) pipeline statistics, such as successful or failed deployments, feedback time, cycle and lead time
+
+===================================================================
+LAMBDA CLOUDWATCH METRICS .
+// To view metrics on the CloudWatch console
+// Open the Metrics page (AWS/Lambda namespace) of the CloudWatch console.
+
+// On the Browse tab, under Metrics, choose any of the following dimensions:
+
+By Function Name (FunctionName) – View aggregate metrics for all versions and aliases of a function.
+
+By Resource (Resource) – View metrics for a version or alias of a function.
+
+By Executed Version (ExecutedVersion) – View metrics for a combination of alias and version. Use the ExecutedVersion dimension to compare error rates for two versions of a function that are both targets of a weighted alias.
+
+// Across All Functions (none) – View aggregate metrics for all functions in the current AWS Region.
+
+// Choose a metric, then choose Add to graph or another graphing option.
+
+// By default, graphs use the Sum statistic for all metrics. To choose a different statistic and customize the graph, use the options on the Graphed metrics tab.
+
+// Note
+// The timestamp on a metric reflects when the function was invoked. Depending on the duration of the invocation, this can be several minutes before the metric is emitted. For example, if your function has a 10-minute timeout, then look more than 10 minutes in the past for accurate metrics.
+
+// For more information about CloudWatch, see the Amazon CloudWatch User Guide.
+
+// Types of metrics
+// The following section describes the types of Lambda metrics available on the CloudWatch console.
+
+Invocation metrics
+Invocation metrics are binary indicators of the outcome of a Lambda function invocation. For example, if the function returns an error, then Lambda sends the Errors metric with a value of 1. To get a count of the number of function errors that occurred each minute, view the Sum of the Errors metric with a period of 1 minute.
+
+// Note
+// View the following invocation metrics with the Sum statistic.
+
+// Invocations – The number of times that your function code is invoked, including successful invocations and invocations that result in a function error. Invocations aren't recorded if the invocation request is throttled or otherwise results in an invocation error. The value of Invocations equals the number of requests billed.
+
+// Errors – The number of invocations that result in a function error. Function errors include exceptions that your code throws and exceptions that the Lambda runtime throws. The runtime returns errors for issues such as timeouts and configuration errors. To calculate the error rate, divide the value of Errors by the value of Invocations. Note that the timestamp on an error metric reflects when the function was invoked, not when the error occurred.
+
+// DeadLetterErrors – For asynchronous invocation, the number of times that Lambda attempts to send an event to a dead-letter queue (DLQ) but fails. Dead-letter errors can occur due to misconfigured resources or size limits.
+
+// DestinationDeliveryFailures – For asynchronous invocation and supported event source mappings, the number of times that Lambda attempts to send an event to a destination but fails. For event source mappings, Lambda supports destinations for stream sources (DynamoDB and Kinesis). Delivery errors can occur due to permissions errors, misconfigured resources, or size limits. Errors can also occur if the destination you have configured is an unsupported type such as an Amazon SQS FIFO queue or an Amazon SNS FIFO topic.
+
+// Throttles – The number of invocation requests that are throttled. When all function instances are processing requests and no concurrency is available to scale up, Lambda rejects additional requests with a TooManyRequestsException error. Throttled requests and other invocation errors don't count as either Invocations or Errors.
+
+// OversizedRecordCount – For Amazon DocumentDB event sources, the number of events your function receives from your change stream that are over 6 MB in size. Lambda drops the message and emits this metric.
+
+// ProvisionedConcurrencyInvocations – The number of times that your function code is invoked using provisioned concurrency.
+
+// ProvisionedConcurrencySpilloverInvocations – The number of times that your function code is invoked using standard concurrency when all provisioned concurrency is in use.
+
+// RecursiveInvocationsDropped – The number of times that Lambda has stopped invocation of your function because it's detected that your function is part of an infinite recursive loop. Lambda recursive loop detection monitors how many times a function is invoked as part of a chain of requests by tracking metadata added by supported AWS SDKs. If your function is invoked as part of a chain of requests more than 16 times, Lambda drops the next invocation.
+
+Performance metrics
+Performance metrics provide performance details about a single function invocation. For example, the Duration metric indicates the amount of time in milliseconds that your function spends processing an event. To get a sense of how fast your function processes events, view these metrics with the Average or Max statistic.
+
+// Duration – The amount of time that your function code spends processing an event. The billed duration for an invocation is the value of Duration rounded up to the nearest millisecond.
+
+// PostRuntimeExtensionsDuration – The cumulative amount of time that the runtime spends running code for extensions after the function code has completed.
+
+// IteratorAge – For DynamoDB, Kinesis, and Amazon DocumentDB event sources, the age of the last record in the event. This metric measures the time between when a stream receives the record and when the event source mapping sends the event to the function.
+
+// OffsetLag – For self-managed Apache Kafka and Amazon Managed Streaming for Apache Kafka (Amazon MSK) event sources, the difference in offset between the last record written to a topic and the last record that your function's consumer group processed. Though a Kafka topic can have multiple partitions, this metric measures the offset lag at the topic level.
+
+// Duration also supports percentile (p) statistics. Use percentiles to exclude outlier values that skew Average and Maximum statistics. For example, the p95 statistic shows the maximum duration of 95 percent of invocations, excluding the slowest 5 percent. For more information, see Percentiles in the Amazon CloudWatch User Guide.
+
+Concurrency metrics
+Lambda reports concurrency metrics as an aggregate count of the number of instances processing events across a function, version, alias, or AWS Region. To see how close you are to hitting concurrency limits, view these metrics with the Max statistic.
+
+// ConcurrentExecutions – The number of function instances that are processing events. If this number reaches your concurrent executions quota for the Region, or the reserved concurrency limit on the function, then Lambda throttles additional invocation requests.
+
+// ProvisionedConcurrentExecutions – The number of function instances that are processing events using provisioned concurrency. For each invocation of an alias or version with provisioned concurrency, Lambda emits the current count.
+
+// ProvisionedConcurrencyUtilization – For a version or alias, the value of ProvisionedConcurrentExecutions divided by the total amount of provisioned concurrency allocated. For example, .5 indicates that 50 percent of allocated provisioned concurrency is in use.
+
+// UnreservedConcurrentExecutions – For a Region, the number of events that functions without reserved concurrency are processing.
+
+Asynchronous invocation metrics
+Asynchronous invocation metrics provide details about asynchronous invocations from event sources and direct invocations. You can set thresholds and alarms to notify you of certain changes. For example, when there's an undesired increase in the number of events queued for processing (AsyncEventsReceived). Or, when an event has been waiting a long time to be processed (AsyncEventAge).
+
+// AsyncEventsReceived – The number of events that Lambda successfully queues for processing. This metric provides insight into the number of events that a Lambda function receives. Monitor this metric and set alarms for thresholds to check for issues. For example, to detect an undesirable number of events sent to Lambda, and to quickly diagnose issues resulting from incorrect trigger or function configurations. Mismatches between AsyncEventsReceived and Invocations can indicate a disparity in processing, events being dropped, or a potential queue backlog.
+
+// AsyncEventAge – The time between when Lambda successfully queues the event and when the function is invoked. The value of this metric increases when events are being retried due to invocation failures or throttling. Monitor this metric and set alarms for thresholds on different statistics for when a queue buildup occurs. To troubleshoot an increase in this metric, look at the Errors metric to identify function errors and the Throttles metric to identify concurrency issues.
+
+// AsyncEventsDropped – The number of events that are dropped without successfully executing the function. If you configure a dead-letter queue (DLQ) or OnFailure destination, then events are sent there before they're dropped. Events are dropped for various reasons. For example, events can exceed the maximum event age or exhaust the maximum retry attempts, or reserved concurrency might be set to 0. To troubleshoot why events are dropped, look at the Errors metric to identify function errors and the Throttles metric to identify concurrency issues.
+=======================================================================
+LAMBDA CLOUDWATCH LOGS .
+
+Using logs helps you dig into specific issues, but you can also use log data to create business-level metrics using Amazon CloudWatch Logs metric filters. You can interact with logs using CloudWatch Logs to drill into any specific log entry or filter them based on a pattern to create your own metrics. See how the following services interact with CloudWatch Logs. 
+
+To learn more, expand each of the following three categories:
+
+
+"Lambda logs"
+–
+Lambda automatically logs all requests handled by your function and stores them in CloudWatch Logs. This gives you access to information about each invocation of your Lambda function.
+
+"API Gateway execution and access logs"
+–
+API Gateway execution logs include information on errors and execution traces. Information such as parameter values, payload, Lambda authorizers used, and API keys appears in the logs. You can log just errors or errors and information. Logging is set up per API stage. These logs are detailed, so you want to be thoughtful about what you need. Also, log groups don’t expire by default, so make sure to set retention values suitable to your workload.
+You can also create custom access logs and send them to your preferred CloudWatch group to track who is accessing your APIs and how. You can specify the access details by selecting context variables and choosing the format that you want to use.
+
+
+"CloudWatch EMF"
+–
+Traditionally, it can be difficult to generate actionable, custom metrics from your ephemeral resources, such as Lambda functions and containers. You can use the embedded metric format (EMF) to instruct CloudWatch Logs to automatically extract metric values that are embedded in structured log events.
+By sending your logs in EMF, CloudWatch will automatically extract the custom metrics, so you can visualize them and create alarms, without having to create or maintain separate code.
+These detailed log events associated with the extracted metrics can be queried using CloudWatch Logs Insights to provide insights into the root causes of operational events.  
+
+==========================================================================
+
+CloudWatch Logs Insights
+
+With CloudWatch Log Insights, you can use prebuilt or custom queries on your logs to provide aggregated views and reporting. If you’ve created structured custom logs, CloudWatch Logs Insights can automatically discover the fields in your logs to help you to query and group your log data. To learn more, choose each the numbered marker:
+
+
+CloudWatch Lambda Insights
+
+In addition to CloudWatch Logs Insights, CloudWatch provides a special monitoring and troubleshooting solution for serverless applications running on Lambda. 
+
+This feature collects, aggregates, and summarizes your metrics, including CPU time, memory, disk, and network. It can also collect, aggregate, and summarize your diagnostic information, such as cold starts and Lambda worker shutdowns. This helps you isolate issues with your Lambda functions and resolve them faster.
+
+Lambda Insights uses a CloudWatch Lambda extension, which is provided directly at the Lambda layer. When you install this extension on your Lambda function, it collects system-level metrics and emits a single performance log event for every invocation of that Lambda function.
+
+===========================================================================
+LAMBDA EXTENSIONS .
+You can use Lambda extensions for use cases such as the following:
+
+Capturing diagnostic information before, during, and after function invocation
+
+Automatically instrumenting your code without needing code changes
+
+Fetching configuration settings or secrets before the function invocation
+
+Detecting and alerting on function activity through security agents
+
+Sending telemetry to custom destinations, such as Amazon S3, Amazon Kinesis, and Amazon OpenSearch Service directly and asynchronously from your Lambda functions.
+
+
+==================================================
+Amazon CloudWatch metrics
+A developer needs to check how many times an AWS Lambda function has been invoked.
+Amazon CloudWatch Logs Insights
+A team wants to search and query the logs for their API.
+Amazon CloudWatch Logs
+An engineer wants to see in plaintext what parameters are being passed into a function.
+AWS X-Ray
+A developer is investigating higher than normal latency for requests to one of their APIs.
+
+====================================================
+LAMBDA AUDITING .
+There are two services that can assist you in auditing your serverless applications by providing centralized reporting and the ability to automate responses to potential security risks: CloudTrail and AWS Config. 
+
+
+CloudTrail for LAMBDA .
+
+You can use CloudTrail to facilitate auditing, security monitoring, and operational troubleshooting by tracking user activity and API usage. For CloudTrail, be aware of the following characteristics:
+
+
+bullet
+Records IAM user, IAM role, and AWS service API activity in your account
+
+
+bullet
+Is enabled when you create an account
+
+
+bullet
+Provides full details about the API action, such as the identity of the requestor, time of the API call, request parameters, and response elements returned by the service
+
+To learn about CloudTrail events and CloudTrail trails, choose the appropriate tab:
+
+
+CLOUDTRAIL EVENTS
+When activity occurs in your AWS account, that activity is recorded in a CloudTrail event, and you can see recent events in the event history.
+The CloudTrail event history provides a viewable, searchable, and downloadable record of the past 90 days of CloudTrail events. Use this history to gain visibility into actions taken in your AWS account in the AWS Management Console, AWS SDKs, AWS Command Line Interface (AWS CLI), and other AWS services
+
+CLOUDTRAIL TRAILS
+A trail is a configuration that enables the delivery of CloudTrail events to an Amazon Simple Storage Service (Amazon S3) bucket, Amazon CloudWatch Logs, and Amazon CloudWatch Events. If you need to maintain a longer history of events, you can create your own trail. When you create a trail, it tracks events performed on or within resources in your AWS account and writes them to an S3 bucket that you specify.
+
+For example, a trail could capture modifications to your API Gateway APIs. You can optionally add data events to track Amazon S3 object-level API activity. Examples include when someone uploads something to the bucket or for Lambda invoke API operations on one or all future Lambda functions in the account.
+
+You can configure CloudTrail Insights on your trails to help you identify and respond to unusual activity associated with write API calls. The CloudTrail Insights feature tracks your normal patterns of API call volume and generates Insights events when the volume is outside normal patterns.
+
+==================================================
+What if someone makes an unapproved change to an API stage? 
+We can invoke an AWS Lambda function based on events emitted to AWS CloudTrail and written to Amazon CloudWatch Logs. The function could validate that the API has the proper authorization information and if it doesn’t, delete the API and send an alert.
+===================================================
+AWS Config
+
+Use AWS Config rules to represent your desired configuration settings for specific AWS resources or for an entire AWS account. If a resource violates a rule, AWS Config flags the resource and the rule as noncompliant and notifies you through Amazon Simple Notification Service (Amazon SNS). AWS Config also provides the following features:
+
+
+bullet
+A normalized snapshot of how your resources are configured and the ability to create rules that enforce the compliant state of those resources
+
+
+bullet
+Customizable, predefined rules to help you get started, in addition to prebuilt remediation actions and the option to automatically remediate an issue
+====================================================
+
+
+SERVERLESS DEPLOYMENTS >
+With serverless development, the term “deployment” can take on a whole new meaning. When developing serverless applications, you no longer deploy new application code to servers, because there are no servers.
+
+
+
+Using infrastructure as code services, such as AWS CloudFormation, AWS Cloud Development Kit (AWS CDK), Terraform, and the Serverless Framework, developers are able to create AWS resources in an orderly and predictable fashion.
+
+
+
+With AWS Lambda, a deployment can be as simple as an API call to create a function or update the function code.
+
+
+=============
+Your company is developing a serverless banking application. The company is about to release a new feature where users canchat with a representative inside of the app. Your manager asks you to make sure that the new feature is delivered as seamlessly as possible. Which of the following choices will help your team deploy this new code successfully? (Select THREE.)
+
+
+Audit changes by monitoring AWS CloudTrail and Amazon CloudWatch metrics.
+Use the ability to halt or roll back bad deployments.
+Deploy changes through a planned and automated process.
+==============
+===============================================
+Pulling configuration data from Parameter Store might increase latency when you call your Lambda function. How can you reduce this latency, while maintaining security best practices?
+
+
+Pull configuration data from Parameter Store and store it in a global variable. Use function code to check if you need to pull or update the parameter.
+
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+$ aws lambda update-function-code --function-name demoFunction \
+--zip-file fileb://heloworld.py.zip
+
+$ aws lambda publish-version --function-name demoFunction
+    "version": "2"
+$ aws lambda update-alias --function-name demoFunction \
+Alias --routing-config '{"AdditionalVersionWeights" : {"2" : 0.05} }'
+// send 5% of traffic to updated code version of the function
+
+$ aws lambda update-alias --name demoAlias --function-version 2 \
+--routing-config AdditionalVersionWeights={}
+//route all traffic to new version
+
+USING SAM:
+Timeout: 15
+AutoPublishAlias: live 
+DeploymentPreference:
+    Enabled: true
+    Type: Canary10Percent30Minutes
+    Alarms:
+    //a list of alrms you want to monitor
+      - !Ref AliasErrorMetricGreaterThanZeroAlarm
+      - !Ref LatestVersionErrorMetricGreaterThanZeroAlarm
+    Hooks:
+    // Validation Lambda Function
+      PreTraffic: !Ref PreTrafficLambdaFunction
+      PostTraffic: !Ref PostTrafficLambdaFunction
+
+
+Pre-traffic hook
+    Started before the alias can accept traffic
+Post-traffic hook
+    Started after traffic shift
+Alarms
+    Helpful to trigger the rollback process
+Deployment preferences
+    Choose whether you want a canary, linear, or all-at-once deployment
+Hooks
+    Sanity checks to test and perform actions against your code
+
+
+
+Lambda versions
+
+When you create a Lambda function, there is only one version called $LATEST. Any time you publish a version, Lambda takes a snapshot copy of $LATEST to create the new version. This copy cannot be modified.
+
+Lambda aliases
+
+A Lambda alias is a pointer to a specific function version. By default, an alias points to a single Lambda version. When the alias is updated to point to a different function version, all incoming request traffic will be redirected to the updated Lambda function version.
+
+
+An alias is being updated to point to a different Lambda version.
+
+Deployment strategies
+
+With Lambda traffic shifting, you can send a small subset of traffic to your newest function version while keeping the majority of incoming production traffic to your old, stable version. Some of the following deployment strategies use traffic shifting. Traffic shifting helps you validate that your new Lambda version works as expected, before sending all production traffic to it.
+ALL_AT_ONCE
+All-at-once deployments instantly shift traffic from the original (old) Lambda function to the updated (new) Lambda function, all at one time. All-at-once deployments can be beneficial when the speed of your deployments matters. In this strategy, the new version of your code is released quickly, and all your users get to access it immediately.
+CANARY
+In a canary deployment, you deploy your new version of your application code and shift a small percentage of production traffic to point to that new version. After you have validated that this version is safe and not causing errors, you direct all traffic to the new version of your code.
+LINEAR
+A linear deployment is similar to canary deployment. In this strategy, you direct a small amount of traffic to your new version of code at first. After a specified period of time, you automatically increment the amount of traffic that you send to the new version until you’re sending 100 percent of production traffic.
+
+
+AllAtOnce	
+Shifts all traffic to the updated Lambda functions at one time.
+
+Canary10Percent30Minutes	
+Shifts 10 percent of traffic in the first increment. The remaining 90 percent is deployed 30 minutes later.
+
+Linear10PercentEvery10Minutes	
+Shifts 10 percent of traffic every 10 minutes until all traffic is shifted.
+
+
+
+
+AUTOMATE LAMBDA DEPLOYMENTS CI/CD
+
+A CI/CD pipeline is mainly made up of four steps: Source, Build, Test, Production. CI/CD can be pictured as a pipeline, where new code is submitted on one end, tested over a series of stages (source, build, test, staging, and production), and then published as production-ready code.
+
+AWS offers a tool for each phase of the pipeline. These tools include:
+
+AWS CodeCommit for Source
+AWS CodeBuild for Build and Test
+AWS CodeDeploy for Production
+AWS CodePipeline for fully managed continuous delivery
+
+
+
+
+AWS SAM Pipelines
+
+AWS SAM Pipelines is a feature of AWS SAM that automates the process of creating a continuous delivery pipeline. AWS SAM Pipelines provides templates for popular CI/CD systems, such as AWS CodePipeline, Jenkins, GitHub Actions, Bitbucket Pipelines, and GitLab CI/CD. Pipeline templates include AWS deployment best practices to help with multi-account and multi-region deployments. AWS environments such as dev and production typically exist in different AWS accounts. Development teams can configure safe deployment pipelines, without making unintended changes to infrastructure. You can also supply your own custom pipeline templates to help to standardize pipelines across development teams. 
+
+AWS SAM Pipelines is composed of two commands:
+
+1
+
+1
+sam pipeline bootstrap, a configuration command that creates the AWS resources and permissions required to deploy application artifacts from your code repository into your AWS environments. 
+
+2
+
+2
+sam pipeline init, an initialization command that generates a pipeline configuration file that your CI/CD system can use to deploy serverless applications using AWS SAM.
+
+With two separate commands, you can manage the credentials for operators and developers separately. Operators can use sam pipeline bootstrap to provision AWS pipeline resources. This can reduce the risk of production errors and operational costs. Developers can then focus on building without having to set up the pipeline infrastructure by running the sam pipeline init command.
+
+You can also combine these two commands by running sam pipeline init --bootstrap. This takes you through the entire guided bootstrap and initialization process.
+
+SAM Pipelines creates appropriate configuration files for your CI/CD provider of choice. For example, when using AWS CodePipeline, SAM will synthesize an AWS CloudFormation template file named codepipeline.yaml. This template defines multiple AWS resources that work together to deploy a serverless application automatically.
+
+SAM Pipelines saves you the work of setting your pipelines up from scratch. However, the configurations that SAM Pipelines creates are simply a convenience to get you started. You are free to edit these CI/CD configuration files after SAM creates them. 
+
+Creating pipeline deployment resources
+
+The sam pipeline init --bootstrap command guides you through a series of questions to help produce the template file that creates the AWS resources and permissions required to deploy application artifacts from your code repository into your AWS environments. The --bootstrap option helps you to set up AWS pipeline stage resources before the template file is initialized.
+
+===========================================================
+A development team has just finished migrating a stable application to AWS Lambda. They're now looking to release a patch version of their application in a safe and gradual manner. The team is planning on sending 10 percent of traffic to the patch version for 30 minutes before directing all of the traffic to the new function.'
+
+
+Use the AWS Serverless Application Model (AWS SAM) to configure a Canary10Percent30Minutes deployment preference.
+
+Activate traffic shifting for an alias using the Lambda API.
+
+================================================================
+You are an application developer that is tasked to extend an existing backend application with a serverless API behind an Amazon API Gateway. Frontend clients will interact with the API of the existing application and the new serverless API via REST calls. Requests to both APIs are authenticated using a token in the HTTP header verified by the existing IAM solution.
+
+Use a Lambda authorizer to validate tokens at the existing IAM solution and connect the Lambda function to a VPC to allow private connectivity to the existing IAM solution.
+
+Here's why this approach is recommended:
+
+Lambda Authorizer with VPC Integration:
+
+A Lambda authorizer allows you to execute custom code to validate tokens or perform authentication before granting access to your API. In this case, you can use it to validate tokens at your existing IAM solution.
+By connecting the Lambda authorizer to a VPC, you can securely access your existing IAM solution, ensuring that authentication is performed correctly.
+This approach doesn't require major changes to your existing authentication mechanism, making it a relatively straightforward integration.
