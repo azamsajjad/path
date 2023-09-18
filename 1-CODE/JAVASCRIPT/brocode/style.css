@@ -1,0 +1,10 @@
+#countlabel {
+    display: block;
+    font-size: 50px;
+}
+#debutton, #rebutton, #inbutton {
+    display: inline;
+    justify-content: center;
+    margin: auto;
+    
+}

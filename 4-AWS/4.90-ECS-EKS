@@ -109,3 +109,13 @@ Containers      you provide ur own cont     limited to standard cont
 Integrations    More Manual Labour          seamless integration with aws
 Pricing         atleast 1 min and every     pay per 100ms
                 additional second   
+
+
+
+=========================================================================
+In Amazon ECS, the machine that runs the containers is an EC2 instance that has an ECS agent installed and configured to run and manage your containers. This instance is called a container instance. In Amazon EKS, the machine that runs the containers is called a worker node or Kubernetes node. 
+
+An ECS container is called a task. An EKS container is called a pod.
+
+
+Amazon ECS runs on AWS native technology. Amazon EKS runs on Kubernetes. 

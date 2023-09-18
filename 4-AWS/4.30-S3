@@ -99,7 +99,40 @@ copy index bucket URL and paste it in Loadpage bucket CORS section in permission
     }
 ]
 
+Versioning states
 
+Buckets can be in one of three states. The versioning state applies to all objects in the bucket. Storage costs are incurred for all objects in your bucket, including all versions. To reduce your Amazon S3 bill, you might want to delete previous versions of your objects when they are no longer needed.
+
+To learn more, expand each of the following three categories.
+
+
+Unversioned (default)
+–
+No new and existing objects in the bucket have a version.
+
+
+Versioning-enabled
+–
+Versioning is enabled for all objects in the bucket. After you version-enable a bucket, it can never return to an unversioned state. However, you can suspend versioning on that bucket.
+
+
+Versioning-suspended
+–
+Versioning is suspended for new objects. All new objects in the bucket will not have a version. However, all existing objects keep their object versions.
+
+
+========================================================
+
+
+Managing your storage lifecycle
+
+If you keep manually changing your objects, such as your employee photos, from storage tier to storage tier, you might want to automate the process by configuring their Amazon S3 lifecycle. When you define a lifecycle configuration for an object or group of objects, you can choose to automate between two types of actions: transition and expiration.
+
+
+The following use cases are good candidates for the use of lifecycle configuration rules:
+
+Periodic logs: If you upload periodic logs to a bucket, your application might need them for a week or a month. After that, you might want to delete them.
+Data that changes in access frequency: Some documents are frequently accessed for a limited period of time. After that, they are infrequently accessed. At some point, you might not need real-time access to them. But your organization or regulations might require you to archive them for a specific period. After that, you can delete them.
 ----------------------------------------------------------------------
 CLOUDFRONT - Amazons CDN content delivery network
 CLOUDFRONT Origin - EC2,S3,ELB,R53 address

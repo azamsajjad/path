@@ -8,7 +8,35 @@ ON-DEMAND - pay by the hour
 RESERVED - upto 72% discount on hourly charge
 SPOT - purchase unused capacity at 90% discount
 DEDICATED - physical ec2 dedicated to you
+Dedicated Hosts
+–
+// A Dedicated Host is a physical Amazon EC2 server that is dedicated for your use. Dedicated Hosts can help you reduce costs because you can use your existing server-bound software licenses, such as Windows Server, SQL Server, and Oracle licenses. And they can also help you meet compliance requirements. Amazon EC2 Dedicated Host is also integrated with AWS License Manager, a service that helps you manage your software licenses, including Microsoft Windows Server and Microsoft SQL Server licenses.
 
+
+
+// Dedicated Hosts can be purchased on demand (hourly).
+// Dedicated Hosts can be purchased as a Reservation for up to 70 percent off the On-Demand price.
+Amazon EC2 instance store
+Instance store is ephemeral block storage. This is preconfigured storage that exists on the same physical server that hosts the EC2 instance and cannot be detached from Amazon EC2. You can think of it as a built-in drive for your EC2 instance.
+
+ 
+
+Instance store is generally well suited for temporary storage of information that is constantly changing, such as buffers, caches, and scratch data. It is not meant for data that is persistent or long lasting. If you need persistent long-term block storage that can be detached from Amazon EC2 and provide you more management flexibility, such as increasing volume size or creating snapshots, you should use Amazon EBS.
+--------------------------------------------------
+Amazon EBS
+Amazon EBS is meant for data that changes frequently and must persist through instance stops, terminations, or hardware failures. Amazon EBS has two types of volumes: SSD-backed volumes and HDD-backed volumes.
+
+The performance of SSD-backed volumes depends on the IOPs and is ideal for transactional workloads, such as databases and boot volumes. 
+
+The performance of HDD-backed volumes depends on megabytes per second (MBps) and is ideal for throughput-intensive workloads, such as big data, data warehouses, log processing, and sequential data I/O.
+
+Here are a few important features of Amazon EBS that you need to know when comparing it to other services.
+
+It is block storage.
+You pay for what you provision (you have to provision storage in advance).
+EBS volumes are replicated across multiple servers in a single Availability Zone.
+Most EBS volumes can only be attached to a single EC2 instance at a time.
+-----------------------------------------------------------
 EBS VOLUMES - attached to ec2 instance 
 types:
 Elastic block store - SSDs
@@ -27,6 +55,11 @@ EBS SNAPSHOTS
 point in time copy of EBS Volume
 if you create new EBS volume from an encrypted snapshot, you will get an encrypted volume - same for unencrypted 
 Create a snapshot of the EC2 volume. Then create a copy of the snapshot, checking the box to enable encryption. Create an AMI of the copied snapshot and then redeploy the EC2 instance using the encrypted AMI. Delete the old EC2 instance.
+
+
+Amazon EBS is ideal for a high-transaction database storage layer. 
+Amazon S3 is ideal for write once, read many (WORM) storage. 
+Amazon EFS is ideal for when you have multiple servers that require access to the same set of files. 
 --------------------------------------------------------------------------
 [Elastic LOAD Balancer]
 
@@ -138,6 +171,41 @@ can handle millions of request maintaining extremely low latency
 can perform Cross-Zone Load balancing
 Great for Multiplayer Video Games
 
+
+A Network Load Balancer is ideal for load balancing TCP and UDP traffic. It functions at Layer 4 of the OSI model, routing connections from a target in the target group based on IP protocol data.
+
+To learn more about some of the primary features of Network Load Balancers, flip each of the following flashcards by choosing them. 
+
+Sticky sessions
+\
+Routes requests from the same client to the same target.
+
+Low latency
+\
+Offers low latency for latency-sensitive applications.
+
+
+Source IP address
+\
+Preserves the client-side source IP address.
+
+
+Static IP support
+\
+Automatically provides a static IP address per Availability Zone (subnet).
+
+
+Elastic IP address support
+\
+Lets users assign a custom, fixed IP address per Availability Zone (subnet).
+
+DNS failover
+\
+Uses Amazon Route 53 to direct traffic to load balancer nodes in other zones.
+
+
+
+
 USE CASES:
 
 PRIVATE ACCESS TO SAAS APPS - see image
@@ -216,6 +284,24 @@ Gateway Load Balancers - provides load balancing for 3rd-party virtual appliance
 What problems does Gateway Load Balancer solve?
 
 Customers and partners face several challenges while moving their workloads to the cloud. Customers would like to keep third-party services that they are comfortable with. Moving to any new service will affect their architecture and may require design change. With Gateway Load Balancer, you can deploy inline networking and security as a managed service in single and multi-tenant designs. This allows customers to consume third-party services in a cloud-native way, and save time and money, while also reducing risks.
+
+
+High availability
+\
+Ensures high availability and reliability by routing traffic through healthy virtual appliances.
+
+Monitoring
+\
+Can be monitored using CloudWatch metrics.
+
+Streamlined deployments
+\
+Can deploy a new virtual appliance by selecting it in the AWS Marketplace.
+
+Private connectivity
+\
+Connects internet gateways, virtual private clouds (VPCs), and other network resources over a private network.
+
 
 Lack of scaling
 –
@@ -334,6 +420,35 @@ GatewayLoadBalancer Endpoint Route Tables:
 0.0.0.0/0 igw 
 10.0.0.0/16 local
 ===========================================================================
+ELB AUTO SCALING .
+After determining the availability of a new EC2 instance, the load balancer starts sending traffic to it. If ELB determines that an EC2 instance is no longer working, it stops sending traffic to it and informs Amazon EC2 Auto Scaling. It is the responsibility of Amazon EC2 Auto Scaling to remove that instance from the group and replace it with a new EC2 instance. Traffic is only sent to the new instance if it passes the health check.
+
+If Amazon EC2 Auto Scaling has a scaling policy that calls for a scale down action, it informs ELB that the EC2 instance will be terminated. ELB can prevent Amazon EC2 Auto Scaling from terminating an EC2 instance until all connections to the instance end. It also prevents any new connections. This feature is called connection draining. We will learn more about Amazon EC2 Auto Scaling in the next lesson.
+
+
+Automatic scaling
+\
+Automatically scales in and out based on demand.
+
+Scheduled scaling
+\
+Scales based on user-defined schedules.
+
+Fleet management
+\
+Automatically replaces unhealthy EC2 instances.
+
+Predictive scaling
+\
+Uses machine learning (ML) to help schedule the optimum number of EC2 instances.
+
+Purchase options
+\
+Includes multiple purchase models, instance types, and Availability Zones.
+
+Amazon EC2 availability
+\
+Comes with the Amazon EC2 service.
 
 X-Forwarded-For - if you need ipv4 address of your end user, look for XForwardedFor HTTP Header
 504 Error - Gateway Timeout - application is not responding within timeout period - troubleshoot application or database server
@@ -365,13 +480,26 @@ c-SCALING Policies:
 
     1-Target Tracking Scaling Policy: 
         maintains a specific metric at a target value 
-        e.g. if average CPU utilization exceeds 75% then add another server 
+        e.g. if average CPU utilizaxtion exceeds 75% then add another server 
     2-Simple Scaling Policy: 
         scales when an alarm is breached 
         not recommended - legacy policy 
     3-Scaling Policies With Steps:
         when an alarm is breached, can escalates based on alarm value changing
-        e.g. add x instances when value of alarm is this, y for that
+        e.g. add 2 instances when value of alarm is 85%, 4 WHEN 97%
+
+LAUNCH TEMPLATES:
+You can use a launch template to manually launch an EC2 instance or for use with Amazon EC2 Auto Scaling. It also supports versioning, which can be used for quickly rolling back if theres an issue or a need to specify a default version of the template. This way, while iterating on a new version, other users can continue launching EC2 instances using the default version until you make the necessary changes.
+
+You can create a launch template in one of three ways as follows:
+
+Use an existing EC2 instance. All the settings are already defined.
+
+Create one from an already existing template or a previous version of a launch template.
+
+Create a template from scratch. These parameters will need to be defined: AMI ID, instance type, key pair, security group, storage, and resource tags.
+
+Another way to define what Amazon EC2 Auto Scaling needs to scale is by using a launch configuration. It’s similar to the launch template, but you cannot use a previously created launch configuration as a template. You also cannot create a template from an already existing EC2 instance. For these reasons, and to ensure that you get the latest features from Amazon EC2, AWS recommends you use a launch template instead of a launch configuration.
 
 LAUNCH CONFIGURATION:
 is an instance configuration template that an autoscaling group uses to launch EC2 instances.
@@ -379,9 +507,6 @@ same process as launching an instance, but it justs saves it
 once set, launch configurations cannot be editted 
 Launch Templates are Launch Configurations with Versioning (not too value)
 but everyone still uses Launch Configurations
-
-
-
 
 
 [ROUTE 53]

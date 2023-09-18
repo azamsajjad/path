@@ -108,3 +108,76 @@ console.log(xx);
 console.log(maximum,minimum);
 
 
+
+
+// calculate perpendicular
+let a;
+let b;
+let c;
+/*
+a = window.prompt("Enter Side A");
+a = Number(a);
+
+b = window.prompt("Enter Side B");
+b = Number(b);
+
+c = Math.pow(a, 2) + Math.pow(b, 2);
+c = Math.sqrt(c);
+
+console.log("Side C =", c);
+*/
+
+document.getElementById("cbutton").onclick = function() {
+    a = document.getElementById("aText").value;
+    a = Number(a);
+
+    a = document.getElementById("bText").value;
+    b = Number(b);
+
+    c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+
+    document.getElementById("cLabel").innerHTML = "Side C: " + c;
+}
+
+
+
+
+
+// make a counter on website
+
+let count = 0;
+document.getElementById("debutton").onclick = function() {
+    count-=1;
+    document.getElementById("countlabel").innerHTML = count;
+
+}
+document.getElementById("rebutton").onclick = function() {
+    count=0;
+    document.getElementById("countlabel").innerHTML = count;
+
+}
+document.getElementById("inbutton").onclick = function() {
+    count+=1;
+    document.getElementById("countlabel").innerHTML = count;
+
+}
+
+
+
+// generate a random number by pressing a button
+
+let r;
+let rr;
+let rrr;
+
+
+
+document.getElementById("roll").onclick = function() {
+   r = Math.floor(Math.random() * 6) + 1;
+   rr = Math.floor(Math.random() * 6) + 1;
+   rrr = Math.floor(Math.random() * 6) + 1;
+
+   document.getElementById("rlabel").innerHTML = r;
+   document.getElementById("rrlabel").innerHTML = rr;
+   document.getElementById("rrrlabel").innerHTML = rrr;
+}

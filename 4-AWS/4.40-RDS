@@ -1,3 +1,35 @@
+ you are then responsible for is the creation, maintenance, and optimization of the database itself. So you are still in charge of creating the right schema, indexing the data, creating stored procedures, enabling encryption, managing access control, and more. But all the rest of the undifferentiated heavy lifting that goes into operating a relational database, AWS takes care of.
+
+Relational databases
+
+A relational database organizes data into tables. Data in one table can link to data in other tables to create relationships—hence, the relational part of the name.
+
+A table stores data in rows and columns. A row, often called a record, contains all information about a specific entry. Columns describe attributes of an entry. 
+
+The tables, rows, columns, and relationships between them is called a logical schema. With relational databases, a schema is fixed. After the database is operational, it becomes difficult to change the schema. Because of this, most of the data modeling is done up front before the database is active.
+
+-----------------------------------------------------------------------
+With a relational database management system (RDBMS), you can create, update, and administer a relational database. Some common examples of RDBMSs include the following:
+
+MySQL
+PostgresQL
+Oracle
+Microsoft SQL Server
+Amazon Aurora
+You communicate with an RDBMS by using structured query language (SQL) queries, similar to the following example:
+
+With SQL, you can join multiple tables so you can better understand relationships between your data.
+You can store data in one table and reference it from other tables instead of saving the same data in different places.
+SELECT * FROM table_name.
+
+This query selects all the data from a particular table. However, the power of SQL queries is in creating more complex queries that pull data from several tables to identify patterns and answers to business problems. For example, querying the sales table and the books table together to see sales in relation to an author’s books. Querying tables together to better understand their relationships is made possible by a "join".
+=========================================================================
+Managed databases
+
+To shift more of the work to AWS, you can use a managed database service. These services provide the setup of both the EC2 instance and the database, and they provide systems for high availability, scalability, patching, and backups. However, in this model, you’re still responsible for database tuning, query optimization, and ensuring that your customer data is secure. This option provides the ultimate convenience but the least amount of control compared to the two previous options.
+
+
+RDS is a managed database
 rds multi-az and read replicas
 rds backups and snapshots
 rds proxy
@@ -28,6 +60,11 @@ READ REPLICA - read-only copy
         used to scale read performance for read-only workloads
         in same AZ or cros-AZ or cross-region
 
+----------------------------------------------------------------------
+Amazon ElastiCache 
+
+ElastiCache is a fully managed, in-memory caching solution. It provides support for two open-source, in-memory cache engines: Redis and Memcached. You aren’t responsible for instance failovers, backups and restores, or software upgrades.
+
 [Elasticache 101 for Rds]
     in-memory cache
     improves database performance
@@ -46,6 +83,61 @@ READ REPLICA - read-only copy
 
 elasticache is good choice if database is read-heavy and not prone to frequent changing 
 caching doesnot help if you are overloaded with write loads, then you need to scale up your database and if you are using OLAP, think redshift.
+--------------------------------------------------------------------------
+Storage on Amazon RDS
+
+The storage portion of DB instances for Amazon RDS use Amazon Elastic Block Store (Amazon EBS) volumes for database and log storage. This includes MySQL, MariaDB, PostgreSQL, Oracle, and SQL Server. 
+
+When using Aurora, data is stored in cluster volumes, which are single, virtual volumes that use solid-state drives (SSDs). A cluster volume contains copies of your data across three Availability Zones in a single AWS Region. For nonpersistent, temporary files, Aurora uses local storage.
+
+Amazon RDS provides three storage types: General Purpose SSD (also called gp2 and gp3), Provisioned IOPS SSD (also called io1), and Magnetic (also called standard). They differ in performance characteristics and price, which means you can tailor your storage performance and cost to the needs of your database workload.
+---------------------------------------------------------------------------
+Amazon RDS in an Amazon Virtual Private Cloud
+
+When you create a DB instance, you select the Amazon Virtual Private Cloud (Amazon VPC) your databases will live in. Then, you select the subnets that will be designated for your DB. This is called a DB subnet group, and it has at least two Availability Zones in its Region. The subnets in a DB subnet group should be private, so they don’t have a route to the internet gateway. This ensures that your DB instance, and the data inside it, can be reached only by the application backend.
+
+Access to the DB instance can be restricted further by using network access control lists (network ACLs) and security groups. With these firewalls, you can control, at a granular level, the type of traffic you want to provide access into your database.
+
+Using these controls provides layers of security for your infrastructure. It reinforces that only the backend instances have access to the database.
+
+Backup data
+
+You don’t want to lose your data. To take regular backups of your Amazon RDS instance, you can use automated backups or manual snapshots. To learn about a category, choose the appropriate tab.
+---------------------------------------------------------------------------
+Redundancy with Amazon RDS Multi-AZ
+
+In an Amazon RDS Multi-AZ deployment, Amazon RDS creates a redundant copy of your database in another Availability Zone. You end up with two copies of your database—a primary copy in a subnet in one Availability Zone and a standby copy in a subnet in a second Availability Zone.
+
+The primary copy of your database provides access to your data so that applications can query and display the information. The data in the primary copy is synchronously replicated to the standby copy. The standby copy is not considered an active database, and it does not get queried by applications.
+
+Diagram depicting Amazon RDS Multi-AZ creating a redundant copy of a database in another Availability Zone.
+To improve availability, Amazon RDS Multi-AZ ensures that you have two copies of your database running and that one of them is in the primary role. If an availability issue arises, such as the primary database loses connectivity, Amazon RDS initiates an automatic failover.
+
+When you create a DB instance, a Domain Name System (DNS) name is provided. AWS uses that DNS name to fail over to the standby database. In an automatic failover, the standby database is promoted to the primary role, and queries are redirected to the new primary database.
+
+To help ensure that you don't lose Multi-AZ configuration, there are two ways you can create a new standby database. They are as follows:
+
+`Demote the previous primary to standby if it's still up and running.
+`Stand up a new standby DB instance.
+
+The reason you can select multiple subnets for an Amazon RDS database is because of the Multi-AZ configuration. You will want to ensure that you have subnets in different Availability Zones for your primary and standby copies.
+--------------------------------------------------------------------------
+Amazon RDS security
+IAM 
+Use IAM policies to assign permission
+resources. For example, you can use IA
+delete DB instances, tag resources, or
+Security Groups 
+Use security groups to control which IP addresses or Amazon EC2 instances can connect toyour databases on a DB instance. When you first create a DB instance, all database access is prevented except through rules specified by an associated security group
+Amazon RDS Encryption 
+Use Secure Sockets Layer (SSL) or Transport Layer Security (TLS) 
+Use Secure Sockets Layer (SSL) or Transport Layer Security (TLS) connections with DB instances running the MySQL, MariaDB, PostgreSQL, Oracle, or SQL Server database engines
+
+===========================================================================
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Amazon MemoryDB for Redis
+
+MemoryDB is a Redis-compatible, durable, in-memory database service that delivers ultra-fast performance. With MemoryDB, you can achieve microsecond read latency, single-digit millisecond write latency, high throughput, and Multi-AZ durability for modern applications, like those built with microservices architectures. You can use MemoryDB as a fully managed, primary database to build high-performance applications. You do not need to separately manage a cache, durable database, or the required underlying infrastructure.
 
 [MemoryDB 101 for Redis]
 massively scalable - in-memory database
@@ -69,16 +161,87 @@ app -> rds proxy > db2
 detects failover and routes requests to standby DB 
 Deployable over multi-AZ for protection from infra failure
 66% faster failover times 
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Amazon Timestream
+
+Timestream is a fast, scalable, and serverless time series database service for Internet of Things (IoT) and operational applications. It makes it easy to store and analyze trillions of events per day up to 1,000 times faster and for as little as one-tenth of the cost of relational databases. Time series data is a sequence of data points recorded over a time interval. It is used for measuring events that change over time, such as stock prices over time or temperature measurements over time.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Amazon Neptune
+
+Neptune is a fully managed graph database offered by AWS. A graph database is a good choice for highly connected data with a rich variety of relationships. Companies often use graph databases for recommendation engines, fraud detection, and knowledge graphs.
+SQL queries for highly connected data are complex and hard to tune for performance. With Neptune, you can use the popular graph query languages Gremlin, openCypher, and SPARQL to execute powerful queries that are easy to write and perform well on connected data.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Amazon Quantum Ledger Database (Amazon QLDB)
+
+With traditional databases, you can overwrite or delete data, so developers use techniques, such as audit tables and audit trails to help track data lineage. These approaches can be difficult to scale and put the burden of ensuring that all data is recorded on the application developer. Amazon QLDB is a purpose-built ledger database that provides a complete and cryptographically verifiable history of all changes made to your application data.
+==================================
+Amazon RDS, Aurora, Amazon Redshift
+Relational	
+Traditional applications, ERP, CRM, ecommerce
+==================================
+
+DynamoDB 
+Key-value    
+High-traffic web applications, ecommerce systems, gaming apps
+==================================
+
+Amazon ElastiCache for Memcached, Amazon ElastiCache for Redis
+In-memory
+Caching, session management, gaming leaderboards, geospatial applications
+==================================
+
+Amazon DocumentDB
+Document	
+Content management, catalogs, user profiles
+==================================
+
+Amazon Keyspaces
+Wide column	
+High-scale industrial applications for equipment maintenance, fleet management, route optimization
+==================================
+
+Neptune
+Graph	
+Fraud detection, social networking, recommendation engines
+==================================
+
+Timestream
+Time series	
+IoT applications, Development Operations (DevOps), industrial telemetry
+==================================
+
+Amazon QLDB
+Ledger	
+Systems of record, supply chain, registrations, banking transactions
 
 
-AWS SYSTEMS MANAGER - PARAMETER STORE 
-    safe place to store licence keys, passwords, database connection strings,  in plain text or encrypted
-    you can reference your parameters using parameter name e.g. in a script
-    its integrated to be used with ec2, cloudformation, lambda, codebuild, codepipeline, codedeploy
 
-AWS SECRETS MANAGER 
-    secrets are encrypted using AWS KMS key
-    CMK customer master key holds key material to encrypt data. CMKs can encrypt upto 4kb of data
-    Secret Rotation is done through lambda function
+======================================================================
+Employee directory application:
 
- 
+#!/bin/bash -ex
+wget https://aws-tc-largeobjects.s3-us-west-2.amazonaws.com/DEV-AWS-MO-GCNv2/FlaskApp.zip
+unzip FlaskApp.zip
+cd FlaskApp/
+yum -y install python3 mysql
+pip3 install -r requirements.txt
+amazon-linux-extras install epel
+yum -y install stress
+export PHOTOS_BUCKET=${SUB_PHOTOS_BUCKET}
+export AWS_DEFAULT_REGION=<INSERT REGION HERE>
+export DYNAMO_MODE=on
+FLASK_APP=application.py /usr/local/bin/flask run --host=0.0.0.0 --port=80
+
+
+
+#!/bin/bash -ex
+wget https://aws-tc-largeobjects.s3-us-west-2.amazonaws.com/DEV-AWS-MO-GCNv2/FlaskApp.zip
+unzip FlaskApp.zip
+cd FlaskApp/
+yum -y install python3-pip
+pip install -r requirements.txt
+yum -y install stress
+export PHOTOS_BUCKET=${SUB_PHOTOS_BUCKET}
+export AWS_DEFAULT_REGION=<INSERT REGION HERE>
+export DYNAMO_MODE=on
+FLASK_APP=application.py /usr/local/bin/flask run --host=0.0.0.0 --port=80 

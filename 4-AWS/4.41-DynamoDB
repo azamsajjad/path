@@ -34,7 +34,41 @@ rows = items
 columns = attributes 
 keys = identifying names of your data 
 values = the actual data itself
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Amazon DocumentDB (with MongoDB compatibility)
+
+Amazon DocumentDB is a fully managed document database from AWS. A document database is a type of NoSQL database you can use to store and query rich documents in your application. These types of databases work well for the following use cases: content management systems, profile management, and web and mobile applications. Amazon DocumentDB has API compatibility with MongoDB. This means you can use popular open-source libraries to interact with Amazon DocumentDB, or you can migrate existing databases to Amazon DocumentDB with minimal hassle.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Amazon Keyspaces (for Apache Cassandra)
+
+Amazon Keyspaces is a scalable, highly available, and managed Apache Cassandra compatible database service. Apache Cassandra is a popular option for high-scale applications that need top-tier performance. Amazon Keyspaces is a good option for high-volume applications with straightforward access patterns. With Amazon Keyspaces, you can run your Cassandra workloads on AWS using the same Cassandra Query Language (CQL) code, Apache 2.0 licensed drivers, and tools that you use today.
+Amazon Keyspaces (for Apache Cassandra) implements the Apache Cassandra Query Language (CQL) API, so you can use CQL and Cassandra drivers that you already use. Updating your application is as easy as updating your Cassandra driver or cqlsh configuration to point to the Amazon Keyspaces service endpoint.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+DynamoDB security
+
+DynamoDB provides a number of security features to consider as you develop and implement your own security policies. They include the following:
+bullet
+DynamoDB provides a highly durable storage infrastructure designed for mission-critical and primary data storage. Data is redundantly stored on multiple devices across multiple facilities in a DynamoDB Region.  
+bullet
+All user data stored in DynamoDB is fully encrypted at rest. DynamoDB encryption at rest provides enhanced security by encrypting all your data at rest using encryption keys stored in AWS Key Management Service (AWS KMS).
+bullet
+IAM administrators control who can be authenticated and authorized to use DynamoDB resources. You can use IAM to manage access permissions and implement security policies.
+bullet
+
+As a managed service, DynamoDB is protected by the AWS global network security procedures.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+USE CLOUDTRAIL .
+When activity occurs in DynamoDB, that activity is recorded in CloudTrail ongoing record of events in DynamoDB and in your AWS files to an Amazon Simple Storage Service (Amazon S3)
+
+If you are using an AWS managed key for encryption at rest, usage of the key is recorded in
+AWS CloudTrail. CloudTrail can tell you who made the request, the services used, actions
+performed, parameters for the action, and response elements returned.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 
 DYNAMODB READ CONSISTANCY:
 data is saved to 3 locations AZs(data centers) at once on SSDs
