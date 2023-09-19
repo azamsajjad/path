@@ -1,3 +1,191 @@
+PREVENT
+
+DETECT
+
+RESPOND
+
+REMEDIATE
+
+"Confidentiality, integrity, and availability"
+
+Security is the practice of protecting your intellectual property from unauthorized access, use, or modification. The confidentiality, integrity, and availability (CIA) triad model highlights the important aspects of information security within an organization. AWS provides several services that you can use to address the needs that this model describes. Select each of the following cards for more information on the CIA triad.
+
+\
+Confidentiality refers to limiting information access and disclosure to authorized users (the right people) and preventing access by unauthorized people. 
+
+\
+Integrity involves maintaining the consistency, accuracy, and trustworthiness of data over its entire life cycle. From a more restrictive view, the integrity of an information system includes only preservation without corruption of whatever was transmitted or entered into the system.
+
+\
+Availability refers to the readiness of information resources. An information system that is not available when you need it is almost as useless as not having an information system. 
+
+
+AWS shared responsibility model
+
+AWS is responsible for protecting the global infrastructure that runs all of the services offered in the AWS Cloud. This infrastructure comprises the hardware, software, networking, and facilities that run AWS services.
+
+As an AWS customer, you are responsible for securing your data, operating systems, networks, platforms, and other resources that you create in the AWS Cloud. You are responsible for protecting the confidentiality, integrity, and availability of your data and for meeting any specific business or compliance requirements for your workloads.
+
+Safeguarding data is a critical part of building and operating information systems. AWS provides services and features that give you several options to protect your data at rest and in transit. These options include fine-grained access controls to objects, creating and controlling the encryption keys used to encrypt your data, selecting appropriate encryption methods, validating integrity, and appropriately retaining data. Creating mechanisms to protect data in transit, such as using virtual private network (VPN) and Transport Layer Security (TLS) connections, is also a security best practice.
+
+The AWS Well-Architected Framework
+
+The AWS Well-Architected Framework helps you understand the pros and cons of decisions you make while building systems on AWS. By using the AWS Well-Architected Framework, you will learn architectural best practices for designing and operating reliable, secure, efficient, and cost-effective systems in the cloud. It provides a way for you to consistently measure your architectures against best practices and identify areas for improvement. AWS believes that having well-architected systems greatly increases the likelihood of business success. 
+
+The framework is based on six pillars. Select each of the following numbered markers for more information: 
+
+Operational Excellence
+Security
+Reliability
+Performance Efficiency
+Cost Optimization
+Sustainability
+
+The security pillar
+
+The security pillar signifies the ability to protect information, systems, and assets while delivering business value through risk assessments and mitigation strategies. The security pillar is made up of five different areas for security in the cloud. All AWS security services can be categorized by these five areas. Select each of the following markers for more information on the different security pillar areas.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+IAM-DETECTIVE CONTROLS-INFRA PROTECTION-DATA PROTECTION-INCIDENT RESPONSE
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+1-1-1-1-1-1-1-1-1-1-1-1--1-1-1-1-1-1-1----------------------IAM:
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Authentication - Who? e.g. using passwords to authenticate
+Authorization - What?
+Sometimes in Authorization, the most important question is not what can users do, but what can they NOT do.
+
+Amazon Cognito
++
+
+AWS Directory Service
++
+
+AWS Identity and Access Management (IAM)
++
+AWS Directory Service is a managed service offering that provides directories that contain information about your organization, including users, groups, computers, and other resources. As a managed offering, AWS Directory Service is designed to reduce management tasks, thereby allowing you to focus more of your time and resources on your business. 
+
+AWS IAM Identity Center (formerly known as AWS Single Sign-On)
+–
+AWS IAM Identity Center is a cloud SSO service that allows for the central management of SSO access to multiple AWS accounts and business applications. It enables users to sign in to a user portal with their existing corporate credentials and access all of their assigned accounts and applications from one place. IAM Identity Center includes built-in Security Assertion Markup Language (SAML) integrations to many business applications. IAM Identity Center may be integrated with Microsoft Active Directory, which means your employees can sign in to your user portal using their corporate Active Directory credentials. 
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2--------------DETECTIVE CONTROLS.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+AWS services for detective controls
+
+AWS provides a suite of services that will monitor and combat threats through unified security and compliance, managed threat detection, application security analysis, and the ability to investigate potential security issues. 
+
+
+AWS Security Hub
+–
+AWS Security Hub provides you with a comprehensive view of your security state within AWS and your compliance with security standards and best practices. Security Hub centralizes and prioritizes security findings from across AWS accounts, services, and supported third-party partners to help you analyze your security trends and identify the highest priority security issues. provides a dashboard and include findings from GaurdDuty, Macie, Detective, Compliance Checks and partners
+@ It continuously aggregates and prioritize findings
+@ Conduct automated compliance scans and checks
+@ AWS Security Hub provides integrated dashboards that bring together your security findings across accounts to show you the current security and compliance status. You can easily spot trends, identify potential issues, and take the necessary next steps.
+@ Can take actions - AWS Security Hub supports integration with Amazon CloudWatch Events. This integration lets you automate the remediation of specific findings by defining custom actions to take when a finding is received. 
+                                                    -->Yellow -> Lambda 1
+Security Hub -> Findings -> Cloudwatch Events Rule _|
+                                                    |-->Red -> SNS notify security team
+
+
+Amazon GuardDuty
++
+Amazon GuardDuty offers threat detection that enables you to continuously monitor and protect your AWS accounts and workloads. GuardDuty analyzes continuous streams of metadata generated from your account and network activity found in CloudTrail events, Amazon Virtual Private Cloud (Amazon VPC) flow logs, and Domain Name System (DNS) logs. It also uses integrated threat intelligence such as known malicious IP addresses, anomaly detection, and machine learning to identify threats more accurately. 
+-------------
+GuardDuty's threat intelligence coupled with machine learning and behavior models help you detect activity such as crypto-currency mining, credential compromise behavior, or API calls from known malicious IPs.
+-------------
+Through the multi-account feature, all member accounts findings can be aggregated with a GuardDuty administrator account. This enables the security team to manage all GuardDuty findings from across the organization in one single account.
+-------------
+Your security team and administrators can use AWS Identity and Access Management (IAM) Access Analyzer to identify resources that can be accessed from outside an AWS account.
+-------------
+GuardDuty comes integrated with up-to-date threat intelligence feeds from AWS, CrowdStrike, and Proofpoint.
+-------------'
+
+
+
+Amazon Inspector
++
+Amazon Inspector is an automated security assessment service that helps you test the network accessibility of your Amazon Elastic Compute Cloud (Amazon EC2) instances and the security state of your applications running on the instances. 
+
+
+
+
+Amazon Detective
++
+Amazon Detective makes it easy to analyze, investigate, and quickly identify the root cause of potential security issues or suspicious activities. Detective automatically collects log data from your AWS resources and uses machine learning, statistical analysis, and graph theory to build a linked set of data that enables you to easily conduct faster and more efficient security investigations.
+
+
+
+
+Amazon Macie
++
+Amazon Macie is a security service that uses machine learning to automatically discover, classify, and protect sensitive data in AWS. Macie recognizes sensitive data such as personally identifiable information (PII) or intellectual property and provides you with dashboards and alerts that give visibility into how this data is being accessed or moved. The fully managed service continuously monitors data access activity for anomalies and generates detailed alerts when it detects risk of unauthorized access or inadvertent data leaks. Macie is available to protect data stored in Amazon S3.
+"@ bullet
+Macie can identify data with high business value, including programming languages, to detect source code, logging formats, database backup formats, credentials, and API key formats.
+@ bullet
+The user behavior analytics engine of Macie helps identify risky or suspicious activity with AWS service API calls and access to high-value content.
+@ bullet
+Macie allows you to integrate with SIEM services and managed security service provider (MSSP) solutions. "
+
+
+Here is an example of a corporation using AWS Direct Connect to create a hybrid connection to AWS. All production data is being sent to AWS for storage, archiving due to compliance requirements, and analysis via Amazon Athena. With the addition of Macie, data is now being monitored and classified for the following:
+
+Anonymous access via the analysis of AWS CloudTrail logs and events
+PII artifacts inside a public Amazon S3 bucket
+Amazon S3 buckets and objects with certain keywords
+Amazon S3 objects containing certain type of data
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+3-3-3-3-3-3-3-3-3-3-3-3--3-3-3-3-33-----INFRASTRUCTURE PROTECTION.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+
+AWS Shield
++
+AWS Shield is a managed service that provides protection against distributed denial of service (DDoS) attacks for applications running on AWS. AWS Shield Standard is automatically enabled to all AWS customers at no additional cost.
+AWS Shield is a managed DDoS protection service that safeguards applications running on AWS. A DDoS attack is an attack in which multiple compromised systems attempt to flood a target, such as a network or web application, with traffic. A DDoS attack can prevent legitimate users from accessing a service and can cause the system to crash due to the overwhelming traffic volume.
+
+AWS provides two levels of protection against DDoS attacks: 
+
+AWS Shield Standard (enabled by default and comes with no additional cost)
+Always-on detection	           ✔  ✔
+Automatic inline mitigation	    ✔	✔
+Layer 3 and 4 protection        ✔  ✔
+(AWS Shield Advanced)
+Expanded DDoS attack protection	✔
+24/7 DDoS response team	       ✔
+Cost protection for DDoS spikes	✔
+Access to real-time reports        ✔
+AWS Shield integrates with Amazon Route 53, Amazon CloudFront, and Elastic Load Balancing to protect your applications from DDoS attacks.
+bullet
+AWS Shield Advanced provides real-time metrics and reports for extensive visibility into attacks on your AWS resources.
+
+AWS WAF
+–
+AWS WAF is a web application firewall that helps protect web applications from attacks by allowing you to configure rules that allow, block, or monitor (count) web requests based on conditions that you define. These conditions include IP addresses, HTTP headers, HTTP body, uniform resource identifier (URI) strings, structured query language (SQL) injection, and cross-site scripting.  
+
+
+AWS Firewall Manager
++
+AWS Firewall Manager is a security management tool that makes it easier for you to configure your AWS WAF rules across your accounts. With Firewall Manager, security administrators of large organizations can write company-wide rules from one place, enforce them across applications protected by AWS WAF, and get the central visibility of attacks against their Application Load Balancers and Amazon CloudFront infrastructure. 
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+4-4-4-4-4-4-4-4-4-44-4-4-4-4-4-4-4-4------DATA PROTECTION.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+AWS Key Management Service (KMS)
++
+
+AWS CloudHSM
++
+
+AWS Certificate Manager (ACM)
++
+
+AWS Secrets Manager
++
 PARAMETER STORE
 SECRETS MANAGER 
 KMS 
@@ -113,11 +301,73 @@ CloudTrail can monitor credentials access in case you need to audit secrets
 CLI:
 $ aws secretsmanager describe-secret --secret-id enterprize/shipdatabase
 $ aws secretsmanager get-secret-value --secret-id enterprize/shipdatabase --version-stage AWSCURRENT
+XXXXXXXXXXXX
+Secrets Manager helps you meet your security and compliance requirements by enabling you to rotate secrets safely without the need for code deployments. 
+XXXXXXXXXXXX
+With Secrets Manager, you can manage access to secrets using fine-grained AWS Identity and Access Management (IAM) policies and resource-based policies.
+XXXXXXXXXXXXXX
+Secrets Manager offers built-in integration for Amazon Relational Database Service (Amazon RDS), Amazon Redshift, and Amazon DocumentDB (with MongoDB compatibility) and automatically rotates these database credentials on your behalf.
+XXXXXXXXXXXXXX
+Using Secrets Manager, you can secure secrets by encrypting them with encryption keys that you manage using AWS KMS.
+XXXXXXXXXXXXXXX
+Secrets Manager also integrates with AWS logging and monitoring services for centralized auditing.
+XXXXXXXXXXXXXXXX
+With Secrets Manager, you pay for the number of secrets managed in Secrets Manager and the number of Secrets Manager API calls made.
+
 
 
 -----------------------------------------------------------------
 KMS is upto FIPS 140-2 Level 2 Complient
 ------------------------------KMS - Key Management Service 
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+STEP1:
+Data delivery
+With server-side encryption (SSE), data is
+delivered to AWS via HTTPS. The service then
+encrypts the data after it receives the API call.
+In this case, the service is Amazon Simple
+Storage Service (Amazon S3). SSE is transparent
+to the end user
+
+STEP2:
+Data key
+AWS KMS then generates a data key, and
+Amazon S3 uses this data key to encrypt each
+object that it receives. Each object will have it
+own unique data key.
+
+STEP3:
+Customer master key
+The data key is then encrypted under a
+customer master key (CMK) that either AWS or
+the customer can manage and rotate. AWS KMS
+tracks which master key was used to encrypt
+the data key.
+
+STEP4:
+Key storage
+The encrypted data key is then stored with the
+encrypted data so that the service knows where
+to find the key to decrypt the data at a later
+time.
+
+
+Types of CMKs
+
+"AWS KMS can use two types of CMKs when encrypting data keys: AWS managed and customer managed. The following table summarizes the key differences and similarities between AWS managed CMKs and customer managed CMKs."
+-----------------------
+With AWS KMS, you control access to your encrypted data by defining the permissions to use the keys while AWS KMS enforces your permissions and handles -the durability and physical security of your keys. 
+bullet--------------------------------
+"AWS KMS presents a single control point to manage keys and define policies consistently across integrated AWS services and your own applications-."
+bullet------------------------
+AWS KMS is integrated with the AWS Encryption SDK to enable you to use AWS KMS protected data encryption keys to encrypt locally within your applications. 
+bullet---------------------
+"The security and quality controls in AWS KMS have been certified under multiple compliance schemes to simplify your own compliance obligations.
+bullet"--------------------
+AWS KMS is integrated with AWS services to simplify using your keys to encrypt data across your AWS workloads. 
+--------------------------
+
 use KMS whenver you are dealing with sensitive data
 S3, RDS, DynamoDB, Lambda, EBS, EFS, CloudTrail, DeveloperTools
 CMK? Customer Master Key = encrypt/decrypt data upto 4kb 
@@ -225,6 +475,12 @@ internet-------->Route 53-----> ALB-------->multiple EC2 instances
 - - - - encrypted - -  - - - - - -- - - - - - - - --encrypted
 manual set up .complex. dnt need you private environment encrypted anyway'
 
+
+SSL/TLS provides encryption for sensitive data in transit and authentication using certificates to establish the identity of your site and to secure connections between browsers, applications, and your site. ACM provides an easy way to provision and manage these certificates so that you can configure a website or application to use the SSL/TLS protocol. 
+
+AWS Private Certificate Authority (CA) provides you a highly available private certificate authority service without the upfront investment and ongoing maintenance costs of operating your own private CA. AWS Private CA allows developers to be more agile by providing them APIs to create and deploy private certificates programmatically. You also have the flexibility to create private certificates for applications that require custom certificate lifetimes or resource names. 
+
+ACM helps manage the challenges of maintaining SSL/TLS certificates, including certificate renewals, so you don’t have to worry about expiring certificates.
 --------------------------------------------------------------------------
 ----------------------------Route 53 
 [ROUTE 53]
@@ -326,4 +582,103 @@ Alias records
 Route 53 doesn't charge for alias queries to AWS resources. For more information, see Amazon Route 53 Pricing.
 
 CNAME records
-Route 53 charges for CNAME queries.
+Route 53 charges for CNAME queries.'
+
+
+
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+5-5-5-5-5-5-5-5-5-5-5-5-5-5-5--5-5-5-5-5------INCIDENT RESPONSE
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
+There are obvious differences between environments built to run in the cloud and environments running on premises. When it comes to incident response, the same can be said. For example, the prepare and practice aspects of incident response can be done more efficiently on AWS. Incident response in the AWS Cloud is faster, cheaper, more effective, and simpler to manage. With AWS, you can significantly enhance your ability to detect, react, and recover. Some capabilities for investigation are possible only by using AWS. 
+
+RECOMMENDED PRACTICES.
+---------------------=============---------------------------
+Using APIs for automation
+In AWS, you can use APIs to automate many of the routine tasks that need to be performed during incident response. For example, using a single command, you can isolate an instance by changing the security groups associated with the instance. 
+---------------------=============---------------------------
+Performing forensics on data volumes
+Forensics often requires capturing the disk image or as-is configuration of an operating system. You can use Amazon Elastic Block Store (Amazon EBS) snapshots and the Amazon Elastic Compute Cloud (Amazon EC2) APIs to capture the data and state of systems under investigation.
+---------------------=============---------------------------
+Operating in a clean room
+AWS CloudFormation can be used to quickly create a new, trusted environment in which to conduct deeper investigation. AWS CloudFormation can deploy preconfigured instances in an isolated environment. These instances may contain all the necessary tools forensic teams need to determine the cause of the incident.
+---------------------=============---------------------------
+Coordinating AWS services into serverless workflows
+AWS Step Functions lets you coordinate multiple AWS services into serverless workflows so you can build and update apps quickly. Workflows are made up of a series of steps, with the output of one step acting as the input into the next. Step Functions can be used to design and run workflows that stitch together services such as AWS Lambda and AWS CloudFormation to respond to an incident in the cloud.
+---------------------=============---------------------------
+
+---------------------=============---AWS CONFIG.------------------------
+---------------------=============---AWS CONFIG.------------------------
+---------------------=============---AWS CONFIG.------------------------
+
+Service features and benefits
+
+
+Continuously Monitor.
+With AWS Config, you are able to "continuously monitor" and record configuration changes of your AWS resources.
+
+Continuously Audit And Assessment.
+AWS Config allows you to "continuously audit and assess" the overall compliance of your AWS resource configurations with your organization’s policies and guidelines. 
+
+Change Management.
+With AWS Config, you are able to track the relationships among resources and review resource dependencies prior to making "changes"
+
+bullet
+AWS Config enables you to capture a comprehensive history of your AWS resource configuration changes to simplify "troubleshooting of your operational issues."
+
+Compliance as Code. in aws lambda
+Security Analysis.
+
+SETUP:
+1- Specify AWS resource you want aws Config to record
+2- Set up Amazon S3 bucket to receive Configuration snapshots
+3- Set up Amazon SNS Topic to stream notifications
+4- Grant aws Config permissions to acces S3 and SNS
+5- Specify rules that you want aws config to use to evaluate compliance information for the recorded resource type.
+
+e.g. you setup with pre-built aws managed RULE that your "desired-EC2-Instance-Type" is t2.small...
+in your environment, when anyone creates an instance other than that, you will instantly know, it will show you which instances are non-compliant
+
+
+Use case: responding to configuration changes
+
+You can use AWS Config to respond to unwanted configuration changes. AWS Config runs evaluations when certain types of resources are created, changed, or deleted. You choose which resources trigger the evaluation by defining the rule's scope. AWS Config invokes an AWS Lambda function when it detects a configuration change.
+
+
+
+---------------------------------------------------
+AWS Well-Architected Tool
+The AWS Well-Architected Tool is a self-service tool that is designed to help customers review AWS workloads at any time without the need for an AWS solutions architect. By using this tool, you can review your workloads using a consistent process, understand potential risks in your workload architectures, and identify next steps for improvement. 
+
+First, define your workload, and then answer a set of questions across the six pillars of the AWS Well-Architected Framework: operational excellence, security, reliability, performance efficiency, and cost optimization. The AWS WA Tool then provides a plan describing the improvements that can be applied to the workload. There’s no charge for the AWS WA Tool; you pay only for any AWS resources that you consume. However, the tool is available only in select Regions. Check the FAQs for more information.'
+
+Operational excellence
+This pillar focuses on running and monitoring systems to deliver bus.
+
+Security
+This pillar focuses on protecting information and systems.
+
+Reliability
+This pillar focuses on the ability to prevent and quickly recover from failures.
+
+Performance efficiency
+This pillar focuses on using IT and computing resources efficiently.
+
+Cost optimization
+This pillar focuses on avoiding unneeded costs.
+
+-------------------------------------------------------------------------------
+Which AWS service allows you to analyze, investigate, and identify the root cause of potential security issues or suspicious activities in your account?
+
+AWS Resource Access Manager
+
+Correctly selected
+"Amazon Detective"
+
+Correctly unselected
+Amazon Macie
+
+Correctly unselected
+Amazon GuardDuty
