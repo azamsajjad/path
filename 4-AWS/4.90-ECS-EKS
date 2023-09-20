@@ -1,3 +1,68 @@
+FEATURES:
+The application is packaged so that you control the application and all associated resources, such as policies, security, and deployment.
+
+
+bullet
+Containers are portable and can be moved to different OS or hardware platforms, and through different environments such as development, testing/staging, pre-production, and production.
+
+
+bullet
+There are no time-out limits when running. This is useful for applications that run longer than 15 minutes or that need to initiate instantly when called.
+
+
+bullet
+Containers run without the startup latency of Lambda or Amazon EC2.
+
+
+bullet
+Containers have no size limit. They can be as large or as small as you need them to be.
+
+
+bullet
+Containers are useful when taking a large traditional application and breaking it down into small parts, or microservices, to make the application more scaleable and resilient. 
+
+
+
+
+
+===============================================================
+When to consider containers
+
+For compute-intensive workloads
+Applications that are compute intensive run better in a container environment. If you have a small application that runs under in 15 minutes but is compute intensive, consider using a container. Lambda is not the best fit for a heavily compute-intensive piece of code.
+
+For large monolithic applications 
+These are appropriate candidates to move to containers. Large monoliths that have many parts are very suitable applications to consider moving to containers. 
+You can break apart applications and run them as independent components, called microservices, using containers to isolate processes.
+By using microservices, you can break large applications into smaller, self-contained pieces. 
+Segmenting a larger application means that updates can be applied on only specific parts. Because each part of the larger application resides in its own container, an update that might have affected files used by a different piece of the application is isolated to its own container.
+
+With containers, you can do frequent updates by pushing out new containers, without the concern that one set of updates might break another part of the application. If you detect any issues, you have the flexibility to undo the change quickly.
+
+When you need to scale quickly 
+Containers can be built and taken down quickly, which means fast application deployment and scaling.
+
+When you need to move your large application to the cloud without altering the code 
+
+With containers, you can package entire applications and move them to the cloud without the need to make any code changes. 
+
+Your application can be as large as you need it to be and can run as long as you require it to run.
+
+
+
+
+
+
+When not to use containers
+
+When applications need persistent data storage 
+Containers can absolutely support persistent storage; however, it tends to be easier to containerize applications that don't require persistent storage. Persistent storage requirements increase the security and storage complexity and also make the containers less portable. If the container is moved, the storage needs to be reconfigured and secured.
+
+Applications that have no state information and don't require complex persistent storage would be better candidates for using a container solution than an application with complex storage needs.
+
+
+When applications have complex networking, routing, or security requirements
+Containers are portable and can be moved through different environments (testing, staging, production). If the application requires a complex configuration for networking, routing, storage, and so on, the containers are much more challenging to move.
 ===============================================================
 =     Auto Scaling Group 
 =

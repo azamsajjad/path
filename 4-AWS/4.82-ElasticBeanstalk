@@ -1,3 +1,27 @@
+Amazon Lightsail - FOR NOOBS.
+
+With a virtual private server (VPS), also known as an instance, users can run websites and web applications in a highly secure and available environment. Lightsail is a VPS provider and is a useful way to get started with AWS for users who need a solution to build and host their applications on AWS Cloud.
+
+Lightsail provides developers with compute, storage, and networking capacity and capabilities to deploy and manage websites and web applications in the cloud. Lightsail includes everything you need to launch your project quickly for a low, predictable monthly price. This includes VMs, containers, databases, content delivery network (CDN), load balancers, Domain Name System (DNS) management, and so on. 
+
+So what is the difference between Amazon EC2 and Lightsail? Lightsail provides low-cost, pre-configured cloud resources for simple workloads just starting on AWS. Amazon EC2 is a compute web service that provides secure, resizable compute in the cloud. It has far greater scale and optimization capabilities than Lightsail.
+==========================================================================
+AWS Batch
+
+Batch computing is defined as the running of a program without manual intervention. The program's input parameters are predefined through scripts, command-line arguments, control files, or job control language. A given batch job might depend on the completion of preceding jobs or on the availability of certain inputs. This makes the sequencing and scheduling of multiple jobs critical.
+
+AWS Batch is a set of batch management capabilities that you can use to efficiently run hundreds of thousands of batch computing jobs on AWS. AWS Batch dynamically provisions the optimal quantity and type of compute resources, such as CPU- or memory-optimized compute resources, based on the volume and specific resource requirements of the batch jobs submitted. AWS Batch plans, schedules, and runs your batch computing workloads using Amazon EC2 and AWS compute resources with Fargate or Fargate Spot. 
+===========================================================================
+AWS Elastic Beanstalk
+
+With Elastic Beanstalk, developers upload their application. Then, Elastic Beanstalk automatically handles the deployment details of capacity provisioning, load balancing, auto-scaling, and application health monitoring. By using Elastic Beanstalk, developers can focus on developing their application and are freed from deployment-oriented tasks, such as provisioning servers, setting up load balancing, or managing scaling. 
+
+Elastic Beanstalk automatically scales your application up and down based on your application's specific need using adjustable Auto Scaling settings. For example, you can use CPU utilization metrics to invoke Auto Scaling actions. With Elastic Beanstalk, your application can handle peaks in workload or traffic while minimizing your costs.
+
+
+
+
+
 "ELASTIC BEANSTALK"
 Platform as a Service
 create infrastructure for you

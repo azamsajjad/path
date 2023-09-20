@@ -181,3 +181,269 @@ document.getElementById("roll").onclick = function() {
    document.getElementById("rrlabel").innerHTML = rr;
    document.getElementById("rrrlabel").innerHTML = rrr;
 }
+
+
+
+
+// Useful String Properties & Methods
+
+let userName = "azam sajjad";
+let phoneNumber = "123-456-7890";
+
+console.log(userName);
+console.log(userName.length);
+console.log(userName.charAt(0));
+console.log(userName.indexOf("a"));
+
+userName = userName.toUpperCase();
+userName = userName.toLowerCase();
+
+console.log(userName);
+console.log(phoneNumber);
+
+phoneNumber = phoneNumber.replaceAll("-", "");
+console.log(phoneNumber);
+
+
+// String Slice Method
+
+let fullName = "Azam Sajjad";
+let fName;
+let lName;
+
+// fName = fullName.slice(0, 9);
+// lName = fullName.slice(10);
+fName = fullName.slice(0, fullName.indexOf(" "));
+lName = fullName.slice(fullName.indexOf(" ") + 1);
+
+console.log(fName);
+console.log(lName);
+
+//Method Chaining
+
+let USERNAME = "azam";
+let letter = USERNAME.charAt(0).toUpperCase().trim()
+console.log(letter);
+
+
+// if Statements - Decision Making
+
+let ages = 70;
+
+if(18 >= ages < 65){
+    console.log("You are an adult")
+}
+else if(ages < 0){
+    console.log("YOU ARE INHUMAN!")
+}
+else if(ages >= 65){
+    console.log("You are a senior")
+}
+else{
+    console.log("you are a child")
+}
+
+
+// booleans with if
+
+let online = false;
+if(online){
+    console.log("you are online")
+}
+else{
+    console.log("you are offline")
+}
+
+
+// Subscribe Button
+
+document.getElementById("subscribebutton").onclick = function() {
+    
+    const myCheckbox = document.getElementById("myCheckbox");
+    const visaBtn = document.getElementById("visaBtn");
+    const mastercardBtn = document.getElementById("mastercardBtn");
+    const paypalBtn = document.getElementById("paypalBtn");
+    
+    if(document.getElementById("myCheckbox").checked){
+        console.log("YOU ARE SUBSCRIBED")
+    }
+    else{
+        console.log("YOU ARE NOT SUBSCRIBED")
+    }
+
+
+    if(visaBtn.checked){
+        console.log("YOU ARE PAYING WITH VISA CARD")
+    }
+    else if(mastercardBtn.checked){
+        console.log("YOU ARE PAYING WITH MASTERCARD")
+    }
+    else if(paypalBtn.checked){
+        console.log("YOU ARE PAYING WITH PAYPAL")
+    }
+    else{
+        console.log("You must Select a Payment Type")
+    }
+}
+
+
+// Using switches instead of too many if else statements
+
+let grade = "F";
+
+switch(grade){
+    case "A":
+        console.log("You did great!");
+        break;
+    case "B":
+        console.log("You did good!");
+        break;
+    case "C":
+        console.log("You did nice!");
+        break;
+    case "D":
+        console.log("You barely passed!");
+        break;
+    case "F":
+        console.log("You failed!");
+        break;
+    default:
+        console.log(grade, "is not a Letter Grade");
+        break;
+}
+
+let graden = 50;
+
+switch(true){
+    case graden >= 90:
+        console.log("You did great!");
+        break;
+        case graden >= 70:
+        console.log("You did good!");
+        break;
+        case graden >= 60:
+        console.log("You did nice!");
+        break;
+        case graden >= 50:
+        console.log("You barely passed!");
+        break;
+    case graden < 50:
+        console.log("You failed!");
+        break;
+    default:
+        console.log(graden, "is not a Letter Grade");
+        break;
+}
+
+// And Or
+
+
+let temp = -5;
+let sunny = true;
+
+if(temp > 0 && temp < 30 && sunny){
+    console.log("The Weather is Good!")
+}
+else{
+    console.log("The Weather is Bad!")
+}
+
+
+
+// if(temp <= 0 || temp >= 30){
+//     console.log("The Weather is Good!")
+// }
+// else{
+//     console.log("The Weather is Bad!")
+// }
+
+
+// !NOT logical operator
+// typically used to reverse a condition's boolean value
+
+
+if(!(temp > 0)){
+    console.log("Its cold outside");
+}
+else{
+    console.log("its warm outside");
+}
+
+if(!sunny){
+    console.log("Its cloudy outside");
+}
+else{
+    console.log("its sunny outside");
+}
+
+
+// WHILE LOOP = repeat some code
+// while some condition is true
+// potentially infinite
+
+
+
+
+// let UserName = "";
+
+// while(UserName == ""){
+//     UserName = window.prompt("Enter Your Name")
+// }
+// console.log("Hello", UserName);
+
+
+
+
+
+// let UserName = "";
+
+// while(UserName == "" || UserName == null){
+//     UserName = window.prompt("Enter Your Name")
+// }
+// console.log("Hello", UserName);
+
+// DO WHILE loop = do something, then check condition, repeat if true
+
+// let UserName;
+
+// do{
+//     UserName = window.prompt("Enter Your Name")
+// }while(UserName == "")
+// console.log("Hello", UserName);
+
+
+
+
+
+// FOR loop = repeat some code 
+//              a certain amount of time
+
+for(let counter = 1; counter <=5; counter+=1){
+    console.log(counter);
+}
+
+for(let i = 10; i > 0; i-=2){
+    console.log(i);
+}
+console.log("HAPPY NEW YEAR");
+
+
+
+
+
+// CONTINUE AND BREAK 
+// skip 13
+for(let j = 1; j <= 20; j+=1){
+    if(j == 13){
+        continue;
+    }
+    console.log(j);
+}
+
+
+for(let k = 1; k <= 20; k+=1){
+    if(k == 13){
+        break;
+    }
+    console.log(k);
+}

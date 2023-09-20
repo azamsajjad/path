@@ -119,7 +119,29 @@ AWS rounds up duration to the nearest ms with no minimum run time. With this pri
 =======================================================================
 -----------------------------------------------------------------------
 =======================================================================
------------------------------------------------------------------------
+Fast development
++
+
+Pay for value
++
+
+Short-lived applications
++
+
+Event-driven applications
+–
+You might need event-initiated, or event-driven, stateless applications that need quick response times. 
+
+
+
+An event-driven architecture uses events to initiate actions and communication between decoupled services. An event is a change in state, a user request, or an update, such as an item being placed in a shopping cart in an ecommerce website. When an event occurs, the information is published for other services to consume it. 
+
+
+Automatic scaling
++
+
+Redundancy and resilience
++-----------------------------------------------------------------------
 =======================================================================
 -----------------------------------------------------------------------
 =======================================================================
