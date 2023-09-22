@@ -38,12 +38,13 @@ Automated Backups - automated , u define backup window
         point in time snapshot + transaction log
         retention period - upto 35 days
         used to recover database
+        free
 vs 
 DB Snapshots -user initiated
         point in time snapshot 
         retention period - indefinite
         used to backup db instance to a known state and restore to that specific state
-
+        charged
 
 RDS can be encrypted at Creation, not afterwards
 encryption include all underlying sotrage, backups, snapshots, logs and RRs
@@ -60,29 +61,19 @@ READ REPLICA - read-only copy
         used to scale read performance for read-only workloads
         in same AZ or cros-AZ or cross-region
 
-----------------------------------------------------------------------
-Amazon ElastiCache 
 
-ElastiCache is a fully managed, in-memory caching solution. It provides support for two open-source, in-memory cache engines: Redis and Memcached. You aren’t responsible for instance failovers, backups and restores, or software upgrades.
+RDS PROXY 
+pools and shares DB connections to assist with application scalability and database efficiency
+Application is pointed @ RDS PROXY <> DATABASE
+RDS PROXY is serverless and scales automatically 
+app -> rds proxy > db1 
+app -> rds proxy > db1
+app -> rds proxy > db2
+detects failover and routes requests to standby DB 
+Deployable over multi-AZ for protection from infra failure
+66% faster failover times 
+======================================================================
 
-[Elasticache 101 for Rds]
-    in-memory cache
-    improves database performance
-    good for read-heavy database workloads
-    2 types:
-        Memcached - inmemory key-value data store
-                    good for object caching
-                    good for simple caching solution
-                    no persistence or multi-AZ
-        Redis - inmemory key-value data store
-                persistence, replication, multi-az, failover
-                supports sorting and ranking data 
-                good for lists, hasshes, gaming boards
-                millisecond read latency
-                use case - website that needs to store session data
-
-elasticache is good choice if database is read-heavy and not prone to frequent changing 
-caching doesnot help if you are overloaded with write loads, then you need to scale up your database and if you are using OLAP, think redshift.
 --------------------------------------------------------------------------
 Storage on Amazon RDS
 
@@ -135,33 +126,7 @@ Use Secure Sockets Layer (SSL) or Transport Layer Security (TLS) connections wit
 
 ===========================================================================
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-Amazon MemoryDB for Redis
 
-MemoryDB is a Redis-compatible, durable, in-memory database service that delivers ultra-fast performance. With MemoryDB, you can achieve microsecond read latency, single-digit millisecond write latency, high throughput, and Multi-AZ durability for modern applications, like those built with microservices architectures. You can use MemoryDB as a fully managed, primary database to build high-performance applications. You do not need to separately manage a cache, durable database, or the required underlying infrastructure.
-
-[MemoryDB 101 for Redis]
-massively scalable - in-memory database
-highly available - transaction log for recovery and durability
-primary dataset - entire dataset for an application can be stored in memory (instead of a database plus a cache)
-miilisecond write latency
-microsecond read latency
-use case - microservices & online gaming company with millions of users sharing digital assets
-
-MemoryDB vs ElastiCache 
-MemoryDB can store whole dataset in memory - no database required 
-Elasticache is an in-memory cache for database e.g. RDS
-
-RDS PROXY 
-pools and shares DB connections to assist with application scalability and database efficiency
-Application is pointed @ RDS PROXY <> DATABASE
-RDS PROXY is serverless and scales automatically 
-app -> rds proxy > db1 
-app -> rds proxy > db1
-app -> rds proxy > db2
-detects failover and routes requests to standby DB 
-Deployable over multi-AZ for protection from infra failure
-66% faster failover times 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 Amazon Timestream
 
 Timestream is a fast, scalable, and serverless time series database service for Internet of Things (IoT) and operational applications. It makes it easy to store and analyze trillions of events per day up to 1,000 times faster and for as little as one-tenth of the cost of relational databases. Time series data is a sequence of data points recorded over a time interval. It is used for measuring events that change over time, such as stock prices over time or temperature measurements over time.
@@ -179,42 +144,6 @@ Amazon RDS, Aurora, Amazon Redshift
 Relational	
 Traditional applications, ERP, CRM, ecommerce
 ==================================
-
-DynamoDB 
-Key-value    
-High-traffic web applications, ecommerce systems, gaming apps
-==================================
-
-Amazon ElastiCache for Memcached, Amazon ElastiCache for Redis
-In-memory
-Caching, session management, gaming leaderboards, geospatial applications
-==================================
-
-Amazon DocumentDB
-Document	
-Content management, catalogs, user profiles
-==================================
-
-Amazon Keyspaces
-Wide column	
-High-scale industrial applications for equipment maintenance, fleet management, route optimization
-==================================
-
-Neptune
-Graph	
-Fraud detection, social networking, recommendation engines
-==================================
-
-Timestream
-Time series	
-IoT applications, Development Operations (DevOps), industrial telemetry
-==================================
-
-Amazon QLDB
-Ledger	
-Systems of record, supply chain, registrations, banking transactions
-
-
 
 ======================================================================
 Employee directory application:
@@ -245,3 +174,67 @@ export PHOTOS_BUCKET=${SUB_PHOTOS_BUCKET}
 export AWS_DEFAULT_REGION=<INSERT REGION HERE>
 export DYNAMO_MODE=on
 FLASK_APP=application.py /usr/local/bin/flask run --host=0.0.0.0 --port=80 
+
+==========================================================================
+USE CASE.
+
+GATHER ->  PROCESS  ->  RAW STORE  ->  MIGRATION  ->  FINAL STORE.
+Kinesis    Lambda       S3             AWS DMS        Aurora.
+
+
+
+==================================
+Which of the following pricing methods are available to pay for Aurora? (Select THREE.)
+On-demand
+Reserved 
+Serverless 
+
+Which of the following instance types are available to pay for Amazon RDS?
+On-demand
+Reserved 
+
+Which of the following are valid capacity modes for DynamoDB?
+On-demand
+Provisioned
+
+Which of the following statements are true of DynamoDB indexes? (Select THREE.)
+you can have a table without an index 
+you can have more than one global secondary index 
+you can have more than one local secondary index 
+
+Which of the following statements are true of security in Amazon RDS? (Select THREE.)
+VPC is used to isolate database from internet 
+connection to db are secured by SSL 
+security groups are used to control access to db
+
+Which of the following statements are true of security in DynamoDB? (Select TWO.)
+IAM is used to manage credentials for DB 
+fully managed encryption at rest is supported
+
+Which of the following statements are true of security in Aurora? (Select THREE.)
+IAM policies can be used to assign permissions to users
+aurora requires both authentication and permissions for users
+security groups used to control access to db instance
+
+Which of the following security groups can control access to an Amazon RDS database instance? (Select THREE.)
+EC2 
+VPC 
+Database Security Group
+
+
+Which of the following use cases is ideal for an Amazon Aurora Serverless database solution?
+Relation db which is only used for a specific time
+
+
+Which tool is required in a heterogenous database migration between on-premises Microsoft SQL Sever to Amazon Aurora MySQL?
+AWS Schema Conversion Tool SCT
+
+Which database type stores data using a defined schema and is commonly used by transactional applications?
+Relational
+
+Queries in an online transaction processing (OLTP) system are simple and short, which requires less time and space to process.
+TRUE
+
+Relational databases rely on tables, fields, and records to hold data.
+TRUE
+===========================================================================

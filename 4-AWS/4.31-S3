@@ -1,6 +1,9 @@
 s3 is object based storage
 not suitable for OS or DB installation 
 
+Object storage is a method of storing files in a flat address space based on attributes and metadata. 
+
+
 rather than in file systems or data blocks
 s3 objects can be of 5tb of size 
 Universal Namespace, globally unique 
@@ -37,7 +40,8 @@ Retrieval fee applies to all infrequent access
 
 
 
-ENCRYPTION 
+-----------------E N C R Y P T I O N-------------------------------------  
+
 S3 is very secure by Default
 server-side encryption 
 ACLs who has access 
@@ -56,11 +60,21 @@ BUCKET ACLs applied at object level
 // Secure your objects with two separate layers of encryption. For details on pricing, see DSSE-KMS pricing on the Storage tab of the Amazon S3 pricing page. 
 // Bucket Key
 // Using an S3 Bucket Key for SSE-KMS reduces encryption costs by lowering calls to AWS KMS. S3 Bucket Keys aren't supported for DSSE-KMS. Learn more 
-// Disable
-// Enable
+
 3- Encryption at rest: Client-Side Encryption SSE-C
 You encrypt yourself before uploading to S3 
+you manage the encryption keys and Amazon S3 manages the encryption, as it writes to disks, and decryption, when you access your objects. With this option, the customer is responsible for managing and rotating the keys, and without access to these keys the Amazon S3 data can not be decrypted.
 
+4- Client-side encryption
+
+Client-side encryption is the act of encrypting sensitive data before sending it to Amazon S3. When using client-side encryption, the encryption performs locally and your data never leaves the run environment unencrypted. You maintain possession of your master encryption keys, and they are never sent to AWS therefore, it is important that you safely store them (i.e., as a file or using a separate key management system) and load them when uploading or downloading objects. This ensures that no one outside of your environment has access to your master keys and without access to the master keys; your data cannot be decrypted. If your master encryption keys are lost, you will not be able to decrypt your own data, therefore it is essential that if you use client-side encryption, that you store your keys safely.
+
+To enable client-side encryption, you have the following options:
+
+Use a customer master key (CMK) stored in AWS Key Management Service (AWS KMS). With this option, you use an AWS KMS CMK for client-side encryption when uploading or downloading data in Amazon S3. 
+
+Use a master key that you store within your application. With this option, you provide a client-side master key to the Amazon S3 encryption client. The client uses the master key only to encrypt the data encryption key that it generates randomly. 
+-----------------------------------------------------------------
 
 TO HOST STATIC WEBSITE OR
 TO make contents of a bucket or a file PUBLIC
@@ -122,6 +136,21 @@ Versioning is suspended for new objects. All new objects in the bucket will not 
 
 
 ========================================================
+Multipart Upload API
+
+You can upload or copy objects of up to 5 GB in a single PUT operation. For objects, up to 5 TB you must use the multipart upload API. The multipart upload API allows you to upload a single object as a set of parts. Each part is a contiguous portion of the objects data. You can upload these object parts independently and in any order.
+
+GET operations
+
+You can use the GET operation to retrieve a whole object or parts of an object directly from Amazon S3. 
+
+If you need to retrieve the object in parts, use the Range HTTP header in a GET request. Doing this allows you to retrieve a specific range of bytes from an object stored in Amazon S3. You can then resume fetching other parts of the object whenever you or your application is ready. This resumeable download is useful if you only need portions of your object data, in cases where network connectivity is poor, or if your application must process only subsets of object data.
+
+
+Use lifecycle rules to clean up incomplete multipart uploads automatically.
+
+An Amazon S3 Lifecycle configuration is an XML file that consists of a set of rules with predefined actions that you want Amazon S3 to perform on objects during their lifetime. As a best practice, we recommend you configure a lifecycle rule using the AbortIncompleteMultipartUpload action to minimize your storage costs.
+
 
 
 Managing your storage lifecycle
@@ -133,6 +162,163 @@ The following use cases are good candidates for the use of lifecycle configurati
 
 Periodic logs: If you upload periodic logs to a bucket, your application might need them for a week or a month. After that, you might want to delete them.
 Data that changes in access frequency: Some documents are frequently accessed for a limited period of time. After that, they are infrequently accessed. At some point, you might not need real-time access to them. But your organization or regulations might require you to archive them for a specific period. After that, you can delete them.
+----------------------------------------------------------------------
+Amazon S3 Transfer Acceleration
+–
+You can use Amazon S3 Transfer Acceleration for fast, easy, and secure transfers of files over long distances. It takes advantage of Amazon CloudFront globally distributed edge locations, routing data to Amazon S3 over an optimized network path.
+
+Transfer Acceleration is best suited for scenarios in which you want to transfer data to a central location from all over the world or transfer significant amounts of data across continents regularly. It can also help you use your available bandwidth when uploading to Amazon S3.
+
+
+
+
+Amazon S3 Transfer Acceleration
+    Secure transfers of files over long distances
+AWS Transfer Family
+    Supports SFTP, FTPS
+Amazon Kinesis Data Firehose
+    Near-real-time analytics with the business intelligence
+AWS DataSync
+    Moves large amounts of data online between on premises and Amazon S3
+Amazon Kinesis Data Streams
+    Continuously captures and stores TBs of data per hour.
+Amazon Partner Network
+    Use of third-party connectors
+
+
+
+"Online data transfer services"
+
+Online data transfer services are a group of offerings that allows you to move your data into and out of the AWS Cloud and Amazon S3 via online, internet based, connections. 
+
+AWS DataSync
+AWS Transfer Family
+Amazon S3 Transfer Acceleration
+Amazon Kinesis Data Firehose
+Amazon Kinesis Data Streams
+Amazon Partner Network
+
+"Offline data transfer services"
+
+AWS Snowcone
+AWS Snowball
+AWS Snowmobile
+
+
+"Hybrid cloud storage services"
+
+If you want to take advantage of the benefits of cloud storage but have applications running on-premises that require low-latency access to their data, or you need rapid data transfer to the cloud; then you can use AWS hybrid cloud storage architectures. 
+
+AWS Direct Connect
+AWS Storage Gateway
+// You can use the AWS Storage Gateway, in File Gateway mode, to store your on premises data in an existing Amazon S3 bucket. You can deploy AWS Storage Gateway as a virtual appliance or purchase a hardware appliance version.
+
+// AWS Storage Gateway configured as a File Gateway enables you to connect your Amazon S3 bucket using either the Network File System (NFS) or Server Message Block (SMB) protocol with local caching. You can transfer your data using an AWS File Storage Gateway over the internet or over an AWS Direct Connect connection.
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+SECURING DATA.
+Pre-Signed URLs
+–
+Pre-Signed URLs are used to grant time-limited access to others with temporary URLs.
+
+        Permissions to the object
+        –
+        Anyone with valid security credentials can create a presigned URL. However, to successfully access an object, someone who has permission to perform the operation must create the presigned URL.
+
+
+        Credentials
+        –
+        The credentials that you can use to create a presigned URL include:
+
+        IAM instance profile: Valid up to 6 hours
+        AWS Security Token Service: Valid up to 36 hours when signed with permanent credentials, such as the credentials of the AWS account root user or an IAM user
+        IAM user: Valid up to 7 days when using AWS Signature Version 4
+        To create a presigned URL that's valid for up to 7 days, first designate IAM user credentials (the access key and secret access key) to the SDK that youre using. Then, generate a presigned URL using AWS Signature Version 4.
+
+
+        Token expiration
+        –
+        If you created a presigned URL using a temporary token, then the URL expires when the token expires, even if you created the URL with a later expiration time. 
+--------------------
+Access control lists
+–
+Access Control List (ACLs) to make individual objects accessible to authorized users.
+
+Note: Amazon S3 ACLs are a legacy access control mechanism that predates IAM. AWS recommends using Amazon S3 bucket policies or IAM policies for access control.
+
+"Access Policies: or Resource Based Policies:"
+
+Access policy describes who has access to what resources. They attach to your resources, such as buckets and objects, and are also called resource policies. For example, bucket policies and access control lists are resource based policies because you attach them directly to buckets and objects.
+
+User policies or IAM policies are access policies attached to users in your account. You may choose to use one type of policy or a combination of both, to manage permissions with your Amazon S3 resources.
+
+"Bucket policies"
+
+In order to grant other AWS accounts or IAM users access to the bucket and the objects in it, you need to attach a bucket policy. Because you are granting access to a user or account, a bucket policy must define a PRINCIPAL (which is an account, user, role, or service) entity within the policy. You will notice that the "Principal" statement is listed in the policy. Consult the image below as an example. max policy size of 20kb
+
+    "When to use a bucket policy
+    Use a bucket policy if:
+
+    You need to grant cross-account permissions to other AWS accounts or users in another account, without using IAM roles.
+    Your IAM policies reach the size limits for users, groups, roles. 
+    You prefer to keep access control policies in the Amazon S3 environment.
+    Although both bucket and user policies support granting permission for all Amazon S3 operations, the user policies are for managing permissions for users in your account. "
+
+    Because bucket policies grant access to another AWS account or IAM user, you must specify the principal, or the user to whom you are granting access, as a "Principal" in the bucket policy.
+----------------------------------------------------------------------
+Decoupling storage from compute
+–
+In traditional Hadoop and data warehouse solutions, storage and compute remain tightly coupled, making it difficult to optimize costs and data processing workflows. With Amazon S3, you can cost-effectively store all data types in their native formats. Then, you can launch as many or as few virtual servers as you need using Amazon Elastic Compute Cloud (EC2), and use AWS analytics tools to process your data. You can also optimize your EC2 instances to provide the right ratios of CPU, memory, and bandwidth for best performance. 
+
+
+Centralized data architecture
+–
+Amazon S3 makes it easy to build a multi-tenant environment, where many users can bring their own data analytics tools to a common set of data. This improves both cost and data governance over that of traditional solutions, which require multiple copies of data to be distributed across multiple processing platforms.
+
+
+Integration with clusterless and serverless AWS services
+–
+You can use Amazon S3 with Amazon Athena, Amazon Redshift Spectrum, Amazon Rekognition, and AWS Glue to query and process data. Amazon S3 also integrates with AWS Lambda serverless computing to run code without provisioning or managing servers. With all of these capabilities, you only pay for the actual amounts of data you process or for the compute time consumed. 
+
+
+Standardized APIs
+–
+Amazon S3 REST APIs are easy to use, and supported by most major third-party independent software vendors (ISVs), including leading Apache Hadoop and analytics tool vendors. This allows customers to bring the tools they are comfortable and knowledgeable about to help them perform analytics on data in Amazon S3.
+
+
+DATA CATALOG.
+
+Thus, an essential component of an Amazon S3-based data lake is the data catalog. The data catalog provides a query-able interfaceE oOf all assets stored in the data lake’s S3 buckets. The design of the data catalog is to provide a single source of truth about the contents of the data lake. 
+
+AWS GLUE.
+
+AWS Glue is a fully managed ETL (extract, transform, and load) service that makes it simple and cost-effective to categorize your data. You can use AWS Glue to organize, cleanse, validate, and format data for storage in a data warehouse or data lake. The AWS Glue Data Catalog is an index to the location, schema, and runtime metrics of your data. In order to create your data warehouse or data lake, you must catalog this data.
+
+AMAZON ATHENA.
+
+Amazon Athena is an interactive query service that makes it easy for you to analyze data directly in Amazon S3, using standard SQL. You can get results in a matter of seconds. 
+
+AMAZON REDSHIFT SPECTRUM.
+
+A second way to perform in-place querying of data assets in an Amazon S3-based data lake is to use Amazon Redshift Spectrum. Amazon Redshift is a large-scale, managed data warehouse service used with data assets in Amazon S3. However, data assets must be loaded into Amazon Redshift before queries run. 
+
+Because Amazon Athena and Amazon Redshift share a common data catalog and data formats, you can use both Athena and Redshift Spectrum against the same data assets.
+
+You would typically use Athena for ad hoc data discovery and SQL querying, and then use Redshift Spectrum for more complex queries and scenarios where a large number of data lake users want to run concurrent BI and reporting workloads.
+
+"Amazon FSx for Lustre and Amazon S3 data lakes"
+
+Amazon FSx for Lustre, is a fully managed file system that is optimized for compute-intensive workloads, such as high performance computing, machine learning, and media data processing workflows.
+
+With Amazon FSx for Lustre, you can launch and run a Lustre file system that can process massive data sets at up to hundreds of gigabytes per second of throughput, millions of IOPS, and sub-millisecond latencies.  Amazon FSx for Lustre file systems can link to Amazon S3 buckets, allowing you to access and process data concurrently from a high-performance file system.
+
+Amazon FSx for Lustre can use Amazon S3 as a raw data repository as well as a repository for processed data. It makes it easy to process your cloud datasets in Amazon S3. 
+
+When linked to an S3 bucket, FSx for Lustre transparently presents objects as files, allowing you to run your workload without managing data transfer from S3. As the contents of your S3 bucket change, FSx for Lustre automatically updates your file system with the latest data available to run your workload.
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 ----------------------------------------------------------------------
 CLOUDFRONT - Amazons CDN content delivery network
 CLOUDFRONT Origin - EC2,S3,ELB,R53 address

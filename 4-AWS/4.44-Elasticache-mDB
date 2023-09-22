@@ -1,0 +1,109 @@
+You can use Amazon ElastiCache to support data-intensive apps or improve the performance of your existing apps by retrieving data from high throughput and low latency in-memory data stores. This service offers fully managed Redis and Memcached cache engines for in-memory data stores. ElastiCache is a popular choice for gaming, advertising technology (ad tech), financial service, healthcare, and Internet of Things (IoT) apps.
+
+On the surface, the Redis and Memcached engines look similar. Each is an in-memory key-value store. However, there are significant differences between the two. Requirements such as compliance, backup and replication, and automatic failover dictate which engine you should implement. For the full list of differences, see Comparing Memcached and Redis.
+
+
+
+With both ElastiCache for Redis and ElastiCache for Memcached, you:
+
+No longer need to perform management tasks such as hardware provisioning, software patching, setup, configuration, and failure recovery
+Have access to monitoring metrics, enabling you to diagnose and react to issues quickly
+Can take advantage of cost-efficient and resizable hardware capacity
+
+
+"Choose Memcached if the following apply for you:"
+You need the simplest model possible.
+You need to run large nodes with multiple cores or threads.
+You need the ability to scale out and in, adding and removing nodes as demand on your system increases and decreases.
+You need to cache objects.
+
+"Choose Redis with a version of ElastiCache for Redis if the following apply for you:"
+ElastiCache for Redis version 7.0 (Enhanced)----------------------
+You want to use Redis Functions, Sharded Pub/Sub, or Redis ACL improvements.
+ElastiCache for Redis version 6.2 (Enhanced)-----------------------
+You want the ability to tier data between memory and SSD using the r6gd node type. 
+ElastiCache for Redis version 6.0 (Enhanced)-----------------------
+You want to authenticate users with role-based access control.
+
+ElastiCache for Redis version 5.0.0 (Enhanced)--------------------
+You want to use Redis streams, a log data structure that allows producers to append new items in real time and also allows consumers to consume messages either in a blocking or non-blocking fashion.
+
+ElastiCache for Redis version 4.0.10 (Enhanced)--------------------
+Supports both encryption and dynamically adding or removing shards from your Redis (cluster mode enabled) cluster.
+
+
+
+----------------------------------------------------------------------
+"MemoryDB for Redis
+In other hand, MemoryDB for Redis aims to replace both cache and database in one component – provides microsecond read latency and data durability.
+
+Amazon ElastiCache for Redis & Memcached
+Amazon ElastiCache for Redis is a manged version of Redis – in-memory data store used mainly for caching. It can be placed in front of a database, like DynamoDB or RDS, to speed reads operations. Two common caching strategies are lazy loading and write-through."
+
+ElastiCache is a fully managed, in-memory caching solution. It provides support for two open-source, in-memory cache engines: Redis and Memcached. You aren’t responsible for instance failovers, backups and restores, or software upgrades.
+        USECASES
+        Caching to ease the load off your relational or NoSQL database
+        Session store
+        Amazon ElastiCache can be used as a session store to manage session information for both Redis and Memcached. This session management is commonly required for online applications, including games, e-commerce websites and social media platforms.
+        Machine learning (AI/ML) use E4R for fraud detection in fin,game
+        machmaking, ride sharing
+        Real-time analytics with kafka,kinesis, time series data analytics
+
+[Elasticache 101 for Redis]
+    in-memory cache
+    improves database performance
+    good for read-heavy database workloads
+    2 types:
+        Memcached - inmemory key-value data store
+                    good for object caching
+                    good for simple caching solution
+                    no persistence or multi-AZ
+        Redis - inmemory key-value data store
+                persistence, replication, multi-az, failover
+                supports sorting and ranking data 
+                good for lists, hasshes, gaming boards
+                millisecond read latency
+                use case - website that needs to store session data
+
+elasticache is good choice if database is read-heavy and not prone to frequent changing 
+caching doesnot help if you are overloaded with write loads, then you need to scale up your database and if you are using OLAP, think redshift.
+
+
+========================================================================
+Amazon MemoryDB for Redis
+
+MemoryDB is a Redis-compatible, durable, in-memory database service that delivers ultra-fast performance. With MemoryDB, you can achieve microsecond read latency, single-digit millisecond write latency, high throughput, and Multi-AZ durability for modern applications, like those built with microservices architectures. You can use MemoryDB as a fully managed, primary database to build high-performance applications. You do not need to separately manage a cache, durable database, or the required underlying infrastructure.
+
+[MemoryDB 101 for Redis]
+massively scalable - in-memory database
+highly available - transaction log for recovery and durability
+primary dataset - entire dataset for an application can be stored in memory (instead of a database plus a cache)
+miilisecond write latency
+microsecond read latency
+use case - microservices & online gaming company with millions of users sharing digital assets
+
+MemoryDB vs ElastiCache 
+MemoryDB can store whole dataset in memory - no database required 
+Elasticache is an in-memory cache for database e.g. RDS
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+USE CASES MEMORYDB FOR REDIS - NON-RELATIONAL
+Build web and mobile applications
+Use versatile Redis data structures to build content data stores, chat and message queues, and geospatial indexes for demanding, data-intensive web and mobile applications that require low latency and high throughput.
+
+Quickly access user preferences and personalization for retail
+Deliver personalized customer experiences and manage user profiles, preferences, and inventory tracking and fulfilment with sub-millisecond latency.
+
+Develop online games
+Build player data stores, session history, and leaderboards for gaming applications that require massive scale, low latency, and high concurrency to make real-time updates.
+
+Stream media and entertainment in real time
+Run high concurrency streaming data feeds to ingest user activity and support millions of requests per day for media and entertainment applications.
+
+
+
+===========================================================================
+Media streaming: Amazon ElastiCache
+Amazon ElastiCache offers a fast, in-memory data store to power live streaming use cases. ElastiCache can store metadata for user profiles and viewing history, authentication information/tokens for millions of users, and manifest files to enable content delivery networks to stream videos to millions of mobile and desktop users at a time.
+
+In this use case, Amazon Simple Storage Service (Amazon S3) and Amazon CloudFront are managing and serving media content. ElastiCache manages the content index and token authentication for in-memory, sub-milliseconds responses at scale.

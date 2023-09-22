@@ -1,6 +1,92 @@
+Block storage architecture
+
+The basic block storage architecture consists of three components: the block storage, the compute system, and the operating system running on the compute system. The block storage is either physically or logically attached to the compute system. The operating system, which runs on the the compute system, then recognizes the block storage as available. The operating system formats or makes the block storage ready for use. In some situations, an application running on the compute system can act as the managing entity rather than the operating system. However, for most use cases, the operating system running on the computer system manages the block storage.
+
+
+Block storage management
+
+The operating system or application manages the block storage. Some of the aspects that the operating system manages are configuring the block size; creating and managing metadata; managing read, modify, and write activity; and managing file-level and block-level locking.
+
+To learn more, select the + symbol next to each type of block storage management.
+
+
+Block size
+–---------
+The operating system must first format the block storage. When you format the block storage, you select the block size that best meets your use case. For some applications, small block sizes are more appropriate, and larger block sizes better serve other applications. Block size flexibility is a fundamental differentiator for block storage. You have the ability to format the storage to best service your application requirements.
+
+
+Metadata management
+–-----------------
+When data is stored, the operating system creates metadata. Metadata is data about the data. The metadata information helps to manage a data resource, such as resource type, permissions, and the time and way it was created. The metadata includes the information that the operating system and users need to identify and track the data.
+
+Metadata includes timestamp tracking for the data such as:
+The creation or birth time (ctime), which is when the data was first created.
+The modification time (mtime), which is when the data or metadata was last changed or modified.
+The access time (atime), which is when the data was last accessed.
+Metadata tracks where the data is stored on the storage system. It tracks which blocks on the drives were used to store the data.
+Metadata also contains information about the data owner and access permissions: who owns the data and who can read or modify the data.
+
+Read-write activity
+–-----------------
+The operating system determines what controls, if any, are in place to manage access to the data. 
+
+Often the operating system uses metadata permissions to control who can access, modify, or delete the data. The operating system can also reference external sources such as Microsoft Active Directory or Lightweight Directory Access Protocol (LDAP) to determine these permissions.
+The operating system also manages how client access is managed when reading data and modifying data. The operating system determines how clients or applications are notified when another client or application is accessing data.
+The operating system manages where and when data is written to the block storage. It determines how writes are cached and staged before writing the blocks and which blocks to write to.
+The operating system also manages the caching or read activity: how are reads cached, what order reads are performed, and how are multiple read requests are managed. 
+
+Locking control
+–-------------
+The operating system also manages data integrity when data is being modified or deleted. The operating system can prevent other clients from modifying the data by applying a lock on the entire data file or on specific portions or blocks being modified. These are called file-level locking and block-level locking, respectively. Some operating systems can also place locks on certain block ranges.
+
+===========================================================================
+Presented as volumes
+
+The block storage can be a single device, or it can be several devices that are combined together before being presented to the compute system. A block storage device is typically referred to as a disk or drive. Combining drives together using a hardware-controlled redundant array of independent disks (RAID) controller or using a SAN system is an example of combining multiple devices.
+
+The physical storage capacity of a block storage device can be divided into smaller logical units, or smaller block storage devices can be combined into larger logical units. These units are called volumes. A volume is a logical storage construct that can be created from a single drive or using multiple drives. You can create multiple volumes that are the right size for your requirements and later allocate the remainder of the storage for other uses. 
+
+As an example, you could have three 2-tebibyte (TiB) SSDs with a total raw capacity of 6 TiB on the storage device. For your application, you need only one 50-gigabytes (GB) volume and two 500-GB volumes. Of the available 6 TiB, you would use 1,050 GB for your use case. The remainder of the raw capacity is available to be allocated as volumes for other use.
+
+===========================================================================
+PERFORMANCE MEASUREMENTS
+LATENCY
+Latency is measured as the amount of time between making a request to the storage system and receiving the response. Latency is often referred to as delay. Low-latency performance is a primary benefit for block storage. 
+
+Latency can range from sub-1 millisecond (ms) to low two-digit millisecond response rates. 
+How the storage is connected to the compute system affects the response rates.
+    Local onsite storage does not traverse any network, which can reduce any external network delay.
+    Onsite SAN storage includes a fast low-latency network; however, traversing the network can add to the latency.
+    The network connectivity in a cloud provider's network impacts cloud storage. 
+Block storage does not have additional network protocol overhead. As a direct connection, the overhead is only what the operating system adds.
+    @ File storage processes include overhead for processing the storage protocol. Requests are processed from the clients, and this processing time adds latency.
+    @ Object storage processes include overhead to process the Hypertext Transfer Protocol (HTTP) requests using REST-APIs. The storage's operating system then processes the HTTP requests. This process adds latency to the request time.
+
+IOPS
+Input/output operations per second (IOPS) is a statistical storage measurement of the number of input/output (I/O) operations that can be performed per second. IOPS is also used to measure the number of operations at a given type of workload and operation size can occur per second. IOPS is typically used to measure random I/O read-write activities. Random means that the information used for the read-write activity is usually very small in size and the different information is not related to each other.
+
+I/O size is capped at 256 kibibyte (KiB) for SSD volumes.
+I/O size is capped at 1,024 KiB for HDD volumes.
+Large sequential I/O operations are divided into separate I/O operations up to the maximum I/O size. A single 1,024 KiB operation would count as four operations on SSDs and one operation on HDDs.
+Noncontiguous I/O operations are not merged and handled as separate I/O operations.
+
+Along with the low latency, block storage can often obtain higher IOPS than other types of storage. SSDs are best suited for applications that require high IOPS. SSDs provide the benefit of low latency and higher read and write performance for random I/O. SSDs do not have the seek times required for HDDs and are able to perform operations much faster.
+
+THROUGHPUT
+Throughput is a statistical storage measurement used to measure the performance associated with reading large sequential data files. Large files, such as video files, must be read from beginning to end. Throughput operations are measured in megabytes per second (MB/s).
+
+
+
+HDDs are also referred to as spinning disks. HDDs are best suited for applications that require sustained read throughput. Applications that read and write large sequential files, such as video files, are well suited for HDDs. Random read operations are slower due to the seek times to locate the blocks and read them. Write operations to HDDs are also slower because of the seek time to locate and write to the blocks.
+
+===========================================================================
+AWS recommends Amazon EBS for data that must be quickly accessible and requires long-term persistence. EBS volumes are particularly well suited for use as the primary storage for file systems, databases, or any applications that require fine granular updates and access to raw, unformatted, block-level storage. Amazon EBS is well suited to both database-style applications that rely on random reads and writes, and to throughput-intensive applications that perform long, sequential reads and writes.
+
+TYPES
+
 The AWS block storage portfolio consists of two types of block storage services: Amazon Elastic Compute Cloud (Amazon EC2) instance storage and Amazon Elastic Block Store (Amazon EBS). Amazon EBS also includes an integrated snapshot service. Amazon EBS is the primary block storage service. 
 
-Amazon FSx for NetApp ONTAP also offers block storage services over an iSCSI access protocol. These block services use NetApp's application programming interface (API) calls and management interface. For customer's seeking an integrated NetApp approach, block storage is available as part of the Amazon FSx service.'
+Amazon FSx for NetApp ONTAP also offers block storage services over an iSCSI access protocol. These block services use NetApp's application programming interface (API) calls and management interface. For customer's seeking an integrated NetApp approach, block storage is available as part of the Amazon FSx service.
 
 INSTANCE STORE
 Instance store is ideal for the following use cases:
@@ -22,49 +108,148 @@ The instance hibernates
 The instance terminates
 
 Therefore, do not rely on an instance store for valuable, long-term data. Instead, use more durable data storage, such as Amazon EBS, for your block storage requirements.
+
+
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=Designed for mission-critical systems, EBS volumes are replicated within an AWS Availability Zone and can scale to store petabytes of data. Also, you can use EBS snapshots with automated lifecycle policies to back up your volumes in Amazon Simple Storage Service (Amazon S3). You can do this  while ensuring geographic protection of your data and business continuity.
 
 With Amazon EBS, you pay only for the storage and resources that you provision.-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 EBS VOLUMES - attached to ec2 instance 
 types:
-Elastic block store - SSDs
+Elastic block store - SSDs -1 GB TO 16 TB
 gp2 ssd - boot & gen - upto 16,000 IOPS per volume - 99.9% durable
 gp3 ssd - boot & gen - 3,000 - 16,000 IOPS per volume - 99.9% durable
+
+  "                                  GP3                 GP2
+Durability	                99.8-99.9% durability (0.1-0.2% AFR) 
+Availability	                    99.999%	         99.999%
+Volume size	                     1 GiB-16 TiB	    1 GiB-16 TiB
+Minimum/maximum IOPS
+at 16 KiB I/O	                 3,000-16,000    	100-16,000
+Maximum throughput per volume	    1,000 MB/s	    250 MB/s *
+Boot volume	                        Supported	    Supported
+Multi-attached volumes 	          Not supported     Not supported
+"
+
+
 Provisioned IOPS:
 io1 -OLTP(latency-sensitive) 50IOPS/GB-upto 64,000 IOPS per volume - 99.9%
 io2 -OLTP(latency-sensitive) 500IOPS/GB-upto 64,000 IOPS per volume-99.999%
 io2 Block Express- Critical Apps SAP HANA,etc upto 64 TB, 500IOPS/GB - upto 256,000 IOPS per volume - 99.999%
+"
+Description	                        io1	                    io2
+Durability	        99.8-99.9% (0.1-0.2% AFR) 	99.999% (0.001% AFR) 
+Volume size                     4 GiB-16 TiB            4 GiB-16 TiB
+Minimum/maximum IOPS
+at 16 KiB I/O                    100-64,000             100-64,000 *
+Maximum throughput per volume     1,000 MB/s            1,000 MB/s *
+Boot volume                       Supported               Supported
+Multi-attached volumes            Supported	              Supported
+
+"
 
 HDD Volumes - 
-st1 - 500mb/s - not boot - 99.9%
+st1 - 500mb/s - not boot - 99.9% THROUGHPUT OPTIMIZED
 sc1 - 250mb/s - not boot - 99.9% lowest cost 
+
+
+Description	                   Throughput Optimized HDD	        Cold HDD
+Durability	                        99.8-99.9% durability (0.1-0.2% AFR) 
+Volume size                         125 GiB-16 TiB      125 GiB-16 TiB
+Minimum/maximum throughput at 1 MB I/O  5-500 MB/s          2-192 MB/s
+Maximum burst throughput per volume     500 MB/s            250 MB/s
+Boot volume                         Not supported           Not supported
+Multi-attached volumes              Not supported	        Not supported
+
+
+
+
+Provisioned IOPS SSD io2 and io1 volumes both can be configured to deliver up to 64,000 IOPS and 1,000 MB/s throughput, however only io2 volumes have a tiered pricing structure for your provisioned IOPS. General Purpose SSD gp3 volumes can be provisioned up to 16,000 IOPS and 1,000 MB/s throughput. Throughput Optimized HDD st1 volumes are configurable for throughput only.
+
+
+
+
+
 
 EBS SNAPSHOTS
 point in time copy of EBS Volume
 if you create new EBS volume from an encrypted snapshot, you will get an encrypted volume - same for unencrypted 
 Create a snapshot of the EC2 volume. Then create a copy of the snapshot, checking the box to enable encryption. Create an AMI of the copied snapshot and then redeploy the EC2 instance using the encrypted AMI. Delete the old EC2 instance.
 
+SNAPSHOTS
+–
+Snapshots are incremental, point-in-time copies of your data stored on your EBS volumes. You can use snapshots to restore new volumes, expand the size of a volume, or move volumes across Availability Zones. 
 
+Snapshots let you geographically protect your data and achieve business continuity. You can use Amazon Data Lifecycle Manager (Amazon DLM) to automate snapshot management without any additional overhead or cost.
+=============================================
+"Amazon Data Lifecycle Manager"===============
+
+You can use Amazon Data Lifecycle Manager (Amazon DLM) to automate the creation, retention, and deletion of snapshots that you use to back up your EBS volumes and Amazon EBS-backed Amazon Machine Images (AMIs). 
+
+Amazon DLM uses a combination of elements to automate the lifecycle management process.
+
+EBS snapshots are one of the primary resource and lifecycle policy types for Amazon DLM. 
+
+
+Lifecycle policy consists of these core settings:====================
+
+Policy type - Defines the type of resources that the policy can manage. Amazon DLM supports two types of lifecycle policies:
+
+Snapshot lifecycle policy - Used to automate the lifecycle of EBS snapshots. These policies can target EBS volumes and instances.
+
+Cross-account copy event policy - Used to automate the copying of snapshots across accounts. This policy type should be used in conjunction with an EBS snapshot policy that shares snapshots across accounts.
+
+EBS-backed AMI lifecycle policy - Used to automate the lifecycle of EBS-backed AMIs. These policies can target instances only.
+
+
+Policy schedules=============================
+–
+Policy schedules define when snapshots or AMIs are created by the policy. Policies can have up to four schedules - one mandatory schedule and up to three optional schedules. 
+
+Adding multiple schedules to a single policy lets you create snapshots or AMIs at different frequencies using the same policy. For example, you can create a single policy that creates daily, weekly, monthly, and yearly snapshots. This eliminates the need to manage multiple policies. 
 ===========================================================================
-As the name implies, Amazon Elastic Block Store (Amazon EBS) is block-level storage that you can attach to an Amazon EC2 instance. You can compare this to how you much attach an external drive to your laptop. This attachable storage is called an EBS volume. EBS volumes act similarly to external drives in more than one way.
+"Amazon EBS features and benefits"
+
+Expand each section to dive deeper into the specific features and benefits. Select the + symbol next to each category.
 
 
-bullet
-Detachable: You can detach an EBS volume from one EC2 instance and attach it to another EC2 instance in the same Availability Zone to access the data on it.
+Persistent
++
+
+Built-in encryption
++
+
+High availability and high durability
++
+
+Multiple volume type options
++
+Using Amazon EC2 and Amazon EBS, you can quickly create your own high-performance block storage for building your own network file system, including the SMB, NFS, XFS, EXT, GPFS, and ZFS protocols.
+You can choose the file system that you need to optimize your applications or workflows. You can bring your media workflows and use their native file system running on EC2 instances and store your data on EBS volumes.
+
+Elastic Volumes
++
+
+Multi-attach
+–
+Customers can enable Multi-attach on an EBS Provisioned IOPS io2 or io1 volume. Multi-attach allows a single EBS volume to be concurrently attached to up to 16 Nitro-based EC2 instances within the same Availability Zone.
+
+Multi-attach makes it easier to achieve higher application availability for applications that manage storage consistency from multiple writers. Each attached instance has full read and write permission to the shared volume. Applications using Multi-attach need to provide I/O fencing for storage consistency. There is no additional fee to enable Multi-attach.
 
 
-bullet
-Distinct: The external drive is separate from the computer. That means that if an accident occurs and the computer goes down, you still have your data on your external drive. The same is true for EBS volumes.
+Volume monitoring
++
 
+Snapshots
++
 
-bullet
-Size-limited: You’re limited to the size of the external drive, because it has a fixed limit to how scalable it can be. For example, you might have a 2 TB external drive, which means you can only have 2 TB of content on it. This also relates to Amazon EBS, because a volume also has a max limitation of how much content you can store on it.
+Backups
+–
+AWS Backup supports backing up your EBS volumes. AWS Backup allows you to centralize and automate data protection across AWS services. AWS Backup offers a cost-effective, fully managed, policy-based service that further simplifies data protection at scale. 
 
+AWS Backup also helps you support your regulatory compliance obligations and meets your business continuity goals. Together with AWS Organizations, AWS Backup enables you to centrally deploy data protection (backup) policies to configure, manage, and govern your backup activity across your organization’s AWS accounts and resources. 
 
-bullet
-1-to-1 connection: Most EBS volumes can only be connected with one computer at a time. Most EBS volumes have a one-to-one relationship with EC2 instances, so they cannot be shared by or attached to multiple instances at one time.
-
+AWS Backup supports many AWS services, including EC2 instances, EBS volumes, Amazon Relational Database Service (Amazon RDS) databases (including Amazon Aurora clusters), Amazon DynamoDB tables, Amazon EFS, FSx for Lustre, FSx for Windows File Server, and AWS Storage Gateway volumes. 
 ----------------------------------------------------------------------
 AWS announced the Amazon EBS multi-attach feature that permits Provisioned IOPS SSD (io1 or io2) volumes to be attached to multiple EC2 instances at one time. This feature is not available for all instance types, and all instances must be in the same Availability Zone.
 ----------------------------------------------------------------------
@@ -100,8 +285,6 @@ Amazon EBS offers data persistence, dynamic performance adjustments, and the abi
 
 
 ==========================================================================
-SNAPSHOTS .
-EBS snapshots are incremental backups that only save the blocks on the volume that have changed after your most recent snapshot. For example, if you have 10 GB of data on a volume and only 2 GB of data have been modified since your last snapshot, only the 2 GB that have been changed are written to Amazon S3.
 
 
 
@@ -160,3 +343,131 @@ AWS Backup also helps you support your regulatory compliance obligations and mee
 Performance monitoring
 –
 Performance metrics, such as bandwidth, throughput, latency, and average queue length, are available through the AWS Management Console. Amazon CloudWatch provides these metrics so that you can monitor the performance of your volumes. You can make sure that you are providing enough performance for your applications and paying only for resources you need.
+
+---------------------------------------------------------------------------
+Workload characteristics questions
+
+Is your workload more IOPS-intensive or throughput-intensive? If your workload is IOPS- intensive, start with the SSD volume types and review the performance characteristics. If your workload is more throughput-intensive, you can start with HDD volume types to see if their performance can meet your performance requirements.
+
+Do the workload requirements exceed the maximum performance characteristics for a selected EBS volume type? If yes, eliminate the volume type from consideration for that volume. Review characteristics for the next higher performing EBS volume type.
+
+What is the applications latency sensitivity? If it is very low and sub-millisecond to single-digit millisecond latency is needed, io2 Provisioned IOPS could be required. If single-digit to low two-digit latency is tolerable, gp3 General Purpose SSD could be the correct choice. 
+
+If your workload is not latency sensitive, HDD volume types could be the most cost effective choice.
+
+Do you prefer to optimize for price or performance? When comparing the EBS volume types, multiple volumes types could satisfy the requirements. 
+
+Compare the EBS volume configurations required. Which configuration is more cost-effective? Does a configuration offer additional desirable performance characteristics? Is there a trade-off and what is the value to your workload?
+
+
+==========================================
+
+PRICING 
+
+==========================================
+Scenario: You initially have 70 GB of data in your provisioned 2,000 GB gp3 volume on day 1 in a 30 day month. You add 30 GB of data on day 15 of the month. The price is $0.05 per GB-month of data stored for the AWS Region you select. 
+
+Your costs are calculated for the volume size using the formula for days.
+((Rate per GB-month) * (Stored data size) * (Time period)) / 
+                                            (Time period units per month)
+($0.05 per GB-month * 70 GB * 30 days) + ($0.05 per GB-month * 30 GB * 15 days) / (30 days per month) = $4.25 for the data storage
+
+
+HDD
+
+Scenario: You provision a 2,000 GB st1 volume for 12 hours (43,200 seconds) in a 30-day month and the price is $0.015 per GB-month for the AWS Region you select. 
+Your costs are calculated for the volume size using the formula for hours.
+((Rate per GB-month) * (Volume size) * (Time period)) / (Time period units per month)
+($0.015 per GB-month * 2,000 GB * 12 hours) / (720 hours per month) = $0.50 for the volume
+
+GP2
+
+Scenario: You provision a 2,000 GB gp2 volume for 12 hours (43,200 seconds) in a 30-day month and the price is $0.10 per GB-month for the AWS Region you select. 
+Your costs are calculated for the volume size using the formula for hours.
+((Rate per GB-month) * (Volume size) * (Time period)) / (Time period units per month)
+($0.10 per GB-month * 2,000 GB * 12 hours) / (720 hours per month) = $3.33 for the volume
+
+GP3
+
+Volume storage for General Purpose SSD gp3 volumes is charged by the amount you provision in GB per month until you release the storage. All gp3 volumes include a free baseline performance of 3,000 provisioned IOPS and 125 provisioned MB/s throughput. 
+
+Scenario: You provision a 2,000 GB gp3 volume for 12 hours (43,200 seconds) in a 30-day month and the price is $0.08 per GB-month for the AWS Region you select. Additionally, you provision 10,000 IOPS at $0.005 per provisioned IOPS-month and provision 500 MB/s at $0.06 per provisioned MB/s-month.
+Your costs are calculated for the volume size, the provisioned IOPS, and the provisioned throughput using the formula for hours.
+((Calculate the volume pricing for time period) + (Provisioned IOPS pricing for time period) + (Provisioned throughput pricing for time period)) / (Time period units per month)
+((Rate per GB-month) * (Volume size) * (Time period)) +
+((Rate per IOPS-month) * ((Provisioned IOPS) - (Base IOPS)) * (Time period)) +
+((Rate per MB/s-month) * ((Provisioned MB/s) - (Base MB/s)) * (Time period)) /
+(Time period units per month)
+(($0.08 per GB-month * 2,000 GB * 12 hours) + ($0.005 * (10,000 IOPS - 3,000 IOPS) * 12 hours) + ($0.06 * (500 MB/s - 125 MB/s) * 12 hours)) / (720 hours per month) = ($1,920 + $420 + $270) / (720 hour per month) = $3.63 for the volume
+
+
+IO1 
+
+Volume storage for Provisioned IOPS SSD io1 volumes is charged by the amount you provision in GB per month until you release the storage. 
+
+With Provisioned IOPS SSD io1 volumes, you are also charged by the amount you provision in IOPS per month. With Provisioned IOPS SSD io1 volumes, no baseline IOPS is provided. You are charged for your total provisioned IOPS amount.
+
+Provisioned storage and provisioned IOPS for io1 volumes are billed in per-second increments, with a minimum of 60 seconds.
+
+Scenario: You provision a 2,000 GB io1 volume for 12 hours (43,200 seconds) in a 30-day month and the price is $0.125 per GB-month for the AWS Region you select. Additionally, you provision 1,000 IOPS at $0.065 per provisioned IOPS-month.
+Your costs are calculated for the volume size, the provisioned IOPS, and the provisioned throughput using the formula for hours.
+((Calculate the volume pricing for time period) + (Provisioned IOPS pricing for time period) / (Time period units per month)
+(((Rate per GB-month) * (Volume size) * (Time period)) +
+((Rate per IOPS-month) * (Provisioned IOPS) * (Time period))) /
+(Time period units per month)
+(($0.125 per GB-month * 2,000 GB * 12 hours) + ($0.065 * 1,000 IOPS * 12 hours))  / (720 hours per month) = ($3,000 + $780) / (720 hour per month) = $5.25 for the volume
+
+
+IO2 
+
+Volume storage for Provisioned IOPS SSD io2 volumes is charged by the amount you provision in GB per month until you release the storage. 
+
+With Provisioned IOPS SSD io2 volumes, you are also charged by the amount you provision in IOPS per month. The provisioned IOPS charges for io2 volumes are tiered. Therefore, as you provision higher IOPS on a single volume, the effective provisioned IOPS charges decrease, making it more economical to scale IOPS on a single volume.
+
+io2 provisioned IOPS tiers:
+
+Tier 1 - Up to 32,000 IOPS
+Tier 2 - 32,001 IOPS to 64,000 IOPS
+
+
+Scenario 1: You provision a 2,000 GB io2 volume for 12 hours (43,200 seconds) in a 30-day month and the price is $0.125 per GB-month for the AWS Region you select. Additionally, you provision 1,000 IOPs at $0.065 per provisioned IOPS-month for the first 32,000 IOPS.
+Your costs are calculated for the volume size, the provisioned IOPS, and the provisioned throughput using the formula for hours.
+((Calculate the volume pricing for time period) + (Provisioned IOPS pricing for time period) / (timer period units per month)
+
+(((Rate per GB-month) * (Volume size) * (Time period)) +
+((Rate per IOPS-month) * (Provisioned IOPS) * (Time period))) /
+(Time period units per month)
+(($0.125 per GB-month * 2,000 GB * 12 hours) + ($0.065 * 1,000 IOPS * 12 hours))  / (720 hours per month) = ($3,000 + $780) / (720 hour per month) = $5.25 for the volume
+
+
+
+Scenario 2: You provision a 2,000 GB io2 volume for 12 hours (43,200 seconds) in a 30-day month and the price is $0.125 per GB-month for the AWS Region you select. Additionally, you provision 60,000 IOPS for 12 hours. Your rate is $0.065 per provisioned IOPS-month for the first 32,000 IOPS and $0.046 for the 28,000 IOPS.
+Your costs are calculated for the volume size, the provisioned IOPS, and the provisioned throughput using the formula for hours.
+((Calculate the volume pricing for time period) + (Tier 1 provisioned IOPS pricing for time period) + (Tier 2 provisioned IOPS pricing for time period)) / (Time period units per month)
+
+(((Rate per GB-month) * (Volume size) * (Time period)) +
+((Tier 1 rate per IOPS-month) * (Provisioned IOPS) * (Time period)) +
+((Tier 2 rate per IOPS-month) * (Provisioned IOPS) * (Time period))) /
+(Time period units per month)
+(($0.125 per GB-month * 2,000 GB * 12 hours) + ($0.065 * 32,000 IOPS * 12 hours) + ($0.046 * 28,000 IOPS * 12 hours))  / (720 hours per month) = ($3,000 + $24,960 + $15,456) / (720 hour per month) = $60.30 for the volume
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Which AWS service monitors configuration and utilization metrics for your Amazon EBS volumes and generates recommendations of which volumes to modify in order to provide the best price-performance trade-off?
+
+AWS Compute Optimizer
+
+
+
+Compute Optimizer uses Amazon CloudWatch metrics to analyze your EBS volumes and provide recommendations to assist you in optimizing your Amazon Elastic Block Store (Amazon EBS) costs. AWS Control Tower, Amazon Inspector, and AWS OpsWorks are other AWS services unrelated to managing EBS volumes. 

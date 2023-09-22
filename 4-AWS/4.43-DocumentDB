@@ -1,0 +1,181 @@
+Amazon DocumentDB
+
+Amazon DocumentDB (with MongoDB compatibility) is a fast, reliable, and fully managed database service. Amazon DocumentDB makes it easy to set up, operate, and scale MongoDB-compatible databases in the cloud. With Amazon DocumentDB, you can run the same application code and use the same drivers and tools that you use with MongoDB.
+
+CLUSTER
+The basic building block is the cluster. A cluster consists of one or more instances and a cluster storage volume that manages the data for those instances. All writes are done through the primary instance. All instances (primary and replicas) support read operations. The cluster's data is stored in the cluster volume, which stores six copies of your data across three different Availability Zones. You can create and modify clusters and instances by using the AWS Management Console or the AWS Command Line Interface (AWS CLI).
+
+
+SECURITY
+Amazon DocumentDB was designed to meet the highest security standards and make it easy for you to verify your security and meet your own regulatory and compliance obligations. Document DB does this by focusing on three key areas.
+1
+Amazon DocumentDB clusters only run within the Amazon Virtual Private Cloud, or Amazon VPC. Amazon VPC provides a logically isolated section of the AWS Cloud for your use. You have complete control of the virtual networking environment.
+
+2
+Second, connecting to the database. By default, the cluster accepts secure connections using Transport Layer Security (TLS).
+
+3
+Third, encrypting data. Amazon DocumentDB uses the 256-bit Advanced Encryption Standard (AES-256) to encrypt your data. Storage encryption is enabled cluster-wide and is applied to all instances, including the primary instance and any replicas, as well as your cluster’s storage volume.
+
+
+USE CASE
+Let’s suppose you have an ecommerce website. A shopper can log into a web application hosted in AWS Elastic Beanstalk. You can then use the web application to access user profile information from an Amazon DocumentDB database. This information allows the website to personalize the experience to the shopper, presenting them with the latest fashions based on the shopper’s interests.
+
+
+USE CASE
+Building high-performance mobile applications that scale to process millions of user requests per second with millisecond latency can be challenging. Let’s assume that you have a website that delivers the latest stock information alongside buy and sell recommendations. The users would log on to the website. The application would connect to the system through Amazon API Gateway, which passes the user request to a microservice hosted in the Amazon Elastic Container Service (Amazon ECS). This service stores and retrieves the data from an Amazon DocumentDB database.
+
+USE CASES.
+Mobile and web applications
+Build high-performance mobile and web applications that scale to process millions of user requests per second with millisecond latency. Amazon DocumentDB lowers your operational burden, allowing you to focus on building unique experiences for your customers. Amazon DocumentDB’s flexible document model, data types, and indexing allow you to adapt and iterate on your applications quickly, cutting down development time.
+
+Content and catalog management
+Shopping sites, online publications, and digital archives, point-of-sale terminals, and self-service kiosks rely on content and catalog management systems to serve their customers. They need fast and reliable access to user reviews, images, ratings, product information, comments, etc. With Amazon DocumentDB’s flexible document model, data types, and indexing, you can store and query content and catalogs quickly and intuitively.
+
+Profile management
+User profile management enables online transactions, user preferences, and user authentication. As the number of users, complexity of user profile data, and user experience expectations grow, so does the demand for scalability, data flexibility, and performance. Amazon DocumentDB’s purpose-built document data model makes storing and querying documents fast and intuitive. You can manage profiles and preferences of millions of users and scale to process millions of user requests per second with millisecond latency.
+
+Migrate your MongoDB workloads
+Self-managing MongoDB databases is difficult, time-consuming, and expensive. With Amazon DocumentDB, you can set up, secure, and scale MongoDB-compatible databases in the cloud without worrying about manually setting up and securing database clusters, running cluster management software, configuring backups, and monitoring production workloads. You can use AWS Database Migration Service (DMS) for free (for six months) to easily migrate their on-premises or Amazon Elastic Compute Cloud (EC2) MongoDB databases to Amazon DocumentDB with virtually no downtime.
+
+
+==========================================================================
+Step 1: Create a cloud9 env
+Step 2: Create a security group
+This security group will enable you to connect to your Amazon DocumentDB cluster from your AWS Cloud9 environment.
+In the Basic details box, input the following for each field:
+
+For Security group name, enter demoDocDB.
+
+For Description, enter a description.
+
+For VPC, accept the usage of your default VPC.
+n the Inbound rules section, custom TCP rule, For Port range, enter 27017.
+The source is the security group for the AWS Cloud9 environment you just created. To see a list of available security groups, enter cloud9 in the search field on the right side to the Source field. Choose the security group with the name aws-cloud9-<environment name>.
+
+Step 3: Create an Amazon DocumentDB cluster
+In the Network settings section, for VPC security groups, choose demoDocDB (VPC) if you are creating a test or demo cluster. If you are creating a cluster for a production system, choose default (VPC) or if you want to create a specific VPC security group
+
+
+Step 4: Install the mongo shell
+install mangoDB shell in Cloud9
+
+// echo -e "[mongodb-org-4.0] \nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/4.0/x86_64/\ngpgcheck=1 \nenabled=1 \ngpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-4.0.repo
+
+// sudo yum install -y mongodb-org-shell
+
+Step 5: Connect to your Amazon DocumentDB cluster
+Encryption-in-transit is enabled by default on Amazon DocumentDB. You can optionally disable TLS. To download the current certificate required to authenticate to your cluster, in the Connectivity & security tab, in the Connect section, under Download the Amazon DocumentDB Certificate Authority (CA) certificate required to authenticate to your cluster, copy the connection string provided. Go back to your AWS Cloud9 environment and paste the connection string.
+
+// wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+
+Return to your cluster in the Amazon DocumentDB console, unde Connectivity & security tab, in the Connect section, under Connect to this cluster with the mongo shell
+
+// mongo --ssl --host docdb-2023-09-22-13-56-22.cluster-cmij2cftdfca.us-east-1.docdb.amazonaws.com:27017 --sslCAFile global-bundle.pem --username rupert --password
+
+
+Step 6: Insert and query data
+To insert a single document, enter the following:
+
+
+db.collection.insert({"hello":"DocumentDB"})
+You get the following output:
+
+WriteResult({ "nInserted" : 1 })
+You can read the document that you wrote with the findOne() command (because it only returns a single document). Input the following:
+
+
+db.collection.findOne()
+You get the following output:
+
+{ "_id" : ObjectId("5e401fe56056fda7321fbd67"), "hello" : "DocumentDB"
+                        }
+To perform a few more queries, consider a gaming profiles use case. First, insert a few entries into a collection titled profiles. Input the following:
+
+
+db.profiles.insertMany([
+                    { "_id" : 1, "name" : "Matt", "status": "active", "level": 12, "score":202},
+                    { "_id" : 2, "name" : "Frank", "status": "inactive", "level": 2, "score":9},
+                    { "_id" : 3, "name" : "Karen", "status": "active", "level": 7, "score":87},
+                    { "_id" : 4, "name" : "Katie", "status": "active", "level": 3, "score":27}
+                    ])
+You get the following output:
+
+{ "acknowledged" : true, "insertedIds" : [ 1, 2, 3, 4 ] }
+Use the find() command to return all the documents in the profiles collection. Input the following:
+
+
+db.profiles.find()
+You will get an output that will match the data you typed in Step 5.
+
+Use a query for a single document using a filter. Input the following:
+
+
+db.profiles.find({name: "Katie"})
+You should get back this output:
+
+{ "_id" : 4, "name" : "Katie", "status": "active", "level": 3,
+                        "score":27}
+Now let’s try to find a profile and modify it using the findAndModify command. We’ll give the user Matt an extra ten points with the following code:
+
+
+db.profiles.findAndModify({
+                query: { name: "Matt", status: "active"},
+                update: { $inc: { score: 10 } }
+            })
+You get the following output (note that his score hasn’t increased yet):
+
+{
+        "_id" : 1,
+        "name" : "Matt",
+        "status" : "active",
+        "level" : 12,
+        "score" : 202
+}
+You can verify that his score has changed with the following query:
+
+
+db.profiles.find({name: "Matt"})
+You get the following output:
+
+{ "_id" : 1, "name" : "Matt", "status" : "active", "level" : 12, "score"
+                        : 212 }
+
+
+==========================================================================
+
+Which of the following are benefits of using Amazon DocumentDB? (Select THREE.)
+
+Ad-hoc Quering 
+Flexible Indexing 
+Powerful Analytics 
+
+
+Authentication is enabled by default and is configured using the MongoDB tools and drivers. Data at rest is encrypted using keys you manage through AWS KMS, and data in transit is encrypted using TLS.
+
+
+Amazon DocumentDB On-Demand Instances allow you to pay by the second. You pay for the storage and IOPS consumed by the database, and there is no additional charge for backup storage of up to 100% of your total Amazon DocumentDB cluster storage for a Region.
+
+
+
+Amazon DocumentDB is purpose-built to store data in which of the following forms?
+JSON Documents and Semistructured data
+ Amazon DocumentDB is purpose-built for storing, indexing, and querying semistructured data in JSON documents.
+
+
+
+
+Which of the following statements are true of Amazon DocumentDB? (Select THREE.)
+Amazon DocumentDB clusters can only be run in an Amazon VPC. 
+Amazon DocumentDB decouples storage and compute, enabling each to scale independently.
+All instances within the cluster support data reads.
+
+The basic component of Amazon DocumentDB is the cluster, which contains a storage volume and instances. Once the cluster is provisioned, you can add and remove instances as needed.
+
+
+you are charged for: 
+IOPS 
+Storage 
+On-demand instances 
+Backup storage beyond 100% 
+

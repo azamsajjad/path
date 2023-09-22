@@ -584,3 +584,64 @@ You can create a Global Secondary Index at any time but you can only create a Lo
 Sorry!
 Correct Answer
 Only Global secondary Indexes can be created or deleted at anytime. Local Secondary Indexes must be created when you first create the table and they cannot be modified or deleted.
+
+
+===========================================================================
+USE CASE 
+Gaming application: Amazon DynamoDB
+Companies in the gaming industry use Amazon DynamoDB in all aspects of game platforms, including game state, player data, session history, and leaderboards. Unlike Amazon RDS, DynamoDB is able to automatically scale to millions of concurrent users and requests while ensuring consistently low latency measured in single-digit milliseconds.
+
+In this use case, player data is stored in DynamoDB for analytics to determine player behavior and usage patterns.
+
+Use cases such as gaming, advertising tech, shopping carts, and IoT lend themselves particularly well to the key-value data model of DynamoDB.
+===========================================================================
+Use Case 2
+Media streaming: Amazon ElastiCache
+Amazon ElastiCache offers a fast, in-memory data store to power live streaming use cases. ElastiCache can store metadata for user profiles and viewing history, authentication information/tokens for millions of users, and manifest files to enable content delivery networks to stream videos to millions of mobile and desktop users at a time.
+
+
+
+In this use case, Amazon Simple Storage Service (Amazon S3) and Amazon CloudFront are managing and serving media content. ElastiCache manages the content index and token authentication for in-memory, sub-milliseconds responses at scale.
+===========================================================================
+Use Case 4
+Knowledge graph: Amazon Neptune
+Amazon Neptune allows you to use existing information resources to build knowledge graphs and host them on a fully managed service. A knowledge graph allows you to store information in a graph model and use graph queries to enable your users to easily navigate highly connected datasets.
+
+
+
+In this use case, comma-separated value (CSV) or Resource Description Framework (RDF) data is loaded from Amazon S3 to Neptune. The client application then uses simple SPARQL queries to build graphical visualizations.
+
+Using a knowledge graph, you can add topical information to product catalogs, build and query complex models of regulatory rules, or model general information.
+===========================================================================
+Use Case 5
+Profile management: Amazon DocumentDB
+User profile management enables online transactions, user preferences, and user authentication. With the growth in number of users, increasingly complex user profile data, and growing user experience expectations, the demand for scalability, data flexibility, and performance has grown too. With Amazon DocumentDB’s document data model, you can manage profiles and preferences for millions of users and scale to process millions of user requests per second with millisecond latency.
+
+
+
+Developers can persist data with Amazon DocumentDB by using the same document model format that they use in their application code. Content management, personalization, and mobile applications are typical use cases.
+===========================================================================
+
+USE CASE.
+Mobile Bookstore web application
+
+The Mobile Bookstore App is a full-stack web application that creates a storefront and backend for customers to shop for books. The app contains multiple customer experiences such as a shopping cart, product search, recommendations, and a top sellers list. For each of these use cases, the app uses a purpose-built database so the developer never has to compromise on functionality, performance, or scale.
+
+Database components
+
+Product catalog/shopping cart: Amazon DynamoDB offers fast, predictable performance for the key-value lookups needed in the product catalog, as well as the shopping cart and order history. In this use case, there are unique identifiers, titles, descriptions, quantities, locations, and price.
+
+Recommendations: Amazon Neptune provides social recommendations based on what a user's friends have purchased, scaling as the storefront grows with more products, pages, and users.
+
+Top sellers list: Amazon ElastiCache for Redis reads order information from Amazon DynamoDB Streams, creating a leaderboard of the “Top 20” purchased or rated books.
+
+Other components
+
+Search: Amazon Elasticsearch Service (Amazon EDS) enables full-text search for the storefront, enabling users to find products based on a variety of terms including author, title, and category.
+
+Serverless backend: Amazon API Gateway powers the interface layer between the front end and backend and invokes serverless compute with AWS Lambda.
+
+Serverless web application: Amazon CloudFront and Amazon Simple Storage Service (Amazon S3) provide a globally-distributed application.
+
+https://github.com/aws-samples/aws-bookstore-demo-app
+https://github.com/amazon-archives/aws-full-stack-template
