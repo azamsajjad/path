@@ -1,0 +1,32 @@
+{
+	"StartAt": "Validate-ALL",
+	"States":{
+		"Validate-ALL":{
+			"Type": "Map",
+			"InputPath": "$",
+			"ItemsPath": "$.transactions",
+			"MaxConcurrency": 0,
+			"Iterator":{
+				"StartAt": "Validate",
+				"States":{
+					"Validate":{
+						"Type": "Task",
+						"Resource": "arn:aws:lambda:us-east-1:767665886117:function:ReturnMapTaskFromStepFunction",
+						"Next": "Wait Three Second"
+					},
+					"Wait Three Seconds":{
+						"Type": "Wait",
+						"Seconds": 3,
+						"Next": "Complete"
+					},
+					"Complete":{
+						"Type": "Pass",
+						"End": true
+					}
+				}
+			},
+			"ResultPath": "$",
+			"End": true
+		}
+	}
+}

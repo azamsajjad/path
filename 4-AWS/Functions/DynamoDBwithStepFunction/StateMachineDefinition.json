@@ -1,0 +1,33 @@
+{
+  "Comment": "Transaction Processor State Machine Using DynamoDB",
+  "StartAt": "ProcessTransaction",
+  "States": {
+    "ProcessTransaction": {
+      "Type": "Pass",
+      "Next": "StoreHistory"
+    },
+    "StoreHistory": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "TransactionHistoryTable",
+        "Item": {
+          "TransactionId": {
+            "S.$": "$.TransactionId"
+          }
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+        "IntervalSeconds": 1,
+        "MaxAttempts": 3
+      }
+    ],
+    "End": true,
+    "ResultPath": "$.DynamoDB"
+  }
+}
+}

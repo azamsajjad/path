@@ -221,3 +221,19 @@ However, AWS DMS creates only those objects required to efficiently migrate the 
 Homogeneous migrations, where you migrate between same database engines, may require the use of native database tools to migrate database elements.
 
 Heterogenous migrations, where you migrate between different database engines, require the use of the AWS Schema Conversion Tool (AWS SCT) to first translate your database schema to the new platform. You can then use AWS DMS to migrate the data. It is important to understand that AWS DMS and SCT are two different tools that serve different needs. 
+
+=====================================================================
+What tools would you use to perform a large-scale migration of an on-premises data warehouse to Amazon Redshift? (Select TWO)
+
+AWS Snowball Edge
+AWS Direct Connect
+````AWS DMS
+Amazon S3
+```AWS SCT agent
+
+ChatGPT
+To perform a large-scale migration of an on-premises data warehouse to Amazon Redshift, you can use:
+
+AWS DMS (Database Migration Service): AWS DMS is a fully managed service that enables you to migrate databases to AWS quickly and securely. It supports both homogeneous (e.g., Oracle to Oracle) and heterogeneous (e.g., Oracle to Amazon Redshift) migrations.
+
+AWS SCT agent (AWS Schema Conversion Tool agent): The AWS SCT agent is used in conjunction with the AWS Schema Conversion Tool. It assists in converting the schema of the source database to a format that can be used with the target database, including Amazon Redshift.

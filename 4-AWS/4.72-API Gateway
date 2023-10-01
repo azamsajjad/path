@@ -1,0 +1,395 @@
+=======================================================================
+-----------------------------------------------------------------------
+=======================================================================
+API : Application Programming Interface 
+we use APIs to interact with web applications 
+Applications use APIs to communicate with each other
+APIs are mechanisms that facilitate two software components communicating with each other. APIs act as the front door for applications to access data, business logic, or functionality from backend services. 
+
+======================="API Gateway features"===========================
+
+----------------"Developer features in API Gateway"----------------------
+
+"Run multiple versions of an API at the same time"
+With API Gateway, you can run multiple versions of the same API simultaneously so that you can quickly iterate, test, and release new versions. You can make changes to your API and host multiple versions of it for different users also.
+
+"Quick SDK generation"
+If you’re using REST APIs, API Gateway can generate client Software Development Kits (SDKs) for several platforms, which you can use to quickly test new APIs from your applications and distribute SDKs to third-party developers. 
+The generated SDKs handle API keys and sign requests using AWS credentials. API Gateway can generate client SDKs for Java, JavaScript, Java for Android, Objective-C or Swift for iOS, and Ruby. You can use AWS Command Line Interface (AWS CLI) to generate and download an SDK of an API for a supported platform by calling the get-sdk command.
+
+"Transform or validate request-response data"
+With API Gateway, you can also transform and validate both incoming and outgoing requests. With this feature, you can use API Gateway as a fully managed environment for transforming requests as they come into your API before they are passed to your backend.
+
+-------------"Features for managing API access"------------------------
+
+There are also some important features for managing API access. To learn more, expand each of the following three categories.
+
+
+"Reduce latency and throttle traffic"
+API Gateway provides end users with the lowest possible latency for API requests and responses by taking advantage of the Amazon CloudFront global network of edge locations. With this service, you also can throttle traffic and authorize API calls to ensure that backend operations withstand traffic spikes and backend systems are not unnecessarily called.
+
+
+"Built-in, flexible authorization option"
+API Gateway gives you several options for authorization. You can authorize access to your APIs with AWS Identity and Access Management (IAM) and Amazon Cognito. If you use OAuth tokens, API Gateway also offers native OpenID Connect (OIDC) and OAuth 2 support. 
+To support custom authorization requirements, you can invoke a Lambda authorizer from Lambda. With a Lambda authorizer, you can develop your own authorization code using a custom Lambda function.
+
+"API keys for third-party developers"
+If you’re using REST APIs, API Gateway helps you manage the ecosystem of third-party developers accessing your APIs. You can create API keys on API Gateway, set fine-grained access permissions on each API key, and distribute them to third-party developers to access your APIs. API keys are not a primary authorization mechanism for your APIs, but provide you the ability to track usage for specific users or services.
+
+========================================================================
+REST APIs are intended for APIs that require API proxy functionality and API management features in a single solution. HTTP APIs are optimized for building APIs that proxy to Lambda functions or HTTP backends, making them ideal for serverless workloads. HTTP APIs are a cheaper and faster alternative to REST APIs, but they do not currently support API management functionality. Unlike a REST API, which receives and responds to requests, a WebSocket API supports two-way communication between client apps and your backend. The backend can send callback messages to connected clients.
+========================================================================
+WebSocket APIs are often used in real-time application use cases such as:
+
+Chat applications
+Streaming dashboards
+Real-time alerts and notifications
+Collaboration platforms
+Multiplayer games
+Financial trading platforms
+
+PRICING
+
+FLAT CHARGE
+WebSocket APIs for API Gateway charge for the messages you send and receive. You can send and receive messages up to 128 KB in size. Messages are metered in 32-KB increments, so a 33-KB message is charged as two messages.
+For WebSocket APIs, the API Gateway free tier currently includes one million messages (sent or received) and 750,000 connection minutes for up to 12 months.
+
+CONNECTION MINUTES
+In addition to paying for the messages you send and receive, you are also charged for the total number of connection minutes.
+
+ADDITIONAL CHARGES
+You may also incur additional charges if you use API Gateway in conjunction with other AWS services or transfer data out of AWS.
+========================================================================
+===========Maintaining connections to WebSocket APIs====================
+
+To understand how the WebSocket connections are maintained, you need to understand how the client connects, sends messages, and disconnects from the API. To learn more, expand each of the following three categories.
+
+
+Connect
+–
+The client apps connect to your WebSocket API by sending a WebSocket upgrade request. If the request succeeds, the $connect route is invoked while the connection is being established. Until the invocation of the integration you associated with the $connect route is completed, the upgrade request is pending and the actual connection will not be established. If the $connect request fails, the connection will not be made.
+
+
+Established connection
+–
+After the connection is established, your client's JSON messages can be routed to invoke a specific backend service based on message content. When a client sends a message over its WebSocket connection, this results in a route request to the WebSocket API. The request will be matched to the route with the corresponding route key in API Gateway. 
+
+
+Disconnect
+–
+The $disconnect route is invoked after the connection is closed. The connection can be closed by the server or by the client. As mentioned earlier in the lesson, since the connection is already closed when it is invoked, the $disconnect route is a best-effort event. API Gateway will try its best to deliver the $disconnect event to your integration, but it cannot guarantee delivery. The backend can initiate disconnection by using the @connections API. '
+-------------------------------------------------------------------------
+=====================TYPES REST APIs====================================
+Regional endpoint
+Provides lower latency for applications that invoke your API within the same AWS Region
+
+Edge-optimized endpoint
+Deploys a fully managed Amazon CloudFront distribution
+
+Private endpoint
+Requests are only routable within a single virtual private cloud (VPC) that you control
+
+
+Q
+Which of the following REST API endpoint type changes is not supported by API Gateway? Select the correct answer and choose SUBMIT. 
+From private to edge-optimized
+-----------------------------------------------------------------------
+You can also define usage  plans that set throttling and request quota limits for each API key. The use of API keys is optional.
+
+Using API Gateway as the front door for APIs
+
+Before diving into how to design and deploy APIs in API Gateway, you need to understand what API Gateway is. API Gateway is a service that facilitates the creation, publishing, maintenance, monitoring, and security of your APIs at any scale. API Gateway handles all your tasks around accepting and processing hundreds of thousands of concurrent API calls. This includes handling traffic management, Cross Origin Resource Sharing (CORS) support, authorization and access control, throttling, monitoring, and API version management. 
+
+
+
+API GATEWAY : is serverless, supports throttling, logged to CloudWatch
+API GATEWAY provides endpoints for your apps running in aws
+publish maintain and monitor APIs 
+API TYPES :
+RESTful APIs are optimized for stateless, serverless workloads
+REST=REpresentational State Transfer, supports JSON
+Websocket APIs are for real-time, two-way, stateful communication e.g. chat apps
+users -> API GATEWAY -> Lambda
+users -> API GATEWAY -> EC2
+users -> API GATEWAY -> DynamoDB
+
+$LATEST is the latest version of code you uploaded into lambda 
+how to version control 
+upload code > action > publish new version > create alias 
+(weighted traffic routing also supported between versions)
+
+Concurrent Execution Limit is 1000 functions per region per account
+HTTP status code 429
+you can also reserve some concurrency for critical lambda functions
+they will be prioritized
+but it also sets limit for that function.e.g if you reserve 500 simultaneous function execution for a particular function, it will never go beyond 500 concurrent runs
+
+LAMBDA and VPC Access 
+it is possible to enable lambda access resources that are inside private VPC
+these resources can be EC2/RDS/etc
+Lambda creates ENIs using IP from private subnets
+configuration > permissions > Execution role url
+AWSLambdaVPCAccessExecutionRole (add this policy for lambda to access VPC)
+
+e.g.
+A company is using AWS Lambda to process small number of images that are uploaded to Amazon S3. Suddenly, they uploaded a large number of image files (several thousands) in S3 bucket. As a result, an error was generated by AWS Lambda (status code 429).
+
+
+What is the MOST likely cause of this error?
+
+
+"The concurrency execution limit for the account has been exceeded."
+
+Amazon S3 could not handle the sudden burst in traffic.
+
+AWS Lambda cannot process multiple files simultaneously
+
+The event source mapping has not been configured.
+
+
+===========================================================================
+
+API GATEWAYS (ADVANCED)
+
+SOAP - legacy protocol - returns a response in XML format instead of JSON
+        came out in 1990s - you can configure API Gateway as a SOAP web service passthrough - how?
+        https://www.rubix.nl/blogs/how-configure-amazon-api-gatewaysoap-        webservice-passthrough-minutes
+REST - Latest protocol
+
+IMPORT APIs
+You can use the API Gateway Import API feature to import an API from an
+external definition file into API Gateway. Currently, the Import API feature supports Swagger v2.0 definition files. aka OpenAPI
+With the Import API, you can either create a new API by submitting
+a POST request that includes a Swagger definition in the payload and
+endpoint configuration, or you can update an existing API by using a PUT
+request that contains a Swagger definition in the payload. You can update
+an API by overwriting it with a new definition, or merge a definition with an
+existing API. You specify the options using a mode query parameter in the
+request URL .
+Import
+
+
+API THROTTLING
+By default, API Gateway limits the steady-state request rate to
+10,000 requests per second (rps).
+The maximum concurrent requests is 5000 requests across all
+APIs within an AWS account.
+If you go over 10,000 requests per second or 5000 concurrent
+requests you will receive a 429 Too Many Request error
+response.
+API
+Import API’s using Swagger 2.0 definition files
+• API Gateway can be throttled
+• Default limits are 10,000 RPS or 5000 concurrently
+• You can configure API Gateway as a SOAP Webservice   
+passthrough
+--------------------------------------------------
+API GATEWAY MOCK ENDPOINTS
+Create, Test, Debug
+backend is not ready yet but you want to test some new website features
+e.g. cart,payment
+allows team to continue development without depending on backend to be build
+API GATEWAY RESPONSE - 
+You definee the response 
+status code and message 
+forms the mock integration response 
+---------------------------------------------------
+API GATEWAY STAGEs 
+references the lifecycle state of the API e.g. dev,prod 
+Each stage can be associated with a different endpoint e.g. dev,prod
+each stage has a unique invoke url e.g. 
+https://dwncjrevn.execute-api.us-east-1.amazonaws.com/dev 
+https://dwncjrevn.execute-api.us-east-1.amazonaws.com/prod
+        API ID                                      Stage name
+
+if we have 2 lambda functions, dev&prod, we can create API gateway with dev&prod stage 
+
+
+LAB Creating Stages 
+Create 2 functions stageDevevFunction,stageProdFunction with following code 
+// export const handler = async (event) => {
+//   // TODO implement
+//   const response = {
+//     statusCode: 200,
+//     body: JSON.stringify('This is my Prod/Dev function'),
+//   };
+//   return response;
+// };
+goto API Gateway
+BUILD REST API --> NewAPI & name=MyAPI -> Create API
+ACTION->CREATE METHOD->"GET"->Lambda Function = ${stageVariables.lmbfunction}->
+it gives you a command to run in cloudshell 
+// aws lambda add-permission --function-name "arn:aws:lambda:us-east-1:965329023955:function:myprod/devfunction" --source-arn "arn:aws:execute-api:us-east-1:965329023955:nzxaisdv5m/*/GET/" --principal apigateway.amazonaws.com --statement-id 0e68dff5-42c2-4116-81f7-a26a4ae2a2bc --action lambda:InvokeFunction
+save 
+ACTION->DEPLOY API->newstage(test)
+CREATE->prod 
+STAGE VARIABLE->key=lmbfunction value=stageProdFunction
+CREATE->dev
+STAGE VARIABLE->key=lmbfunction value=stageDevFunction
+-----------------------------------------------------
+API RESPONSE TRANSFORMATIONS
+AppFrontend->APIRequest->  APIGateway  ->APIRequest->AppBackend
+                          modify Request
+
+AppFrontend<-APIResponse<-  APIGateway  <-APIResponse<-AppBackend
+                          modify Response
+
+HTTP APIs:
+parameter mapping is used to modify API requests and responses
+we can change the Header, Query String, Request Path in API Request
+we can change the Header, Status Code,               in API Response
+-----------------------------------------------------
+API GATEWAY CACHING:
+CACHES your endpoints response (this reduces no. of calls made to endpoint)
+TTL (when u enable caching, api gateway caches responses from endpoints for a specified TTL, default is 300 seconds)
+API GATEWAY returns cached response to new requests, instead of making new request to endpoint. 
+THIS REDUCES LATENCY
+
+API GATEWAY THROTTLING is to prevent your API from being overwhelmed by too many requests
+by-default, API Gateway limits the steady-state request rate to 10,000 requests per second,per region.
+by-default, API Gateway limits the concurrent request to 5,000 across all APIs per second,per region.
+if you exceed any of these limits, you get 429 ERROR (Too Many Requests)
+
+Throttling Example 
+5,000 requests in 1st millisecond 
+5,000 requests evenly spread across 999 milliseconds
+this is within limits of 10,000 req per second and 5,000 concurrent request
+this will happen without any errors
+
+------------------------------------------------------
+X-Ray
+X-Ray [Service Map] provides end-to-end view of API requests as they travel through your application
+X-Ray can be integrated with EC2, ECS, Lambda, EB, SNS, SQS, DynamoDB, ELB, API Gateway, S3
+X-Ray can be integrated with with your own application written in java, node.js, .net, go, ruby, python
+X-Ray SDK automatically captures metadata for API calls made to AWS services using AWS SDK
+
+Procedure:
+Install X-Ray Agent on EC2 instance
+Instrument your application using X-Ray SDK (sdk has libraries)
+X-Ray sdk gathers informationfrom request and response headers, the code in your application and metadata about aws resources on which it runs and send this trace data to X-Ray e.g. HTTP requests, error codes, latency data
+
+You need instrument(configure) both the X-Ray SDK and X-Ray Daemon on your systems
+sdk sends data to daemon, which uploads them to X-Ray in batches
+
+for docker container, install X-Ray daemon in its own docker container, and your application in its own container, all in same ECS cluster
+
+---------------------------------------------------------------------------
+
+Which of these migrations patterns helps an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application?
+
+Leapfrog
+
+Correctly unselected
+Strangler
+
+Correctly selected
+Organic
+
+Correctly unselected
+Saga
+
+Correctly unselected
+Correct
+With the strangler pattern, an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application.
+
+
+
+Distinct API endpoints can point to old vs. new components, and safe deployment options (like canary deployments) let you point back to the legacy version with very little risk.
+
+
+
+To learn more about different migration patterns, review the Migrating to Serverless lesson.
+
+===========================================================================
+API GATEWAY - SERVICE PROXY.
+
+OLD WAYS:
+browser -> API Gateway -> Lambda (to parse payload) -> DynamoDB (POST,GET)
+
+WITH SERVICE PROXY:
+browser -> API Gateway  -> DynamoDB (POST,GET)
+
+LAB:
+1-Setup DynamoDB Customers table
+                            
+2-Create API Gateway Endpoint --> STAGE
+                            |___> API
+
+3-Configure IAM --> POLICY
+              |__> TRUST RELATIONSHIP.
+
+1-Created Table
+2-
+AWS Region->us-east-1
+AWS service->DynamoDB
+AWS subdomain->blank
+HTTP method->POST
+Action type
+Use action name(tick) - X Use path override Xnotick
+
+Action name -> PutItem
+Execution role
+arn:aws:iam::767665886117:role/DynamoDB_API_PutItem
+
+
+3-
+DynamoDBFullAccess
+Trust:
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "APIgateway",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "apigateway.amazonaws.com"
+			},
+			"Action": "sts:AssumeRole"
+		}
+	]
+}
+
+create resource->method->deploy
+postman-> test
+body->raw 
+{
+    "TableName": "customers",
+    "Item": {
+        "customerId": {
+            "S": "1"
+        },
+        "date": {
+            "S": "2023"
+        },
+        "name": {
+            "S": "azamsajjad"
+        }
+    }
+}
+
+BUT THIS IS INCSECURE
+
+INSTEAD, CREATE A MAPPING TEMPLATE 
+/ -> customers -> POST -> Create MApping Template 
+
+{
+    "TableName": "customers",
+    "Item": {
+        "customerId": {
+            "S": "$context.requestId"
+        },
+        "date": {
+            "S": "$input.path('$.date')"
+        },
+        "name": {
+            "S": "$input.path('$.name')"
+        }
+    }
+}
+
+New Cleaner Input required now---
+{
+        "date": "2023"
+        "name": "azam sajjad"
+}
+// for customerid, $context.requestId generates a random customer id 16 digit unique

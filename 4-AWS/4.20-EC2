@@ -694,6 +694,205 @@ Step 4: Distribution settings
 // -
 // -
 // -
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+AWS SYSTEMS MANAGER. 
+
+key benefits:
+hybrid
+cross-platform support e.g. linux,windows 
+scalable
+aws Optimized
+no complex licensing models
+partner benefits-adding solutions on top of systems manager 
+
+CAPABILITIES:
+RUN command
+STATE MANAGER
+INVENTORY 
+PATCH MANAGER - on large no. of instance 
+MAINTENANCE WINDOW - at set times - builtin integration with RUN and PATCH
+AUTOMATION - automation workflows - operational RUNBOOKS
+PARAMETER STORE 
+SESSION MANAGER - browser based shell without keys/bastion & more
+OpsCENTER - central location, review ops work items - issues, etc 
+EXPLORER - 
+CHANGE CALENDER
+DISTRIBUTOR
+
+BUILDING BLOCKS:
+SSM Agent ON EC2 
+DOCUMENT - operational playbooks
+
+PRE-REQISITES:
+1-ACCESS CONTROLS - privileges to manage the service - instance profile role
+2-SSM Agent
+3-CONNECTIVITY TO SYSTEMS MANAGER SERVICE 
+
+
+
+you can also use SSM Quick Setup to let SSM create roles and update SSM Agent for you and specify target instances
+                                1-IAM POLICIES:
+
+Create a Group - SSMAdmins
+AmazonSSMFullAccess
+
+
+policies
+AmazonSSMManagedInstanceCore -required policy 4 SM to manage EC2 resources
+AmazonSSMDirectoryServiceAccess - if you want to use managed directory too
+CloudWatchAgentServerPolicy - if you send data from SSM to cloudwatch
+policy avl in SSM docs      - if you send ssm to S3 bucket 
+
+newrole->ec2->policy"AmazonSSMManagedInstanceCore" & "AmazonSSMDirectoryServiceAccess" & "CloudWatchAgentServerPolicy"->Create Role -> SSMInstanceProfile
+
+
+
+                                2-SSM Agent 
+pre-installed on amazon AMI 1 & 2 ubuntu 16&18, windows server 2016,2019,2003-12, avl on github 
+
+                                3-CONNECTIVITY
+instances in public subnet or in private subnets with VPC endpoints to connect to SSM
 
 
 ---------------------------------------------------------------------------
+RUN COMMAND USE CASES:
+monitoring your systems 
+joining instances to a domain 
+on-demand patching 
+deploying code to instances 
+process management 
+run bootstrap scripts on applications
+user and account management 
+and more..................
+
+
+NO ADDITIONAL costs
+fully managed 
+no need for SSH ports open 
+increased audit with cloudtrail 
+single view of configuration changes
+---------------------------------------------------------------------------
+STATE MANAGER 
+USE CASES:
+enabling or disabling a service 
+ensuring desired state is continuously applied eg closing ports on firewall
+collecting inventory
+running scripts throughout instance lifecycle 
+running antivirus scans 
+
+---------------------------------------------------------------------------
+INVENTORY
+collect instance details
+apps installed, network configuration, updates installed, monitor file paths, monitor windows services 
+registry keys 
+billing information 
+custom inventory 
+integrates with AWS CONFIG 
+aggregates data using resource Data Sync 
+
+---------------------------------------------------------------------------
+PATCH MANAGER 
+simply OS and APP patching process 
+whitelist or blacklist specific patches 
+specify timing to roll out 
+control instance reboots 
+reports patching compliance 
+schedule automatic rollout with maintenance windows 
+no additional cost for amazon ami or on-premises system patching 
+
+Req: Patch Group Tags added for ease of patching groups of instances 
+Configure patch baselines - define approval rules - patch group tags, 
+w/blist
+---------------------------------------------------------------------------
+MAINTENANCE WINDOW 
+patching an OS
+updating drivers 
+installing software 
+creating AMIs
+
+Define a Schedule:
+Specify the duration:
+Register set of targets:
+Register set of Tasks:, in
+    RUN command 
+    Automation document 
+    Lambda Function 
+    Step Functions 
+
+--------------------------------------------------------------------------
+AUTOMATION:
+Ansible 
+Automating creation of Golden AMIs - used for one-click configuration of new instances 
+Automatically remediating resources through AWS Config
+
+How it Works?
+It Assumes current user context by default 
+option to specify service role 
+leverage AWS playbooks 
+Create custom Automation Documents 
+Multi-account and multi-region playbook runs 
+register automation documents dring maintenance windows 
+YOU CAN CALL LAMBDA FUNCTIONS IN AUTOMATION DOCUMENTS 
+
+---------------------------------------------------------------------------
+AWS Session Manager 
+
+Create IAM Role to log in into private instance via Session Manager without key pair. Attach the following role with EC2
+Select AmazonSSMManagedInstanceCore policy. 
+Systems Manager Session Manager for EC2 Instance). Click Create role:
+
+3.1 Connect using Amazon EC2 console
+
+Navigate to Amazon EC2 select your instance and click Connect. Select Session Manager and click Connect:
+
+3.2 Connect using AWS Systems Manager console
+
+Navigate to AWS Systems Manager and select Instances & Nodes -> Session Manager. Click Start session. Select your instance and click Start session:
+
+3.3 Connect using AWS CLI
+
+$ aws ssm start-session --target INSTANCE_ID
+Example:
+
+$ aws ssm start-session --target i-06fd9f063a7cf53fd
+
+
+
+
+
+Extra: Connect using SSH command and SSH key, without ROLE
+Launch new EC2 instance (e.g. i-077b1f947c98988d5) and download SSH key (e.g. key.pem).
+
+The Amazon EC2 instance must have the latest SSM Agent installed to allow connection using SSH. You can install the agent on both Windows instances and Linux instances.
+
+On Amazon Linux 2, you can install the latest SSM Agent by using the following command:
+
+$ sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+Let’s prepare your local machine. First, install the latest Session Manager Plugin on you local machine.
+
+
+
+Second, update ~/.ssh/config file on your local machine and add the code below:
+# SSH over AWS Systems Manager Session Manager
+host i-* mi-*
+    ProxyCommand sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
+
+
+
+
+
+Third, start a session by using the following ssh command:
+
+$ ssh -i SSH_KEY ec2-user@INSTANCE_ID
+Example:
+
+$ ssh -i key.pem ec2-user@i-077b1f947c98988d5
+

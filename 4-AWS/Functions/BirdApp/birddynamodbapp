@@ -1,0 +1,125 @@
+CloudFront distribution domain: d3454ynfa1gwh1.cloudfront.net
+Table name: 
+Table partition key: 
+Table sort key:  
+Password:
+Index name:
+Index partition key: 
+Index sort key:
+
+
+wget https://us-east-1-tcprod.s3.amazonaws.com/courses/CUR-TF-100-EDBLDR/v1.0.4.prod-930e7fcd/02-lab-ddb/scripts/code.zip
+unzip code.zip
+cd resources
+. ./setup.sh
+
+
+# The S3 bucket name is: 
+"labstack-c7762b2b-736b-4e77-8370-7a3f0b1-s3bucket-ur5p2skwx2ps"
+# The CloudFront distribution domain is: 
+"d3454ynfa1gwh1.cloudfront.net"
+
+npm start
+
+
+Task 2: Creating a DynamoDB table
+Table name: Enter 
+BirdSightings
+
+Partition key: Enter 
+id  and ensure that String is selected.
+
+Sort key: Enter 
+student_name_str and ensure that String is selected.
+
+
+Task 3: Adding multiple records to the table by using a batch script
+expand the node_server folder. Locate and open the past_sightings.json file. 
+
+add table name to this file and run -
+node load_past_sightings.js
+Update the db_scan.js file by replacing the <table-name>
+
+cd /home/ec2-user/environment/website
+cp index_db_scan.html index.html
+cp scripts/templates_sightings_from_db.js scripts/templates.js
+
+cd /home/ec2-user/environment/resources
+python upload_website_code.py
+
+NPM START --> LOGIN TO WEBSITE 
+
+ Task 4:       Update the website/scripts/db_scan_filter.js file by replacing the <attribute-name> placeholder with the name of the attribute that stores student names.
+        
+        In your second terminal window, run the following commands to update the website code to use the db_scan_filer.js code:
+        cd /home/ec2-user/environment/website
+        cp index_db_scan_filter.html index.html
+
+cd /home/ec2-user/environment/resources
+python upload_website_code.py
+Test the website updates:
+Return to the browser tab where the Birds application is open.
+Refresh the browser page.
+The page should now only display one record, which is a bird sighting for teststudent.
+
+
+Task 5: Adding a single record to the table by using the put method
+In this task, you will update the Birds application so that students can add records through the Report page.
+Update the templates_with_add_sighting.js file by replacing the following placeholders with the appropriate values:
+<table-name>
+
+<table-partition-key>
+
+<table-sort-key>
+
+cp /home/ec2-user/environment/website/scripts/templates_with_add_sightings.js /home/ec2-user/environment/website/scripts/templates.js 
+python /home/ec2-user/environment/resources/upload_website_code.py
+
+
+
+Task 6: Adding a GSI to the table
+Ms. García would like to receive a weekly report so that she can review student activity. She has requested that the report only show data for the third grade students, and she only wants to see sightings that were reported in the past 7 days.
+Currently, your table’s composite primary key provides two attributes that can be used to locate records: id and student_name_str. You don’t have a way to search on the grade level or sighting date. You know that you can’t change the table’s primary key, so you have decided to add a global secondary index (GSI) to the table. You can use the GSI to search on the attributes that are required to meet the reporting requirements: class_level_str and date_int.
+Before you create the index, load additional items to the table by running the following commands. This dataset includes a few records from fourth grade students.
+cd /home/ec2-user/environment/node_server
+node load_past_sightings_2.js
+ADDED 9 OLD RECORDS OF 4TH GRADE
+Create the GSI:
+Return to the browser tab where the DynamoDB console is open.
+In the navigation pane, choose Tables.
+Choose the name of the BirdSightings table.
+Choose Actions > Create index.
+In the Index details section, configure the following settings:
+Partition key: Enter 
+                    class_level_str - String
+Sort key: Enter 
+                date_int - Number
+Index name: Enter 
+                class-date-index
+Choose Create index.
+
+
+
+Task 7: Using a GSI in a DynamoDB query operation
+Update the ddb_query.js file by replacing the following placeholders with the appropriate values:
+<index-name>
+<index-partition-key>
+<index-sort-key>
+Save your changes, and close the file.
+
+                        var params = {
+                            TableName: "BirdSightings",
+                            IndexName: "class-date-index",
+                            KeyConditionExpression: "#class = :class and #date > :begin_date",
+                            ExpressionAttributeNames:{
+                                "#class": "class_level_str",
+                                "#date": "date_int"
+                            },
+                            ExpressionAttributeValues: {
+                                ":class": "3rd Grade",
+                                ":begin_date": begin_date
+                            }
+                        };
+notice the new parameter, ExpressionAttributeNames. This parameter isn’t necessary in the scenario. However, it can be helpful when an attribute name in your table is also a reserved word in DynamoDB. This parameter provides the ability to use name substitution. If you cannot directly use an attribute name, as you saw in the scan parameters code, use ExpressionAttributeNames to substitute a different name for the attribute. Examples of reserved words include DATE, ZONE, and YEAR. For a complete list of reserved words in DynamoDB, refer to the Amazon DynamoDB Developer Guide.
+
+-> node ddb_query.js

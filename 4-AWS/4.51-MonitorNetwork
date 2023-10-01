@@ -1,0 +1,1135 @@
+
+
+
+
+NETWORK TROUBLESHOOTING.
+AWS Network Manager monitors:
+HOW TO IMPLEMENT NETWORK SECURITY:
+"Tools for monitoring and troubleshooting "
+Monitor NETWORK using Amazon CloudWatch
+VPC FLOW LOGS:
+VPC TRAFFIC MIRRORING:
+AWS REACHABILITY ANALYZER:
+AWS TRANSIT GATEWAY NETWORK MANAGER:
+
+
+
+
+*************************************************************************
+Module 1: Overview of Network Monitoring and Troubleshooting
+In this module, you explore the following concepts and learn about their benefits:
+What monitoring is and how monitoring can improve network performance
+Why monitoring is important for troubleshooting and what metrics can help
+Why monitoring is fundamental for network security
+What tools and services are available for monitoring and troubleshooting your network
+
+
+NETWORK TROUBLESHOOTING.
+
+// When diagnosing network issues, tools are available to identify whether there really is a problem, the nature of the problem, and the location of the problem.
+
+// Ping will send Internet Control Message Protocol (ICMP) echo packets to a host and measure the host’s response time. However, ICMP is disabled by default by AWS and for certain services like Amazon Lightsail, you cannot enable it. Lightsail is an easy-to-use virtual private server that offers everything you need to build an application or website
+// Traceroute is another useful tool that will use successive echo packets to display the path to the destination and the response time of each hop..
+// Web-based tools such as Speedtest are also useful in evaluating the performance of your internet access.
+// However, many of these tools’ usefulness is limited without having anything to compare the measured data to. Without knowing what the usual value is, it’s hard to establish that there is an issue. You need a means to establish a baseline of your network’s performance.
+
+// A packet analyzer (or packet sniffer) is the standard tool for capturing packets. Traffic Mirroring can direct network traffic coming to and from an EC2 instance to a separate Amazon EC2 based packet analyzer. The majority of modern performance monitoring solutions integrate or, at the very least, support an option for capturing packets that traverse the routers, switches, and network interfaces they monitor.
+
+// A packet analyzer logs each packet it intercepts, decodes the packet, and presents the values of the various fields within the packet for examination. 
+
+// Diego's network is using the TCP/IP protocol. The packets captured conform to the TCP/IP protocol model, which has four layers:
+
+// Application layer (HTTP, FTP, and so on)
+// Transport layer (TCP or UDP)
+// Internet layer (IP)
+// Network access layer (Ethernet)
+// TCP/IP packets contain more information than just a payload of data. The packet header contains information about who sent the data, where the data is intended to go to, what protocol was used to encode the data, and information for validating the integrity of the data within the packet.
+
+// ---
+
+// After Diego reviews the packets captured, he was able to determine that the packets instructing the firewall to close the port connection after each login action were missing.'
+Why Network Monitoring?
+
+Network performance monitoring
+Network security monitoring
+Capacity monitoring
+// You can also monitor the users on your network to see if one or many are draining the network. Users might be using the network for non-related work purposes. Downloading videos or even streaming videos can cause a strain on your resources.
+Application performance optimization
+// Application performance optimization and network monitoring facilitates monitoring and troubleshooting of performance issues with your applications. This also permits your highly distributed applications to evaluate the network API communication.
+// You can monitor HTTP and database calls for your three-tier network applications, and understand whether the application performance issues relate to network factors. If they are, you can resolve the performance issues.
+// You can use network monitoring to guide decisions on your distributed application architecture, for example, decide when to locally cache network API calls.
+Monitoring is also important for troubleshooting. Troubleshooting your network refers to the process of identifying problems using a precise and repeatable process. 
+
+=========================Five phases=================================
+In the AWS Well-Architected Framework, specifically in the Performance Efficiency Pillar, details that monitoring in AWS consists of five distinct phases. 
+
+Generate - data through monitoring, thresholds set, metrics
+Aggregate - creation of complete view from multiple resources
+Alert - incident - recognize issues - respond
+Storage - data management and storage policies, where you store log data
+Analyze - dashboards, reports, insights
+=======================================================================
+
+
+Module 2: Monitoring Your Network with Amazon CloudWatch
+In this module, you explore the following concepts and learn about their benefits: 
+What is Amazon CloudWatch and how Amazon CloudWatch works
+What are Amazon CloudWatch metrics
+What are the benefits of the SSM tool relating to metrics
+How to use Amazon CloudWatch dashboard for better visibility
+What are Amazon CloudWatch Log Insights
+How to create an Amazon CloudWatch query
+What are the benefits of using Amazon CloudWatch Alarms
+How with Amazon CloudWatch pricing you pay for what you use
+==========================Metrics to Watch================================
+Bandwidth capacity
+    Bandwidth usage is the maximum data transmission rate possible on a network. For optimal network operations, you want to get as close to your maximum bandwidth as possible without reaching critical levels. This indicates that your network is sending as much data as it can within a period of time, but isn’t being overloaded.
+Throughput
+    Throughput measures your network’s actual data transmission rate, which can vary wildly through different areas of your network. While your network’s bandwidth measures the theoretical limit of data transfer, throughput tells you how much data is actually being sent. Specifically, throughput measures the units such as megabyte or gigabyte per second of data packets that are successfully being sent. 
+    A low throughput means there are a lot of failed or dropped packets that need to be sent again.
+    If you have a high bandwidth connection but low throughput,  that's an indicator of an underlying problem. You would need to dig in and look at all the other metrics listed in this section, such as packet loss and retransmission to try to locate the issues.'
+Latency
+    Latency is the delay that happens between a node or device requesting data and when that data is finished being delivered. This delay can happen for a variety of reasons, but whatever the cause, your network performance monitoring solution can track any delays and log them. Consistent delays or odd spikes in delay time indicate a major performance issue; however, because delays can often be undetectable to the human eye, you need a monitoring tool to keep an eye on any delays that happen.
+    Technical savvy users in today's world might demand instant gratification, but the world does not provide instant gratification. For example, consider a website’s page load time. If your application takes more than 3 seconds to load, an estimated 53 percent of users will abandon your site.
+    When it comes to connectivity, speed is equally important along with bandwidth latency in your network.'
+Packet loss
+    Packet loss examines how many data packets are dropped during data transmissions on your network. The more data packets that are lost, the longer it takes for a data request to be fulfilled. Your IT team should know how many packets are being dropped on average across your infrastructure. A network’s TCP interprets when packets are dropped and takes steps to ensure that data packets can still be transmitted; your network team should monitor this system to make sure it’s working.
+Retransmission
+    Retransmission is when packets are lost. The network needs to retransmit them to complete a data request. This retransmission rate lets your enterprise know how often packets are being dropped, which is an indication of congestion on your network. 
+    You can analyze retransmission delay (or the time it takes for a dropped packet to be retransmitted) to understand how long it takes your network to recover from packet loss.
+Availability
+    Network availability, also known as uptime, measures whether the network   is currently operational. Uptime is a measurement of availability, the percentage of time the network is available. 
+    You can never guarantee 100 percent availability, but you want to be aware of any downtime that happens on your network that you weren’t expecting. It’s important to be alerted when the network goes down, which network monitoring tools will provide for you. However, you should also be able to discover your actual uptime percentage and how often your network goes down.
+Connectivity
+    Connectivity refers to whether the connections between the nodes on your network are working properly. If there is an improper or malfunctioning connection on your network, it can be a major hurdle for your organization. Ideally, every connection should be operating at peak levels at all times. However, performance issues with software like malware can target specific nodes or connections to affect performance in that specific area of the network.
+
+    One metric to track for connectivity is jitter, which is important when using real-time applications, such as video conferencing and virtual desktop infrastructure. Jitter is a variation in delay or disruption that occurs while data packets travel across the network.
+
+    There are many factors that can cause jitter, and one difficult thing about jitter is that it doesn’t affect all network traffic in the same way.
+
+    Jitter can be caused by network congestion, which occurs when network devices are unable to send the equivalent amount of traffic they receive. In this case, their packet buffer fills up and they start dropping packets. If there is no disturbance on the network at an endpoint, every packet arrives. However, if the endpoint buffer becomes full, packets arrive later and later.
+
+    If you’ve ever been talking to someone on a video call and suddenly their voice speeds up significantly, then slows down to catch up, or keeps fluctuating between the two, then you have a jitter problem. 
+
+    Jitter can also be caused by the type of connection you use. A connection on a shared medium, such as a cable, is more likely to have higher jitter than a dedicated connection. 
+Network and server response time
+    Many applications today utilize the TCP protocol and are based on a client/server model. The application response time metric measures the time it takes for a server to respond to a data request with application data. This metric can tell us how quickly the application is responding to requests. If the response time increases, this indicates that the application is running slowly.
+
+-------------------------------------------------------------------------
+AWS Network Manager monitors:
+
+
+    Global network: A single, private network that acts as the high-level container for your network objects.
+
+    Device: Represents a physical or virtual appliance in an on-premises network, data center, AWS Cloud, or other cloud providers.
+
+    Connection: Represents connectivity between two devices. The connection can be between a physical or virtual appliance and a third-party virtual appliance inside a virtual private cloud (VPC), or it can be between physical appliances in an on-premises network.
+
+    Link: Represents a single internet connection from a site.
+
+    Site: Represents a physical on-premises location. It could be a branch, office, store, campus, or a data center.
+
+
+BEST PRACTICES:
+Understand your network
+    To understand how networking impacts performance, determine the workload requirements for bandwidth, latency, jitter, and throughput.
+    For example, network latency often impacts the user experience. Not providing enough network capacity can bottleneck workload performance.
+Evaluate and integrate networking features to increase performance
+    Measure the impact of these features through testing, metrics, and analysis. 
+    For example, take advantage of network-level features that are available to reduce latency, network distance, or jitter.
+Choose appropriately sized dedicated connectivity
+    When there is a requirement for on premises communication, ensure that you have adequate bandwidth for workload performance. Based on bandwidth requirements, a single dedicated connection or a single virtual private network (VPN) might not be enough. You can enable traffic load balancing across multiple connections.
+    AWS offers many services and features to optimize network performance. 
+Use load balancing and encryption offloading
+    Distribute traffic across multiple resources or services to allow your workload to take advantage of the elasticity that the cloud provides. You can also use load balancing for offloading encryption termination to improve performance and to manage and route traffic effectively.
+
+    When implementing a scale-out architecture where you want to use multiple instances for service content, you can use load balancers inside your Amazon VPC. AWS provides multiple models for your applications in the Elastic Load Balancing (ELB) service. 
+
+    Application Load Balancer is best suited for load balancing of HTTP and HTTPS traffic and provides advanced request routing targeted at the delivery of modern application architectures, including microservices and containers.
+
+    Network Load Balancer is best suited for load balancing of TCP traffic where extreme performance is required. It is capable of handling millions of requests per second while maintaining ultra-low latencies, and it is optimized to handle sudden and volatile traffic patterns.
+
+    ELB provides integrated certificate management and SSL/TLS decryption, providing the flexibility to centrally manage the SSL settings of the load balancer and offload CPU intensive work from your workload.
+Choose network protocols to optimize network traffic
+    Make decisions about protocols for communication between systems and networks based on the impact to the workload’s performance.
+    There is a relationship between latency and bandwidth to achieve throughput. 
+    If your file transfer is using TCP, higher latencies will reduce overall throughput. There are approaches to fix this with TCP tuning and optimized transfer protocols. Some approaches use UDP.
+Choose location based on network requirements
+    Use the cloud location options available to reduce network latency or improve throughput. 
+
+    Utilize AWS Regions, Availability Zones, placement groups, and edge locations such as AWS Outposts, AWS Local Zones, and AWS Wavelength, to reduce network latency or improve throughput.
+
+    The AWS Cloud infrastructure is built around Regions and Availability Zones. 
+
+    Choose the appropriate Region or Regions for your deployment based on the following key elements.
+
+    Where your users are located: Choosing a Region close to your workload’s users ensures lower latency when they use the workload.
+    Where your data is located: For data-heavy applications, the major bottleneck in latency is data transfer. Application code should execute as close to the data as possible.
+Optimize network configuration based on metrics
+    Use collected and analyzed data to make informed decisions about optimizing your network configuration. Measure the impact of those changes and use the impact measurements to make future decisions.
+
+    Enable VPC Flow Logs for all VPC networks that are used by your workload. VPC Flow Logs are a feature that allows you to capture information about the IP traffic going to and from network interfaces in your VPC. 
+
+    VPC Flow Logs help you with a number of tasks, such as troubleshooting why specific traffic is not reaching an instance, which in turn helps you diagnose overly restrictive security group rules. You can use flow logs as a security tool to monitor the traffic that is reaching your instance, to profile your network traffic, and to look for abnormal traffic behaviors.
+
+---------------------------------------------------------------------------
+HOW TO IMPLEMENT NETWORK SECURITY:
+
+Firewalls
+    Firewalls are a system designed to prevent unauthorized access to or from a private network. 
+
+    You can implement a firewall in either hardware or software form, or a combination of both. 
+
+    Firewalls prevent unauthorized internet users from accessing private networks connected to the internet, especially intranets.
+Packet Sniffers
+    Packet sniffers, also known as a packet analyzer, protocol analyzer or network analyzer, are pieces of hardware or software used to monitor network traffic. 
+
+    Sniffers work by examining streams of data packets that flow between computers on a network and also flow between networked computers and the larger internet. 
+
+    These packets are addressed to specific machines. Using a packet sniffer in promiscuous mode lets engineers, end users, or malicious intruders to examine any packet, regardless of destination. 
+
+    You can configure sniffers in two ways.
+
+    The first is unfiltered, meaning they will capture all packets possible and write them to a local hard drive for later examination. 
+    Next is filtered, mode, meaning analyzers will only capture packets that contain specific data elements. 
+    Packet sniffers can be used on both wired and wireless networks.
+
+    On a wired network, sniffers might have access to the packets of every connected machine or may be limited by the placement of network switches. 
+    On a wireless network, most sniffers can only scan one channel at a time, but the use of multiple wireless interfaces can expand this capability.
+Penetration testing
+    Penetration testing software or penetration tools help in identifying security weaknesses in a network, server, or web application. 
+
+    These tools are useful to identify the unknown vulnerabilities in the software and networking applications that can cause a security breach. 
+
+    Using penetration testing:
+
+    The pentester will simulate an attack against the organization’s security infrastructure (network, applications, and users) to detect the exploitable weaknesses in the system. 
+    The assessment results will then be documented for  management and the technical team. 
+    Penetration testing helps to determine the efficacy of the security policies, strategies, and controls in an organization.
+
+TYPES OF ACTIVE ATTACKS:
+Active network attacks are often aggressive and people are immediately aware of the attack. An active attack is one in which an unauthorized change of the system is attempted. This could include, for example, the modification of transmitted or stored data, or the creation of new data streams.
+Examples of active attacks are:
+
+Masquerade attacks
+// a spoofing attack is a situation in which a person or program successfully identifies as another by falsifying data, to gain an illegitimate advantage.
+// Many of the protocols in the TCP/IP suite do not provide mechanisms for authenticating the source or destination of a message,[2] leaving them vulnerable to spoofing attacks when extra precautions are not taken by applications to verify the identity of the sending or receiving host. 
+// The term 'Domain name spoofing' (or simply though less accurately, 'Domain spoofing') is used generically to describe one or more of a class of phishing attacks that depend on falsifying or misrepresenting an internet domain name.
+// Geolocation spoofing occurs when a user applies technologies to make their device appear to be located somewhere other than where it is actually located.[7] The most common geolocation spoofing is through the use of a Virtual Private Network (VPN) or DNS Proxy in order for the user to appear to be located in a different country,
+Message replay 
+// A replay attack (also known as a repeat attack or playback attack) is a form of network attack in which valid data transmission is maliciously or fraudulently repeated or delayed.[1] This is carried out either by the originator or by an adversary who intercepts the data and re-transmits it, possibly as part of a spoofing attack by IP packet substitution. This is one of the lower-tier versions of a man-in-the-middle attack. Replay attacks are usually passive in nature.
+Message modification
+// A cyberattack is any offensive maneuver that targets computer information systems, computer networks, infrastructures, personal computer devices,[1] or smartphones. An attacker is a person or process that attempts to access data, functions, or other restricted areas of the system without authorization, potentially with malicious intent.
+// A cyberattack may steal, alter, or destroy a specified target by hacking into a private network or otherwise susceptible system.[3] Cyberattacks can range from installing spyware on a personal computer to attempting to destroy the infrastructure of entire nations.
+Denial-of-service attacks 
+// In computing, a denial-of-service attack (DoS attack) is a cyber-attack in which the perpetrator seeks to make a machine or network resource unavailable to its intended users by temporarily or indefinitely disrupting services of a host connected to a network. Denial of service is typically accomplished by flooding the targeted machine or resource with superfluous requests in an attempt to overload systems and prevent some or all legitimate requests from being fulfilled.
+-->With active attacks, instead of prevention, it is important to focus more on detective controls, detecting the attacks, and restoring the system afterward. Active attacks typically require more effort and generally have more difficult implications.
+
+TYPES OF PASSIVE ATTACKS:
+Passive network attacks are when an attacker analyzes traffic and the content of packets. 
+
+From the packet collection, information can be obtained regarding your network design, protocols used, information on hosts, and more. When reassembling packets, encryption can be compromised over time and confidential data can be collected.
+
+An example of a passive attack is a Man-in-the-middle attack.
+// In cryptography and computer security, a man-in-the-middle[a] (MITM) attack is a cyberattack where the attacker secretly relays and possibly alters the communications between two parties who believe that they are directly communicating with each other, as the attacker has inserted themselves between the two parties.[9] One example of a MITM attack is active eavesdropping, in which the attacker makes independent connections with the victims and relays messages between them to make them believe they are talking directly to each other over a private connection, when in fact the entire conversation is controlled by the attacker
+
+Unlike active attacks, passive attacks are difficult to detect because they do not involve alteration in data or information. Although they can be prevented using encryption techniques, more emphasis is given to prevention controls compared to the detection controls. 
+
+
+ANAMOLIES
+
+Collecting data facilitates understanding of the daily traffic patterns on your network, which is your baseline. Changes in metrics that show variance from the baseline are, by definition, anomalies. Anomaly detection is a technique used to identify unusual patterns that do not conform to expected behavior, called outliers. Anomaly detection has many applications in network monitoring and troubleshooting, from:
+
+Intrusion detection (identifying strange patterns in network traffic that could signal a hack) 
+Network performance monitoring (spotting changes in application performance could be a sign of increased latency on the network) 
+Fault detection in operating environments (alerts on system failures)
+
+CLASSIFICATIONS
+
+Network anomalies: deviate from what is normal, standard, or expected network behavior. Detection of anomalies in network behavior demands the continuous monitoring of a network for unexpected trends or events. To know when to act, network engineers must have an established baseline. 
+
+Application performance anomalies: observe application function, collect data on all problems, including supporting infrastructure and application dependencies. When anomalies are detected, rate limiting is activiated. Then, engineers are alerted about the resource experiencing drift from the baseline. 
+
+Web application security anomalies: include any other anomalous or suspicious web application behavior that impacts security such as cross-site scripting attacks or DDoS attacks.
+-------------------------------------------------------------------------
+
+"Tools for monitoring and troubleshooting "
+
+In a future module, you learn more about these tools. Here is an overview of these services.
+
+
+Amazon CloudWatch
++
+VPC Flow Logs
++
+Traffic Mirroring
++
+VPC Reachability Analyzer
++
+AWS Transit Gateway Network Manager
++
+AWS CloudTrail
++
+
+BENCHING TOOLS:
+
+Benching tools can help you understand how your network is performing. They allow you to react to bottlenecks, help improve network planning, and lead to effective network troubleshooting. 
+
+Throughput and bandwidth are measured by benching tools, but what is the difference between throughput and bandwidth?
+
+Bandwidth is the maximum amount of data that can go through a given medium.
+Throughput is the amount of data that actually goes through that medium.
+You can get a baseline of your existing throughput to forecast highs and lows of your volume. 
+
+NETWORK MONITORING TOOLS:
+
+You can use open-source tools to monitor network traffic from Amazon EC2 instances. There are two types of networking monitoring tools: commercial off-the-shelf (COTS) network monitoring tools and open-source network monitoring tools.
+
+OPEN-SOURCE TOOLS TO MONITOR THROUGHPUT AND BANDWIDTH:
+
+
+iPerf and iPerf3
+–
+iPerf/iPerf3 are tools for active measurements of the maximum achievable bandwidth on IP networks. It supports tuning of various parameters related to timing, buffers, and protocols (TCP, UDP, SCTP with IPv4 and IPv6). For each test, they report the bandwidth, loss, and other parameters. 
+iPerf3 is a new implementation that shares no code with the original iPerf and also is not backwards compatible.
+
+ExtraHop
+–
+ExtraHop is a monitoring solution for security, network performance, and the cloud. It gives detailed metrics on average bandwidth utilization, average throughput, and more.
+
+Netperf
+–
+Netperf is a CLI tool similar to iPerf that measures throughput and benchmarking speeds.
+
+"What is the difference between security and compliance?
+
+Compliance focuses on the kind of data handled and stored by a company and what regulatory requirements (frameworks) apply to its protection.
+Security is a clear set of technical systems and tools and processes that are put in place to protect and defend the information and technology assets of an enterprise."
+
+"What is the AWS Transit Gateway Network Manager?
+
+A service that lets you centrally manage your networks that are built around transit gateways. You can visualize and monitor your global network across AWS Regions and on-premises locations."
+
+
+
+Monitor NETWORK using Amazon CloudWatch
+
+You can use CloudWatch to collect and process raw data into readable, near real-time metrics. For example, CloudWatch can help to:
+
+    Monitor the physical AWS Direct Connect connections and virtual interfaces.
+    Monitor Network Manager to centrally manage your networks that are built around transit gateways. 
+CloudWatch data is recorded for a period of 15 months to access historical information and gain a better perspective on how your network, application, or service is performing.
+
+Amazon VPCs publish data points to CloudWatch in your global network for:
+
+Registered transited gateways (BytesIn, BytesOut, PacketsIn, PacketsOut)
+Associated Site-to-Site VPN connections 
+(TunnelDataIn, TunnelDataOut, TunnelState) 
+VPC peering connections (awsRegion, vpcPeeringConnectionId, accepterVPCInfo, requesterVPCInfo)
+On-premises resources (BytesIn, BytesOut, VPCTunnelDown). 
+VPC Flow Logs metrics
+
+CLOUDWATCH METRICS BOUNDARIES:
+Bandwidth capability
+// Each EC2 instance has a maximum bandwidth for aggregate inbound and outbound traffic, based on instance type and size. Some instances use a network I/O credit mechanism to allocate network bandwidth based on average bandwidth utilization. Amazon EC2 also has maximum bandwidth for traffic to AWS Direct Connect and the internet.
+Packet-per-second (PPS) performance
+// Each EC2 instance has a maximum PPS performance, based on instance type and size.
+Connections tracked
+// The security group tracks each connection established to ensure that return packets are delivered as expected. There is a maximum number of connections that can be tracked per instance.
+Link-local service access
+// Amazon EC2 provides a maximum PPS per network interface for traffic to services such as the Domain Name System (DNS) service, the instance metadata service (IMDS), and the Amazon Time Sync Service.
+
+'Scenario #1
+
+SpilloverCount
+ Web application behind a load balancer
+
+How it started
+Imagine seeing an alert through CloudWatch from your web application indicating that the application load balancer is generating 5XX errors. Reports have also come in from customers that the website is taking slower than normal to load.
+
+
+
+In the CloudWatch dashboard, the specific metrics for the application load balancer are visible. The SpilloverCount metric for the Application Load Balancer is showing greater than 0, indicating that your elastic network interfaceE iIs overwhelmed and potentially maxed out on capacity. 
+
+
+How it got worse
+
+Checking the Amazon EC2 dashboard and viewing the Elastic Load Balancer (ELB) Metrics tab, you see that the HTTP_ELB_503_Count is more than 0. HTTP 503 errors indicating that the ELB is returning 503 Service Unavailable to clients. This means the nodes behind the ELB cannot handle requests due to being overloaded or down for maintenance.
+
+
+
+After checking with the application team and viewing the load balancers auto scaling configuration, it is clear that no maintenance is currently underway and that the maximum number of hosts configured for auto scaling have been deployed.
+
+
+How it was identified
+
+Having ruled out issues on the client-side, you determine that the spillover is happening because the instance is rejecting incoming requests that it cannot handle. Amazon EC2 elastic network interfaces are limited to servicing 1,024 requests simultaneously. Any requests beyond 1,024 are reported as spillover.
+
+
+How it was resolved
+
+To resolve this issue, you reach out to the application team and suggest increasing the maximum number of instances for the auto scaling group.'
+
+
+'Scenario #2
+–
+UnHealthyHostCount
+Web application behind a load balancer
+
+How it started
+You are working with your companys application team to maintain a legacy application hosted on two Amazon EC2 instances behind an AWS Classic Load Balancer. You receive reports that customers are experiencing intermittent issues loading pages for the application.
+
+How it was identified
+
+Looking at the CloudWatch alarms, you see that the HTTPCode_ELB_5XX metric is not 0. There are 11 different types of 500 errors, to determine which 500 error is being generated you use curl.
+
+Curl returns an HTTP 503 error, 503 Service Unavailable, indicating that the server cannot handle the sent request, commonly because it is overloaded or temporarily unavailable. You go to the Amazon EC2 dashboard on the AWS Management Console and view the Classic Load Balancer (CLB) Metrics tab. You see that the UnHealthyHostCount for the load balancers is 1. You also see that the SurgeQueueLength has reached the maximum number of queued requests (1,024 queued requests) multiple times over the last 3 hours. Requests are added to the Surge Queue when instances behind the load balancer cannot accept the request. 
+
+How it was resolved
+
+Next you take a look at the unhealthy Amazon EC2 instance. You see that the CPUUtilization for the instance has been maxed at 100% for hours. You know that the unhealthy instance was patched during the last maintenance window, so you ask the application team to look at the unhealthy instance to investigate what is causing the high CPU utilization.'
+
+CASE STUDY:
+Nisha updates her Direct Connect design.
+Nisha was recently tasked with adding a Direct Connect connection for her organization.  She designed the direct connect connection with a 10 Gbps port speed, 10 virtual interfaces (VIFs) on the connection to be used by 10 separate business units each with a different AWS account. The business units would share the aggregate bandwidth.
+
+Nisha receives a report from the application team stating that customers started experiencing slower than normal processing times on the application in a specific time frame during weekdays.
+
+1111111111111111111111
+Direct Connect connection
+Nisha checked the connection and identified abnormal traffic spikes that matched the time periods reported by the application team. But Nisha faced the challenge of identifying the source of the traffic spike. When Nisha was configuring the Direct Connect connection, she made sure to send aggregated metrics to CloudWatch.  
+
+Namely:
+
+ConnectionState - The up or down state of the connection.
+
+ConnectionBpsEgress - The bitrate for outbound data from the AWS side of the connection.
+
+ConnectionBpsIngress - The bitrate for inbound data to the AWS side of the connection.
+
+ConnectionPpsEgress - The packet rate for outbound data from the AWS side of the connection.
+
+ConnectionPpsIngress - The packet rate for inbound data to the AWS side of the connection.
+
+ConnectionErrorCount - The total error count for all types of MAC level errors on the AWS device. The total includes cyclic redundancy check (CRC) errors.
+
+
+When Nisha checked CloudWatch, she found that these aggregated metrics provided details on the total throughput usage of the connection, but it didn't show the individual throughput per virtual interfaces for each of the 10 AWS accounts.'
+
+2222222222222222222222222
+CloudWatch
+In-order for Nisha to gain visibility into the virtual interfaces, she setup a cross-account CloudWatch functionality. This functionality gives a central AWS account the ability to receive CloudWatch metrics from other AWS accounts. So the account owners for all separate business units configured CloudWatch metrics sharing to the central account managed by the Nisha and her team. This helped Nisha monitor all the virtual interfaces from all 10 business units in a singe CloudWatch dashboard.
+
+The cross-account CloudWatch functionality added visibility to the following additional metrics:
+
+VirtualInterfaceBpsEgress 
+The bitrate for outbound data from the AWS side of the virtual interface.
+
+VirtualInterfaceBpsIngress
+The bitrate for inbound data to the AWS side of the virtual interface.
+
+VirtualInterfacePpsEgress
+The packet rate for outbound data from the AWS side of the virtual interface.
+
+VirtualInterfacePpsIngress
+The packet rate for inbound data to the AWS side of the virtual interface.
+
+
+Using this updated design, Nisha was able to identify higher than normal traffic throughput coming from one specific AWS account that matched the same time frame of the reported slowness from the application team.
+***************************************************************************
+Module 3: Traffic Visibility and Analysis
+In this module, you explore the following concepts and learn about their benefits:  
+What are VPC Flow Logs
+How you can use VPC Flow Logs
+What is Traffic Mirroring
+What are the limitations of VPC Flow Logs
+How to add open source tools for more visibility
+
+===========================================================================
+VPC FLOW LOGS:
+
+USE CASES:
+PERFORMANCE
+VPC Flow Logs provides flow duration, latency, and bytes sent and can be used to identify latencies, establish performance baselines, and improve applications. Being able to identify performance issues quickly delivers a better user experience.
+For network performance, VPC Flow Logs can help:
+
+Diagnose and troubleshoot connectivity issues across your Amazon VPCs and network traffic-related problems.
+Monitor the traffic that is reaching your instance. Flow logs can help you analyze all the requests that come in and either accept or reject them. This improves access control list rules. You can create alarms for unauthorized IP addresses and the unauthorized destination port that is malicious software trying to gain access. 
+Determine the direction of the traffic to and from the network interfaces.
+PERFORMANCE SCENARIO:
+// Imagine your organization has an internal website hosted within an Amazon VPC that employees reach through a dedicated AWS Site-to-Site VPN linking the company's primary office to the company's AWS environment. You are alerted by a CloudWatch alarm that the AWS Site-to-Site VPN connection is being dropped intermittently. In addition, you received reports from employees that the internal website is intermittently taking slower than normal times to load.
+
+// First, you check that the tunnel is up. Then, you view your tunnel status from the VPN console or from a CloudWatch dashboard. In the CloudWatch dashboard, the metric, TunnelState, shows the AWS Site-to-Site VPN connection is up. 
+
+// Viewing that the tunnel is up, you attempt to connect to the application using curl to check if bytes are coming in and out for your application. In the VPC Flow Logs, you view the results of the curl shows that your application is reachable and bytes are being returned. Next, you validate your curl results by going back to CloudWatch and looking at the TunnelDataIn and TunnelDataOut metrics to determine if there has been a change in their data trends. You see that over night there was a drop in traffic to about half of normal.
+
+// During the process, you reach out to the application team maintaining the website to see if the site is experiencing any errors or if there was maintenance that could account for the change in traffic. The application team reports that the application is showing no errors over the last 24 hours, no maintenance has been performed, and they confirm that they are seeing a drop in traffic from the primary office.  
+
+// Next, you log into the VPN appliance for the AWS Site-to-Site connection at the primary office. After reviewing the logs on the device, you identify that the connection with AWS has been resetting at seemingly random intervals since approximately 11:30 pm the previous night. You review the maintenance log and see that the device was patched during the last maintenance window.
+
+// Finally, you open a ticket and begin the process for rolling back the patch on the appliance. Once you have completed the rollback, you monitor the device for connection resets. After watching the appliance for 2 hours, not seeing any new connection resets, you close the incident and send a report to the maintenance team to investigate why the patch caused the issue.
+
+SECURITY
+For network security, VPC Flow Logs can help:
+
+Detect network intrusions by tracking the movement of a compromised host, monitoring for port scanning, tracking network enumeration attempts and data exfiltration.
+Monitor anomaly detection by using flow logs as a security tool to monitor the traffic that is reaching your instance, to profile your network traffic, and to look for abnormal traffic behaviors.
+Monitor remote logins by flagging ports (SSH and RDP) used for administrative activity that should only be accessible from trusted sources. You may also want to monitor the traffic on administrative web app ports.
+SECURITY SCENARIO:
+// Imagine you are contacted by your management regarding a request from the company's Information Security (InfoSec) group. A new application is being deployed and the data for this application will be hosted within a dedicated secure Amazon VPC. InfoSec is requesting that alerts be configured to notify two different teams if any connection attempts are made to the Amazon VPC using specific protocols or if coming from any subnet outside an approved Class-less Inter-Domain Routing (CIDR).
+
+// Configure your VPC Flow Logs for the Amazon VPC and create two CloudWatch Events. 
+
+// CloudWatch Event #1 will scan the VPC Flow Logs for the specific protocols InfoSec requested. If a positive match is found, the CloudWatch Event will generate an email and short message service (SMS) alert that will be sent to the two identified groups.
+// CloudWatch Event #2 creates a query that will generate an alert if the source IP for any flow log record does not match an IP from the approved CIDR range. When an alert is generated, emails will be sent to the two identified groups.
+
+COMPLIANCE
+For network compliance, VPC Flow Logs can help:
+
+Demonstrate that monitored network traffic complies with ingress and egress regulations.
+Show that access controls have been maintained and no unauthorized events have occurred.
+
+OVERALL SCENARIO:
+
+Efua follows the flow.
+Efua's company has redesigned their software as a service (SaaS) application hosted on AWS to be multi-regional. She has been tasked with configuring CloudWatch to monitor the network traffic for database replication between two AWS Regions, Ohio and Oregon, and to set alerts that can troubleshoot if replication halts.
+
+Let's explore how Efua can follow the flow of the traffic between these Regions.
+
+Metrics to monitor
+// The first step Efua needs to take is determining what information is relevant or useful for monitoring replication traffic and route table changes. AWS provides metrics for monitoring the replicating traffic and any changes to the route table. 
+
+// Examples of metrics to monitor for:
+
+// Replication traffic are NetworkIn, InboundPackets
+// Route table changes are ReplaceRoute, ReplaceRouteTableAssociation
+
+Add VPC Flow Logs
+// When the metrics have been chosen, Efua adds a VPC Flow Log at each subnet level to capture all traffic flowing between the VPC peering connection and to send the metadata to CloudWatch Logs.
+
+// She can then determine which replication server is the source database by checking the source and destination IP addresses in the VPC Flow Logs. This is also helpful to identify the traffic being rejected due to a network ACL or security group rule. 
+
+// This information is useful:
+
+// When you are troubleshooting replication that will not start or inconsistent replication that seems to lose connection frequently.
+// If the replication server cannot maintain the change rate, due to a network bottleneck, CPU utilization, or a disk I/O bottleneck, causing the replication lag to grow.
+
+Configure the CloudWatch Event
+// Using the chosen metrics to monitor, Efua configures a CloudWatch event that combines the flow log monitoring of the traffic between the two database servers and any changes to the route table that allows replication traffic.
+
+// This CloudWatch event will initiate a CloudWatch alarm from the monitored metrics and send an email notifying the networking team if the:
+
+// Traffic between the two databases drops to zero for more than 60 seconds.
+// Route table changes.
+
+Monitoring remediation
+// When the CloudWatch event is created, Efua can monitor the metrics using the namespace for the peering connection.
+
+// AWS/PCX
+// To further drill down or query the data monitored, she can use the dimension, peeringConnectionId, to get specific data points.
+
+Summary
+// This design helps to maintain operations and also remediate changes. If the route table changes or traffic between the two databases drops to zero for more than 60 seconds, the CloudWatch event initiates alarms and notifications to the networking team.
+==========================================================================
+
+"Anatomy of a flow log"
+
+You can view information about your flow logs in the Amazon EC2 and Amazon VPC consoles by viewing the Flow Logs tab for a specific resource. When you select the resource, all the flow logs for that resource are listed. The information displayed includes the:
+
+ID of the flow log.
+Flow log configuration.
+Information about the status of the flow log.
+By default, each flow log record:
+
+Captures a network internet protocol (IP) traffic flow that occurs within an aggregation interval, also referred to as a capture window.
+Is a string with fields separated by spaces and includes values for the different components of the IP flow, for example, the source, destination, and protocol.
+Uses the default format for the flow log record, or you can specify a custom format.
+
+"Flow log sessions"
+
+A flow log session is one complete information exchange between two systems. For example, a TCP session includes all packets in both directions from the initial SYN connection, which is the connection establishment to the final FIN/ACK, which is the connection teardown.
+
+In order to inspect flow logs, you must understand that the flow of a flow log is a subset of a session and describes the number of packets moving in one direction.
+
+
+13.10.03 2 123456789 eni-109d7682 73.45.160.75 172.34.9.226 24901 80 6 6 1450 123458651 123458657 ACCEPT OK
+AWSAccountNumberSource-NetworkInterface-SourceIP-DestIP-SourcePort-DestPort-6(TCP)-6(packets)-1450bytesin6Packets-Action(Accepted/Rejected/bySG/NACL)
+If a field is not applicable or could not be computed for a specific record, the record displays a '-' symbol for that entry. 
+----------------------------------------------------- - - - - - - - - -
+
+This flow log would be described as a single flow.
+EXAMPLE 1:
+For example, there are 6 packets moving from source port TCP/24901 on 73.45.160.75 to destination port TCP/80 on 172.34.9.226.
+13.10.03 2 123456789 eni-109d7682 73.45.160.75 172.34.9.226 24901 80 6 6 1450 123458651 123458657 ACCEPT OK
+
+EXAMPLE 2:
+in this row there are 5 packets moving from source port TCP/80 on 172.34.9.226 to destination port TCP/24901 on 73.45.160.75.
+13.10.03 2 123456789 eni-109d7682 172.34.9.226 73.45.160.75 80 24901 6 5 796 123458651 123458657 ACCEPT OK
+
+Combine the first two single flows (Examples 1 & 2) together and they describe a single session between the two systems.
+----------------------------------------------------- - - - - - - - - -
+
+
+ 13.10.03 2 123456789 eni-109d7682 172.34.9.226 73.45.160.75 80 24925 6 5 796 123458651 123458657 ACCEPT OK
+Inspect this third flow log carefully. Initially you may think that this third flow is also part of the session in example 3. 
+
+How do you inspect and analyze flow logs as a session and not a single flow? Note:
+
+The source and destination ports. 
+The packets. 
+In this third flow log, 5 packets are moving from source port TCP/80 to destination port TCP/24925. 
+
+Because at least one of the TCP ports being used has changed, this flow is part of a different session.
+----------------------------------------------------- - - - - - - - - -
+
+FLOW LOG LIMITATIONS:
+Flow logs can only be configured for "VPC peering connections" deployed by your account. VPC peering connections deployed by another account cannot be monitored using VPC flow logs even if they have been authorized to link to VPCs within your account.
+
+Network interfaces for EC2-Classic instances are not supported. This includes instances linked to your VPC through ClassicLink.
+
+Sent through an "intermediate device, such as a NAT gateway," will record the IP of the intermediate device in the srcaddr field. To ensure that the original source IP address of device that generated the packet is recorded, configure the flow log to use the pkt-srcaddr field.
+
+Received from an "intermediate device, such as a NAT gateway," will record the IP of the intermediate device in the dstaddr field. To ensure that the original destination IP address is recorded, configure the flow log to use the pkt-dstaddr field.
+
+Flow logs do not capture IP traffic to and from Amazon reserved IPs. This includes but is not limited to Amazon Domain Name Service (DNS), Amazon Windows license activation service, instance metadata, and Amazon Time Sync. The five IPv4 addresses reserved by Amazon for each subnet are also excluded from VPC flow logs.
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+VPC Traffic Mirroring
+
+Traffic mirroring is commonly used by network engineers and developers who need to monitor and analyze the network traffic, diagnose network problems, balance traffic loads, block unwanted traffic, and spot intrusions.
+
+Within a traditional on-premises network, packet inspection is accomplished through port mirroring on a physical switch or hub. 
+
+For example, configuring a Switched Port Analyzer (SPAN) or installing a test access point (TAP). As described within the AWS Shared Responsibility Model, AWS does not provide customers with direct access to any physical network components.
+
+Instead of duplicating packets on the switch or hub, AWS offers a feature called VPC Traffic Mirroring, which is similar in concept to traditional network port mirroring.
+
+VPC Traffic Mirroring:
+
+Copies each IP packet, sent or received, by an elastic network interface (ENI) on an Amazon EC2 instance to a traffic mirror target. A traffic mirror target is an out-of-band security appliance, monitoring appliance, or Network Load balancer.
+Captures and inspects network traffic at scale and provides data for troubleshooting and intrusion detection, along with other types of threat monitoring and content inspection. 
+Traffic mirror source
++
+Traffic mirror target
++
+Traffic mirror filter
++
+Traffic mirror session
++
+Connectivity
++
+How Traffic Mirroring works
+
+Traffic Mirroring copies inbound and outbound traffic from the network interfaces that are attached to your Amazon EC2 instances. You can send the mirrored traffic to the network interface of another EC2 instance, or a Network Load Balancer that has a User Datagram Protocol (UDP) listener. If the traffic mirror source and the traffic mirror target is owned by:
+
+The same AWS account, it can be in the same Amazon VPC or in a different Amazon VPC connected through an intra-Region VPC peering or a transit gateway.
+A different AWS account from the traffic mirror source, this is a cross-account traffic mirror target design. The traffic mirror target owner must share the target with you using the Amazon Resource Access Manager (Amazon RAM). 
+
+Traffic Mirroring uses
+
+Traffic Mirroring uses include:
+
+Performance Monitoring and network visibility to analyze specific traffic patterns to identify any vulnerable blind spots or choke points between application tiers or Amazon EC2 instances.
+
+Troubleshooting by extracting traffic of interest from any workload in an Amazon VPC and sending it to the right tools to detect and respond faster to attacks often missed by traditional log-centric tools. Analyzing the actual packets helps to perform a root-cause analysis on a performance issue and assist with diagnosis of network issues. This gives visibility beyond what is available through VPC Flow Logs. 
+
+Security Monitoring using packet inspection, signature analysis, anomaly detection, and machine learning based techniques provides further protection, threat prevention, and network forensics to your network traffic. For example, VPC Traffic Mirroring provides access to granular network traffic that detect attacks from insider threats, critical misconfigurations, and new types of ransomware.
+
+Better Response Time using the right tools to detect, extract, and respond to traffic of interest from any workload in an Amazon VPC that is often missed by traditional log-centric tools.
+
+
+
+Traffic Mirroring benefits
+
+Traffic Mirroring offers the following benefits:
+
+Simplified operation: Mirror any range of your VPC traffic without having to manage packet forwarding agents on your EC2 instances.
+Enhanced security: Capture packets at the elastic network interface, which cannot be disabled or tampered with from a user space.
+Increased monitoring options: Send your mirrored traffic to any security device.
+
+Scenario #1---------------------
+–
+Securing your AWS infrastructure
+As a network engineer, to add additional security to the network, you are tasked with the requirement of:
+
+// Deploying a virtual monitoring appliance to your AWS network.
+// Network security monitoring tools need access to your network traffic to secure your network and infrastructure. That access usually combines deep packet inspection (content inspection), signature analysis, anomaly detection, and machine learning based techniques to provide further protection.  
+
+// In AWS, you can use both VPC Traffic Mirroring to provide that granular access to your Amazon EC2 network traffic and a third-party network detection and response (NDR) solution. This combination design uses non-signature-based advanced analytical techniques such as machine learning to detect suspicious network activity. 
+
+// Using CloudWatch alarms, it can be configured to notify and respond to anomalous or malicious traffic and threats that other security tools miss.
+
+Scenario #2-------------------
+–
+On-demand traffic inspection
+As a network engineer, to add additional security to the network, you are tasked with the requirement of:
+
+// Configuring a low-cost test environment to troubleshoot, diagnose, analyze, and determine the root cause of suspected malicious traffic.
+// To implement this new requirement in your network design, first you configure a CloudWatch alert that initiates a Lambda function to set up a virtual monitoring appliance and create a VPC Traffic Mirroring session. 
+
+// This session mirrors traffic from the suspected source of the problem to the monitoring appliance in real time. This helps to diagnose, troubleshoot, and analyze root cause.   
+
+// When the diagnosis is complete, the Lambda function deletes the mirroring session and target instance. Because the session only lasts for a small amount of time in the test environment, you only pay for the resources as they are being used.
+
+TOTAL SCENARIO:-------------------
+// Nikki was asked by the DevOps team to implement a monitoring solution for a new version of their application. Not only can you split traffic for deploying a new version of applications with blue/green deployments, you can also use traffic mirroring to monitor and replay production traffic in a test environment. This design ensures no impact to the end user’s experience and provides the ability to monitor and test the new application version with real production traffic. 
+
+// Let's walk through how Nikki uses VPC Traffic Mirroring to monitor the new version of the application.'
+
+VPC DESIGN:
+// Nikki uses her current account and network design to determine how to incorporate the new requirements from the DevOps team.
+
+// The current environment has a:
+
+// VPC configured and launched.
+// Production environment.
+// Test environment.
+// Once the environment is confirmed, Nikki can configure the traffic mirroring session.
+
+TRAFFIC MIRROR SOURCE:
+// Nikki chooses the sources of the VPC traffic mirroring as the elastic network interfaces (ENIs) of the Amazon Elastic Compute Cloud (EC2) instances in the production environment.
+
+TRAFFIC MIRROR TARGET:
+// Nikki chooses the targets of the VPC traffic mirroring as the elastic network interfaces (ENIs) of the Amazon EC2 instances in the test environment.
+
+TESTING THE MIRRORING:
+// Nikki mirrors the traffic and verifies that HTTP requests sent to the production environment are automatically replicated to the test environment. This design for monitoring and mirroring HTTP requests replicates traffic out-of-band with no performance impact. 
+
+// Using the CloudWatch dashboard, Nikki can visualize the CloudWatch metric NetworkIn of the production and test instances in a metric graph.
+
+// Using VPC Flow Logs for the subnet hosting the test servers, Nikki can provide the development team with network performance trends that the development team can align with the test servers performance to ensure that the application they are testing performs as they have intended under real-world loads.
+-------------------------------------------------------------------------
+Traffic Mirroring and VPC Flow Logs
+
+VPC Traffic Mirroring and VPC Flow Logs can be used together for a deeper understanding of your Amazon VPC traffic. 
+
+VPC Flow Logs are easier to implement and use, but they provide little context. VPC Flow Logs help to troubleshoot connectivity and security issues, and collects, stores, and analyzes network flow logs about the following:
+
+Allowed and denied traffic
+
+Source and destination IP addresses
+
+Ports
+
+Protocol number
+
+Packet and byte counts
+
+Action taken (accept or reject)
+
+Traffic Mirroring provides deeper insight and gives more context into the network traffic to analyze actual traffic content, including payload. All traffic is combined into log files and shows pivot points, which are a technical analysis indicator used to determine the overall trend, such as certificate hashes, protocol version, and authentication status. 
+
+For example, if you connect by using SSH into the traffic mirroring target EC2 instance using VPC Flow Logs, you get no actual insight into what is happening. The log will show a TCP-based connection using port 22 and that the SSH session corresponds to flow entries. However, using both VPC Traffic Mirroring and VPC Flow Logs, you can track a full session of your network traffic, compare ports and TCP flags, which provides metadata about the actual traffic as well as combining them into useful logs to search.
+-------------------------------------------------------------------------
+"Open-Source Tools and Traffic Mirroring"
+1) Monitor network traffic from Amazon EC2 instances. 
+
+The following tools work with VPC Traffic Mirroring:
+
+Zeek — Zeek Network Security Monitor is a comprehensive open-source platform for intrusion detection and other security monitoring features, as well as network traffic analysis. 
+Suricata — Suricata, an open-source network threat detection engine, enables real-time intrusion detection and prevention and network security monitoring, driven by the Open Information Security Foundation. 
+
+2)  Analyze traffic in real time for both troubleshooting and security. There are numerous paid solutions to integrate into your cloud infrastructure on AWS but also open-source tools. The following tools help test, detect, and decrypt network traffic.
+
+IPERF3
+
+iPerf3 can be used for testing bandwidth and jitter for TCP and UDP traffic. iPerf3 can generate traffic using TCP and UDP traffic to perform the following tests:
+
+Latency (response time or RTT): Can be measured with the Ping utility.
+Jitter: Can be measured with an iPerf3 UDP test.
+Datagram loss: Can be measured with an Iperf UDP test.
+Bandwidth tests are done using the iPerf TCP tests.
+iPerf3 uses the unique characteristics of TCP and UDP to provide statistics about network links. (TCP checks that the packets are correct sent to the receiver. UDP is sent without any checks.)
+
+
+WIRESHARK
+Wireshark is an incredibly useful tool for detecting and decrypting network traffic. It will capture all broadcast, multicast, and unicast messages that are received. 
+To use this to detect all network traffic to your controllers, install Wireshark and configure your traffic mirroring. With Wireshark installed, traffic is captured and analyzed to extract insights from the network traffic.
+***************************************************************************
+AWS REACHABILITY ANALYZER:
+
+Module 4: Network Mapping
+In this module, you explore the following concepts and learn about their benefits:
+What is the VPC Reachability Analyzer
+Demo - VPC Reachability Analyzer
+What is the AWS Transit Gateway Network Manager
+Demo - AWS Transit Gateway Network Manager
+
+AWS offers the VPC Reachability Analyzer, which can be integrated into your network design process. It aids in troubleshooting network issues by verifying connectivity using automated reasoning. All resource configurations (security groups, routes, firewalls, and so on) that can affect the connectivity of your network are inspected to determine if the network flow is possible. 
+
+It can only be used for endpoints within the same Amazon VPC as a:
+
+Configuration analysis tool that helps to perform connectivity testing between a source resource and a destination resource. 
+Network diagnostics tool that troubleshoots reachability between two endpoints.
+There is a large array of available connection types and endpoints to test, it is not limited to Amazon EC2 instances. You can run a reachability analysis between:
+
+VPN gateways
+Network interfaces
+Internet gateways
+VPC endpoints
+VPC peering connections
+Transit gateways
+VPC Reachability Analyzer analyzes all possible paths through your network without having to send any traffic on the wire. It looks at the configuration of all resources in your Amazon VPCs to determine what network flows are feasible. 
+
+STEPS:
+Create a path.11111111111111111111111111111111111111111111111111111111111
+The source and destination resources must be:
+
+Owned by the same AWS account.
+In the same AWS Region.
+In the same Amazon VPC or in Amazon VPCs that are connected through a VPC peering connection. In the case of a shared Amazon VPC, the resources must be owned by the same AWS account.
+
+Analyze the path.222222222222222222222222222222222222222222222222222222222
+AWS R A - would:
+
+Check if there is a ENI attached to that instance and check the outbound traffic on the security group. 
+Begin the journey to the other instance by checking its security group for inbound rules that apply at the elastic network interface.
+Arrive at the destination instance, instance B.
+
+
+View the results of the path analysis .333333333333333333333333333333333333
+
+Reachable, the Reachability Analyzer produces hop-by-hop details of the virtual network path between the source and the destination. 
+
+Not Reachable, the Reachability Analyzer identifies the blocking component. Paths can be blocked by configuration issues in a security group, network ACL, route table, or load balancer. 
+
+If a destination is not reachable, Reachability Analyzer provides one or more explanation codes to help you diagnose and address network misconfiguration. For example:
+ENI_SG_RULES_MISMATCH means the security group has no inbound or outbound rules that apply.
+TGW_ROUTE_AZ_RESTRICTION means the transit gateway is not registered in the Availability Zone where the traffic originates.
+
+
+Change the network configuration and analyze the path .44444444444444444444
+
+If the reachability status does not match your intent, you can change your network configuration. Then you can analyze the path again to confirm that the reachability status matches your intent.
+
+For example, you could specify:
+
+----Internet gateway as the source.
+----Amazon EC2 instance as the destination.
+----Port 22 as the destination port
+----TCP as the protocol. 
+
+This would help to verify that you can connect to the EC2 instance through the internet gateway using Secure Shell (SSH).
+
+If there are multiple reachable paths between a source and a destination, Reachability Analyzer identifies and displays the shortest path. You can analyze the path again, specifying an intermediate component, to find an alternative reachable path that traverses the intermediate component.
+-----------------------------------------------------------------------
+In order to provide inter-VPC communication, you need update your design and configurations and use the Appliance Mode feature of the transit gateway.
+
+Using VPC Reachability Analyzer, you can verify connectivity between the two endpoints, but also diagnose any blocked paths with the application updates or updated configurations.
+
+
+
+To resolve automatically, you can configure VPC Reachability Analyzer with CloudWatch to alert on connectivity issues and possibly automatically remediate using AWS Lambda.
+
+BE PROACTIVE:
+Verify network reachability and connectivity between VPC elements in an Amazon VPC or multiple Amazon VPCs after an infrastructure change is made
+Alert administrators in the event reachability has been affected, to mitigate problems before major outages occur
+
+
+PRICING:
+With VPC Reachability Analyzer, you are charged per analysis run between a source and a destination. It is best practice to run analysis during networking configuration changes and to troubleshoot connectivity issues that arise. Optionally, you can tag your analysis to keep track of the cost. 
+***************************************************************************
+
+AWS TRANSIT GATEWAY NETWORK MANAGER:
+Imagine your organization network design is growing and becoming increasingly complex to manage and monitor a global network that is spread across AWS Regions and on-premises sites. This hybrid design can result in an incompatible configuration for monitoring, and troubleshooting. It can also have increased costs and lack visibility of the whole network. 
+
+To monitor your entire global network, you must stitch together data from the entire network along with a design to optimize, monitor, and troubleshoot.
+
+
+
+
+AWS Transit Gateway Network Manager helps to centrally manage your networks that are built around transit gateways.
+
+STEPS:
+
+11111111111111111111111
+Create a global network
+Create a global network to represent your network. Your global network will initially be empty. It should be a single, private network that acts as the high-level container for your network objects. 
+
+
+222222222222222222222222222222
+Register your transit gateways
+You can register transit gateways that are in the same AWS account as your global network. When you register a transit gateway, the following transit gateway attachments are automatically included in your global network:
+
+VPCs
+Site-to-Site VPN connections
+AWS Direct Connect gateways
+Transit Gateway Connect
+Transit gateway peering connections
+    When you register a transit gateway that has a peering attachment, you can view the peer transit gateway in your global network, but you cannot view its attachments. If you own the peer transit gateway, you can register it in your global network to view its attachments.
+
+33333333333333333333333
+Define and add resources
+Define and add devices, links, and sites for your on-premises resources to your global network. 
+
+A device represents the physical or virtual appliance that establishes connectivity with a transit gateway over an IPsec tunnel. A device can have a more specific location than the site, for example, a building in a campus or a floor in a building. When you create a device, you can specify its physical location, and the site where it's located. 
+
+A site represents the physical location of your branch, office, store, campus, or data center. When you add a site, you can specify the location information, including the physical address and coordinates. This helps you to visualize and monitor your AWS resources and your on-premises networks.
+
+A link represents a single outbound internet connection used by a device, for example, a 20-Mbps broadband link. When you create a link, you create it for a specific site. You can then associate a device with a link.
+If you use a SD-WAN solutions, network manager can automatically create AWS Site-to-Site VPN connections and upload the branch device information.'
+
+
+44444444444444444444
+Analyze your network
+Diagnosing problems in your network traffic or fixing routing issues between your transit gateways can be complex. The Route Analyzer feature of Network Manager is designed to diagnose and resolve network disruptions quickly. With Route Analyzer, you are able to validate new and existing routes within your AWS Transit Gateway route table. This helps reduce the amount of work needed to diagnose route issues or missing routes between transit gateways. It does this by providing a visual layout of your network traffic between AWS Transit Gateway VPCs.
+
+Whether you have multiple peered transit gateways, on premises VPN connections, or AWS Direct Connect, Route Analyzer can be used to resolve network connectivity issues. 
+
+555555555555555555555
+Monitor your networks
+Monitor and visualize your networks through a dashboard on the Network Manager console. You can view network activity and health using CloudWatch metrics and CloudWatch Events. 
+
+The Network Manager console can help you identify whether issues in your network are caused by AWS resources, your on-premises resources, or the connections between them.
+
+You can use the following features to monitor your transit gateways, analyze traffic patterns, and troubleshoot issues with your transit gateways.
+
+CloudWatch metrics retrieve statistics about data points for your transit gateways as an ordered set of time series data, known as metrics. You can use these metrics to verify that your system is performing as expected. 
+
+VPC Flow Logs capture detailed information about the traffic going to and from the VPCs that are attached to your transit gateways. 
+
+AWS CloudTrail logs capture detailed information about calls made to the transit gateway API. It also can store them as log files in Amazon S3. You can use CloudTrail logs to determine which calls were made, source IP address where the call came from, and who made the call. For more information, review Logging API calls for your transit gateway using AWS CloudTrail.
+
+Summary
+Transit Gateway Network Manager adds simplified visibility and network control to monitor your Amazon VPCs and edge connections from a central console.
+
+Create a global network
+Register your transit gateways
+Define and add resources
+Analyze your network
+Monitor your network
+--------------------------------------------------------------------------
+The Network Manager console provides a dashboard that helps you visualize and monitor your global network.
+You can review utilization metrics, such as:
+
+Bytes in/out
+Packets in/out
+Packets dropped
+Alerts for changes
+
+Alert changes can include the topology, routing, and up/down connection status, and more easily support you in managing your entire global network.
+---------------------------------------------------------------------------
+Network Manager USE CASES:
+
+Simplify network operations and administration and provides a centralized and consistent user experience. Global networks' configurations and performance data can be monitored, summarized, and viewed with a single interface from all AWS Transit Gateways, their attachments, other Amazon VPCs, and on-premises locations.
+
+Monitor the performance and availability of their transit gateways and attachments to help build out and manage global enterprise-grade networks.
+Decrease the time and resources required to deploy and manage a global network architecture with less complexity, decreasing both network infrastructure and operational costs.
+
+Quickly add on-premises locations of your Network Manager's SD-WAN partners to your network. Automatically provision AWS Site-to-Site VPN connections on your SD-WAN devices and connect new network locations remotely from your SD-WAN console and the AWS global network.
+
+Respond to connectivity problems with event notifications from a single interfaAce to get a global view of what is happening on your network. You can identify and troubleshoot network problems faster than if you received the information from different tools.
+
+Identify global network issues to visualize network activity from many locations on one single dashboard. You can compare activity and identify inconsistencies between on-premises locations and AWS, or issues that affect several locations differently. View components of the global networks through different visualizations (lists, logical diagrams, or geographic maps) and alert administrators of unhealthy connections and changes in availability and performance across AWS Regions and on-premises sites.
+
+--------------------------------------------------------------------------
+SD-WAN connecting to AWS
+–
+Software-defined wide area networks (SD-WANs) have been used for years to connect offices to data centers. This design takes additional configurations, manual provisioning, and so on. In AWS, you can extend this SD-WAN design and integrate it with your Amazon VPC using AWS Transit Gateway and Network Manager. This design not only increases the total bandwidth, but also supports Border Gateway Protocol (BGP), Generic Routing Encapsulation (GRE), performance metrics, telemetry data, and adds advanced visibility through the network topology.
+
+In the diagram, your on-premises network consists of two sites. The Virgina site has two devices and the Georgia site has one device. Your AWS network consists of two transit gateways associated with customer gateways (Site-to-Site VPN attachments) on both transit gateways.
+
+Your on-premises network is managed using SD-WAN. The SD-WAN controller creates Site-to-Site VPN connections to the transit gateways, and creates the device, site, and link resources in Network Manager. This automates connectivity and provides a full view of your network in Network Manager. 
+
+The SD-WAN controller can also use Network Manager events and metrics to enhance its dashboard. 
+===========================================================================
+Which activities are best practices for monitoring alerts? (Select TWO.)
+
+Announce not only when a problem has occurred (or a threshold is being approached), but also whenever a new application or piece of equipment is brought online. 
+Contain information about the device, the issue, and the event that initiated the notification.
+
+
+
+
+
+
+
+=========================================================================
+What is VPC Flow Log?
+
+"A service that captures information about traffic traversing your network.
+"
+A service that captures and analyzes traffic traversing your network.
+
+A service that can only be used at the top level of your Amazon VPC to capture information about traffic traversing your network.
+
+A third-party tool to monitor your internet protocol (IP) traffic in your on-premises and AWS network.
+
+
+
+
+What traffic can you filter with VPC Flow Logs? (Select TWO.)
+"
+Accepted
+"
+"
+Rejected
+"
+
+SSH
+TCP
+HTTPS
+
+
+
+What are available fields in VPC Flow Logs? (Select TWO.)
+
+"Source address"
+
+
+"Protocol"
+
+Rejected
+
+Accepted
+
+All traffic
+
+
+
+What are two reasons to send VPC Flow Logs to Amazon Simple Storage Service (Amazon S3)?
+
+"To analyze them using their own tooling or use Amazon Athena to correlate those logs with other data elsewhere."
+
+Correctly checked
+To analyze them using their own tooling or use Amazon Macie to correlate those logs with other data elsewhere.
+
+Correctly unchecked
+To use the flow logs and AWS Lambda to alert and remediate your environment.
+
+Correctly unchecked
+"For cost optimization and archival storage."
+==============================================================
+When you register a transit gateway with AWS Tranist Gateway Network Manager, what gateway attachments are automatically included in your global network configuration? (Select TWO.)
+
+"Site-to-Site VPN connections"
+
+Correctly checked
+"AWS Direct Connect Gateways"
+
+Correctly checked
+Amazon EC2 instances
+
+Correctly unchecked
+VPC Flow Logs
+
+Correctly unchecked
+VPC peering connections
+
+
+
+===========================================
+A life-cycle network design defines the network, removes assumptions, and helps to create a baseline.  The network design process follows these steps:
+
+Identify initial and new requirements.
+Compare the current network to the requirements.
+Design the network, add in hardware, software, configurations at a high level, then in detail.
+Deploy the network.
+Monitor, review, and improve.
+
+
+===========================================
+What is the retention period for Amazon CloudWatch metrics ?
+
+"Data points with a 1-minute period are available for 15 days.
+"
+Incorrectly unselected
+Data points with a 1-minute period are available for 30 days.
+
+Correctly unselected
+Data points with a 1-hour period are available for 2 years.
+
+Correctly unselected
+Data points with a 5-minute period are available for 1 year.
+===============================================
+
+
+The following traffic types cannot be mirrored:
+
+ARP
+DHCP
+Instance metadata service
+NTP
+Windows activation
+
+
+-============================================
+Which AWS service identifies the blocking component in your network? For example, paths can be blocked by configuration issues in a security group, network ACL, route table, or load balancer.
+
+Network Manager
+
+Correctly unselected
+Traffic Mirroring
+
+Correctly unselected
+"VPC Reachability Analyzer"
+
+Incorrectly unselected
+VPC Flow Logs
+
+Incorrectly selected
+AWS CloudTrail
+
+
+===============================================
+You are architecting your network to ensure all requirements for PCI compliance are met. To configure this design, you need to monitor:
+
+Application logs to identify any malicious activity.
+Access attempts from unapproved sources.
+Which AWS services do you choose to integrate into your network design?
+
+"Amazon CloudWatch Logs and VPC Flow Logs"
+
+Correctly selected
+AWS CloudTrail and VPC Flow Logs
+
+Correctly unselected
+AWS CloudTrail and AWS Config
+
+Correctly unselected
+AWS CloudTrail and CloudWatch Logs
+
+==================================================
+What AWS service can you use to monitor EC2 network traffic in your AWS environment for both active and passive attacks?
+
+VPC Flow Logs
+
+Incorrectly selected
+"VPC Traffic Mirroring"
+
+Incorrectly unselected
+VPC Reachability Analyzer
+
+Correctly unselected
+Amazon CloudWatch
+
+Correctly unselected
+SUBMIT
+Incorrect
+
+
+VPC Traffic Mirroring duplicates inbound and outbound traffic for Amazon EC2 instances within an Amazon VPC without the need to install anything on the instances themselves.  You are able to send the duplicated traffic to the destination of your choice for analysis. 
+
+
+
+VPC Traffic Mirroring collects the full packet, allowing payload analysis, while other tools collect information of protocol, source, and destination. This lets you analyze for both active and passive attacks.
+
+===========================================================
+Imagine in your production environment you are using the VPC Reachability Analyzer to validate a change made to your AWS network. What can you do if the VPC Reachability Analyzer returns a status that does not match the intent of your change?
+
+"Update your network configuration, and analyze the path again to confirm the reachability status matches your intent.
+"
+Correctly selected
+Run the analysis in a test environment and updated the network configuration.
+
+Correctly unselected
+Analyze the path again to confirm that the reachability status matches your intent.
+
+Correctly unselected
+Update the network configuration and run the analysis in a test again in a test environment.

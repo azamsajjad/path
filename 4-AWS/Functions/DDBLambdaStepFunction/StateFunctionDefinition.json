@@ -1,0 +1,92 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Add Entry to CustomerOderTable",
+  "States": {
+    "Add Entry to CustomerOderTable": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "CustomerOrdersTable",
+        "Item": {
+          "customerId": {
+            "S.$": "$.customerId"
+          },
+          "orderId": {
+            "S.$": "$.orderId"
+          }
+        }
+      },
+      "ResultSelector": {
+        "statusCode.$": "$.SdkHttpMetadata.HttpStatusCode"
+      },
+      "ResultPath": "$.result",
+      "Next": "Choice"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.result.statusCode",
+          "NumericEquals": 200,
+          "Next": "Call Credit Card Service To Charge Customer"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Call Credit Card Service To Charge Customer": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:us-east-1:767665886117:function:DummyFunctionToReturnStatusCodeToStateMachine:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "DynamoDB Delete the Entry",
+          "ResultPath": "$.result"
+        }
+      ],
+      "Next": "Success",
+      "ResultPath": "$.result"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "DynamoDB Delete the Entry": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:deleteItem",
+      "Parameters": {
+        "TableName": "CustomerOrdersTable",
+        "Key": {
+          "customerId": {
+            "S.$": "$.customerId"
+          },
+          "orderId": {
+            "S.$": "$.orderId"
+          }
+        }
+      },
+      "Next": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}

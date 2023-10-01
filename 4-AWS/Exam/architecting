@@ -1,0 +1,1257 @@
+Question Category	Total questions	Total score
+AWS Technical Essentials	5	80 %
+Introduction to AWS Identity and Access Management (IAM)	1	100 %
+Getting Started with AWS Security, Identity, and Compliance	1	100 %
+AWS Compute Services Overview	1	100 %
+Core AWS Storage Services	1	0 %
+Getting Started with Amazon Simple Storage Service	3	100 %
+Amazon Elastic Block Store (Amazon EBS) Primer	2	50 %
+AWS Database Offerings	3	55.27 %
+Troubleshooting: Amazon DynamoDB	1	100 %
+Amazon RDS Service Primer	2	100 %
+AWS Networking Basics	2	50 %
+Amazon Route 53 - Amazon Route 53 - Basics	2	50 %
+Subnets, Gateways, and Route Tables Explained	1	100 %
+Securing and Protecting Your Data in Amazon Simple Storage Service	3	33.33 %
+Configuring and Deploying VPCs with Multiple Subnets	1	100 %
+Introduction to Amazon API Gateway	1	100 %
+AWS Network Connectivity Options	1	100 %
+Understanding AWS Networking Gateways	1	100 %
+AWS Network – Monitoring and Troubleshooting	2	100 %
+Getting Started with AWS CloudFormation	1	100 %
+AWS Well-Architected	1	100 %
+AWS Lambda Foundations	1	100 %
+Architecting Serverless Applications	1	67.09 %
+Scaling Serverless Architectures	1	100 %
+Introduction to Database Migration	1	49.37 %
+AWS Foundations: Cost Management	1	100 %
+Amazon Simple Storage Service (Amazon S3) Cost Optimization	1	100 %
+Deep Dive: Amazon Elastic Block Store (Amazon EBS) Cost Optimization	1	100 %
+AWS Storage Gateway Deep Dive: Amazon S3 File Gateway	1	100 %
+Introduction to Step Functions	1	100 %
+Migration Evaluator Overview for Customers	1	34.18 %
+AWS Backup Primer	1	49.37 %
+AWS Systems Manager	1	100 %
+Deep Dive with Security: AWS Identity and Access Management (IAM)	1	49.37 %
+Differences Between Security Groups and NACLs	1	100 %
+
+
+---------------------------------------------------------------------------
+1
+A company uses Amazon API Gateway, AWS Lambda, and Amazon RDS for their multi-tier application. During testing, it was observed that the API Gateway requests are taking longer time to complete. They want to investigate the slow response time of API Gateway calls.
+
+What is the MOST operationally efficient way for the company to determine the cause of slow response time from API Gateway?
+
+
+Use Amazon CloudWatch
+
+Use AWS CloudTrail
+
+`````Use AWS X-Ray
+
+Use VPC Flow Logs
+---------------------------------------------------------------------------
+2
+As the AWS solutions architect, you need to explore whether Amazon ECS is the right choice to build sophisticated application architectures on a microservices model.
+
+Which of the following is true for Amazon ECS? (Select THREE)
+
+````Amazon ECS has built-in security; all of the images are stored in a container registry that is only accessible through HTTPS.
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Amazon ECS manages your cluster resources for all launch types.
+WHY: When using the EC2 launch type, you manage your cluster resources.
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Easier to manage since your entire application need to be on a single task definition.
+````A cluster may contain a mix of tasks hosted on AWS Fargate, Amazon EC2 instances, or external instances.
+Amazon ECS supports multi-cloud integration.Amazon ECS provides service discovery for a microservice architecture.
+---------------------------------------------------------------------------
+3
+A customer has a Linux based application which currently requires access to a shared storage solution for the application to work properly in a cluster. The application has been deployed in Placement Group due to the required node to node transaction throughputs. The application is latency sensitive.
+
+As a solutions architect which storage option would you choose to satisfy the latency requirement?
+
+
+Amazon EBS Multi-attached
+
+````Amazon EFS
+
+Amazon S3
+
+Amazon Glacier
+---------------------------------------------------------------------------
+4
+
+You have created an Amazon RDS instance.
+
+How can you retrieve an endpoint of the newly created instance? (Select TWO)
+
+```AWS Management Console
+```AWS CLI
+Log into Amazon RDS instance.
+Amazon RDS Parameter groups.
+You must create a AWS Lambda function to retrieve the database instance end point.
+---------------------------------------------------------------------------
+5
+A company runs a batch application in the AWS Cloud hosted on 200+ Amazon EC2 instances. As a solutions architect, you are asked to push debug logs to an Amazon S3 bucket every 2:00 AM for all the EC2 instances.
+
+What is the best possible solution from an operation point of view?
+
+
+`````Create a schedule in AWS Systems Manager Maintenance window to move the logs to S3 bucket every 2:00 AM in the morning.
+
+Use SSM Session Manager to run a shell script on all Amazon EC2 instances 2:00 AM in the morning.
+
+Use Systems Manager Distributor to transfer the logs every 2:00 AM on all the AWS Systems Manager Managed instances.
+
+Inject a user script via Ops Work to all of the Amazon EC2 instances that will push the logs to this Amazon S3 bucket.
+---------------------------------------------------------------------------
+6
+You are in charge of securely managing Amazon S3 buckets on AWS. One bucket currently receives requests to read or write over the public internet. A potential risk exists where person in the middle attacks or eavesdropping attempts may occur.
+
+Which of the following options below would address this risk regardless of where the request comes from?
+
+
+`````Create a bucket policy for the designated bucket and create a condition using as:SecureTransport to only allow encrypted connections over HTTPS.
+
+Create a SCP policy for the organization with a condition using as:SecureTransport to only allow encrypted connections over HTTPS.
+
+Create a SCP policy for the organization with a condition to only write to the bucket if the data is encrypted.
+
+Create an IAM User policy with a condition that will only allow users to upload or read from the designated bucket if as:SecureTransport is True.
+---------------------------------------------------------------------------
+7
+You have a large customer base spread across three geographic areasthe US East Coast, India and Western Europe. The high performance web application serving customers in three regions requires data with minimum latency and no downtime.
+
+What would be the best way to fulfil this requirement?
+
+
+Aurora DB with multi AZ enabled.
+
+Amazon RDS with cross region replication.
+
+Amazon DynamoDB with provisioned capacity mode.
+
+````Use Amazon DynamoDB Global Tables.
+---------------------------------------------------------------------------
+8
+An application transforms large images to thumbnails stored on Amazon S3. Thumbnails need to be available to download for 30 days. Thumbnails can be easily recreated using original images. Original images need to be immediately available for 30 days and accessible within 4 hrs. for another 60 days.
+
+What is the most cost effective storage option for original images and converted thumbnails? (Select TWO)
+
+```Store Original images in STANDARD_IA for 30 days and transition to DEEP_ARCHIVE for 60 days, then expire the data.
+Store the original images in STANDARD for 30 days, transition to GLACIER for 60 days, then delete the data.
+Store thumbnails in STANDARD for 30 days then move to DEEP_ARCHIVE.
+Store original images in INTELLIGENT Tier.
+```Store thumbnails in ONEZONE_IA for 30 days then delete the data.
+---------------------------------------------------------------------------
+9
+Your team has an application that they would like to move to the cloud. The application and its logic are complex. It processes the departments accounting information and adjusts calculations in a stateful manner. As such, it needs to run for a large amount of compute time. The application runs long during the second and fourth week of the month to process additional payments. Because it is calculating many payments and makes requests to multiple external systems, it utilizes complex networking and needs access to the underlying files in the operating system to run.
+
+Which compute option is best for this workload?
+
+
+Rewrite the application to put part of the calculations into containers on an EKS cluster with AWS Fargate for the main application and scheduling
+
+Rewrite the application into a Lambda serverless application. Lambda will automatically scale based on need for the second and fourth week of the month.
+
+Put the application into a container. Containers are optimized for complex networking, and long compute times make sense for container workloads
+
+````Host the application on Amazon EC2 instances. Enable autoscaling for the EC2 instances when needed for the second and fourth week of the month.
+---------------------------------------------------------------------------
+10
+A customer has two AWS accounts. One of them is a devtest account used by their development and QA teams and the other one is a production account where currently all their production workloads are running. The customer has several Amazon VPCs in both the accounts. The customer is using Amazon Route 53 as DNS service in both of their AWS accounts and planning to have Private Hosted Zones created. The customer is looking for a solution with which they could have ease of management and efforts for the Private Hosted Zones.
+
+Which of the following options has the least administrative efforts and ease of management for the customer to associate VPCs and Private Hosted Zones with Route 53 service?
+
+
+Create Private Hosted Zones in both the AWS accounts separately and associate their respective Amazon VPCs with their corresponding Private Hosted Zones.
+
+`````Associate VPCs belonging to different accounts with a single hosted zone.
+
+Customer could write a script for the Amazon VPCs in one account to be associated with the Private Hosted Zone of the other AWS Account and host that script on AWS Lambda which can perform the job for the customer.
+
+Amazon VPCs from the different AWS account are associated by default with the Private Hosted Zone in the other account as both accounts belongs to the same customer.
+---------------------------------------------------------------------------
+11
+You are a cloud security engineer and have been tasked with ensuring that confidential data is not accessible publicly. To ensure compliance with this mandate, you are interested in turning on Amazon S3 Block Public Access (BPA) feature.
+
+Which of the following is not a valid option under BPA settings?
+
+
+```Block all public access.
+
+Block all access point policies.
+
+Block public and cross-account access to buckets and objects through any public bucket or access point policies.
+
+Block Public Access granted through new ACLs.
+---------------------------------------------------------------------------
+12
+Which of the following are benefits of integrating AWS Firewall Manager withAWS Organizations ? (Select TWO)
+
+You can centrally manage Amazon S3 Lifecycle configuration on a bucket.```Firewall Manager monitors for new resources created to ensure they comply with a mandatory set of security policies.
+````You can enable AWS WAF rules, AWS Shield Advanced protections, Amazon VPC security groups and AWS Network Firewalls.
+You can configure Amazon RDS database engines and Database parameters.
+---------------------------------------------------------------------------
+13
+A solutions architect has to design an Amazon VPC with a private dual-stack subnet, running both IPv4 and IPv6 addresses, and it requires connectivity to the internet.
+
+Which gateways can be used for both types of addresses to achieve this connectivity? (Select TWO)
+
+```NAT Gateway for IPv4 addresses
+```Egress Only Gateway for IPv6 addresses
+NAT Gateway for IPv6 addresses
+Transit Gateway for both IPv4 and IPv6 addresses
+Egress Only Gateway for IPv4 addresses
+
+---------------------------------------------------------------------------
+14
+A company is working on a new product launch. Both production and test environments are using similar Amazon EC2 instances with attached Amazon EBS volumes. The Billing team will need a solution to monitor the costs of both environments to identify any unexpected charges.
+
+What should a solutions architect implement to ensure that the Billing team can identify the charges for each environment? (Select TWO)
+
+Budgets
+Savings Plans
+AWS Trusted Advisor
+Cost Explorer
+```Cost Allocation Tag
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+To ensure that the Billing team can identify the charges for each environment (production and test), the solutions architect should implement the following:
+
+Cost Allocation Tag:
+
+Cost allocation tags are key-value pairs that you can assign to your AWS resources. They help you categorize and track your AWS costs. By tagging resources with specific environment identifiers (e.g., "Environment:Production" and "Environment:Test"), the Billing team can use these tags to differentiate costs between the two environments.
+AWS Trusted Advisor:
+
+AWS Trusted Advisor is a service that provides recommendations to help you follow best practices for your AWS resources. It includes cost optimization recommendations, which can help identify cost-saving opportunities and potential unexpected charges. While it won't provide detailed breakdowns by environment, it can give high-level guidance on cost optimization.
+While the other options are valuable for cost monitoring and control'
+---------------------------------------------------------------------------
+15
+Which open source databases are compatible with Amazon Aurora? (Select TWO)
+
+SQL Server
+MariaDB
+Redis
+```MySQL
+```PostgreSQL
+
+
+
+AND 
+
+
+
+A company is using SQL to query their self hosted PostgreSQL server. The IT architect wants to migrate their database to AWS purpose built databases and use a serverless database as their workloads are very unpredictable.
+
+Which service will meet their needs?
+
+````````Amazon Aurora
+Amazon RDS
+Amazon ElastiCache
+DynamoDB
+Comments: DynamoDB is a NoSQL database.
+---------------------------------------------------------------------------
+16
+A multi-national company has services across the globe which has a web application as its customer-facing frontend. One of the features of the app is to allow users to be able to upload huge amounts of files. As part of their architecture, they use a single bucket in the us-east-1 region and all the data from users is uploaded to this bucket. Now, as the demand for applications has grown, more and more users are using the application, which has led to an increase in file uploads. Because the users are across the globe, the upload takes time when the users are geographically far from the us-east-1region, which leads to a degraded user experience. You need to improve the upload experience without making major code level changes.
+
+Which is the best service that you could use to achieve this requirement?
+
+
+Amazon Partner Network
+
+````Amazon S3 Transfer Acceleration
+
+AWS Transfer Family
+
+AWS DataSync
+
+Amazon S3 Transfer Acceleration
+
+Amazon S3 Transfer Acceleration is a service that utilizes Amazon CloudFront's globally distributed edge locations to accelerate uploads to an S3 bucket. It optimizes the transfer of data over the public internet, reducing the time taken to upload files from different regions around the world.'
+---------------------------------------------------------------------------
+17
+The IT Director of a company wants to set automated backup of all the Amazon Elastic Block Storage (EBS) volumes for Amazon EC2 instances as soon as possible.
+
+What is the fastest and most cost-effective solution to automatically back up all of your EBS Volumes?
+
+
+Create a lambda function that calls the "create-snapshot" command via the AWS SDK to take a snapshot of production EBS volumes periodically.
+
+Set Amazon Storage Gateway with EBS volumes as the data source and store the backups in your on-premises servers through the storage gateway.
+
+````Use Amazon Data Lifecycle Manager (Amazon DLM) to automate the creation of EBS snapshots.
+
+Use Amazon S3 lifecycle policy to backup EBS volumes to S3
+
+
+You can use Amazon Data Lifecycle Manager to automate the creation, retention, and deletion of EBS snapshots and EBS-backed AMIs. When you automate snapshot and AMI management, it helps you to:
+
+Protect valuable data by enforcing a regular backup schedule.
+
+Create standardized AMIs that can be refreshed at regular intervals.
+
+Retain backups as required by auditors or internal compliance.
+
+Reduce storage costs by deleting outdated backups.
+
+Create disaster recovery backup policies that back up data to isolated accounts.
+---------------------------------------------------------------------------
+18
+A company uses Amazon API Gateway, AWS Lambda, and Amazon RDS for their multi-tier application. During testing, it was observed that the API Gateway requests are taking longer time to complete. They want to investigate the slow response time of API Gateway calls.
+
+What is the MOST operationally efficient way for the company to determine the cause of slow response time from API Gateway?
+
+
+Use Amazon CloudWatch
+
+Use AWS CloudTrail
+
+Use VPC Flow Logs
+
+```Use AWS X-Ray
+
+---------------------------------------------------------------------------
+19
+You recently launched a new Amazon EC2 instance into your Amazon VPC, but cannot SSH into the instance to apply an upgrade.
+
+What troubleshooting step should you take to ensure secure SSH traffic is allowed into your Amazon EC2 instance?
+
+
+Configure your network ACL to allow inbound traffic over port 22 from your company's private IP address range.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Configure your security group to all inbound traffic over port 22 from 0.0.0.0/0.
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Configure your network ACL to allow outbound traffic over port 22 from your company's private IP address range.
+
+```Configure your security group and network ACL to all inbound traffic over port 22 from your companys private IP address range.
+---------------------------------------------------------------------------
+20
+Your company uses an Identity Provider (IdP) for Single-sign on (SSO) and has tasked their solutions architect with connecting their AWS Account to the IdP so their users can leverage their corporate identity to access the environment.
+
+What actions should the solutions architect take to meet these requirements? (Select TWO)
+
+```Create an AWS IAM Identity Provider by uploading the JSON metadata document from your IdP.
+Create an AWS IAM User with AWS Management Console Access, attach a policy with a trust relationship with the IdP.
+```Create an AWS IAM Role with a trust relationship with the IdP.
+Create an AWS IAM Identity Provider by uploading the SAML metadata document from your IdP.
+Create an AWS IAM User Group, associate the User Group with the IdP and add users to the User Group.
+---------------------------------------------------------------------------
+21
+An AWS customer purchased the Developer Support Plan. They want to run checks on the AWS account to ensure it is deployed according to AWS Security best practices.
+
+How many security check do they have access to with AWS Trusted Advisor?
+
+
+None. Only Business and Enterprise Support Plan customers have access to Security checks.
+
+```6
+
+None. Only Enterprise Support Plan customers have access to Security checks.
+
+35
+
+Trusted Advisor draws upon best practices learned from serving hundreds of thousands of AWS customers. Trusted Advisor inspects your AWS environment, and then makes recommendations when opportunities exist to save money, improve system availability and performance, or help close security gaps.
+
+If you have a Basic or Developer Support plan, you can use the Trusted Advisor console to access all checks in the Service Limits category and six checks in the Security category.
+
+If you have a Business, Enterprise On-Ramp, or Enterprise Support plan, you can use the Trusted Advisor console and the AWS Support API to access all Trusted Advisor checks. You also can use Amazon CloudWatch Events to monitor the status of Trusted Advisor checks
+---------------------------------------------------------------------------
+22
+A solutions architect needs to test the connectivity of different protocols, such as ICMP, between an Amazon EC2 instance and an Internet Gateway, both in the same AWS account.
+
+Which service can the solutions architect use?
+
+
+```VPC Reachability Analyzer
+
+VPC IP Address Manager (IPAM)
+
+Network Access Analyzer
+
+VPC Flow Logs
+
+
+VPC Reachability Analyzer
+
+VPC Reachability Analyzer allows you to analyze the reachability of resources in your Virtual Private Cloud (VPC). It helps you identify connectivity issues, troubleshoot problems, and verify the security of your network configurations. This includes testing connectivity between resources within your VPC, such as an EC2 instance, and external resources like an Internet Gateway.
+---------------------------------------------------------------------------
+23
+A customer application runs on a fleet of Amazon EC2 instances. The program read and writes to Amazon DynamoDB. The application just needs last 7 days of data. However, the size of the database keeps increasing. The company needs a solution that minimizes cost and development effort.
+
+Which solution meets these requirements?
+
+
+Use AWS CloudFormation to deploy the solution and re-deploy stack every 7 days.
+
+```Configure application to add an attribute that has a value of current timestamp plus 7 days to each item created in table. Configure DynamoDB to use the attribute as TTL attribute.
+
+Configure Amazon DynamoDB stream to invoke AWS Lambda function when new item is created. Configure AWS Lambda to delete items in table that are older than 7 days.
+
+Use Amazon EC2 instance to run a script to delete items thats have timestamp older than 7 days.
+
+
+Efficient Use of DynamoDB Features:
+
+DynamoDB's TTL feature is specifically designed for scenarios like this, where you want to automatically expire and delete old data. It's a native capability of DynamoDB and doesn't require additional services or complex scripts.'
+---------------------------------------------------------------------------
+24
+A company is building an Amazon VPC with a 10.0.0.0/16 CIDR. Two subnets need to be created.
+
+In the IP address design, which CIDRs can be assigned to these subnets? (Select TWO)
+
+```10.0.0.0/28
+10.0.0.0/29
+10.0.0.0/32
+10.0.0.0/30
+```10.0.0.16/27
+---------------------------------------------------------------------------
+25
+You are a cloud security engineer and have been tasked with ensuring that confidential data is not accessible publicly. To ensure compliance with this mandate, you are interested in turning on Amazon S3 Block Public Access (BPA) feature.
+
+Which of the following statements best describes the AWS concept of public access?
+
+
+````Any bucket or object that grants permissions to any resources located outside AWS.
+
+Any bucket or object that grants permissions to AllUsers OR AuthenticatedUsers groups.
+
+Any bucket or object accessible by any source other than the bucket or object owner.
+
+Any bucket or object that grants permissions to any resource in another AWS account.
+---------------------------------------------------------------------------
+26
+Which of the following are primary impacts on concurrency in AWS Lambda? (Select TWO)
+
+Service Limits
+AWS Region Deployment
+Invocation Model
+RDS Database Engine selection
+CloudWatch Monitoring
+
+Service Limits:
+
+Service limits directly impact the maximum level of concurrency you can achieve in AWS Lambda. These limits are defined at the AWS account level and can be specific to different resources like the number of concurrent executions, the number of provisioned concurrency configurations, etc.
+Invocation Model:
+
+The invocation model you choose can impact concurrency. For example, synchronous invocations may result in higher concurrency compared to asynchronous invocations, as synchronous invocations may require immediate resources to be available
+---------------------------------------------------------------------------
+27
+A customer runs Nodejs application code on an AWS Lambda function. To meet their business use case, they connected the Lambda function to an Amazon VPC to access an internal HTTP endpoint. However, they noticed that the Lambda function is no longer able to connect to an external service on the internet.
+
+How can this issue be resolved?
+
+
+Update the function code to avoid the VPC while connecting to the external service on the internet.
+
+Enable enhanced VPC routing for the AWS Lambda function.
+
+Connect your Lambda function to VPC by creating a Virtual Private Gateway in the Subnet.
+
+````Connect your Lambda function to Private subnet and add an entry to the subnet route table pointing to a NAT gateway.
+
+
+
+By default, a lambda function is not bounded to a VPC, which enables it to have internet access, but prevents it from accessing resources in a VPC, such as RDS instances.
+
+If you attach the lambda to a VPC, you'll loose internet access, which prevents you from accessing resources such S3 and Dynamo, and from making HTTP requests.
+
+If you need both, then I'll have to set up the VPC for internet access, which is a mess (hey AWS guys, if you have a well-defined process for it, please make it simple: turn it into a checkbox or button ;)
+
+
+Your Lambda function loses internet access after connecting to a VPC. When you connect a function to a VPC, all outbound requests go through the VPC. To connect to the internet, configure your VPC to send outbound traffic from the function's subnet to a NAT gateway in a public subnet.
+---------------------------------------------------------------------------
+28
+Which of the following is a serverless NoSQL database for applications that need high performance at any scale? (Select TWO)
+
+Amazon Aurora
+```Amazon DocumentDB
+```Amazon DynamoDB
+Amazon RDS
+Amazon ElastiCache
+---------------------------------------------------------------------------
+29
+Your operational team wants to automate and centralize Amazon EBS volumes backup. You decided to use AWS Backup and created a backup plan based on a template provided by AWS Backup. Your operational team has now decided to configure a new custom Backup plan from scratch. You have to delete the backup plan.
+
+What will happen if a backup plan is deleted?
+
+
+Existing Amazon EBS volumes backups are also deleted.
+
+````Existing Amazon EBS volumes backups are not deleted.
+
+You need sign in as the root user to delete a backup plan once it is created.
+
+Only unencrypted Amazon EBS volumes backups are deleted.'
+
+
+If a backup plan is deleted, the existing Amazon EBS volumes backups are not deleted. Deleting a backup plan does not remove the existing backups. The backups associated with the deleted plan will continue to exist, but they will not be part of any active backup plan.
+---------------------------------------------------------------------------
+30
+A solutions architect has been asked to help troubleshoot a Step Function's execution of a state machine. The users are noticing that occasionally, a task doesnt return a response and it creates a situation where the state machine has to be reset.
+
+What can be added to the process flow in the state machine to help recover automatically from a stuck condition created by an un-returned result from a task?
+
+
+Create a cron job that will automatically retrigger the state machine after a certain amount of time.
+
+````Use timeouts to avoid stuck executions.'
+
+Create a Pass process flow to bypass the problem task.
+
+Remove the problem task from the state machine.
+
+
+You can set a timeout for your state machine using the TimeoutSeconds field in your Amazon States Language definition. For more information, see State Machine Structure. 
+5 minutes. If an execution runs for more than the 5-minute maximum, it will fail with a States. Timeout error and emit a ExecutionsTimedOut CloudWatch metric.
+---------------------------------------------------------------------------
+31
+Your company has a private Amazon VPC in their AWS account that cannot be connected to the internet due to data sensitivity concerns. A solutions architect needs a way to interactively troubleshoot an Amazon EC2 Instance running in this VPC.
+
+What should the solutions architect do in order to gain access to the Amazon EC2 instance, without provisioning any type of internet connectivity? (Select TWO)
+
+````Create an SSH key pair, use the SSH key pair to SSH into the AWS EC2 instance from AWS SSM Session Manager.
+
+````Attach an AWS IAM Instance Profile with the necessary permissions for AWS SSM Session Manager to the Amazon EC2 instance. Use AWS SSM Session Manager to access the Amazon EC2 Instance.
+
+Create Amazon VPC Interface Endpoints for SSM, SSMMessages, and EC2Messages.
+
+Create Amazon VPC Interface Endpoints for EC2, EC2Messages, and a VPC Gateway Endpoint for S3.
+
+Create an SSH key pair, use the key pair to SSH into the Amazon EC2 instance from their workstation.
+
+
+
+Create IAM Role to log in into private instance via Session Manager without key pair. Attach the following role with EC2
+Select AmazonSSMManagedInstanceCore policy. 
+Systems Manager Session Manager for EC2 Instance). Click Create role:
+
+3.1 Connect using Amazon EC2 console
+
+Navigate to Amazon EC2 select your instance and click Connect. Select Session Manager and click Connect:
+
+3.2 Connect using AWS Systems Manager console
+
+Navigate to AWS Systems Manager and select Instances & Nodes -> Session Manager. Click Start session. Select your instance and click Start session:
+
+3.3 Connect using AWS CLI
+
+$ aws ssm start-session --target INSTANCE_ID
+Example:
+
+$ aws ssm start-session --target i-06fd9f063a7cf53fd
+---------------------------------------------------------------------------
+32
+A company wants a solution to deploy and track AWS resources using dynamic templates authored in YAML format. Teams should have the ability to select frompre-defined values that change properties of AWS resources in the template.
+
+What AWS service would you recommend that is able to meet these requirements?
+
+
+AWS OpsWorks
+
+AWS CodePipeline
+
+AWS Elastic Beanstalk
+
+````AWS CloudFormation
+---------------------------------------------------------------------------
+33
+What tools would you use to perform a large-scale migration of an on-premises data warehouse to Amazon Redshift? (Select TWO)
+
+AWS Direct Connect
+AWS Snowball Edge
+AWS DMS
+AWS SCT agent
+Amazon S3
+---------------------------------------------------------------------------
+34
+You have created an Amazon RDS instance.
+
+How can you retrieve an endpoint of the newly created instance? (Select TWO)
+
+```AWS CLI
+Amazon RDS Parameter groups.
+```AWS Management Console
+Log into Amazon RDS instance.
+You must create a AWS Lambda function to retrieve the database instance end point.
+---------------------------------------------------------------------------
+35
+
+Your organization's operational lead has decided to build a cost effective centralized logging solution for multiple AWS accounts. The solution includes an Amazon S3 bucket in the centralized logging account. The logs must be deleted after three months to minimize cost.
+
+What is the most operationally efficient way to accomplish this task?
+
+
+Transition actions
+
+````Expiration actions
+
+Archive objects to the S3 Glacier Flexible Retrieval storage class for three months and delete manually.
+
+Transition objects to the S3 Standard-IA storage class 30 days after creating them and delete manually/'
+---------------------------------------------------------------------------
+36
+After a budget review, you have noticed your Amazon EBS charges make up a significant portion of your bill. Currently, all EBS volumes are in use and required to stay active. All unattached volumes have been deleted after creating snapshots. Snapshots are managed with lifecycle policies and a review has found no issue with retention.
+
+Which of the following options will best help you to reduce your EBS spending?
+
+
+Generate snapshots of all volumes and only create and Amazon EBS volume when the data is requested.
+
+````Review the Amazon EBS volume size to make sure you did not over provision EBS volumes.
+
+Detach the Amazon EBS volume from the Amazon EC2 instance. This will make sure you are not being charged unless you are using the EBS volume by attaching it to an EC2 instance.
+
+Manually delete snapshots you are not currently using or anticipate using within the next year.
+---------------------------------------------------------------------------
+37
+As an AWS solutions architect, you've been asked to scale out write performance across multiple Availability Zones within an AWS Region. You've decided to deploy the Aurora Multi-Master.
+
+Which of the following are features of an Amazon Aurora Multi-Master deployment option? (Select THREE)
+
+```Supports up to four READ/WRITE nodes.
+```Available with Amazon Aurora MySQL-Compatible edition.
+```Features continuous availability with no failover when a writer DB instance becomes unavailable.
+You can enable cross-Region replicas from multi-master clusters.Features high availability with brief downtime during failover.
+Available with Amazon Aurora PostgreSQL-Compatible edition.
+---------------------------------------------------------------------------
+38
+As a cloud architect, you've been tasked with finding a way to restrict access to a specific content for all users in a specific country.
+
+Which of the following services could be used? (Select TWO)
+
+AWS Shield
+```AWS WAF
+AWS Network Firewall
+```Amazon CloudFront
+Amazon Route 53
+
+
+
+To restrict access to specific content for users in a specific country, you can use:
+
+AWS WAF (Web Application Firewall):
+
+AWS WAF can be used to create rules that allow or deny access to your content based on various conditions, including the geographic location of the user. You can create rules to block access from specific countries.
+Amazon CloudFront:
+
+CloudFront, when used in conjunction with AWS WAF, can further enhance the ability to restrict access based on geographic location. CloudFront can use the WAF rules to control access to content and cache it globally.'
+---------------------------------------------------------------------------
+39Since your company launched a new high performance computing (HPC) application in AWS, customers are complaining of latency. You, as the network engineer, have been tasked to ensure increased network performance for the application running on Amazon EC2 instances.
+
+What should you implement to ensure the application has the lowest latency, highest network performance, and remains cost-effective?
+
+
+Launch multiple Amazon EC2 instances in a partition placement group across two Availability Zones.
+
+Vertical scale the Amazon EC2 instances.
+
+````Ensure enhanced networking is enabled on all Amazon EC2 instances running your application.
+
+Launch multiple Amazon EC2 instances with the current instance type and use two Availability Zones.
+
+You can enable enhanced networking on supported instance types to provide lower latencies, lower network jitter, and higher packet-per-second (PPS) performance. Most applications do not consistently need a high level of network performance, but can benefit from access to increased bandwidth when they send or receive data.
+---------------------------------------------------------------------------
+40
+The finance team in your organization needs to send data to your team's backend workflow. You want to filter inbound traffic at the subnet level while allowing returning traffic back to the finance team's service.
+
+What do you need to setup to complete this workflow?
+
+
+Create a Security Group.
+Enable inbound connections from the other team. Enable outbound returning traffic to the other team's service
+
+Create a Security Group.
+Enable inbound connections from the other team. Since Security Group is stateful, it will automatically enable outbound returning traffic.
+
+Create a Network Access Control List (NACL).
+Enable inbound traffic from the other team's service. Since NACL is stateful, it will automatically enable outbound returning traffic.
+
+````````Create a Network Access Control List (NACL).
+Enable inbound traffic from the other team's service; enable outbound traffic to return data to the other team's service
+---------------------------------------------------------------------------
+41
+You have to design a hybrid network architecture for an AWS Direct Connect link for connecting to a customer's on-premise site.
+
+What gateways can you use to make this connection? (Select THREE)
+
+````Transit Gateway
+````Virtual Private Gateway
+Internet Gateway
+Egress only Gateway
+NAT Gateway
+````Direct Connect Gateway'
+---------------------------------------------------------------------------
+42
+Which use cases are supported by Amazon S3 File Gateway? (Select TWO)
+
+``````Migrating on-premises file data to Amazon S3, while maintaining fast local access to recently accessed data.
+``````Backing up on-premises file data as objects in Amazon S3.
+Backing up on-premises file data as objects directly in Amazon S3 Glacier.Backing up on-premises file data as objects directly in Amazon EBS.Processing machine learning, big data analytics or serverless functions.
+
+Q: What can I do with Amazon S3 File Gateway?
+
+Use cases for Amazon S3 File Gateway include: (a) migrating on-premises file data to Amazon S3, while maintaining fast local access to recently accessed data, (b) backing up on-premises file data as objects in Amazon S3 (including Microsoft SQL Server and Oracle databases and logs), with the ability to use S3 capabilities such as lifecycle management and cross region replication, and, (c) hybrid cloud workflows using data generated by on-premises applications for processing by AWS services such as machine learning, big data analytics or serverless functions.
+Q: What are the benefits of using File Gateway to store data in S3?
+
+Amazon S3 File Gateway enables your existing file-based applications, devices, and workflows to use Amazon S3, without modification. Amazon S3 File Gateway securely and durably stores both file contents and metadata as objects, while providing your on-premises applications low-latency access to cached data.
+
+Q: Which Amazon S3 storage classes does S3 File Gateway support?
+
+Amazon S3 File Gateway supports Amazon S3 Standard, S3 Intelligent-Tiering, S3 Standard - Infrequent Access (S3 Standard-IA) and S3 One Zone-IA.
+---------------------------------------------------------------------------
+43
+A storage specialist of a company created a bucket named 'demobucket2022' for the purpose of storing files for the creation of a proof of concept (POC). After the successful implementation of proof of concept, the team wanted to leverage the bucket for the development work because of the content which was generated during POC. However, they didn't want to name it 'demobucket2022'.
+
+What is the solution for the team to proceed with this implementation of the requirement?
+
+
+````Amazon S3 buckets cannot be renamed once created. So, a new bucket needs to be created and copy the content using cp/sync command from the AWS CLI.
+
+Raise a support ticket and work with AWS support to rename the bucket.
+
+Use the AWS Management Console and rename the bucket using rename bucket option.
+
+Use AWS CLI and update the name of the bucket using the update bucket api.'
+---------------------------------------------------------------------------
+44
+Your team has an application that they would like to move to the cloud. The application and its logic are complex. It processes the departments accounting information and adjusts calculations in a stateful manner. As such, it needs to run for a large amount of compute time. The application runs long during the second and fourth week of the month to process additional payments. Because it is calculating many payments and makes requests to multiple external systems, it utilizes complex networking and needs access to the underlying files in the operating system to run.
+
+Which compute option is best for this workload?
+
+
+Rewrite the application into a Lambda serverless application. Lambda will automatically scale based on need for the second and fourth week of the month.
+
+Rewrite the application to put part of the calculations into containers on an EKS cluster with AWS Fargate for the main application and scheduling
+
+Put the application into a container. Containers are optimized for complex networking, and long compute times make sense for container workloads
+
+````Host the application on Amazon EC2 instances. Enable autoscaling for the EC2 instances when needed for the second and fourth week of the month.
+---------------------------------------------------------------------------
+45
+
+A company wants to allow their existing Active Directory users access to AWS without having to recreate AWS IAM user accounts for every person.
+
+Which of the following methods is the most cost effective solution to meet the requirements? (Select TWO)
+
+```SAML 2.0
+X.509 Certificate
+Amazon Directory Services
+```OpenID Connect
+Cognito Identity Pool
+
+SAML 2.0
+Comments: To use an IdP, you create an IAM identity provider entity to establish a trust relationship between your AWS account and the IdP. IAM supports IdPs that are compatible with OpenID Connect (OIDC) or SAML 2.0 (Security Assertion Markup Language 2.0)
+Amazon Directory Services
+Comments: AWS Directory Service for Microsoft Active Directory, also known as AWS Managed Microsoft Active Directory (AD), enables your directory-aware workloads and AWS resources to use managed Active Directory (AD) in AWS.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+wrong
+The most cost-effective solutions to allow existing Active Directory users access to AWS without having to recreate AWS IAM user accounts are:
+
+SAML 2.0
+
+SAML (Security Assertion Markup Language) can be used to enable Single Sign-On (SSO) between your existing Active Directory and AWS. This allows your Active Directory users to access AWS resources without the need for separate IAM user accounts. SAML-based federation is a cost-effective way to achieve this.
+Amazon Directory Services
+
+Amazon Directory Services, particularly the AWS Directory Service for Microsoft Active Directory (also known as AWS Managed Microsoft AD), allows you to integrate your existing on-premises Active Directory with AWS. This enables your Active Directory users to access AWS resources using their existing credentials. While there are costs associated with using Amazon Directory Services, it is often a cost-effective solution compared to managing IAM user accounts for every user.
+---------------------------------------------------------------------------
+46
+Your CEO decided to migrate your data center to AWS. You are engaged as the AWS migration specialist to create a business case and decide to use AWS Migration Evaluator.
+
+Which of the following are included in the business case report? (Select THREE)
+
+Recommend AWS services required for your target architecture.
+"A breakdown of what went into the on-premises costs."
+Recommendation on how to automatically converting your source servers from physical, virtual, or cloud infrastructure to run natively on AWS
+"An executive summary of the savings across a combination of scenarios applied to different workloads."
+Provide configuration data about your on-premises servers.
+"Recommendation for the customer on next steps for a successful migration."
+
+
+Migration Evaluator Business Case
+A business case report is provided to the customer at the end of the migration assessment. This report includes 5 sections:
+
+what went into the assessment (collection window, existing inventory from 3rd party export, assumptions, server counts, etc.)
+an executive summary of the savings across a combination of scenarios applied to different workloads
+a breakdown of what went into the on-premises costs
+multiple workload specific 'what-if' scenarios for repurchasing and bring your own licenses (BYOL) (with or without dedicated hosts)
+recommendation for the customer on next steps for a successful migration
+---------------------------------------------------------------------------
+47
+What native Amazon VPC security feature can be used to allow and deny network traffic with the same rule at the subnet level?
+
+
+Security Groups
+
+````Network Access Control List (NACL)
+
+AWS Network Firewall
+
+AWS WAF
+---------------------------------------------------------------------------
+48
+A customer wants to host their domain in AWS using Amazon Route 53 service. They plan to use Amazon CloudFront for distributing their website globally. All the static assets of the website will be served from Amazon S3 and Amazon EC2 will be used for serving the dynamic content via Amazon CloudFront. The customer needs a way to integrate Amazon Route 53 with AWS CloudFront and Amazon S3.
+
+Which strategy would you recommend that is the easiest to configure?
+
+
+`````````It is possible to integrate Amazon Route53 with other AWS services like CloudFront and S3 via creating an alias record in Route 53 that points to CloudFront distributions and S3 buckets.
+
+It is possible, however, we need to insert the code for the integration of other AWS Services in our application which will be using Amazon Route 53.
+
+Use an AWS Lambda function with API Gateway to redirect the API calls from Amazon Route53 to Amazon CloudFront and from there to Amazon S3 and Amazon EC2.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+````They are integrated by default.
+They are integrated by default.
+Comments: That doesn't work out of the box, we need to create the alias records which point to those services.'
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+---------------------------------------------------------------------------
+49
+A developer with limited AWS knowledge recently joined a company. As part of their initial tasks, the developer was required to create a new bucket. However, while trying to create a new bucket, the developer kept on getting different errors. You are the senior developer of the company and you are tasked with sharing the bucket naming rules that AWS has for creating new buckets.
+
+What are the correct rules for creating new buckets? (Select THREE)
+
+```Bucket names must not begin with xn--Bucket name must be unique only for the region.
+Bucket names can be formatted as an IP address (i.e. 198.68.10.2).
+```Bucket names must start with a lowercase letter or number.
+Bucket name must be between 3-40 characters long.
+```Bucket Names can use a dot(.) in the name, only if its used for Amazon S3 static website.
+---------------------------------------------------------------------------
+50
+Your company sells a SaaS solution for scheduling pet sitters to your customers.The solution is highly available running in an active-active configuration in your companies datacenter in London, England and a co-location facility located on the other side of the city. All of your customers are located in the United Kingdom. The proposed architecture in AWS should run in an active-active configuration.
+
+How would you design the solution to meet these requirements?
+
+
+When migrating to AWS the customer doesn't need to worry about high availability like they did on premises
+
+````Deploy the solution in two AWS regions in an active-active configuration.
+
+Deploy the solution in a single Availability Zone.
+
+Deploy the solution in a single region across two availability zones
+
+'
+Active/Active configuration and advantages
+In Active/Active mode, two or more servers aggregate the network traffic load, and working as a team, they distribute it to the network servers. The load balancers can also remember information requests from users and keep this information in cache. Should they return looking for the same information, the user will be locked onto the load balancer that previously served them. The information is provided again from the cache without the network server having to respond. This process reduces network traffic load.
+
+The one potential disadvantage of setting up your load balancers in Active/Active mode is that you are running them at near full capacity. What this would mean is that unless you have a spare load balancer to commission and make operational within the network, in the event of a load balancer failure, your network servers would appear to run slow or user sessions would time out.
+---------------------------------------------------------------------------
+51
+For which of the following Amazon RDS database engines is the disk I/O activity suspended on the primary database during backup for a Multi-AZ deployment?
+
+
+SQL Server
+
+None. Backups are taken on the primary for Multi-AZ deployments
+
+````MySQL
+
+Oracle
+---------------------------------------------------------------------------
+52
+Which of the following Amazon EBS data persistence statements are correct? (Select THREE)
+
+````A non-root EBS volume "DeleteOnTermination" attribute is set to false, by default.
+````A non-root EBS volume persists, by default, on instance termination.````EBS volume's "DeleteOnTermination" attribute value can be changed while instance is running.
+A non-root EBS volume is deleted when an instance is rebooted.
+Both root and non-root EBS volume data is persisted by default regardless of the EC2 instance state is started/stopped/terminated
+EBS volume's "DeleteOnTermination" attribute value can only be set during EC2 instance creation and cannot be changed while instance is running.
+---------------------------------------------------------------------------
+53
+A company has an On-Demand Amazon EC2 instance with an attached Amazon EBS volume. There is a scheduled job that creates a snapshot of this EBS volume at 12 AM when the instance is not used. You have a production incident where you need to perform a change on both the instance and on the EBS volume at the same time when the snapshot is currently taking place.
+
+Which of the following scenarios is valid when it comes to the usage of an EBS volume while the snapshot is in progress?
+
+
+The Amazon EBS volume can't be detached or attached when a snapshot is in progress.
+
+The volume can be used in read only mode when a snapshot is in progress.
+
+````The Amazon EBS volume can be used when the snapshot is in progress.
+
+The Amazon EBS volume cannot be used when a snapshot is in progress.You can continue to use the EBS volume while a snapshot is in progress. The snapshot process is designed to be non-disruptive to the normal operation of the volume and the attached instance. However, it's important to note that the snapshot captures a point-in-time copy of the volume, so any changes made after the snapshot process begins will not be included in the snapshot.
+---------------------------------------------------------------------------
+54
+A customer wants to place a Amazon EC2 instances with IPv4 in a private subnet on an Amazon VPC. This private subnet must have direct connectivity to the internet and without traversing a Site-to-Site VPN.
+
+Which gateways are required to achieve this architecture? (Select TWO)
+
+Direct Connect Gateway
+Transit Gateway
+```Internet Gateway
+Virtual Private Gateway
+`````NAT Gateway
+---------------------------------------------------------------------------
+55
+A business wants to run many scheduled and event-driven workloads. The solution can take an average runtime of 30 minutes. The business wants AWS to manage the instances provisioned for these large processing workloads.
+
+Which of the following services are suitable for this use case? (Select TWO)
+
+AWS Lambda
+Amazon EventBridge
+AWS Fargate
+Amazon EKS Distro
+AWS EC2
+---------------------------------------------------------------------------
+56
+Your company uses Amazon Route 53 in their networking account to manage public hosted zone records for their root domain, example.com. A developer in a different account requires the ability to create, update, or delete DNS records for their public application, app1.
+
+How should you meet this requirement without giving the developer access to the companys networking account, or control over the root domain? (Select TWO)
+
+Create an A record in the example.com Public Hosted Zone for the subdomain with the IP address from the app1.example.com Public Hosted Zone.
+
+Create the app1.example.com Public Hosted Zone in the developer’s account.
+
+```Create an NS record in the example.com Public Hosted Zone for the subdomain with the name servers from the app1.example.com Public Hosted Zone.
+// Comments: Creating an NS record in the root domain, will delegate the subdomain to the authoritative name servers provided.
+
+Create the app1.example.com Private Hosted Zone in the developers account.
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```Create the example.com Public Hosted Zone in the developers account.
+
+Create the example.com Public Hosted Zone in the developer’s account.
+Comments: This is incorrect, this Public Hosted Zone would not be authorities as it exists in the networking account. Also requirements said developers should not have control over the root domain.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+---------------------------------------------------------------------------
+57
+Which of the following requirements must be met before you use Amazon S3 File Gateway? (Select TWO)
+
+Configure Microsoft Active Directory (AD).
+````Configure your private networking, VPN, or AWS Direct Connect between your Amazon Virtual Private Cloud (Amazon VPC) and the on-premises environment where you are deploying your gateway.
+Configure Amazon Athena to count number of files transferred to Amazon S3 bucket.
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+````Make sure your gateway can resolve the name of your AWS IAM Identity Center. WRONG
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Comments: File Gateway setup prerequisites requirements (https://docs.aws.amazon.com/filegateway/latest/files3/Requirements.html)
+---------------------------------------------------------------------------
+58
+Your company uses an Identity Provider (IdP) for Single-sign on (SSO) and has tasked their solutions architect with connecting their AWS Account to the IdP so their users can leverage their corporate identity to access the environment.
+
+What actions should the solutions architect take to meet these requirements? (Select TWO)
+
+Create an AWS IAM User with AWS Management Console Access, attach a policy with a trust relationship with the IdP.
+
+````Create an AWS IAM Identity Provider by uploading the SAML metadata document from your IdP.
+
+Create an AWS IAM User Group, associate the User Group with the IdP and add users to the User Group.
+
+Create an AWS IAM Identity Provider by uploading the JSON metadata document from your IdP.
+
+````Create an AWS IAM Role with a trust relationship with the IdP.
+---------------------------------------------------------------------------
+59
+Your company is working on a serverless project based in Java. The developer team tested the application locally and then deployed it to AWS Lambda. While testing the application remotely, the Lambda function fails with an access denied message.
+
+How can this issue be addressed?
+
+
+Include an IAM policy document at the root of the deployment package and redeploy the Lambda function.
+
+Redeploy the Lambda function using an account with access to the Administrator Access policy.
+
+Update the Lambda function's resource policy to include the missing permissions.
+
+````Update the Lambda function's execution role to include the missing permissions.
+---------------------------------------------------------------------------
+60
+A company is running a three-tier architecture on AWS. The web tier is in a public subnet, the application tier and the database are in private subnets across two availability zones. The company's security team noticed that specific IP addresses are attacking the Amazon EC2 instances in the web tier. A solutions architect must block traffic from those IP addresses from reaching the Amazon VPC.
+
+How can this requirement be met?
+
+```````Block the IP addresses with Network ACLs from reaching instances in the public subnets.
+Block the IP address using Amazon Inspector.
+Block the IP addresses with Security Groups.
+Block the IP address using Amazon GuardDuty.'
+---------------------------------------------------------------------------
+61
+You been asked to explore whether AWS Shield Advanced is the right solution to protect internet facing applications against Distributed Denial of Service (DDoS) attacks.
+
+Which of the following is true for AWS Shield Advanced? (Select TWO)
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+It is enabled automatically when you use select AWS services. FIND ANSWER
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+````It mitigates against  layer 3, 4, and detects layer 7 attacks.
+It detects layers 1 thru 7  attacks, and mitigates layer 7 attacks.
+It charges a monthly fee, plus a usage fee based on data transfer out from select services.
+It is available only to customers at the Business and Enterprise Premium support plans.
+
+
+
+AWS Shield Standard, which provides automatic protection against common and most DDoS attacks, is automatically enabled for all AWS customers at no additional cost. AWS Shield Advanced builds on this protection and provides enhanced features for more demanding applications.
+It charges a monthly fee, plus a usage fee based on data transfer out from select services.
+
+AWS Shield Advanced is available for a monthly fee, which includes protection for all AWS resources in the AWS account. Additionally, there may be usage fees based on data transfer out from certain AWS services.
+---------------------------------------------------------------------------
+62
+A company operates in a highly regulated industry. The company stores log files in Amazon S3. Industry policy requires that the company must not delete or overwritten the log files for at least 6 months.
+
+What should a solutions architect do to meet these requirements?
+
+
+"Create a new bucket and enable object lock."
+
+Use presigned URL to protect the bucket from deletion.
+
+Configure MFA (multi-factor authentication) delete.
+
+Enable Amazon S3 Intelligent-Tiering
+
+
+
+
+With S3 Object Lock, you can store objects using a write-once-read-many (WORM) model. Object Lock can help prevent objects from being deleted or overwritten for a fixed amount of time or indefinitely. You can use Object Lock to help meet regulatory requirements that require WORM storage, or to simply add another layer of protection against object changes and deletion.
+
+S3 Object Lock has been assessed by Cohasset Associates for use in environments that are subject to SEC 17a-4, CFTC, and FINRA regulations. For more information about how Object Lock relates to these regulations, see the Cohasset Associates Compliance Assessment.
+
+Object Lock provides two ways to manage object retention: retention periods and legal holds.
+
+Retention period — Specifies a fixed period of time during which an object remains locked. During this period, your object is WORM-protected and can't be overwritten or deleted. For more information, see Retention periods
+
+Legal hold — Provides the same protection as a retention period, but it has no expiration date. Instead, a legal hold remains in place until you explicitly remove it. Legal holds are independent from retention periods. For more information, see Legal holds.
+
+An object version can have both a retention period and a legal hold, one but not the other, or neither. For more information, see How S3 Object Lock works.
+
+Object Lock works only in versioned buckets, and retention periods and legal holds apply to individual object versions. When you lock an object version, Amazon S3 stores the lock information in the metadata for that object version. Placing a retention period or legal hold on an object protects only the version specified in the request. It doesn't prevent new versions of the object from being created.
+---------------------------------------------------------------------------
+63
+
+The publicly accessible website hosted on Amazon EC2 instance in GovCloud region is able to communicate with Amazon S3. Amazon DynamoDB within the same region is also able to access Amazon S3 buckets. However, the Amazon RDS database instance that uses a private subnet of a Amazon VPC hosted in the same region is unable to send SNS notifications to Amazon S3.
+
+Which one of the following would you use to resolve the problem?
+
+
+Direct Connect Gateway
+
+AWS Transit Gateway
+
+`````VPC Endpoint
+
+Virtual Private Gateway
+---------------------------------------------------------------------------
+64
+A healthcare company has strict security requirements and they need to make sure that data in Amazon S3 buckets is not publicly accessible. However, one of their team members inadvertently made a bucket publicly available. The Security team of the company wants to implement a solution that would prevent public access to any buckets requiring minimal administrative effort.
+
+What settings needs to be implemented by the Security team to achieve the requirement?
+
+
+Implement a Config rule named 's3-bucket-public-write-prohibited' which will prevent public access to all the buckets.
+
+````Implement block public access level setting at the account level.
+
+Configure an AWS Lambda function which periodically identifies any publicly accessible buckets and remediates the issue.
+
+Implement block public access level setting at the bucket level.
+---------------------------------------------------------------------------
+65
+Which of the following are key features of Amazon Redshift? (Select THREE)
+
+You can run on premises using Amazon Redshift on Outposts.
+````It offers both provisioned and serverless options.Amazon 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Redshift also supports multi-region deployments.
+Analyze data from terabytes to petabytes and run complex analytical queries.
+````Fast, fully managed, petabyte-scale data warehouse service.
+It is easy for customer to perform interactive log analytics, real-time application monitoring, website search.
+-----------------------------------------------------------------------
+66
+You are in charge of securely managing Amazon S3 buckets on AWS. One bucket currently receives requests to read or write over the public internet. A potential risk exists where person in the middle attacks or eavesdropping attempts may occur.
+
+Which of the following options below would address this risk regardless of where the request comes from?
+
+
+```Create a bucket policy for the designated bucket and create a condition using as:SecureTransport to only allow encrypted connections over HTTPS.
+
+Create a SCP policy for the organization with a condition using as:SecureTransport to only allow encrypted connections over HTTPS.
+
+Create a SCP policy for the organization with a condition to only write to the bucket if the data is encrypted.
+
+Create an IAM User policy with a condition that will only allow users to upload or read from the designated bucket if as:SecureTransport is True.
+---------------------------------------------------------------------------
+67
+A customer uses Amazon API Gateway as a REST API solution for their E-commerce business application. During a go-live of a new feature, their developer mistakenly deployed the wrong API configurations to the "Production" stage. This caused an unexpected outage of their application. As a result, their customers are unable to place orders.
+
+What would be the FASTEST way to bring their application back to normal?
+
+
+Change the application code to point to the stage URL of Development environment until the issue is resolved.
+
+After correcting the API configurations, create a new stage with different name. Also, change the application code to point to the recently created stage URL.
+
+````Using the APIs or the console, roll back the "Production" stage to the most recent working deployment.
+
+Make use of canary deployment feature of Amazon API Gateway to shift traffic to a working stage URL.
+---------------------------------------------------------------------------
+68
+Your company processes and stores sensitive and private data on Amazon S3. Amazon EC2 instances process the data and then the data is sent to Amazon S3.
+
+What design solution ensures the data does not traverse the public internet?
+
+
+```Configure an Amazon VPC endpoint and add a route to send the private data to Amazon S3.
+
+Configure a NAT Gateway in the private subnet that sends the private data to Amazon S3.
+
+Configure a transit gateway and add a route to send the private data to Amazon S3.
+
+Configure an internet gateway in the public subnet to send the private data to Amazon S3.
+---------------------------------------------------------------------------
+69
+A solutions architect has been tasked to migrate the shared filesystem for a High Performance Compute (HPC) workload to AWS. The workload runs on Amazon Linux 2, and requires a shared filesystem that can support sub-millisecond latencies, hundreds of gigabytes per second of throughput, and millions of IOPS.
+
+Which storage service should the solutions architect choose to meet these requirements?
+
+
+````Amazon FSx for Lustre
+
+AWS Storage Gateway File Gateway with an Amazon S3 Bucket
+
+Amazon EFS One Zone
+
+Amazon FSx for Windows
+---------------------------------------------------------------------------
+70
+A user wants to create a distributed application with multiple lambda functions. During the design of the application, it was discovered that in the process flow, certain lambda functions need to be conditionally triggered based on results that are passed from micro service to micro service.
+
+Which of the State Machine process flow should be used to meet their concern?
+
+
+Map
+
+Parallel
+
+Pass
+
+````Choice
+---------------------------------------------------------------------------
+71
+A company is currently running a SQL Server database on-premises and is interested in migrating the database to Amazon Aurora.
+
+Which of the following methods will help migrate the existing database to AWS?
+
+
+````Use the Schema Conversion Tool to convert the existing schema for a new database engine. Once the schema is available, use the Database Migration Service to load the data into a new Amazon Aurora Database.
+
+Use the Schema Conversion Tool to create a new schema for this homogenous migration. A new schema will allow you to load the data directly to Amazon Aurora.
+
+Use the Database Migration Service to directly read the data from the existing SQL Server database and load the data into a new Amazon Aurora Database.
+
+Use the Schema Conversion Tool to create a new schema for this heterogenous migration. The schema will allow you to load the data directly to Amazon Aurora.
+---------------------------------------------------------------------------
+72
+A company has several unencrypted Amazon EBS snapshots in their Amazon VPC. The solutions architect must ensure that all of the new EBS volumes restored from the unencrypted snapshots are automatically encrypted.
+
+Which of these options will satisfy the requirement with the least administrative effort?
+
+
+`````Enable the EBS Encryption By Default feature for the AWS Region.
+
+Launch new EBS volumes and specify the symmetric customer master key (CMK) for encryption
+
+Enable the EBS Encryption By Default feature for specific EBS volumes
+
+Launch new EBS volumes and encrypt them using an asymmetric customer master key (CMK)
+---------------------------------------------------------------------------
+73
+our company has an on-premises contact center.Your CTO is looking to migrate to the cloud to reduce operational workloads and costs.
+
+Which AWS managed service will meet the companies requirements?
+
+
+Alexa for business
+
+Amazon Monitron
+
+Amazon Connect
+
+Amazon Chime
+
+
+Amazon Connect
+
+Amazon Connect is a cloud-based contact center service that enables businesses to set up and manage a customer contact center easily. It is designed to be highly scalable, reliable, and cost-effective. Migrating to Amazon Connect can help in reducing operational workloads and costs compared to maintaining an on-premises contact center.
+---------------------------------------------------------------------------
+74
+A highly regulated company has deployed their web application on AWS which comprises an Auto scaling group of Amazon EC2 instances, an Application Load Balancer and a PostgreSQL RDS instance. To ensure data confidentiality, you are tasked to validate that RDS can only be accessed using an instance profile for Amazon EC2 instance via authentication token.
+
+How would you secure the solution to meet the above requirement?
+
+
+````Enable the AWS IAM DB Authentication.
+
+Configure SSL in your application to encrypt the database connection to Amazon RDS.
+
+Use a combination of AWS IAM and STS to restrict access to your Amazon RDS instance via a temporary token.
+
+Create an AWS IAM Role and assign it to your Amazon EC2 instance which will grant exclusive access to your Amazon RDS instance.
+
+
+
+IAM database authentication for MariaDB, MySQL, and PostgreSQL
+PDF
+RSS
+You can authenticate to your DB instance using AWS Identity and Access Management (IAM) database authentication. IAM database authentication works with MariaDB, MySQL, and PostgreSQL. With this authentication method, you don't need to use a password when you connect to a DB instance. Instead, you use an authentication token.
+
+An authentication token is a unique string of characters that Amazon RDS generates on request. Authentication tokens are generated using AWS Signature Version 4. Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication is managed externally using IAM. You can also still use standard database authentication. The token is only used for authentication and doesn't affect the session after it is established.
+
+IAM database authentication provides the following benefits:
+
+Network traffic to and from the database is encrypted using Secure Socket Layer (SSL) or Transport Layer Security (TLS). For more information about using SSL/TLS with Amazon RDS, see Using SSL/TLS to encrypt a connection to a DB instance.
+
+You can use IAM to centrally manage access to your database resources, instead of managing access individually on each DB instance.
+
+For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security.
+
+
+
+Connecting to your DB instance using IAM authentication
+PDF
+RSS
+With IAM database authentication, you use an authentication token when you connect to your DB instance. An authentication token is a string of characters that you use instead of a password. After you generate an authentication token, it's valid for 15 minutes before it expires. If you try to connect using an expired token, the connection request is denied.
+
+Every authentication token must be accompanied by a valid signature, using AWS signature version 4. (For more information, see Signature Version 4 signing process in the AWS General Reference.) The AWS CLI and an AWS SDK, such as the AWS SDK for Java or AWS SDK for Python (Boto3), can automatically sign each token you create.
+
+You can use an authentication token when you connect to Amazon RDS from another AWS service, such as AWS Lambda. By using a token, you can avoid placing a password in your code. Alternatively, you can use an AWS SDK to programmatically create and programmatically sign an authentication token.
+
+After you have a signed IAM authentication token, you can connect to an Amazon RDS DB instance. Following, you can find out how to do this using either a command line tool or an AWS SDK, such as the AWS SDK for Java or AWS SDK for Python (Boto3).
+---------------------------------------------------------------------------
+75
+A media entertainment company is planning to process large media contents. The data engineering team has decided to implement batch processing solution. The solution must include the ability to plan, schedule, and execute batch computing workloads across the full range of AWS services, including Amazon EC2, AWS Fargate, and Amazon EC2 Spot Instances.
+
+Which service is suitable for this use case?
+
+
+```Amazon ECS
+
+AWS Elastic Beanstalk
+
+AWS Lambda
+
+AWS CodeBuild
+
+
+Amazon ECS (Elastic Container Service).
+
+Amazon ECS allows you to run, stop, and manage Docker containers on a cluster. It provides flexibility and control over where your containers are deployed and how they are managed. It can effectively utilize EC2 instances, Fargate for serverless container management, and Spot Instances for cost-effective computing.
+
+While other services like AWS Elastic Beanstalk, AWS Lambda, and AWS CodeBuild are valuable for various use cases, they are not optimized for batch processing across different computing resources as specified in this scenario.
+---------------------------------------------------------------------------
+77
+A business wants to run many scheduled and event-driven workloads. The solution can take an average runtime of 30 minutes. The business wants AWS to manage the instances provisioned for these large processing workloads.
+
+Which of the following services are suitable for this use case? (Select TWO)
+
+AWS Lambda
+Amazon EventBridge
+Amazon EKS Distro
+AWS EC2
+AWS Fargate

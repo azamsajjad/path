@@ -1,0 +1,104 @@
+OUTPUT OF DynamoDB
+
+{
+  "SdkHttpMetadata": {
+    "AllHttpHeaders": {
+      "Server": [
+        "Server"
+      ],
+      "Connection": [
+        "keep-alive"
+      ],
+      "x-amzn-RequestId": [
+        "KL04D4E7IO8S25410KALQ4KJP3VV4KQNSO5AEMVJF66Q9ASUAAJG"
+      ],
+      "x-amz-crc32": [
+        "2745614147"
+      ],
+      "Content-Length": [
+        "2"
+      ],
+      "Date": [
+        "Fri, 29 Sep 2023 14:15:07 GMT"
+      ],
+      "Content-Type": [
+        "application/x-amz-json-1.0"
+      ]
+    },
+    "HttpHeaders": {
+      "Connection": "keep-alive",
+      "Content-Length": "2",
+      "Content-Type": "application/x-amz-json-1.0",
+      "Date": "Fri, 29 Sep 2023 14:15:07 GMT",
+      "Server": "Server",
+      "x-amz-crc32": "2745614147",
+      "x-amzn-RequestId": "KL04D4E7IO8S25410KALQ4KJP3VV4KQNSO5AEMVJF66Q9ASUAAJG"
+    },
+    "HttpStatusCode": 200
+  },
+  "SdkResponseMetadata": {
+    "RequestId": "KL04D4E7IO8S25410KALQ4KJP3VV4KQNSO5AEMVJF66Q9ASUAAJG"
+  }
+}
+
+
+
+DynamoDB Output Section in Step Funtion:
+
+1-Transform result with ResultSelector - optional  
+Use the ResultSelector filter to construct a new JSON object using parts of the task result. Info
+{
+  "statusCode.$": "$.SdkHttpMetadata.HttpStatusCode"
+}
+
+2-Add original input to output using ResultPath - optional  
+$.result
+
+
+in CONFIGURATION OF ADDITEM:
+{
+  "TableName": "CustomerOrdersTable",
+  "Item": {
+    "customerId": {
+      "S.$": "$.customerId"
+    },
+    "orderId": {
+      "S.$": "$.orderId"
+    }
+  }
+}
+
+
+in CONFIGURATION OF DELETEITEM
+{
+  "TableName": "CustomerOrdersTable",
+  "Key": {
+    "customerId": {
+      "S.$": "$.customerId"
+    },
+    "orderId": {
+      "S.$": "$.orderId"
+    }
+  }
+}
+
+
+
+IN LAMBDA CATCHER - DONT FORGET TO SPECIFY RESULT PATH
+
+ResultPath - optional
+Use the ResultPath filter to add the error to the original state input before sending it as output to the fallback state.
+
+$.result 
+
+it will act as input to DynamoDB DELETEITEM
+
+
+
+
+AND IN LAMBDA OUTPUT - DONT FORGET TO SPECIFY RESULT PATH
+
+Add original input to output using ResultPath - optional  
+By default, a state sends its task result as output. Use the ResultPath filter to include the original input in the state's output. Info
+
+$.result

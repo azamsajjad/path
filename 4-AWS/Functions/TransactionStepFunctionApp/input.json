@@ -1,0 +1,5 @@
+{
+	"TransactionType": "PURCHASE"
+}
+
+// based on input of this variable, state machine will choose the path 

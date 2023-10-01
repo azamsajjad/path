@@ -1,0 +1,6 @@
+import boto3
+import json
+import time
+
+def lambda_handler(event, context):
+	return event['transactionId'] + '' + event['type']

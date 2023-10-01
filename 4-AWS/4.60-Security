@@ -167,6 +167,12 @@ AWS WAF
 –
 AWS WAF is a web application firewall that helps protect web applications from attacks by allowing you to configure rules that allow, block, or monitor (count) web requests based on conditions that you define. These conditions include IP addresses, HTTP headers, HTTP body, uniform resource identifier (URI) strings, structured query language (SQL) injection, and cross-site scripting.  
 
+Which of the following are benefits of integrating AWS Firewall Manager withAWS Organizations ? (Select TWO)
+
+``Firewall Manager monitors for new resources created to ensure they comply with a mandatory set of security policies.
+You can configure Amazon RDS database engines and Database parameters.
+``You can enable AWS WAF rules, AWS Shield Advanced protections, Amazon VPC security groups and AWS Network Firewalls.
+You can centrally manage Amazon S3 Lifecycle configuration on a bucket.
 
 AWS Firewall Manager
 +

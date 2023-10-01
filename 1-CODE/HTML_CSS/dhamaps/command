@@ -1,0 +1,61 @@
+
+
+
+sudo amazon-linux-extras install -y php7.2
+systemctl enable --now httpd
+sudo usermod -a -G apache ec2-user
+sudo chown -R ec2-user:apache /var/www
+
+sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
+find /var/www -type f -exec sudo chmod 0664 {} \;
+
+
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+php wp-cli.phar — info
+$ chmod +x wp-cli.phar
+$ sudo mv wp-cli.phar /usr/local/bin/wp
+wp core download
+
+
+sudo amazon-linux-extras install epel -y 
+sudo yum install https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm 
+sudo yum install mysql-community-server 
+
+[root@dhamaps ~]# systemctl enable --now mysqld
+[root@dhamaps ~]# systemctl status mysqld
+
+cat /var/log/mysqld.log | grep "A temporary password" 
+
+j=(upG%2UDdf
+
+sudo mysql_secure_installation
+
+Al...1!
+
+mysql -u root -p 
+CREATE DATABASE database_name DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+SHOW DATABASES;
+
+CREATE USER 'rupertdb'@'localhost' IDENTIFIED BY 'Altreason1!';
+GRANT PRIVILEGES ON dhamapsdb.table TO 'rupertdb'@'localhost';
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'sammy'@'localhost' WITH GRANT OPTION;
+or (not recommended)
+GRANT ALL PRIVILEGES ON *.* TO 'sammy'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+SHOW GRANTS FOR 'rupertdb'@'localhost';
+
+DROP USER 'username'@'localhost';
+exit
+mysql -u sammy -p
+
+ ALTER USER 'rupertdb'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Altreason1!';
+
+old site -> all-in-one WP migration plugin
+new site -> all-in-one WP migration plugin
+
+
+
+ServerName dhamaps.com
+ServerAlias www.dhamaps.com
+
+

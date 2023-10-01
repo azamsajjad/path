@@ -1,0 +1,9 @@
+https://sqs.us-east-1.amazonaws.com/767665886117/QueueFromStepFunctions
+
+
+no need to create role
+create sqs
+create state machine
+
+An execution role will be created with full permissions.
+A new execution role named StepFunctions-TransactionProcessingStateMachineFr-role-ovr7t47fa will be created. All required permissions for the actions specified in your state machine will be auto-generated.

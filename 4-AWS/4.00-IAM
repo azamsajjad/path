@@ -243,12 +243,12 @@ PART 2:
 6.	In the CloudShell, create new identity pool, named DynamoPool, allow unauthenticated entities:
 
 aws cognito-identity create-identity-pool \
-    --identity-pool-name DynamoPool \
+    --identity-pool-name DynamoPoolus \
     --allow-unauthenticated-identities \
     --output json
 
-
-us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5
+"IdentityPoolId": "us-east-1:d4e6fc07-844e-4bee-bd6d-db826df83c32" usa
+"IdentityPoolId": "us-east-1:3bdfca7e-ce2e-4a7c-85a4-54c1b2cbd697"
 7. Download the permissions policy for the role we are going to create. 
 
 wget https://raw.githubusercontent.com/ACloudGuru-Resources/course-aws-certified-developer-associate/main/Cognito_Demo/myCognitoPolicy.json
@@ -266,6 +266,8 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBRe
 10. 	Get the IAM role Amazon Resource Name (ARN).
 aws iam get-role --role-name Cognito_DynamoPoolUnauth --output json
 
+arn:aws:iam::767665886117:role/cognito_dynamopoolunauthusa
+
 11.	Add our role to the Cognito Identity Pool. Replace the identity pool ID with your own identity pool ID and use the role ARN from the previous step.
 
 aws cognito-identity set-identity-pool-roles --identity-pool-id "us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5" \
@@ -276,13 +278,13 @@ aws cognito-identity set-identity-pool-roles --identity-pool-id "us-east-1:6dc2a
 aws cognito-identity get-identity-pool-roles  --identity-pool-id "us-east-1:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 
-// [cloudshell-user@ip-10-6-11-26 ~]$ aws cognito-identity get-identity-pool-roles --identity-pool-id "us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5"
-// {
-//     "IdentityPoolId": "us-east-1:6dc2afe1-1aff-43df-91f4-9b16123688b5",
-//     "Roles": {
-//         "unauthenticated": "arn:aws:iam::282485216722:role/Cognito_DynamoPoolUnauth"
-//     }
-// }
+cloudshell-user@ip-10-2-28-120 ~]$ aws cognito-identity get-identity-pool-roles --identity-pool-id "us-east-1:d4e6fc07-844e-4bee-bd6d-db826df83c32"
+{
+    "IdentityPoolId": "us-east-1:d4e6fc07-844e-4bee-bd6d-db826df83c32",
+    "Roles": {
+        "unauthenticated": "arn:aws:iam::767665886117:role/cognito_dynamopoolunauthusa"
+    }
+}
 
 13. 	We can now specify the Cognito credentials in our application - i.e. in the JavaScript section of our webpage!
 Replace the identity pool ID with your own and the role ARN with your own role ARN. 
@@ -292,8 +294,8 @@ We are going to add this snippet to our index.html:
 sudo vi /var/www/html
 
 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-IdentityPoolId: "us-east-1:2344c8f8-bc7d-4bf8-9836-c8be99916812",
-RoleArn: "arn:aws:iam::xxxxxxxxxxxx:role/Cognito_DynamoPoolUnauth"
+IdentityPoolId: "us-east-1:3bdfca7e-ce2e-4a7c-85a4-54c1b2cbd697",
+RoleArn: "arn:aws:iam::767665886117:role/cognito_dynamodbunauth"
 });
 
 
@@ -588,3 +590,30 @@ Incorrect. AWS recommends Amazon Cognito, so you can focus on creating great app
 
 Correct Answer
 Correct. Amazon Cognito works with external identity providers that support SAML or OpenID Connect, social identity providers (such as Facebook, Twitter, Amazon) and you can also integrate your own identity provider.
+----------------------------------------------------------------------
+The most cost-effective solutions to allow existing Active Directory users access to AWS without having to recreate AWS IAM user accounts are:
+
+SAML 2.0
+
+Amazon Directory Services
+
+SAML 2.0 enables web-based, single sign-on (SSO) authentication between an identity provider (IdP) and an application, which in this case would be AWS. This allows you to use your existing Active Directory for authentication.
+
+Amazon Directory Services allows you to connect your AWS resources to an existing Microsoft AD, which means you can use your existing AD users and groups to access AWS resources. This option leverages your existing infrastructure and doesn't require the creation of additional IAM users.
+
+
+
+-----------------------
+
+Your company uses an Identity Provider (IdP) for Single-sign on (SSO) and has tasked their solutions architect with connecting their AWS Account to the IdP so their users can leverage their corporate identity to access the environment.
+
+What actions should the solutions architect take to meet these requirements? (Select TWO)
+
+````Create an AWS IAM Role with a trust relationship with the IdP.
+Create an AWS IAM User Group, associate the User Group with the IdP and add users to the User Group.
+````Create an AWS IAM Identity Provider by uploading the SAML metadata document from your IdP.
+Create an AWS IAM User with AWS Management Console Access, attach a policy with a trust relationship with the IdP.
+Create an AWS IAM Identity Provider by uploading the JSON metadata document from your IdP.
+
+
+-------------------------

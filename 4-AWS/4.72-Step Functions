@@ -1,0 +1,288 @@
+---------------------------------------------------------------------------
+STEP Functions: 
+provide visual interfac for serverless apps app is series of steps excuted in order as defined by your business logic
+Output of one step can be input of next step
+step functions also logs state of each step
+
+A state machine is an object that has a set number of operating conditions that depend on its previous condition to determine output.
+
+STEP Functions Workflows
+Standard Workflows: 
+     -> Long-Running (upto 1 year)
+     -> At-Most-Once Model  - (tasks are never executed more than once, unless explicitly specified by retry actions.)
+     -> Non-Idempotent Actions e.g. when processing payments, you want payment to be processed once
+     -> Change in State? a req is non-idempotent if it always change state
+     -> Limits - 4000 state transactions per second (Billed on)
+                 2000 step function start per second
+
+
+Express Workflows:
+    -> Short-Lived (upto 5 minutes)
+    -> At-Least-Once 
+    -> Idempotent Actions
+    -> Identical Request - has no side effect
+    2 types of Express Workflows
+        -> Synchronous - begins workflow->wait till complete->return result
+            workflows hold u up until they are complete
+            e.g. job interview, successful payment b4 processing order
+        -> Asynchronous - begins->confirm that its started->cloudwatch logs
+            runs in the background
+            e.g. email to a colleage, messaging system
+            (Billed on) no. of steps, duration of steps and memory
+            (Same as Lambda functions) because behind the scenes its lambda
+    -> Limits - UNLIMITED state transactions per second 
+                100,000 step function start per second
+                No Access to Debugging option in Step Function Console
+                view issues in cloudwatch
+    -> Use Case - INSTAGRAM (dont allow upload of vulgar pic)
+e.g.
+A solutions architect has been asked to help troubleshoot a Step Functions execution of a state machine. The users are noticing that occasionally, a task doesnt return a response and it creates a situation where the state machine has to be reset.
+
+What can be added to the process flow in the state machine to help recover automatically from a stuck condition created by an un-returned result from a task?
+
+
+Remove the problem task from the state machine.
+
+Create a cron job that will automatically retrigger the state machine after a certain amount of time.
+
+`````Use timeouts to avoid stuck executions.
+
+Create a Pass process flow to bypass the problem task.
+
+Highly Scalable and Low Cost $0.025 / 1000 State Transitions
+Built-in RETRY functionality - dont progress until success
+
+
+========================================================================
+"Step Functions benefits"
+Build and deploy rapidly
+Write less integration code
+Build fault-tolerant and stateful workflows
+                Step Functions can help you build workflows that are fault-tolerant and stateful. It manages state, checkpoints, and restarts for you to make sure that your workflows run in order and as expected. Built-in try/catch, retry, and rollback capabilities deal with errors  and exceptions automatically based on your defined business logic.
+Designed for reliability and scale
+========================================================================
+Step Functions workflow (2 of 6)
+1. Check inventory and hold a product: You can use Lambda to check inventory and place a product on hold.
+2. Bill the customer: Use another Lambda function to bill the customer. If billing does not go through on the first try, it will retry three times with exponential backoff.
+3. Remove the hold: Suppose that the credit card does not go through. You can introduce exception handling by adding a catch statement to remove the hold.
+4. Ship the product: If payment is received, another Lambda function can be used to send a shipping notification. Human interactions can be used with Callback Task Patterns.
+5. Notify the customer: As soon as the product is shipped, an SNS notification can be sent to the customer, informing them that their order has been shipped.
+
+"Step Functions use cases"
+Creating a bank account
+Orchestrate ETL process
+Building an ML pipeline
+
+You can use Step Functions to implement a business process as a series of steps that make up a workflow.
+The individual steps in the workflow can invoke a Lambda function or a container that has some business logic. They can also update a database such as DynamoDB or publish a message to a queue after that step or the entire workflow completes running.
+======================================================================
+"Lambda considerations"
+Because Lambda is a service that is often used to build out StepFunctions, you should be aware of limitations concerning Lambda.
+
+Lambda functions have a maximum runtime of 15 minutes.
+
+The /tmp directory storage space, which is used to store files during the runtime of the function, is limited to 512 MB.
+
+Lambda allocates CPU power in proportion to the amount of memory that is configured. Memory is the amount of memory available to your Lambda function at runtime. You can increase or decrease the memory and CPU power that is allocated to your function by using the Memory (MB) setting. To configure the memory for your function, set a value between 128 MB and 10,240 MB in I-MB increments.
+
+A Lambda function's execution role is an AWS Identity and Access Management (IAM) role that grants the function permission to access AWS services and resources. You provide this role when you create a function,
+and Lambda assumes the role when your function is invoked.
+======================================================================
+"Step Functions cost structure"
+Step Function pricing is a pay-as-you-go service with no upfront costs and no minimum fees. Step Functions counts a state transition each time a step of your workflow is performed. You are charged for the total number of state transitions across all your state machines, including retries.
+
+Free tier
+At the time of publishing, the free tier is available to both existing and new AWS customers indefinitely. It does not automatically expire at the end of your 12-month AWS Free Tier term. 
+The free tier provides 4,000 free state transitions a month for the Standard Workflows only. After that, you are charged for each state transition. Step Functions Express Workflows are not covered in the AWS Free Tier.
+
+Considerations
+With Step Functions Express Workflows, you are charged for the number of transition requests in a workflow and also its duration. Step Functions Express Workflows count a request each time that it starts performing a workflow. You are charged for the total number of requests across all of your workflows, including tests from the console. Duration is calculated from the time your workflow begins running until it completes or otherwise stops.
+
+======================================================================
+
+"Step Functions features"
+AWS service integrations-----------------------------------------------
+Using Step Functions service tasks, you can configure your Step Functions
+workflow to call other AWS services, including the following:
+• Compute services — AWS Lambda, Amazon Elastic Container Service (Amazon
+ECS), Amazon Elastic Kubernetes Service (Amazon EKS), and AWS Fargate
+• Database services — Amazon DynamoDB
+• Messaging services — Amazon Simple Notification Service (Amazon SNS) and
+Amazon Simple Queue Service (Amazon SQS)
+• Data processing and analytics services — Amazon Athena, AWS Batch, AWS Glue, Amazon EMR, and AWS Glue DataBrew
+• Machine learning services — Amazon SageMaker
+• APIs created by Amazon API Gateway-----------------------------------
+
+Coordination of components
+Workflow abstraction
+Built-in error handling
+History of each job
+Visual monitoring
+Compliance
+========================================================================
+Task states
+A Task state represents a single unit of work that a state machine performs. All work in your state machine is done by tasks. A Task state performs work in several ways:
+• Using a Lambda function
+• Passing parameters to the API actions of other services
+• Completing an activity (which is an application that you host and run through an activity worker)
+
+
+Choice states
+States like the Choice state orchestrate tasks but do not perform work themselves.
+Choice rules determine what the state machine will do next.
+You can also specify a default option so that a path exists if the data doesnt match one of the rules.
+
+
+Parallel states
+Parallel states start their branches as concurrently as possible.
+• Parallel states wait until all branches stop or complete.
+
+
+Wait states
+You can use the Wait state to pause processing for a specific or relative time frame.
+• Use Wait states instead of having a Lambda function wait for work to complete.
+This technique is more efficient and less costly for Lambda. If you build wait time into a Lambda function, you pay for that idle time. The cost of Step Functions is based on the number of state transitions, not how long it takes to move from one state to another.
+
+
+Callbacks
+Use callbacks for tasks that must wait for an external action.
+• Pass a task token, and Step Functions will pause until the token is returned.
+Alternatively, you might need the processing to pause until you get an external response. For example, you might need a human approval or a third-party system that must process your request and respond. In this
+example, the head pie baker must approve that the pie is baked correctly.
+Some AWS services that are integrated with Step Functions can use a task token that you pass to them. Then, they return the token when the work is
+complete.
+
+
+Intrinsic functions
+The Amazon States Language provides several intrinsics to allow basic operations without Task states. Intrinsics are constructs that look like functions in programming languages and can be used to help Payload Builders process the data going to and from Task Resources. Intrinsics include States.Format, States.StringToJason, States.Array, and many
+others. Take a look at one example of intrinsics.
+
+States.Format supports string construction from literal and interpolated values and takes one or more arguments. The value of the first argument must be a string and can include zero or more instances of the character sequence {}. The invocation must have as many remaining arguments as occurrences of {}. The interpreter returns the first-argument string with each O replaced by the value of the positionally corresponding argument in the intrinsic invocation.
+States.Format can be used as follows:
+                    States.Format('HeIlo, my name is {}.', $.name)
+Or
+                    States.Format($.template, $.name)
+
+Example of data inputs:
+{"name": "Arnav",
+"template": "Hello, my name is O."}
+========================================================================
+Step Functions for failure management
+========================================================================
+RETRY 
+What if the call to the DynamoDB table fails when trying to retrieve the connection ID? To address this, you should include a Retry field with exponential backoff to retry the connection.
+
+
+CATCH
+What if the Lambda function fails to write the execution ARN and WebSocket URL? In this case, a retry wouldn’t resolve it. So you could use a Catch field to catch the error and transition to a fallback state.
+
+
+LOOPING
+What if the Step Functions work completes before the client has connected via the WebSocket API? The notification step wouldn't find the connection ID in the DynamoDB table. To address this type of issue, you could nest a looping pattern within the GetConn task that uses a Lambda function to execute the GetItem API call to the database a set number of times before failing that step.'
+========================================================================
+Which of these statements about AWS Step Functions States Language are true? (Select THREE.)
+
+"
+Task and Parallel states can have a field named Retry. An individual retrier represents a certain number of retries."
+
+Correctly checked
+Choice states can have a field named Catch. When a state reports an error that cant be resolved by retriers, Step Functions scans through the catchers to find the error name in the ErrorEquals field.
+
+Correctly unchecked
+You cant use a Retry or Catch field to handle timeouts.
+
+"Correctly checked
+The Amazon States Language defines a set of built-in strings that name well-known errors, all beginning with the States. prefix."
+
+"Correctly checked
+The reserved name States.ALL is a wildcard that matches any error name."
+
+Correctly checked
+Choice states can have a field named Retry. An individual retrier represents a certain number of retries.
+========================================================================
+========================================================================
+CREDIT CARD PROCESSING APPLICATION WITH EC2
+can create a workflow for success and fail events , but no retry strategy, wait and retry functionality. a customer needs to re-initiate the transaction if fails.
+CREDIT CARD PROCESSING APPLICATION WITH STEP FUNCTIONS
+
+START 
+|
+|
+ProcessTransactio
+|
+StoreHistory (DYNAMODB)
+|
+PinAuthorizer (LAMBDA)
+|
+PinDecider___________________________________________________
+|                                                           |
+PinSuccess                                              PinFailure
+|                (LAMBDA)                                   |
+CommitTransaction___________________                        |
+|                                  |                        |
+BroadcastSuccessMessage     CommitTransactionFailure        |
+|          (SNS)                   |                        |
+|                                  |                        |
+END_______________________________/_________________________/
+
+ASL - STEPS FUNCTIONS NATIVE LANGUAGE - AMAZON STATES LANGUAGE
+
+"StoreHistory": {
+    "Type": "Task",
+    "Resource": "arn:aws:states:::dynamodb:putItem",
+    "Parameters": {
+        "TableName": "TransactionHistoryTable",
+        "Item": {
+            "TransactionId": {"S.$": "$.TransactionId"}
+        }
+    },
+    "Retry": [
+        {
+            "ErrorEquals": ["States.ALL"],
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3
+        }
+    ],
+    "Next": "PinAuthorizer"
+    }
+}
+
+"PinAuthorizer": {
+    "Type": "Task",
+    "Resource": "arn:aws:lambda:us-east-1:398447858632:function:PinAuthorizer"
+    "Next": "PinDecider"
+},
+
+
+REVIEW FUNCTION FOLDER.
+
+Wait for callback
+
+The "Wait for callback" pattern lets you pause your workflow at this state until some external process is complete. To use this pattern, you must pass a unique task token along with the API parameters for [Service][API]. You retrieve the task token from the Context Object , and put it into a key value pair, for example:
+"MyTaskToken.$": "$$.Task.Token"
+Copy
+Later, after your external process completes, you will pass the task token to the Step Functions SendTaskSuccess  or SendTaskFailure  APIs to report the outcome and resume the execution. Note: Only APIs whose parameters support arbitrary data can be used with the "Wait for Callback" pattern.
+
+{
+  "type.$": "$.type",
+  "MyTaskToken.$": "$$.Task.Token"
+}
+PAYLOAD
+===========================================================================
+An application that processes order returns must complete different steps depending on whether the return is within 30 days of purchase.
+Which AWS Step Functions state could a developer use to implement this logic?
+C) Parallel
+Task
+Choice`````````
+Wait
+
+An application that processes order returns must run two independent audit checks.
+When both checks are successfully completed, the return authorization step is run.
+Which AWS Step Functions state could a developer use to implement this logic?
+@ Parallel``````````
+O
+Task
+O
+Choice
+o
+Wait

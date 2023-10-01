@@ -1,6 +1,31 @@
+Why is monitoring important for troubleshooting?
+
+You should collect monitoring data from all parts of your AWS solution to help troubleshoot a multipoint failure if one occurs. Before you start monitoring Amazon Elastic Container Service (Amazon ECS), first create a monitoring plan to answer the following questions.
+
+1
+What are your monitoring goals?
+
+2
+What resources will you monitor?
+
+3
+How often will you monitor these resources?
+
+4
+What monitoring tools will you use?
+
+5
+Who will perform the monitoring tasks?
+
+6
+Who should be notified when something goes wrong?
+
+========================================================================
+
 CloudWatch
 CloudTrail
 X-Ray 
+AWS Systems Manager
 ---------------------------
 CloudWatch
 
@@ -203,7 +228,31 @@ total 348668
 -rwxr-xr-x. 1 root root 100508040 Jul 18 21:53 start-aws-cloudwatch-agent
 [root@ip-172-31-37-171 bin]# cat config.json 
 
+========================================================================
+CloudWatch pricing
 
+With Amazon CloudWatch, there is no up-front commitment or minimum fee. You pay for what you use, and you will be charged at the end of the month for that usage. A good best practice is to understand when charges occur using CloudWatch. For example, if you have a single CloudWatch alarm with multiple metrics, you are charged for each metric associated with a CloudWatch alarm. 
+
+Charges are also incurred:
+
+When you exceed three dashboards with up to 50 metrics.
+By ingesting and storing logs, as well as the amount of ingested logs scanned for each CloudWatch Insights query.
+Based on the number of custom events.
+Charges are also incurred when you monitor more than 10 custom metrics. Custom metrics can be metrics you create and also metrics from tools such as the CloudWatch agent. Metrics collected by the CloudWatch agent are billed as custom metrics. 
+
+Recommendations to cost optimize your account:
+
+Only use detailed monitoring when needed.
+Remove any unnecessary alarms.
+Disable monitoring of custom metrics.
+Delete unnecessary dashboards.
+Stop ingesting logs that are not needed.
+Run queries for shorter durations.  
+Most AWS services automatically send metrics to CloudWatch for free. Many AWS accounts and applications should be able to operate within these AWS Free Tier limits. If not, you can use the AWS Pricing Calculator to estimate your monthly bill; however, know that pricing in AWS varies by:
+
+AWS Regions
+CloudWatch metric API calls
+Data transferred
 ------------------------------------------------------------------------
 CloudWatch Metrics
 CloudWatch Namespaces
@@ -352,7 +401,40 @@ aws cloudwatch put-metric-alarm \
 
 
 ---------------------------------------------------------------------------
-CloudWatch Logs Insight 
+CLOUDWATCH LOGS.
+Log events
+–
+Log events are a record of some activity recorded by the application or resource being monitored. The log event record that CloudWatch Logs understands contains two properties: the timestamp of when the event occurred, and the raw event message. Event messages must be UTF-8 encoded.
+
+
+Log streams
+–
+Log streams are a sequence of log events that share the same source. More specifically, a log stream is generally intended to represent the sequence of events coming from the application instance or resource being monitored. 
+
+
+Log groups
+–
+Log groups define groups of log streams that share the same retention, monitoring, and access control settings. Each log stream has to belong to one log group. For example, if you have a separate log stream for the Apache access logs from each host, you can group those log streams into a single log group called MyWebsite.com/Apache/access_log.
+There is no limit on the number of log streams that can belong to one log group.
+
+
+Metric filters
+–
+Metric filters can extract metric observations from ingested events and transform them to data points in a CloudWatch metric. Metric filters are assigned to log groups and all of the filters assigned to a log group are applied to their log streams.
+
+
+Retention settings
+–
+Retention settings can be used to specify how long log events are kept in CloudWatch Logs. Expired log events get deleted automatically. Just like metric filters, retention settings are also assigned to log groups, and the retention assigned to a log group is applied to its log streams. By default, log data is stored in CloudWatch Logs indefinitely. However, you can configure how long to store log data in a log group. Any data older than the current retention setting is deleted automatically. You can change the log retention for each log group at any time. You can also export log data from your log groups to an Amazon Simple Storage Service (S3) bucket and use this data in custom processing and analysis, or to load onto other systems.
+---------------------------------------------------------------------------
+CLOUDWATCH LOGS INSIGHT.
+Note: CloudWatch Logs Insights queries incur charges based on the amount of data that is queried.
+A single request can query up to 20 log groups. Queries time out after 15 minutes, if they have not completed. Query results are available for 7 days.
+
+
+Perform queries to help you more efficiently and effectively respond to operational issues. If an issue occurs, you can use CloudWatch Logs Insights to identify potential causes and validate deployed fixes.
+
+
 1- Create a Basic Lambda Function:
 a new log group is automatically created, enabling it to send logs to cloudwatch
 
@@ -365,11 +447,82 @@ line graphs, pie charts, and stacked areas as well.
 And they also give you loads of cool example queries.
 For instance,
 you can display the 25 most recently added log events.
+
 Search your VPC flow logs
 to find out which IP addresses are using a specific protocol
 or even find the most expensive Lambda requests.
 
+
+
+QUERY LANGUAGE:
+Includes a purpose-built query language with a few simple but powerful commands. 
+Provides sample queries, command descriptions, query autocompletion, and log field discovery to help you get started. Sample queries are included for several types of AWS service logs.
+Supports a query language you can use to perform queries on your log groups. Each query can include one or more query commands separated by Unix-style pipe characters (|).
+Six query commands are supported, along with many supporting functions and operations, including regular expressions, arithmetic operations, comparison operations, numeric functions, datetime functions, string functions, and generic functions.
+
+Comments are also supported.
+Lines in a query that start with the # character are ignored.
+Fields that start with the @ symbol are generated by CloudWatch Logs Insights.
+
+TYPES OF LOGS:
+CloudWatch Logs Insights supports all types of logs. 
+For every log sent to CloudWatch Logs, five system fields are automatically generated:
+
+>@message contains the raw unparsed log event. This is equivalent to the message field in InputLogevent.
+>@timestamp contains the event timestamp contained in the log events timestamp field. This is equivalent to the timestamp field in InputLogevent.
+>@ingestionTime contains the time when the log event was received by CloudWatch Logs.
+>@logStream contains the name of the log stream that the log event was added to. Log streams are used to group logs by the same process that generated them.
+>@log is a log group identifier in the form of account-id:log-group-name. This can be useful in queries of multiple log groups, to identify which log group a particular event belongs to.
+CloudWatch Logs Insights inserts the @ symbol at the start of fields for logs it automatically processes. Logs not automatically processed by CloudWatch can be processed by using parse command to extract and create ephemeral fields for use in that query.
+
+SCHEDULE A QUERY:
+To schedule a query of a log group using CloudWatch Logs Insights, specify the: 
+
+Log group
+Time range to query
+Query string to use
+
+
+USEFUL QUERIES:
+Top 15 packet transfers across your hosts.
+stats sum(packets) as packetsTransferred by srcAddr, dstAddr    
+| sort packetsTransferred  desc   
+| limit 15
+
+
+Top 15 byte transfers for hosts in a given subnet.
+filter isIpv4InSubnet(srcAddr, "192.X.X.X/24")    
+| stats sum(bytes) as bytesTransferred by dstAddr    
+| sort bytesTransferred desc    
+| limit 15
+
+
+IP addresses that use specific protocols.
+filter protocol=6 | stats count(*) by srcAddr 
+This is for TCP protocol.  Replace the 6 with 17 for UDP, and so on. 
+For more information: Protocol Numbers
+
+
+IP addresses that skipped flow log records during the capture window.
+filter logStatus="SKIPDATA"   
+| stats count(*) by bin(1h) as t    
+| sort t
+
+
+10 DNS resolvers with the highest number of requests.
+stats count(*) as numRequests by resolverIp    
+| sort numRequests desc   
+| limit 10
+
+
+25 most recently added log events.
+fields @timestamp, @message | sort @timestamp desc | limit 25
+List of log events that are not exceptions.
+
 ---------------------------------------------------------------------------
+CLOUDWATCH ALARMS:
+Create up to 5,000 alarms per Region per AWS account.
+Only use ASCII characters for alarm names.
 Receiving Notifications with CloudWatch
 1- launch EC2 instance 
 2- Create CloudWatch Alarm 
@@ -379,7 +532,56 @@ Receiving Notifications with CloudWatch
 cpu utilization 99% script
 for i in 1 2 3 4; do while : ; do : ; done & done
 
+Metric alarm states
 
+When you create a CloudWatch alarm that watches a single CloudWatch metric, an alarm invokes actions only when the alarm changes state.
+
+The alarm can be in one of three states:
+
+OK means the metric is within the defined threshold.
+ALARM means the metric is outside the defined threshold.
+INSUFFICIENT_DATA means enough information has yet to be gathered that can determine whether the metric is within or outside of the threshold range.
+For each alarm you create, you can specify CloudWatch to treat missing data points as: 
+
+notBreaching – Missing data points are treated as good and within the threshold.
+breaching – Missing data points are treated as bad and breaching the threshold.
+ignore – The current alarm state is maintained.
+missing – If all data points in the alarm evaluation range are missing, the alarm transitions to INSUFFICIENT_DATA.
+
+
+"Recommendations of alarms to configure"
+ALARM TRIGGERS:
+Ensure that a CloudWatch alarm is initiated each time a configuration change is made to:
+
+
+VPC internet gateway or a VPC VPN customer gateway---------------------
++
+When a VPC internet gateway or a VPC VPN customer gateway configuration change is made, the CloudWatch alarm should fire every time an AWS API call is performed to create, update, or delete a VPC customer or internet gateway.
+
+Network access control list (network ACL)------------------------------
++
+When a network access control list (network ACL) configuration change is made, the CloudWatch alarm should fire every time an AWS API call is performed to create, update, or delete a network ACL.
+
+Security group---------------------------------------------------------
++
+When a security group configuration change is made, the CloudWatch alarm should fire every time an AWS API call is performed to create, update, or delete a security group.
+
+CloudTrail-------------------------------------------------------------
++
+
+Root account-----------------------------------------------------------
++
+When the root account is used, the CloudWatch alarm should be initiated every time an AWS root account is used.
+
+VPC Flow Logs----------------------------------------------------------
++
+Ensure that a CloudWatch alarm is created and configured for the metric filter attached to the VPC Flow Logs CloudWatch log group to receive notifications when IP packets are rejected inside the specified VPC. The CloudWatch alarm must be configured to watch the VPC Flow Logs metric filter over a specified period and perform an action based on the value of the metric relative to a given threshold over a number of time periods. 
+Ensure that a metric filter that matches the pattern of the rejected traffic is created for the CloudWatch log group assigned to VPC Flow Logs. VPC Flow Logs is a feature that records information about the IP traffic (accepted, rejected, or all traffic) going to and from the elastic network interfaces (ENIs) available within your VPC. The captured log data is stored using CloudWatch Logs service. You can manage flow log records as you would with any other log events collected by CloudWatch Logs. A metric filter defines the terms and patterns to look for in the flow log data as this is sent to CloudWatch Logs. CloudWatch uses this metric filter to turn log data into numerical metrics that you can graph or set an alarm on.
+
+
+Alarm events and EventBridge
+
+CloudWatch sends events to Amazon EventBridge whenever a CloudWatch alarm changes alarm state. You can use EventBridge and these events to write rules that take actions, such as notifying you, when an alarm changes state
 ---------------------------------------------------------------------------
 EventBridge
 easily configure event-driven systems
@@ -630,3 +832,94 @@ The X-Ray SDK records exception details and the (stack trace) (if avl)
 Lambda,ApiG,Fargate,ELB,SNS,SQS,CloudTrail,CloudWatch,EC2,ECS,EB,aws config
 -----------------------------"Languages"----------------------------------
 go,java,nodejs,python,ruby,php,.net         no powershell
+
+
+
+---------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------------
+AWS SYSTEMS MANAGER
+
+
+
+AWS Systems Manager Agent (SSM Agent)
+
+The SSM Agent is Amazon software that can be installed and configured on an Amazon Elastic Compute Cloud (Amazon EC2) instance, an on-premises server, or a virtual machine (VM). SSM Agent makes it possible for Systems Manager to update, manage, and configure these resources.
+
+AWS Systems Manager (formerly known as SSM) is an AWS service that you can use to view and control your infrastructure on AWS. 
+
+Using the Systems Manager console, you can view operational data from multiple AWS services and automate operational tasks across your AWS resources. 
+
+Systems Manager helps you maintain security and compliance by scanning your managed instances and reporting on (or taking corrective action on) any policy violations it detects. For more hands-on information: AWS Systems Manager Workshop.
+
+When you install the SSM Agent onto a server, Amazon EC2 instance, or virtual machine, that server becomes a managed instance. A managed instance is a machine that has been configured for use with Systems Manager. Systems Manager also helps you configure and maintain your managed instances. 
+
+If you monitor traffic, you will see your Amazon Elastic Compute Cloud (Amazon EC2) instances, any on-premises servers, or virtual machines in your hybrid environment, communicating with ec2messages.* endpoints. AWS 
+
+
+
+Systems Manager Agent (SSM Agent):
+Writes information about executions, commands, scheduled actions, errors, and health statuses to log files on each instance. 
+Logs files by manually connecting to an instance or automatically send logs to CloudWatch Logs.
+You can also store agent configuration settings in the Systems Manager Parameter Store for use with the CloudWatch Agent. Parameter Store is a capability of AWS Systems Manager.
+
+
+
+Using the SSM Agent:
+SSM Agent processes requests from the Systems Manager service in AWS and configures your machine as specified in the request. You can manage servers without having to log in to them using automation. SSM Agent sends status and execution information back to the Systems Manager service by using the Amazon Message Delivery Service (service prefix: ec2messages).
+
+You can improve the security posture of your managed instances (including managed instances in your hybrid environment) by configuring Systems Manager to use an interface VPC endpoint in Amazon VPC. An interface VPC endpoint (interface endpoint) helps to connect to services powered by AWS PrivateLink, a technology that enables you to privately access Amazon Elastic Compute Cloud (Amazon EC2) and Systems Manager APIs by using private IP addresses. 
+
+AWS PrivateLink restricts all network traffic between your managed instances, Systems Manager, and Amazon EC2 to the Amazon network. This means that your managed instances don't have access to the internet. If you use AWS PrivateLink, you don't need an internet gateway, a network address translation (NAT) device, or a virtual private gateway. You aren't required to configure AWS PrivateLink, but it's recommended.
+
+
+
+Other uses for the SSM Agent:
+
+Use SSM to connect to your hosts, not exposing port 22.
+
+Log SSM API calls with CloudTrail.
+
+Sending instance logs to CloudWatch Logs.
+
+Configure CloudWatch Logs for Run command.
+
+Monitor Run Command metrics using CloudWatch.
+
+
+
+SSM Agent compared to CloudWatch Agent:
+
+Manually connecting to an instance to view log files and troubleshoot an issue with SSM Agent is time consuming. A best practice is to configure the SSM Agent to automatically send its log data to a log group in CloudWatch Logs for analysis. You can configure and use the CloudWatch Agent to collect metrics and logs from your instances instead of using Systems Manager Agent (SSM Agent) for these tasks. 
+
+For more efficient monitoring, the CloudWatch Agent gathers more metrics on EC2 instances and on-premises servers than are available using SSM Agent. Using CloudWatch Logs, you can monitor log data in real time, search and filter log data by creating one or more metric filters, and archive and retrieve historical data when you need it. 
+
+
+CloudWatch Logs provides the following benefits:
+
+Centralized log file storage for all SSM Agent log files
+
+Quicker access to files to investigate errors
+
+Indefinite log file retention (configurable)
+
+Ability to maintain and access logs regardless of the status of the instance
+
+Access to other CloudWatch features such as metrics and alarms
+
+
+
+
+Systems Manager pricing:
+
+With AWS Systems Manager, you pay for what you use on the following priced features. There are no minimum fees or up-front commitments.

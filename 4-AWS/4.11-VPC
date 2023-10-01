@@ -228,13 +228,12 @@ AWS Transit Gateway also supports AWS VPN and Direct Connect gateways, offering 
 
 ref: image transit gateway complex
 
-Transit gateways are a regional service and support a hub-and-spoke network design within the Region in which they are deployed. This permits traffic from one connected VPC to route to any other connected VPC through that Region's transit gateway. Transit gateway inter-Region peering is nontransitive. This means that traffic routing between Regions can only pass from the transit gateway in the originating Region to the transit gateway in the destination Region.
+Transit gateways are a regional service and support a hub-and-spoke network design within the Region in which they are deployed. This permits traffic from one connected VPC to route to any other connected VPC through that Regions transit gateway. Transit gateway inter-Region peering is nontransitive. This means that traffic routing between Regions can only pass from the transit gateway in the originating Region to the transit gateway in the destination Region.
 
 To make a highly available multiregional AWS environment using transit gateways, a mesh network design is required. A mesh design ensures that each transit gateway has a peered connection with every other transit gateway in the environment, so traffic moves across the environment as needed.
 
 
-
-
+=========================================================================
 
 ------------------------------------------------------------------------
 '
@@ -352,3 +351,68 @@ Service directory – A centralized registry of all services that have been regi
 Service network – A logical grouping mechanism to simplify how users enable connectivity and apply common policies to a collection of services. Service networks can be shared across accounts with AWS RAM and associated with VPCs to enable connectivity to a group of services.
 
 Auth policy – Auth policy is an AWS Identity and Access Management (IAM) resource policy that you can associate with a service network and individual services to define access controls. Auth policy uses IAM, and you can specify rich principal-action-resource-condition (PARC)-style questions to enforce context-specific authorization on VPC Lattice services. Typically, an organization would apply coarse-grained Auth policies at the service network, such as “only authenticated requests within my org-id are allowed,” and more granular policies at the service level.
+
+======================================================================
+A solutions architect needs to capture IP traffic logs going in and out of the network interfaces of the Amazon EC2 instances inside of an Amazon VPC. The records need to capture network internet protocol (IP) traffic flow transmitted by a 5-tuple. This information must be publishable in Amazon CloudWatch Logs.
+
+What service function would you use to cover all the subnets that belong to the same VPC?
+
+VPC IP Address Manager (IPAM)
+"VPC Flow Logs"
+Network Access Analyzer
+VPC Reachability Analyzer
+
+To capture IP traffic logs going in and out of the network interfaces of Amazon EC2 instances inside a VPC, and to publish this information in Amazon CloudWatch Logs, you would use:
+
+VPC Flow Logs
+
+VPC Flow Logs capture information about the IP traffic going to and from network interfaces in a VPC. This information includes details like source and destination IP addresses, source and destination ports, protocol, and action (accept or reject).
+
+So, to cover all subnets belonging to the same VPC, you would set up VPC Flow Logs for that VPC.
+
+========================================================================
+A customer has two AWS accounts. One of them is a devtest account used by their development and QA teams and the other one is a production account where currently all their production workloads are running. The customer has several Amazon VPCs in both the accounts. The customer is using Amazon Route 53 as DNS service in both of their AWS accounts and planning to have Private Hosted Zones created. The customer is looking for a solution with which they could have ease of management and efforts for the Private Hosted Zones.
+
+Which of the following options has the least administrative efforts and ease of management for the customer to associate VPCs and Private Hosted Zones with Route 53 service?
+
+
+Amazon VPCs from the different AWS account are associated by default with the Private Hosted Zone in the other account as both accounts belongs to the same customer.
+
+Associate VPCs belonging to different accounts with a single hosted zone.
+
+```````Create Private Hosted Zones in both the AWS accounts separately and associate their respective Amazon VPCs with their corresponding Private Hosted Zones.
+
+Customer could write a script for the Amazon VPCs in one account to be associated with the Private Hosted Zone of the other AWS Account and host that script on AWS Lambda which can perform the job for the customer.
+----------------
+The option that has the least administrative efforts and ease of management for the customer to associate VPCs and Private Hosted Zones with Route 53 service is:
+
+Create Private Hosted Zones in both the AWS accounts separately and associate their respective Amazon VPCs with their corresponding Private Hosted Zones.
+
+By creating separate Private Hosted Zones in each AWS account and associating the corresponding Amazon VPCs, the customer can maintain clear and organized DNS configurations for their devtest and production environments. This approach ensures simplicity and separation of concerns. It's also a straightforward and standard practice for managing Private Hosted Zones in different AWS accounts.
+======================================================================
+A solutions architect needs to test the connectivity of different protocols, such as ICMP, between an Amazon EC2 instance and an Internet Gateway, both in the same AWS account.
+
+Which service can the solutions architect use?
+
+
+Network Access Analyzer
+
+```````````````VPC Reachability Analyzer
+
+VPC IP Address Manager (IPAM)
+
+VPC Flow Logs
+=======================================================================
+Your company uses an Amazon EC2 instance in a public subnet to host a web application. The Amazon EC2 instance uses a default security group. The network ACL is configured to block all traffic to the instance. You must allow incoming traffic on port 443 to access the application from any source.
+
+Which combination of steps will accomplish this requirement? (Select TWO)
+
+
+In the network ACL, add a rule to allow inbound TCP traffic on port 443 from source 0.0.0.0/0 and outbound traffic on port 1024-65535 to the destination 0.0.0.0/0.
+
+This allows inbound traffic on port 443 and outbound traffic on ephemeral ports (1024-65535) from any source to any destination.
+
+In the security group, add a rule to allow TCP connections on port 443 from the source 0.0.0.0/0.
+
+This allows incoming TCP traffic on port 443 from any source.
+========================================================================

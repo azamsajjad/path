@@ -299,18 +299,93 @@ Security groups
 -------------------------------------------------
 There are seven AWS Networking Gateways.
 
-1-Internet gateway is an Amazon VPC component that allows communication between your computer and the internet. Applications include, Elastic Load Balancers, Amazon EC2 instances, Amazon S3, AWS Lambda and so on.
-2-Customer Gateway is a physical or software appliance that you own or manage in your on premises network. Applications include manages routing to and from your environment.
-3-VPN Gateway is the gateway on the AWS side of site-to-site VPN connection. Applications include Amazon EC2 instances, Amazon S3, Amazon RDS< Amazon Lambda, and so on.
-4-Direct Connect Gateway establishes connectivity that spans Amazon VPCs spread across multiple AWS Regions. Applications include Amazon EC2 instances, Amazon RDS, AWS Lambda, and so on.
-5-NAT Gateway is a network address translation service that enables instances in a private subnet to connect to services outside your VPC. Applications include Amazon EC2 instances, Amazon RDS, AWS Lambda, and so on.
+1-Internet gateway (IS A COMPONENT ON VPC LEVEL) is an Amazon VPC component that allows communication between your computer and the internet. Applications include, Elastic Load Balancers, Amazon EC2 instances, Amazon S3, AWS Lambda and so on.
+in public subnet Route Table, we add entry 
+0.0.0.0/0 -> IGW
+INTERNET GATEWAY supports INGRESS ROUTING, which means....
+you can associate a route table with AWS VIRTUAL PRIVATE GATEWAY
+to redirect incoming and outgoing VPC traffic through virtual appliances 
+it segments VPC traffic
+ROUTE TABLES CAN BE ATTACHED DIRECTLY
+**********************************************************************
+2-NAT Gateway (IS A COMPONENT ON SUBNET LEVEL) (LIVES IN A SPECIFIC AVAILABILITY ZONE IN PUBLIC SUBNET) is a network address translation service that enables instances in a private subnet to connect to services outside your VPC. Applications include Amazon EC2 instances, Amazon RDS, AWS Lambda, and so on. 
+in private subnet Route Table, we add entry 
+0.0.0.0/0 -> NAT
+NG performs NAT for instances in private subnet with no public IPs
+        You cannot Route Traffic to NG through VPCpeering, site-2-site VPN, or Direct Connect, because it NAT is a regional resource.
+**********************************************************************
+3-Customer Gateway is a physical or software appliance that you own or manage in your on premises network. Applications include manages routing to and from your environment.
+Redundant IPSec Tunnels for Automatic Failover.
+Configure both Tunnels on the Customer Gateway.
+Each Tunnel contains an Internet Key Exchange (IKE) security association, an IPSec security association and a BGP peering
+Customer Gateway is a Physical or Software Appliance on the Customer side of a Site-to-Site VPN Connection
+1 CG can be used to work with multiple site-to-site VPN connections
+**********************************************************************
+4-Virtual Private Gateway is the gateway on the AWS side of site-to-site VPN connection. Applications include Amazon EC2 instances, Amazon S3, Amazon RDS< Amazon Lambda, and so on.
+just like INTERNET GATEWAY
+AWS VIRTUAL PRIVATE GATEWAY supports INGRESS ROUTING, which means....
+you can associate a route table with AWS VIRTUAL PRIVATE GATEWAY
+to redirect incoming and outgoing VPC traffic through virtual appliances 
+it segments VPC traffic
+
+ONE VPN TUNNEL CAN BE ACTIVE AT A TIME - THROUGHPUT 1.25gbps -> CustG
+REGIONAL RESOURCE - LIVES INSIDE OF VPC - BUT VPC-BOUND
+encrypts data automatically
+ROUTE TABLES CAN BE ATTACHED DIRECTLY - help with passing packets thru appliance
+**********************************************************************
+5-Direct Connect Gateway establishes connectivity that spans Amazon VPCs spread across multiple AWS Regions. Applications include Amazon EC2 instances, Amazon RDS, AWS Lambda, and so on.
+CustomerGateway->DC Endpoint--->AWS   DC Gateway---> 2or3or4 VGW
+                in DC Location
+
+has 1 BGP peering per Direct Connect Gateway per DC Connection
+Global Resource - connects upto 10 VGWs globally and cross account
+Allows North-South Traffic Flow, but not VPC-to-VPC 
+
+Direct Connect Location Can be associated with:
+----Virtual Private Gateway - set up 1 BGP connection per 1 VGW
+or
+----DirectConnect Gateway and VGW - refuse VPC to VPC connectivity
+or
+----DirectConnect Gateway and TG - permit VPC to VPC conectivity
+
+GLOBAL RESOURCE - LIVES OUTSIDE OF REGION AND VPC
+**********************************************************************
 6-AWS Transit Gateway connects Amazon VPCs, AWS accounts, and on premises networks to a single gateway. Applications include Amazon VPC connections, AWS VPN connection, AWS Direct Connect.
-7-Virtual gateway allows resources that are outside of your mesh network to communicate to resources that are inside. Applications include Amazon EC2, Amazon ECS, and Amazon EKS.
+
+Can be attached directly to Customer Gateway - VPN Connection
+BOTH VPN TUNNELS CAN BE ACTIVE AT A TIME - THROUGHPUT 2.5gbps -> CustG
+REGIONAL RESOURCE - LIVES OUTSIDE OF VPC - BUT REGION-BOUND
+ROUTE TABLES CAN BE ATTACHED DIRECTLY - 
+
+**********************************************************************
+7-Local Gateway allows resources in Outposts to communicate with on-premise resources. 
+Route Tables:
+        AWS Creates a local Gateway for your outposts as part of the installation process . 
+        You can only associate the local gateway route table with subnets that reside in the outpost
+Virtual Interfaces:
+        AWS creates 1 VIF for each Link Aggregation Group (LAG), and then associates the VIF with the default local gateway route table.
+        The Local Gateway Route Table has a default route to the 2 VIFs for local network connectivity
+ROUTE TABLES CAN BE ATTACHED DIRECTLY (part of aws installation process)
 
 ---------------------------------------------------------------------------
+
+
+
+
+
+
+=============================================================
+WHEN WHAT?11111111111111111111111111111111111111111111111111
+=============================================================
+IF ALL YOU NEED IS COMMUNICATION B/W VPC 1 AND VPC 2, AND.....
+you dont have overlapping CIDR ranges 
+you dont need transitive communication
+VPC PEERING IS A VIABLE OPTION.
+=============================================================
+----------------------------------
 VPC peering
 
-Now let's dive deeper into the Amazon VPC and discuss a foundation service in AWS that can add peering to provide communication between Amazon VPCs. VPC peering(opens in a new tab) is a way to link multiple Amazon VPCs together and allows direct communications between two isolated Amazon VPCs using their private IP addresses. VPC peers can span AWS accounts and also Regions. The data shared is encrypted using the AWS global infrastructure. To learn more, expand the following category.'
+Now let's dive deeper into the Amazon VPC and discuss a foundation service in AWS that can add peering to provide communication between Amazon VPCs. VPC peering is a way to link multiple Amazon VPCs together and allows direct communications between two isolated Amazon VPCs using their private IP addresses. VPC peers can span AWS accounts and also Regions. The data shared is encrypted using the AWS global infrastructure. To learn more, expand the following category.'
 
 VPC peering
 –
@@ -321,11 +396,45 @@ Vendor or partner systems that need to connect your Amazon VPC to access an appl
 Security audits to give the needed access to your Amazon VPC
 Requirements to split an application into multiple isolated Amazon VPCs to limit the impact of a potential outage or application failure
 
+SETUP:
+1- set up a perring connection b/w 2 VPCs. e.g. VPX-123
+2- add entries in route tables.
+VPC 1 RT:
+10.0.0.0/0 local 
+192.168.0.0/16 VPX-123
 
----------------------------------
-AWS Transit Gateway
-–
-AWS Transit Gateway creates a one-to-many peering connection through a central hub. Inter-Region peering connects AWS Transit Gateways together using the AWS global network. This adds automatic encryption for your data, and your data never travels over the public internet. Transit gateways adds scalability, connectivity, better visibility and control, and improved security over peering connections. Transit gateways can also be used to connect your AWS environment to your on premises infrastructure creating a hybrid network of AWS and physical networks. Transit gateway offers AWS Transit Gateway Network Manager, which adds a unique view over your entire network, even connecting to Software-Defined Wide Area Network (opens in a new tab)(SD-WAN) devices.
+VPC 2 RT:
+192.168.0.0/16 local 
+10.0.0.0/0 VPX-123
+
+
+=============================================================
+WHEN WHAT?2222222222222222222222222222222222222222222222222
+=============================================================
+IF ALL YOU NEED IS communication B/W VPC 1 AND VPC 2, AND.....
+both VPCs are in different AWS accounts OR ON-PREMISES using VPN
+you want to manage both ends of VPN connection with your own VPN software provider
+you want to be responsible for impleimenting high-availability solutions for all VPN endpoints 
+you are aware that you need an internet gateway in each VPC
+you dont want traffic to traverse the internet
+AWS CLIENT VPN IS A VIABLE OPTION.
+AWS CLIENT VPN is the gateway on the AWS side of site-to-site VPN connection.
+=============================================================
+AWS Client VPN provides secure access to AWS resources in the cloud and on-premises networks from any location.
+
+
+
+
+=============================================================
+WHEN WHAT?33333333333333333333333333333333333333333333333333
+=============================================================
+IF ALL YOU NEED IS SHARING SERVICES B/W VPC 1 AND VPC 2, AND.....
+both VPCs are in different AWS accounts
+you dont want traffic to traverse the internet
+you dont care about overlapping CIDR ranges 
+AWS PRIVATELINK IS A VIABLE OPTION.
+consumerVPC consuming (VPC Endpoint of providerVPC) through Privatelink 
+=============================================================
 ----------------------------------
 AWS PrivateLink
 
@@ -333,3 +442,270 @@ As you expand your environment globally, another part of your design should be s
 
 Interface VPC endpoints, powered by AWS PrivateLink, connect you to services hosted by AWS Partners and supported solutions available in AWS Marketplace. 
 Gateway Load Balancer endpoints, powered by AWS PrivateLink, brings the same level of security and performance to your virtual network appliances or custom traffic inspection logic.
+
+
+
+
+
+=============================================================
+WHEN WHAT?44444444444444444444444444444444444444444444444444444
+=============================================================
+IF ALL YOU NEED IS SHARING SERVICES B/W VPC 1 AND VPC 2, AND.....
+both VPCs are in different AWS accounts OR ON-PREMISES
+you dont want traffic to traverse the internet
+you dont care about overlapping CIDR ranges
+you want AWS to manage VPN Endpoints including redundancy and failover
+you want to use dedicated Direct Connect Connection 
+you want simplicity 
+AWS VIRTUAL PRIVATE GATEWAY IS A VIABLE OPTION.
+4-VPN Gateway is the gateway on the AWS side of site-to-site VPN connection.
+=============================================================
+AWS VIRTUAL PRIVATE GATEWAY (VPN GATEWAY)
+
+Scenario A:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ON-PREMISES<--------->site-to-site VPN<--------->AWS VPC
+3-customer gateway----redundant IPSec Tunnels-----4-Virtual Private Gateway
+
+VPC Route Table.
+10.0.0.0/16 local 
+172.16.0.0/16 VGW-123
+one Virtual Private Gateway per VPC
+Redundant IPSec Tunnels 
+Redundant Routers across 2 AZs
+Border Gateway Protocol (BGP) or Static Routes
+when terminating at VGW-123, only 1 tunnel out of the pair can be active with max 1.25gbps throughput
+1 VPC can have just 1 VPGateway
+you can connect multiple customer gateways to 1 Virtual Private Gateway
+upto 10 
+
+
+
+Scenario B:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ON-PREMISES<--------->site-to-site VPN<--------->AWS VPC
+3-customer gateway----redundant IPSec Tunnels-----4-Virtual Private Gateway
+
+ON-PREMISES<--------->site-to-site VPN<--------->^
+3-customer gateway----redundant IPSec Tunnels----
+
+ON-PREMISES<--------->site-to-site VPN<--------->^
+3-customer gateway----redundant IPSec Tunnels----
+
+
+
+
+
+Scenario C:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+you can also use AWS VIRTUAL PRIVATE GATEWAY with Direct Connect in b/w
+                                                      AWS VGW3 in Region-1
+                                                      AWS VGW2 in Region-1
+ON-PREMISES<--------->Direct Connect Location<------->AWS VGW1 in Region-1
+3-customer gateway----AWS CAGE->DC Endpoint  -----4-Virtual Private Gateway
+customer router  >         >              Private VIFs^^^->VPC->EC2
+customer router >           >             Public VIFs-> S3, DynamoDB
+restricted to 1 region 
+Maximum of 50 VIFs (Virtual Interfaces) per Direct Connect Connection
+to connect to multiple VGWs in same region
+
+
+
+
+Scenario D:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+CUSTOMER GATEWAY--->DIRECT CONNECT GATEWAY--->VIRTUAL PRIVATE GATEWAYS
+                        Supports 10 VGW connections in different regions
+                                                                           ^-->VGW in VPC-e XXXXXXXXX^-->VGW in VPC-d XXXXXXXXX^-->VGW in VPC-c
+all these VPCs can connect to On-premises Data Center through DCG, 
+BUT they cant connect to eachother via DCG
+
+you can also use Direct Connect Gateway to attach multiple AWS VIRTUAL PRIVATE GATEWAYa with Direct Connect in b/w the Customer Gateway
+
+Direct Connect Gateway Exists in AWS Cloud , not in Direct Connect Location which has:
+ Customer Cage with a Customer Router and
+ AWS Cage with Direct Connect Endpoint                  d/f Regions
+                                                        ^-->VGW in VPC-e
+                                                        ^-->VGW in VPC-d
+                                                        ^-->VGW in VPC-c
+                                                        DCG-->VGW in VPC-b
+ON-PREMISES<--------->Direct Connect Location<--------->AWS VGW in VPC-a
+3-customer gateway----AWS CAGE->DC Endpoint  -----4-Virtual Private Gateway
+customer router  >         >              Private VIFs^^^->VPC->EC2
+customer router >           >             Public VIFs-> S3, DynamoDB
+restricted to 1 region 
+Maximum of 50 VIFs (Virtual Interfaces) per Direct Connect Connection
+
+
+
+
+
+
+
+
+
+=============================================================
+WHEN WHAT?5555555555555555555555555555555555555555555555555555
+=============================================================
+IF ALL YOU NEED IS SHARING SERVICES B/W ON-PREMISES AND AWS.....
+USING DIRECT CONNECT GATEWAY to connect multiple VPCs which are in different AWS Accounts and you want VPCs to Talk to Eachother too
+you dont want traffic to traverse the internet
+you want to use dedicated Direct Connect Connection 
+you want simplicity 
+AWS TRANSIT GATEWAY IS A VIABLE OPTION.
+4-VPN Gateway is the gateway on the AWS side of site-to-site VPN connection.
+=============================================================
+CUSTOMER GATEWAY--->DIRECT CONNECT GATEWAY--->TRANSIT GATEWAY
+                                        TGW Association
+                        Supports 10 VGW connections in different regions
+                                                                           
+all these VPCs can connect to On-premises Data Center through DCG, 
+BUT they cant connect to eachother via DCG
+
+you can also use Direct Connect Gateway to attach multiple AWS VIRTUAL PRIVATE GATEWAYa with Direct Connect in b/w the Customer Gateway
+
+Direct Connect Gateway Exists in AWS Cloud , not in Direct Connect Location which has:
+ Customer Cage with a Customer Router and
+ AWS Cage with Direct Connect Endpoint               
+ 
+TransitGateway 1 is in US-EAST-1 ---VPC-A (AWS-accountA)
+                                 ---VPC-B (AWS-accountB)
+TransitGateway 2 is in US-WEST-1 ---VPC-C (AWS-accountC)
+                                 ---VPC-D (AWS-accountD)
+
+VPC-A & VPC-B can send traffic to ON-PRIMISES via TG1 & DCG 
+VPC-A & VPC-B can send traffic to EACH-OTHER via TG1
+VPC-A & VPC-B can NOT send traffic to VPC-C & VPC-D 
+
+but we can do that ^ with the help of TransitGateway Peering Connection
+then,
+VPC-A & VPC-B can send traffic to VPC-C & VPC-D 
+
+We can also attach VPN to Transit Gateway to directly connect it to CG
+
+ON-PREMISES<------------vpn---------------------------------->TG1 
+                                                        DCG-->TG1 <- VPC-A
+                                                        DCG-->TG1 <- VPC-B
+                                                                |
+                                                           peering TG1-TG2
+                                                                |
+                                                        DCG-->TG2 in VPC-C
+                                                        DCG-->TG2 in VPC-D
+ON-PREMISES<------>Direct Connect Location<------>AWS-DCG^
+3-customer g----AWS CAGE->DC Endpoint  --
+customer router  >         >              Transit VIFs^^^->VPC->EC2
+
+Maximum of 50 VIFs (Virtual Interfaces) per Direct Connect Connection
+---------------------------------
+
+AWS Transit Gateway
+–
+AWS Transit Gateway creates a one-to-many peering connection through a central hub. Inter-Region peering connects AWS Transit Gateways together using the AWS global network. This adds automatic encryption for your data, and your data never travels over the public internet. Transit gateways adds scalability, connectivity, better visibility and control, and improved security over peering connections. Transit gateways can also be used to connect your AWS environment to your on premises infrastructure creating a hybrid network of AWS and physical networks. Transit gateway offers AWS Transit Gateway Network Manager, which adds a unique view over your entire network, even connecting to Software-Defined Wide Area Network (opens in a new tab)(SD-WAN) devices.
+
+TRANSIT GATEWAY CONCEPTS:
+Attachments: connections from VPC, VPN, DC, peering with another TG
+Associations: the route table used to route packets coming from attachment
+Propagation: the route table where attachments routes are installed
+
+ATTACHMENTS:
+VPCs 
+VPN connection 
+Direct Connect Gateway 
+Transit Gateway Connect Attachments 
+Transit Gateway Peering Connections
+
+
+                   site-2-site VPN
+                          |
+                   TRANSIT GATEWAY
+AWS VPCs<-Vpc Attachment->TG<--Connect Attachment<->3rdParty SD-WAN HUB VPC
+                                                                |
+                                                                |
+                                                                |
+Branch<----------SD-WAN Overlay Attachment----------------------|
+                                                                |
+Branch<----------SD-WAN Overlay Attachment----------------------|
+                                                                |
+                                                                |
+                                                                |
+Corporate SD WAN<---Direct Connect Attachment-------------------|
+Corporate SD WAN<---SD-WAN Overlay Attachment as backup---------|
+
+
+you can have 20 different Route Tables per Transit Gateway 
+
+
+ASSOCIATION:
+you have to associate each attachment to a specific route table of the transit gateway
+DC -> att-orange  ------->tgw-rtb-a
+s2s-vpn -> att-red    ------->tgw-rtb-a
+vpc -> att-blue   ------->tgw-rtb-a
+
+
+PROPAGATION:
+attachments themselves propagates their routes to one or more TG route tables
+
+DC -> att-orange  ------->tgw-rtb-a
+s2s-vpn -> att-red    ------->tgw-rtb-a
+vpc -> att-blue   ------->tgw-rtb-a
+10.1 has been propagated 10.1.0.0/16 via att-blue
+10.2 has been propagated 10.2.0.0/16 via att-red
+10.3 has been propagated 10.3.0.0/16 via att-orange
+&
+in vpc route table -> 10.0.0.0/8 to go TGW
+
+When you create a Transit Gateway, Default setting are in place regarding the Route Table
+1 RT for TG, default for any new Associations and Propagations
+
+
+but.........
+how does a TG learn about its attachment?
+you can use static routes propagation by making an entry in TG route table
+or dynamic routes propagation using BGP 
+for all connections, VPC,VPN,DC
+
+how does the attachments learn about the routes of TG?
+you can only enter static entry of TG into VPC route table 
+you can enter static entry of TG into VPN route table (customer gateway)
+or leverage BGP to learn the routes for VPN 
+you can leverage BGP to learn the routes for Direct Connect
+
+
+Path Selection Behavior: priority 
+1- Most Specific Route (longest prefix match)
+2- Static Route Entries, including Site-2-Site VPN  routes 
+3- BGP-propagated routes from Direct Connect Gateway 
+4- BGP-propagated routes from AWS Site-2-Site VPN 
+
+you can pool OUTPOSTS to upto 96 racks, you can have just 1 Local Gateway per Outpost
+Local Gateway provides a target in your VPC route table for on-premises destined traffic
+Local Gateway performs NAT for instances that have been assigned addresses from you customer owned IP Pool
+
+===========================================================================
+A customer wants to connect their on-premises infrastructure and AWS environment in the next 2 weeks. A network engineer must ensure that traffic between the on-premises and AWS resources is secure and encrypted.
+
+Which service do you recommend that meets these requirements?
+
+
+VPC Peering Connection
+
+Public Internet
+
+"Virtual Private Network"
+
+AWS Direct Connect
+
+ChatGPT
+For secure and encrypted communication between on-premises infrastructure and AWS resources, I recommend using:
+
+Virtual Private Network (VPN)
+
+A Virtual Private Network (VPN) establishes an encrypted tunnel between your on-premises network and your Amazon VPC, ensuring secure communication over the internet. This solution provides a cost-effective and relatively quick way to connect on-premises and AWS environments.
+=======================================================================
+A solutions architect has to design an Amazon VPC with a private dual-stack subnet, running both IPv4 and IPv6 addresses, and it requires connectivity to the internet.
+
+Which gateways can be used for both types of addresses to achieve this connectivity? (Select TWO)
+
+``Egress Only Gateway for IPv6 addresses
+``NAT Gateway for IPv4 addresses
+Egress Only Gateway for IPv4 addresses
+Transit Gateway for both IPv4 and IPv6 addresses
+NAT Gateway for IPv6 addresses
+
+Egress-only Internet gateway is a horizontally scaled, redundant, and highly available VPC component that allows outbound communication over IPv6 from instances in the VPC to the Internet, and prevents the Internet from initiating an IPv6 connection with the instances.

@@ -2,7 +2,20 @@ You can use Amazon ElastiCache to support data-intensive apps or improve the per
 
 On the surface, the Redis and Memcached engines look similar. Each is an in-memory key-value store. However, there are significant differences between the two. Requirements such as compliance, backup and replication, and automatic failover dictate which engine you should implement. For the full list of differences, see Comparing Memcached and Redis.
 
+"There are three common types of data caches: built-in, application, and remote. A remote cache is a centralized, in-memory repository that can dramatically improve the responsiveness of databases and applications. It stores data externally from the database in a non-relational key-value database. ElastiCache is a remote cache engine and supports the two most common open source caching engines: Memcached and Redis.
 
+SECURITY 
+All new ElastiCache clusters are launched within an Amazon VPC. One of the unique benefits of ElastiCache is that on-premises servers can use it if they are connected to the AWS Cloud using a VPN or AWS Direct Connect.
+
+ElastiCache for Memcached does not currently offer versions that are compliant with HIPAA, although ElastiCache for Redis does. ElastiCache uses IAM for user authentication and authorization. Optionally, ElastiCache for Redis can use Redis AUTH for authentication.
+
+COST 
+ElastiCache provides both On-Demand and Reserved Node types, and you are never charged for traffic in or out of the ElastiCache nodes themselves. You are instead charged for the Amazon EC2 data transfer rates per gigabyte per month.
+
+Standard Amazon EC2 regional data transfer charges apply to both inbound and outbound data transfer between Regions. ElastiCache does not charge for the first database snapshot.
+
+LAZY LOADING - WRITE THROUGH
+Two common approaches to caching are lazy loading and write-through. Lazy loading is reactive. Data is put into the cache the first time it is requested. Write-through is proactive. Data is put into the cache at the same time it is put into the database."
 
 With both ElastiCache for Redis and ElastiCache for Memcached, you:
 
@@ -107,3 +120,5 @@ Media streaming: Amazon ElastiCache
 Amazon ElastiCache offers a fast, in-memory data store to power live streaming use cases. ElastiCache can store metadata for user profiles and viewing history, authentication information/tokens for millions of users, and manifest files to enable content delivery networks to stream videos to millions of mobile and desktop users at a time.
 
 In this use case, Amazon Simple Storage Service (Amazon S3) and Amazon CloudFront are managing and serving media content. ElastiCache manages the content index and token authentication for in-memory, sub-milliseconds responses at scale.
+
+Dream11 is India’s number one fantasy sports platform with over 14 million users in South Asia. The company has been using ElastiCache for Redis to support fantasy games including cricket and soccer. Dream11 has a peak demand of 1.5 million requests per minute and workloads that can quickly surge ten-fold. ElastiCache provides scaling on demand without downtime.

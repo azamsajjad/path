@@ -184,3 +184,26 @@ An ECS container is called a task. An EKS container is called a pod.
 
 
 Amazon ECS runs on AWS native technology. Amazon EKS runs on Kubernetes. 
+
+============================================================================
+As the AWS solutions architect, you need to explore whether Amazon ECS is the right choice to build sophisticated application architectures on a microservices model.
+
+Which of the following is true for Amazon ECS? (Select THREE)
+
+```Amazon ECS provides service discovery for a microservice architecture.
+```A cluster may contain a mix of tasks hosted on AWS Fargate, Amazon EC2 instances, or external instances.
+```Amazon ECS manages your cluster resources for all launch types.
+Easier to manage since your entire application need to be on a single task definition.
+Amazon ECS has built-in security; all of the images are stored in a container registry that is only accessible through HTTPS.
+Amazon ECS supports multi-cloud integration.
+
+============================================================================
+For migrating Windows workloads with the top priority of convenience and ease, the best option among the provided AWS managed services would be:
+
+Amazon ECS (Elastic Container Service) with AWS Fargate
+
+Amazon ECS is a fully managed container orchestration service, and when used in conjunction with AWS Fargate, it allows you to run containers without managing the underlying infrastructure. This means you can focus on deploying and managing your Windows workloads without worrying about server management tasks.
+
+AWS Fargate is a serverless compute engine for containers that works seamlessly with Amazon ECS. It removes the need to manage the underlying infrastructure, allowing you to concentrate on deploying your applications.
+
+Together, Amazon ECS and AWS Fargate provide a convenient and easy way to migrate and manage containerized Windows workloads on AWS.

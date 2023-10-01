@@ -1,0 +1,182 @@
+S3 bucket: labstack-c7762b2b-736b-4e77-8370-7a3f0b1-s3bucket-1olcsey890a2x
+CloudFront distribution domain: d1mosikby2wrsp.cloudfront.net
+User pool ID: 	us-east-1_5vKUUriUc
+App client ID: 26c31qf9s59q9s1ta87d0cajs5
+Amazon Cognito domain prefix: reasonablebird
+Identity pool ID: us-east-1:61c319f1-c2df-4d5f-ba84-015a4cbb02b8
+
+
+wget https://us-east-1-tcprod.s3.amazonaws.com/courses/CUR-TF-100-EDBLDR/v1.0.4.prod-930e7fcd/01-lab-cognito/scripts/code.zip
+unzip code.zip
+cd resources
+. ./setup.sh
+
+
+The Origin Access Id is: E1AG39FW81Q108
+# The S3 bucket name is: 
+"labstack-c7762b2b-736b-4e77-8370-7a3f0b1-s3bucket-1olcsey890a2x"
+# The CloudFront distribution domain is: 
+"d1mosikby2wrsp.cloudfront.net"
+
+Update the web application code to point to the node server’s API endpoint:
+In the Environment window to the left of the terminal, expand the website/scripts folder.
+Open the config.js file.
+In the file, replace the <cloudfront-domain> placeholder on the first line with the CloudFront distribution domain that you recorded in your text editor.
+
+aws s3 cp website s3://labstack-c7762b2b-736b-4e77-8370-7a3f0b1-s3bucket-1olcsey890a2x/ --recursive --cache-control "max-age=0"
+
+To start the node server, run the following commands:
+cd /home/ec2-user/environment/node_server
+npm start
+
+
+
+From the Services menu, choose CloudFront.
+Locate the Status of the distribution:
+If the status is Deploying, wait until the status says Enabled, and then proceed to the next task.
+
+
+
+In the developer tools area:
+Chrome or Edge: Choose the Application tab.
+In the left navigation pane of the developer tools area, expand Local Storage.
+The CloudFront distribution domain is listed.
+Choose the CloudFront distribution domain. In the area to the right, notice the key named bearer_str.
+The bearer_str value is the token that the Amazon Cognito user pool generated. In the next task, you will update the application to use this token to verify that the user has logged in. The application code will evaluate the token to verify that it is valid and has not expired.
+bearer_str
+#access_token=eyJraWQiOiIyczFORUlRWHpsSkV4TFhIcDJqczhDTXc4aURaN1BIcE0xbDFEblJzdUpJPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIyNDAyYjMyYy1mYjhkLTRmMjktYTQ5Ny04YmQ1MWVhOTFkZGMiLCJ0b2tlbl91c2UiOiJhY2Nlc3MiLCJzY29wZSI6InBob25lIG9wZW5pZCBlbWFpbCIsImF1dGhfdGltZSI6MTY5NjEwMTUyMSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfNXZLVVVyaVVjIiwiZXhwIjoxNjk2MTA1MTIxLCJpYXQiOjE2OTYxMDE1MjEsInZlcnNpb24iOjIsImp0aSI6IjJhNjUyNWNkLTQzNTUtNGQ1Ny1hZDRkLWVhN2Q0YmVmZWQ0YiIsImNsaWVudF9pZCI6IjI2YzMxcWY5czU5cTlzMXRhODdkMGNhanM1IiwidXNlcm5hbWUiOiJ0ZXN0c3R1ZGVudCJ9.foFijwcitCyCHY3FfjKIgPBFsMjPTDBf-gQNq4OwiCHuG3GHNjmuhtFEwj7hqNkiQ10YtOI4eFllDOCEkCzckiEOSB2DBoMqJkmfLVpRNqWP8Gib3l0B4S31lo7-muWbjR1_JbA_qWVcy7PRBI24WXMzfZenbWMCjL_1Un07GKUCV3iLh0iue09JC4aW45am7ou06kqoFRL98nBZYCgXIUO7ZQIzk2YcBX_UaV1QemqZWjVHvqYAgAG8P9jG-OqdlKxiB8AMcsk1M6a-ZF9sK6g7-TGETUdVd7IybTS26Q-Vtm1VeP9vkHOM2mv1WecSERLSqI_OcIBMpH7HlaHFcA&id_token=eyJraWQiOiI1RG1VN24rOWVpa3FyOUpvdlNNNVF6cHJkQ2pHUXFDMTVoVmZHTnk4ejZRPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiUEFGQ25aSGVIdVR6Um1RWXFIUWY1dyIsInN1YiI6IjI0MDJiMzJjLWZiOGQtNGYyOS1hNDk3LThiZDUxZWE5MWRkYyIsImF1ZCI6IjI2YzMxcWY5czU5cTlzMXRhODdkMGNhanM1IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2OTYxMDE1MjEsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xXzV2S1VVcmlVYyIsImNvZ25pdG86dXNlcm5hbWUiOiJ0ZXN0c3R1ZGVudCIsImV4cCI6MTY5NjEwNTEyMSwiaWF0IjoxNjk2MTAxNTIxLCJqdGkiOiJlOWI4ODhhZC0wZDYxLTQyNWItYmRjNC01ODFlMDk4MjlhN2YifQ.jDyXVfZEaww93xdyXT7UWYV51fFfJ2Mje8_TP_ajXTXfLIEhfht7d-X-fl8X3ADveaPHIz_Hd2R4OuysHpolccL3OT93xQ3injn_8jYu_X9Zhh5dOBLfdsFgz5eiRM6tQ4-Dv_EmAxy9OzwDJ2gP5n6JX3O6IbYKE2J3a9FJPdtTGHHn5C1iCE3OWZRScuZuGtiTLcZgpteSWEubOMumqq29gOJfhRFhWcx-pvL5FeUdlpcN4DYxKpzpcnjHi7PDkKimCV99pgV52RKGu9HQ48_0oNlMbKmt6G9OA4NMnWukDPCFwYclbtIn73h2Vl1ylvBGKwKa5UXLXqQ7JRo0xg&token_type=Bearer&expires_in=3600
+
+Task 3: Creating a user pool
+In this task, you will create an Amazon Cognito user pool, which will be used as the identity provider to create users and manage user passwords. The user pool will also generate tokens. The Birds web application will use the tokens to ensure that users have authenticated and have a valid session before they can access a protected page or perform a protected action.
+
+Return to the browser tab where the CloudFront console is open.
+From the Services menu, choose Cognito.
+At the top of the page, choose User Pools.
+Choose Create user pool.
+On the Configure sign-in experience page, configure the following settings:
+Authentication providers: Cognito user pool
+Cognito user pool sign-in options: User name
+User name requirements: Make user name case sensitive
+Choose Next.
+On the Configure security requirements page, configure the following settings:
+Password policy mode: Cognito defaults
+Multi-factor authentication: No MFA
+User account recovery:
+Deselect Enable self-service account recovery - Recommended
+Choose Next.
+On the Configure sign-up experience page, configure the following settings:
+Deselect Enable self-registration
+Deselect Allow Cognito to automatically send messages to verify and confirm - Recommended
+Choose Next.
+
+On the Configure message delivery page, configre the following settings:
+
+Choose Send email with Cognito
+Choose Next.
+
+On the Integrate your app page, congifure the following settings:
+
+User pool name: 
+
+bird_app
+Select  Use the Cognito Hosted UI
+In the Domain pane, configure the following settings:
+Choose Use a Cognito domain.
+
+In the Cognito domain field, enter a unique domain name.
+
+Note: We recommend using your initials and the current date for the domain name; for example, abc-10-12-2021. You can add extra characters if needed.
+
+If the domain is not available, you will find a message in red below the text field. If it isn’t available, enter a different name until you find a domain name that is available.
+
+Record the Amazon Cognito domain prefix in your text editor.
+The domain prefix is similar to the following: abc-10-12-2021
+
+You also need to provide details about the application that will use this user pool for authentication.
+
+In the Initial app client pane, configure the following settings:
+Choose Public client
+In the App client name field enter: 
+
+bird_app_client
+Under Allowed callback URLs, in the URL field, enter 
+
+https://<cloudfront-domain>/callback.html
+, and replace the <cloudfront-domain> placeholder with the CloudFront distribution domain.
+The updated URL should be similar to the following: https://d123456acbdef.cloudfront.net/callback.html
+
+Under Advanced app client settings, ensure that the following options are selected:
+ALLOW_USER_PASSWORD_AUTH
+ALLOW_REFRESH_TOKEN_AUTH
+Under OAuth 2.0 Grant Types:
+Deselect Authorization code grant
+Select Implicit grant
+Choose Next.
+
+Review the settings and choose Create user pool.
+
+Record the User pool Id value in your text file.
+
+You will use this information when you configure the web application to use Amazon Cognito for authentication.
+
+Choose the bird-app link.
+
+Choose App integration tab, then scroll to the bottom of the page to find the and locate App clients and analytics pane.
+
+Locate bird_app_client and record the Client ID value in your text file.
+
+You will need this value when you update the web application.
+
+You have set up the user pool and the app client. Now, it’s time to create a test user.
+
+
+
+
+Task 5: Updating the application to use the user pool for authentication
+So far, you have created the Amazon Cognito user pool, configured it with information about the web application, and created a user. However, the Birds application isn’t set up with authentication yet, because the application doesn’t know about Amazon Cognito.
+In this task, you will update the application to provide the information it requires to interact with Amazon Cognito. This information includes the user pool ID, app client ID, and Amazon Cognito domain prefix.
+
+add all values to /website/scripts/config.js - save - push changes
+aws s3 cp website s3://labstack-c7762b2b-736b-4e77-8370-7a3f0b1-s3bucket-1olcsey890a2x/ --recursive --cache-control "max-age=0"
+
+
+To update the node server files, run the following commands:
+
+cd /home/ec2-user/environment/node_server
+cp package2.json package.json
+cp libs/mw2.js libs/mw.js
+
+
+Update the package.json file to add Amazon Cognito user pool information to the node server:
+In the Environment window to the left of the terminal, expand the node_server folder.
+Open the package.json file.
+Replace the <cognito_user_pool_id> placeholder with the Amazon Cognito user pool ID that you saved earlier.
+
+
+Task 7: Configuring the identity pool
+An Amazon Cognito identity pool was created for you when you launched the lab environment. In this task, you will configure the identity pool to work with the Birds application.
+Return to the browser tab where the AWS Management Console is open.
+From the menu on the left side of the page, choose Identity pools and Federated identities tab.
+Choose bird_app_id_pool.
+Choose Edit identity pool in the upper-right corner.
+Record the Identity pool ID in your text editor to use when updating the website.
+On the Edit identity pool page, notice the following configurations:
+The Unauthenticated role is bird-app-id-poolUnauth_Role. This role is applied to users who have not been authenticated. For the Birds application, unauthenticated users have limited access.
+The Authenticated role is bird-app-student-role. When a user has been authenticated (meaning they have logged in), they are given the Authenticated role by default. For the Birds application, this role is configured to allow students to add and select records from a DynamoDB table.
+Expand the Authentication providers section, choose the Cognito tab, and configure:
+User Pool ID: Enter the bird_app user pool ID.
+App client id: Enter the bird_app_client ID.
+Choose Save Changes.
+
+
+Task 8: Updating the application to use the identity pool for authorization
+In the Environment window, expand the website/scripts folder.
+Open the config.js file.
+Uncomment the last line of code, and replace the <cognito-identity-pool-id> placeholder with the identity pool ID that you saved earlier.
+
+
+Update the auth.js file:
+In the website/scripts folder, open the auth.js file.
+In the file, replace the <cognito-user-pool-id> placeholder in the following section of code with the user pool ID. The placeholder is on or around line 91 in the file.
+
+aws s3 cp website s3://labstack-c7762b2b-736b-4e77-8370-7a3f0b1-s3bucket-1olcsey890a2x/ --recursive --cache-control "max-age=0"

@@ -1,3 +1,20 @@
+Which statement about Amazon DynamoDB partitions is true?
+O DynamoDB stores data in partitions and chooses the partition based on the range attribute.
+O If a table has a simple primary key (partition key only), DynamoDB stores and retrieves each item based on its hash attribute.
+O If a table has a composite primary key, DynamoDB will sort the items based on the sort key before selecting the partition for the item.
+o A developer writes a hash function to tell DynamoDB how to partition the items.
+
+The correct answer is: If a table has a simple primary key (partition key only),DynamoDB stores and retrieves each item based on its hash attribute.
+
+With a composite primary key, DynamoDB stores all the items that have the same partition key value physically close together. It will then order them by sort key value in the partition.
+
+
+How far back in time can an Amazon DynamoDB table be restored by using point-in-time recovery?
+C) The last week
+o The last 10 days
+@ The last 35 days-------------------------------------------------------
+C) The last calendar month
+-------------------------------------------------------------------------
 Low-Latency NoSQL database 
 serverless, integrates well with lambda, autoscales
 performance is good with SSD storage 
@@ -46,9 +63,31 @@ Amazon Keyspaces (for Apache Cassandra)
 Amazon Keyspaces is a scalable, highly available, and managed Apache Cassandra compatible database service. Apache Cassandra is a popular option for high-scale applications that need top-tier performance. Amazon Keyspaces is a good option for high-volume applications with straightforward access patterns. With Amazon Keyspaces, you can run your Cassandra workloads on AWS using the same Cassandra Query Language (CQL) code, Apache 2.0 licensed drivers, and tools that you use today.
 Amazon Keyspaces (for Apache Cassandra) implements the Apache Cassandra Query Language (CQL) API, so you can use CQL and Cassandra drivers that you already use. Updating your application is as easy as updating your Cassandra driver or cqlsh configuration to point to the Amazon Keyspaces service endpoint.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+DynamoDB SECURITY.
+USE CLOUDTRAIL .
+THROTTLING
+TRANSACTIONS (at no additional cost)
+DynamoDB TTL 
+PARTITIONS:
+PARTITION KEY:
+LAB
+INDEXES - for efficient Sorting
+SCAN vs QUERY API Calls
+DynamoDB API CALLS (programatically)
+DynamoDB Provisioned Throughput
+DYNAMODB GLOBAL TABLES 
+DAX:
+STREAMS
+EXPONENTIAL BACKOFF
+USE CASE:
+MONITORING:
+Contributor Insights for DynamoDB: 
+TROUBLESHOOTING:
+THROTTLING:
+PROBLEMS SOLUTION:
+AUTO SCALING:
  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-DynamoDB security
+DynamoDB SECURITY.
 
 DynamoDB provides a number of security features to consider as you develop and implement your own security policies. They include the following:
 bullet
@@ -62,13 +101,16 @@ bullet
 As a managed service, DynamoDB is protected by the AWS global network security procedures.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 USE CLOUDTRAIL .
+
 When activity occurs in DynamoDB, that activity is recorded in CloudTrail ongoing record of events in DynamoDB and in your AWS files to an Amazon Simple Storage Service (Amazon S3)
 
 If you are using an AWS managed key for encryption at rest, usage of the key is recorded in
 AWS CloudTrail. CloudTrail can tell you who made the request, the services used, actions
 performed, parameters for the action, and response elements returned.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+THROTTLING:
+–
+Throttling is the action of limiting the number of requests that a client can submit to a given operation in a given amount of time. Throttling prevents your application from consuming too many capacity units. When a request is throttled, it fails with an HTTP 400 Bad Request error and a ProvisionedThroughputExceededException.
 
 DYNAMODB READ CONSISTANCY:
 data is saved to 3 locations AZs(data centers) at once on SSDs
@@ -89,6 +131,7 @@ use it when consistant data is crucial for your business logic
 best for read consistency
 ==========================================================================
 TRANSACTIONS (at no additional cost)
+
 DDB offers ALL or NOTHING changes to multiple items both WITHIN & ACROSS tables
 ->DynamoDB Transactions -> supports ACID Transactions
 Atomic (all or nothing transaction,if my money is deducted,urs is toppd up)
@@ -163,6 +206,7 @@ it gives you unique combination required for a primary key in table
  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 LAB
+
 create a user with access keys
 launch an instance 
 login
@@ -212,6 +256,7 @@ curl -O https://raw.githubusercontent.com/ACloudGuru-Resources/course-aws-certif
 }
  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 INDEXES - for efficient Sorting
+
 a database index is a copy of selected columns of data which is used to quickly sort
 DynamoDB ACCESS CONTROL 
 fine-grained Access Control with IAM 
@@ -248,6 +293,7 @@ Cannot provide strong CONSISTENCY
  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 SCAN vs QUERY API Calls
+
 QUERY:
 By Default, reads as "EventuallyConsistant", even if Str Cons is in settings
 A query finds items in a table based on the primary key attribute and a dinstinct value to search for
@@ -338,6 +384,7 @@ They will need IAM permissions to call PutItem
 
 ---------------------------------------------------------------------------
 DynamoDB Provisioned Throughput
+
 5 write capacity unit ---$2.91/month
 5 read capacity unit  ---^
 while creating table, specify...
@@ -393,6 +440,7 @@ Sorry!
 One write request unit represents one write for an item up to 1 KB in size. If you write 600 items every minute, it means 10 items are written per second ( 600 / 60 ). The total number of write capacity units required depends on the item size. If your item size is 5 KB, just multiply 10 items by 5 KB, so you require 50 write capacity units to sustain one write request. Read/Write Capacity Mode.
 ------------------------------------------------------------------------
 DYNAMODB GLOBAL TABLES 
+
 provide a fully managed solution for deploying a multi-region, multi-master database, without having to build and maintain your own replication solution
 
 To create Global Tables: you need to.....
@@ -401,8 +449,46 @@ To create Global Tables: you need to.....
 3- Stream Type of New and Old Image
 then add region 
 then add replica to global table
+
+
+Suppose that you have a large customer base that's spread across three
+geographic areas: North America, Europe, and Asia. Customers must
+update their profile information while they are using your application.
+To address these requirements, you could create three identical
+DynamoDB tables that are named CustomerProfiles in three different
+AWS Regions. These three tables would be entirely separate from each
+other. Changes to the data in one table would not be reflected in the
+other tables. Without a managed replication solution, you could write
+code to replicate data changes among these tables. However, writing
+this code could be a time-consuming and labor-intensive effort.
+Instead of writing your own code, you could create a global table that
+consists of your three Region-specific CustomerProfiles tables.
+DynamoDB would then automatically replicate data changes among
+those tables. Thus, changes to CustomerProfiles data in one Region
+would be propagated to the other Regions. In addition, if one of the
+AWS Regions should become temporarily unavailable, your customers
+could still access the same CustomerProfiles data in the other Regions.
 ------------------------------------------------------------------------
 DynamDB Accelerator DAX:
+DynamoDB Accelerator (DAX) reduces latency at scale by providing a write-through in-memory caching service. DAX provides sub-millisecond response times for eventually consistent read workloads. Read-heavy or bursty workloads benefit from increased throughput and reduced RCU provisioning, especially for repeated reads of individual keys. This technique is more efficient than a side cache such as Amazon ElastiCache because no code change is required. You need to get only a
+new endpoint to use.
+
+The DAX cluster, which consists of a primary node and optional read replicas, houses the cache, including the following:
+• Item cache — Eventually consistent item data stored by primary key values
+• Query cache — Result sets from queries and scans on the DynamoDB tables stored by their parameter values 
+
+billing is per node-hour consumed, based on the EC2 instance type. For a three-node cluster, you are charged for three
+nodes. There is no charge for data transfer between Amazon EC2 and DAX within the same Availability Zone. Standard Amazon EC2 data transfer charges apply across Availability Zones within the same Region. No additional charge is incurred for traffic into or out of the DAX node itself.
+
+
+The DAX client directs all the application's DynamoDB API requests to the DAX cluster endpoint. The DAX cluster either processes the request directly (cache hit) or passes it through to DynamoDB (cache miss).
+
+1. The client requests data from the cache.
+2. The data is not present in the cache, and the request is sent to the database.
+3. The data is returned from the database to the cache.
+4. The data is sent to the client.
+
+
 DAX is a fully managed clustered in-memory cache for DynamoDB
 Deliver upto 10x read performance 
 microsecond performance for millions of requests per second
@@ -497,6 +583,14 @@ to trigger your application
 to take actions based on the changing contents
 of your DynamoDB table.
 
+
+Amazon DynamoDB Streams
+A DynamoDB stream is an ordered flow of information about changes to items in a DynamoDB table. When you enable a stream on a table, DynamoDB captures
+information about every modification to data items in the table.
+A stream consists of stream records. Each stream record represents a single data modification in the DynamoDB table that the stream belongs to. Each stream record is assigned a sequence number, which reflects the order that the record was published to the stream. When an application creates, updates, or deletes items in the table, DynamoDB Streams writes a stream record. It records the primary key attributes of the items that were modified. You can configure the stream so that the stream records capture additional information, such as the before and after images of modified items.
+
+SHARD
+Stream records are organized into groups, or shards. Each shard acts as a container for multiple stream records, and it contains information that is required for accessing and iterating through these records. The stream records in a shard are automatically removed after 24 hours.
 ---------------------------------------------------------------------------'
 EXPONENTIAL BACKOFF - when provisioned throughput exceeds 
 ProvisionedThroughputExceeded Error
@@ -587,7 +681,8 @@ Only Global secondary Indexes can be created or deleted at anytime. Local Second
 
 
 ===========================================================================
-USE CASE 
+USE CASE:
+
 Gaming application: Amazon DynamoDB
 Companies in the gaming industry use Amazon DynamoDB in all aspects of game platforms, including game state, player data, session history, and leaderboards. Unlike Amazon RDS, DynamoDB is able to automatically scale to millions of concurrent users and requests while ensuring consistently low latency measured in single-digit milliseconds.
 
@@ -644,4 +739,307 @@ Serverless backend: Amazon API Gateway powers the interface layer between the fr
 Serverless web application: Amazon CloudFront and Amazon Simple Storage Service (Amazon S3) provide a globally-distributed application.
 
 https://github.com/aws-samples/aws-bookstore-demo-app
-https://github.com/amazon-archives/aws-full-stack-template
+https://github.com/amazon-archives/aws-full-stack-template'
+
+=========================================================================
+MONITORING:
+What types of monitoring metrics can I gather?
+
+DynamoDB sends the following sets of metrics to CloudWatch:
+
+Account metrics
+Table metrics
+Table operations metrics
+Global secondary index name and table metrics
+
+
+Account metrics
+--------------------------------------------------------------------
+AccountMaxReads
+AccountMaxWrites
+    Count	The maximum number of read/write capacity units that can be used by an account
+AccountMaxTableLevelReads
+AccountMaxTableLevelWrites
+    Count	The maximum number of read/write capacity units that can be used by a table or global secondary index of an account
+AccountProvisionedReadCapacityUtilization
+AccountProvisionedWriteCapacityUtilization
+    Percent	The percentage of provisioned read/write capacity units used by an account
+MaxProvisionedTableReadCapacityUtilization
+MaxProvisionedTableWriteCapacityUtilization
+    Percent	The percentage of provisioned read/write capacity units used by the highest provisioned read table or global secondary index of an account
+UserErrors
+    Count	Requests to DynamoDB or DynamoDB Streams that generate an HTTP 400 status error code during the specified time period
+
+
+Table metrics
+--------------------------------------------------------------------
+ConsumedReadCapacityUnits
+    Count	The number of read capacity units consumed over the specified time period
+ConsumedWriteCapacityUnits
+    Count	The number of write capacity units consumed over the specified time period
+ProvisionedReadCapacityUnits
+    Count	The number of provisioned read capacity units for a table or a global secondary index
+ProvisionedWriteCapacityUnits
+    Count	The number of provisioned write capacity units for a table or a global secondary index
+
+
+Table operations metrics
+--------------------------------------------------------------------
+ReturnedItemCount
+    Count	The number of items returned by Query, Scan or ExecuteStatement (select) operations during the specified time period
+SuccessfulRequestLatency
+    Milliseconds 	The elapsed time for successful requests to DynamoDB or DynamoDB Streams during the specified time period
+
+
+Global secondary index name and table metrics
+--------------------------------------------------------------------
+
+
+
+Why are the metrics on the DynamoDB console different from the CloudWatch metrics?
+
+The graphs on the Metrics tab in the Amazon DynamoDB console are different from the graphs in the CloudWatch console. The metrics in the CloudWatch console are raw and provide more statistics options than the metrics in the DynamoDB console. The metrics in the DynamoDB console are average values over 1-minute intervals. For example, ConsumedWriteCapacityUnits is the sum of the consumed units over 1 minute, divided by the number of seconds (60) in a minute.
+
+What are auto scaling alarms?
+
+When you turn on auto scaling for a table, DynamoDB automatically creates several alarms that can launch auto scaling actions.
+
+---------------------------------------------------------------------------
+Contributor Insights for DynamoDB: 
+
+CloudWatch Contributor Insights for DynamoDB is a diagnostic tool for identifying the most frequently accessed and throttled keys in your table or index at a glance.
+
+If you set up CloudWatch Contributor Insights for DynamoDB on a table or global secondary index, you can determine the most accessed and throttled items in those resources.
+
+DynamoDB creates the following rules on your behalf. Expand each of the following four tabs to learn more about these rules.
+
+
+Most accessed items (partition key)
+This rule identifies the partition keys of the most accessed items in your table or global secondary index.
+CloudWatch rule name format:
+        DynamoDBContributorInsights-PKC-[resource_name]-[creationtimestamp]
+
+Most throttled keys (partition key)
+        DynamoDBContributorInsights-PKT-[resource_name]-[creationtimestamp]
+
+Most accessed keys (partition and sort keys)
+        DynamoDBContributorInsights-SKC-[resource_name]-[creationtimestamp]
+
+Most throttled keys (partition and sort keys)
+        DynamoDBContributorInsights-SKT-[resource_name]-[creationtimestamp]
+
+
+---------------------------------------------------------------------------
+TROUBLESHOOTING:
+How do I determine my problem?
+
+To learn about the general steps to follow for problem determination, choose each of the following seven tabs.
+
+
+Problem determination
++
+
+Step 1: Identify the problem
+–
+Try to categorize the problem based on characteristic symptoms:
+What error message is the administrator seeing on the console or in log files?
+Are customers getting error messages in their browsers? 
+What messages or error codes are users getting?
+
+Step 2: Collect data
++
+Step 3: Analyze the data
+–
+Analyze data to pinpoint one or more possible root causes. Sometimes you can manually search the relevant log files and tracing data.
+For large amounts of diagnostic data, it might be helpful to use tools for analyzing data, such as the following:
+
+Amazon Athena
+CloudWatch Logs Insights
+Splunk
+Sumo Logic
+
+Step 4: Review documentation
++
+Step 5: Try known solutions
++
+What else can I try?
+
+If you exhaust all known issues and solutions without success, try the following:
+
+Post your issue to AWS re:Post. AWS re:Post is a community-driven question-and-answer service to help AWS customers remove technical roadblocks and troubleshoot problems.
+Engage with AWS IQ to post a request for help by an AWS Certified expert. Pay through AWS.
+Subscribe to an AWS Support Plan and open a case:
+Select a support plan that meets your needs. Compare AWS Support Plans.
+You can submit your case, along with any data you gathered.
+
+
+THROTTLING ISSUE:
+Some of the common throttling issues that you might face are the following:
+
+Your DynamoDB table has adequate provisioned capacity, but most of the requests are being throttled.
+You activated AWS Application Auto Scaling for DynamoDB, but your DynamoDB table is being throttled.
+Your DynamoDB table is in on-demand capacity mode, but the table is being throttled.
+You have a hot partition in your table.
+
+What DynamoDB metric should I examine if my tables experience throttling?
+
+The metrics associated with throttling are:
+
+OnlineIndexThrottleEvents
+ReadThrottleEvents
+ThrottledPutRecordCount
+ThrottledRequests
+WriteThrottleEvents
+
+
+Common reasons why a DynamoDB table is throttled
+
+To learn about the common causes of table throttling, expand each of the following four tabs.
+
+
+Table has enough provisioned capacity, but most requests are throttled
++
+        'DynamoDB reports minute-level metrics to CloudWatch. The metrics are calculated as the sum for a minute, and then are averaged. However, the DynamoDB rate limits are applied per second.
+        For example, if you provisioned 60 write capacity units for your DynamoDB table, then you can perform 3600 writes in one minute. However, driving all 3600 requests in one second, with no requests for the rest of the minute, might result in throttling.
+        The total number of read capacity units or write capacity units per minute might be lower than the provisioned throughput for the table. However, if all the workload falls within a couple of seconds, then the requests might be throttled.'
+
+        Solution: Add jitter and exponential backoff to your API calls. For more information, see the Exponential Backoff and Jitter documentation.
+
+Application Auto Scaling is set up, but your table is still throttled
++
+        'Application Auto Scaling is not a suitable solution to address sudden spikes in traffic with DynamoDB tables. It only initiates a scale-up when two consecutive data points for consumed capacity units exceed the configured target utilization value in a 1-minute span.'
+
+        Solution: If you use DynamoDB for a service that receives requests with several peak times and abrupt workload spikes, you too can benefit from switching the capacity mode from provisioned to on demand.
+
+Your table uses the on-demand capacity mode but is still throttled
++
+        For on-demand tables, DynamoDB automatically allocates more capacity as your traffic volume increases to make sure that your workload doesn't experience throttling. However, throttling can occur if the traffic volume is more than double the previous peak within a span of 30 minutes. '
+         the table doesn't throttle as long as the following conditions are true:
+
+        @ The table doesn't exceed double its previous peak traffic.
+        @ The access pattern is distributed evenly across partitions to avoid issues related to a hot partition. (In general, a 'hot partition' is one that is accessed more frequently than other partitions in the table.)
+        
+
+        Solution: Apply a strategy to avoid creating hot partitions such as distributing the read and write operations as evenly as possible across your table. Refer to the following topic, You have a hot partition in your table.
+
+You have a hot partition in your table
++
+        'In DynamoDB, a partition key that doesnt have a high cardinality can result in many requests targeting only a few partitions and resulting in a hot partition. A hot partition can cause throttling if the partition limits of 3000 read capacity units (RCU) or 1000 write capacity units (WCU) (or a combination of both) per second are exceeded.
+
+        To find the most accessed and throttled items in your table, use the Amazon CloudWatch Contributor Insights. Amazon CloudWatch Contributor Insights is a diagnostic tool that provides a summarized view of your DynamoDB tables traffic trends and helps you identify the most frequently accessed partition keys. With this tool, you can continuously monitor the graphs for your table’s item access patterns. 
+
+        A hot partition can degrade the overall performance of your table. '
+
+        Solution: To avoid this poor performance, distribute the read and write operations as evenly as possible across your table.
+
+
+
+Here are two common reasons why on-demand tables might be throttled:
+
+The traffic is more than double the previous peak
+The traffic exceeds the per-partition maximum
+        Each partition on the table can serve up to 3,000 read request units or 1,000 write request units, or a linear combination of both. If the traffic to a partition exceeds this limit, then the partition might be throttled. To resolve this issue:
+
+        Use CloudWatch Contributor Insights for DynamoDB to identify the most frequently accessed and throttled keys in your table.
+        Randomize the requests to the table so that the requests to the hot partition keys are distributed over time. 
+
+
+PROBLEM:
+You are getting a 4xx error ProvisionedThroughputExceededException for one of your tables.
+For example:
+ProvisionedThroughputExceededException: An error occurred (ProvisionedThroughputExceededException) when calling the PutItem operation (reached max retries: 9): The level of configured provisioned throughput for the table was exceeded. Consider increasing your provisioning level with the UpdateTable API.
+
+SOLUTION:
+1- Determine whether the table is an on-demand table or a provisioned table. Check the read/write capacity modes in the DynamoDB console or with the AWS CLI command dynamodb describe-table. 
+
+2- If the table is provisioned, determine the following:
+A- Is auto scaling configured? Use the DynamoDB console to find this data.
+B- Is the consumed capacity greater than the provisioned capacity? Use the CloudWatch console to compare the metrics. For example, in the following screenshot, observe that there is a spike in Consumed Write Capacity where it is going above Provisioned Capacity.
+
+3- If the table is on demand:
+A- If possible, determine the previous consumed capacity peak fr the table.
+B- If you have the previous peak data, is the current consumed capacity double the previous peak?
+C- Is CloudWatch Contributor Insights configured for the table? If so, identify the most frequently accessed and throttled keys in your table or index.
+
+----------------------------------------------------------------------
+PROBLEM:
+How can I troubleshoot high latency on a DynamoDB table?
+Performance issue: You observe an increase in the response time for DynamoDB requests.
+CloudWatch metric SuccessfulRequestLatency.
+// Keep in mind that DynamoDB latency metrics measure activity only in DynamoDB or DynamoDB Streams. The latency metrics don't take network latency or client-side activity into account.
+Reduce the request timeout settings
++
+// Tune the client AWS SDK parameters requestTimeOut and clientExecutionTimeout to timeout and fail much faster (for example, after 50 milliseconds). This causes the client to abandon high-latency requests after the specified time period and then send a second request that usually completes much faster than the first.
+Reduce distance between client and DynamoDB endpoint
++
+// If you have globally dispersed users, consider using global tables. With global tables, you can specify the AWS Regions for which you want the table to be available. This can help to significantly reduce latency for your users.
+Use caching
++
+// If your traffic is read heavy, consider using a caching service such as Amazon DynamoDB Accelerator (DAX). DAX is a fully managed, highly available in-memory cache for DynamoDB that can help improve performance from milliseconds to microseconds, even at millions of requests per second.
+Send constant traffic or reuse connections
++
+// When you are not making requests, consider having the client send dummy traffic to a DynamoDB table. You can also reuse client connections or try connection pooling. All of these techniques keep internal caches warm, which can help keep latency low.
+Use eventually consistent reads
++
+// If your application doesn't require strongly consistent reads, consider using eventually consistent reads. Eventually consistent reads are cheaper and are less likely to experience high latency.
+
+When analyzing the CloudWatch metric SuccessfulRequestLatency, it's a best practice to check the average latency. Occasional spikes in latency aren't a cause for concern. However, if average latency is high, you may need to resolve an underlying issue.
+As shown in the following screenshot, initial requests can experience higher latency because caches are cold.
+
+
+------------------------------------------------------------------------
+PROBLEM:
+Resolving HTTP 5xx errors
+–
+A 5xx error indicates a problem that must be resolved by AWS. This might be a transient issue, such as a network outage or backend hardware failure. To mitigate 5xx errors, do the following:
+
+Implement a retry strategy for requests that fail with a 5xx error code. All AWS SDKs have a built-in retry mechanism with an algorithm that uses exponential backoff. You can modify the retry parameters to suit your needs. For more information, see the Error Retries and Exponential Backoff documentation.
+Avoid strongly consistent reads. When there is a network delay or outage, strongly consistent reads are more likely to fail with a 500 error. For more information, see the Read Consistency documentation.
+If you continue to get 5xx errors, open the AWS Health Dashboard to check if there are any operational issues with the service.
+
+========================================================================
+AUTO SCALING:
+What is DynamoDB auto scaling?
+
+DynamoDB auto scaling creates CloudWatch alarms on your behalf. When an alarm is activated, the CloudWatch alarm invokes AWS Application Auto Scaling. This, in turn, notifies DynamoDB to adjust the provisioned throughput capacity for the table.
+
+DynamoDB auto scaling modifies provisioned throughput only when the workload stays depressed or elevated for several minutes. For example, assume that you set the minimum read capacity units (RCUs) to 100 and the target utilization to 70 percent:
+
+DynamoDB auto scaling increases provisioned capacity when utilization exceeds 70 RCUs for at least 2 consecutive minutes.
+DynamoDB auto scaling decreases provisioned capacity when utilization is 20 percent or more below the target for 15 consecutive minutes (50 RCUs).
+
+PROBLEM:
+To learn how to resolve issues with DyanamoDB auto scaling, choose each of the following three tabs.
+
+Don't delete CloudWatch alarms
+Be sure that you don't delete the CloudWatch alarms that DynamoDB creates when you turn on auto scaling for a table. If you do, DynamoDB auto scaling might not work as expected.
+
+// If you accidentally delete the CloudWatch alarms, then turn off and turn on auto scaling for the table. When you do this, CloudWatch automatically recreates the alarms.
+
+
+DynamoDB might not handle short activity spikes
+// Don't rely on DynamoDB auto scaling to handle occasional short-duration activity spikes. DynamoDB auto scaling works best when there are gradual increases or decreases in traffic. The table's built-in burst capacity handles occasional activity spikes.
+
+Set the billing mode to PAY_PER_REQUEST
+// If the table traffic is frequently unpredictable, use an UpdateTable operation to set the billing mode to PAY_PER_REQUEST. This activates on-demand mode, which instantly adapts throughput to handle the workload.
+
+=============================================================================
+You have a large customer base spread across three geographic areasthe US East Coast, India and Western Europe. The high performance web application serving customers in three regions requires data with minimum latency and no downtime.
+
+What would be the best way to fulfil this requirement?
+
+
+"Use Amazon DynamoDB Global Tables."
+
+Amazon DynamoDB with provisioned capacity mode.
+
+Aurora DB with multi AZ enabled.
+
+Amazon RDS with cross region replication.
+
+
+To fulfill the requirement of serving a high-performance web application with minimum latency and no downtime for customers spread across three geographic regions (US East Coast, India, and Western Europe), the best option would be:
+
+Use Amazon DynamoDB Global Tables.
+
+Amazon DynamoDB Global Tables provide a fully managed, multi-region, and globally distributed database that automatically replicates data across regions. This ensures low-latency access for customers in different geographic areas while providing high availability and fault tolerance.

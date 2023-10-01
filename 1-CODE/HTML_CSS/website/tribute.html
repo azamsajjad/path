@@ -1,0 +1,69 @@
+<!Doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="tribute.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
+  <title id="title">Dr. Pervez Hoodbhoy</title>
+</head>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+<body>
+  <header>
+    <div class="hdiv">
+    <h1>Dr. Pervez Hoodbhoy</h1> 
+      <a href="https://codepen.io/azamsajjad/pen/JjwpomP" target="_blank">
+      <button class="button" type="button">Source Code</button></a></div>
+    <p>The only voice of reason in Pakistan</p>
+     
+  </header>
+  <main id="main">
+    <div id="img-div">
+      <img id="image" class="imge" src="hoodbhoydp.jpeg"
+      alt="This is life" />
+      <div id="img-caption">
+        <p id="img" class="caption">Pervez Amirali Hoodbhoy is a Pakistani nuclear physicist and activist who serves as a professor at the Forman Christian College and previously taught physics at the Quaid-e-Azam University.</p>
+      </div>
+      
+  <div id="tribute" class="tribute">
+    <div class="container">
+    <button class="btn" onclick="readItem()">Click here learn an awesome fact about Mr. Hoodbhoy!</button></div>
+    <script>
+      AWS.config.region = 'us-east-1';
+      AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: "us-east-1:d4e6fc07-844e-4bee-bd6d-db826df83c32",
+      RoleArn: "arn:aws:iam::767665886117:role/cognito_dynamopoolunauthusa"
+});
+      function readItem() {
+      var docClient = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
+      var table = "tribute_facts";
+      var params = {
+              TableName: table,
+              Key:{
+                  "fact_id": Math.floor((Math.random() * 20) + 1),
+              }
+          };
+          docClient.get(params, function(err, data) {
+              if (err) {
+                  document.getElementById('hood').innerHTML = "Unable to read item: " + "\n" + JSON.stringify(err, undefined, 2);
+              } else {
+                var string=JSON.stringify(data);
+                  var output=string.split("\"");
+                  document.getElementById('hood').innerHTML = output[5];
+                  
+              }
+          });
+      }
+      
+    </script>
+    <div class="fact-box">
+    <h1> <span id="hood"> </span></h1></div>
+  <p class="quote"><q>
+A society oriented towards fatalism, or one in which an interventionist deity forms part of the matrix of causal connections, is bound to produce fewer individuals inclined to probe the unknown with the tools of science.
+</q></p><br><p class="quote">-- Pervez Hoodbhoy, Islam and Science: Religious Orthodoxy and the Battle for Rationality, 1992</p>
+<p class="wiki">If you have time, you should read more about this incredible human being on his <a id="tribute-link" target="_blank" href="https://en.wikipedia.org/wiki/Pervez_Hoodbhoy">Wikipedia entry</a>.</p>
+</div>
+  </main>
+  <footer>
+  </footer>
+</body>
+</html>

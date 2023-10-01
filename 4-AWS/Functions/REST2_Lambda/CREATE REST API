@@ -1,0 +1,10 @@
+1- CREATE REST API
+2- CREATE RESOURCE - transactions
+3- CREATE GET METHOD - Use Lambda Proxy integration CHECK TICK
+4- Deploy
+
+5- test -> / -> /transactions -> GET
+invoke url--------------------------
+ https://eb1neml8fe.execute-api.us-east-1.amazonaws.com/test/transactions
+
+ https://eb1neml8fe.execute-api.us-east-1.amazonaws.com/test/transactions?transactionId=329&type=PURCHASE&amount=$999

@@ -73,7 +73,17 @@ detects failover and routes requests to standby DB
 Deployable over multi-AZ for protection from infra failure
 66% faster failover times 
 ======================================================================
+What is Amazon Aurora Multi-Master?
+Amazon Aurora Multi-Master allows you to create multiple read-write instances of your Aurora database across multiple Availability Zones, which enables uptime-sensitive applications to achieve continuous write availability in the event of instance failure
 
+Select Amazon Aurora MySQL-Compatible Edition as the edition.
+Select Multi-master after expanding Replication features. Only Aurora (MySQL 5.6) multimaster 10a is supported for multi-master clusters of the versions that are currently available.
+
+Most kinds of Aurora clusters are single-master clusters. For example, provisioned, Aurora Serverless, parallel query, and Global Database clusters are all single-master clusters. In a single-master cluster, a single DB instance performs all write operations and any other DB instances are read-only. If the writer DB instance becomes unavailable, a failover mechanism promotes one of the read-only instances to be the new writer.
+
+Amazon Aurora Multi-Master, which allows uptime-sensitive applications to achieve continuous write availability across instance failure, is now broadly available. It lets you build several read-write instances of your Aurora database across multiple Availability Zones.
+
+Multi-master clusters work differently in many ways from the other kinds of Aurora clusters, such as provisioning, Aurora Serverless, and parallel query clusters. With multi-master clusters, you consider different factors in areas such as high availability, monitoring, connection management, and database features. A multi-master cluster, for instance, can help to prevent an outage when a writer instance becomes unavailable in applications where even minimal downtime for database write operations cannot be tolerated. The multi-master cluster doesn't use the failover mechanism, because it doesn't need to promote another DB instance to have read/write capability. With a multi-master cluster, you examine metrics related to data manipulation language(DML) throughput, latency, and deadlocks for all DB instances instead of a single primary instance.
 --------------------------------------------------------------------------
 Storage on Amazon RDS
 
@@ -238,3 +248,13 @@ TRUE
 Relational databases rely on tables, fields, and records to hold data.
 TRUE
 ===========================================================================
+As an AWS solutions architect, you've been asked to scale out write performance across multiple Availability Zones within an AWS Region. You've decided to deploy the Aurora Multi-Master.
+
+Which of the following are features of an Amazon Aurora Multi-Master deployment option? (Select THREE)
+
+`Features continuous availability with no failover when a writer DB instance becomes unavailable.
+`Available with Amazon Aurora MySQL-Compatible edition.
+Features high availability with brief downtime during failover.
+Supports up to four READ/WRITE nodes.
+`You can enable cross-Region replicas from multi-master clusters.
+Available with Amazon Aurora PostgreSQL-Compatible edition.

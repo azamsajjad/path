@@ -1,0 +1,223 @@
+common reasons to migrate a database:
+
+Database modernization
+Moving data from legacy database engines to modern database engines, enabling business agility to compete in the digital age.
+
+
+Database migration
+ Moving data from one platform to another, in the context of enterprise applications.
+
+
+Database replication
+Frequently copying data electronically from a database in one computer/server to a database in another to share the same level of information with all users.
+
+
+What are the benefits of migrating a database with AWS?
+
+Relational databases are a mature technology, enabling you to routinely manage high levels of availability with on-premises servers. Although NoSQL databases are newer, we can usually maintain high availability on-premises; however, any database downtime can severely impact both application downtime and a company's ability to serve its customers in a timely manner.
+
+AWS database technologies, such as Amazon Relational Database Service (Amazon RDS) and Amazon DynamoDB, provide low-cost, scalable, highly available database solutions that are simple to set up and use. For many companies, migrating their databases to the cloud (particularly if switching to a different engine) would lower downtime and cost compared to on-premises servers.
+---------------------------------------------------------------------------
+
+
+AWS DMS
+
+At its most basic level, AWS DMS is a server in the AWS Cloud that runs replication software. You create a source and target connection to tell AWS DMS where to extract from and load to. Then you schedule a task that runs on this server to move your data.
+
+AWS DMS creates the tables and associated primary keys if they don't exist on the target. You can pre-create the target tables manually, if you prefer. Or you can use AWS SCT to create some or all of the target tables, indexes, views, triggers, and so on.
+
+AWS SCT
+
+If you want to switch database engines, AWS SCT can convert your existing database schema to the target platform. This includes tables, indexes, views, and stored procedures, plus your application code. If the schema from your source database can't be converted automatically, AWS SCT provides guidance on how you can create equivalent schema in your target database engine.
+
+
+
+
+---------------------------------------------------------------------------
+Envisioning and assessing migration (AWS SCT)
+Step 1: Envision and assess migration
+
+    AWS SCT can assist you in the migration process by cataloging the physical and logical components of the existing system. If you are performing a hete rogeneous migration, AWS SCT will evaluate how much effort is needed to migrate to one or more popular open-source engines. It will provide a detailed report on each engine, and you can choose the best target for your particular use case.
+
+How does AWS SCT assess the complexity of my migration?
+
+    The assessment report shows you what AWS SCT can convert automatically, which objects need manual remediation, and which objects require significant remediation. Levels of effort are color coded as green, gray, orange, and red in the summary report.
+
+    Simple actions usually require less than an hour, medium actions can be completed in 1-4 hours, and complex actions would typically take over 4 hours. You can use this information to develop level-of-effort estimates across different lines of responsibility like database administrators (DBAs), application developers, test engineers, and business stakeholders.
+
+Database code objects with conversion actions
+
+    AWS SCT not only helps you convert tables and indexes: it can also assist you in converting code objects such as stored procedures and functions, database packages, and views and triggers. AWS SCT will translate code written in the native language of the source database into equivalent code in the target database language.
+
+AWS SCT report
+
+    AWS SCT also provides a granular view of the report to use as a remediation “checklist.” Responsible developers, DBAs, and others can use this view to validate that corrective action has been taken on cited objects and that remediation is complete.
+
+How does AWS SCT function?
+
+    AWS SCT will convert your source-object definitions to the target engine’s formats. Then, when you’re ready to build the database schema, it will apply them to the target engine.
+
+    When you’re performing a heterogeneous migration (from one database engine to another), your target database may be missing features that are available in your source database. If AWS SCT can’t convert an object, it flags it for manual intervention, along with a color-coded level of effort needed to resolve.
+
+What happens if AWS SCT doesn't work for my migration needs?
+
+    Sometimes, you will find that a feature in your source database does not have an exact analog in the target database that AWS SCT can translate to. In these cases, you will need to recode the objects using design patterns based on the target engine’s capabilities.
+
+    To help with this process, we provide migration playbooks that contain design patterns for the most popular source and target combinations. For example, the Oracle to Aurora PostgreSQL playbook is 317 pages and contains information on 60 design patterns that are fully, partially, or not supported by the target.
+
+How do I use the Database Migration Playbooks?
+
+    The Database Migration Playbooks are a series of guides focused on best practices for creating successful blueprints for heterogeneous database migration. The playbooks complement existing automated and semiautomated database migration solutions and tools from Amazon, including AWS SCT and AWS DMS. 
+
+AWS currently offers five migration playbooks and will release more over time.
+
+    Microsoft SQL Server to Aurora MySQL
+    Microsoft SQL Server to Aurora PostgreSQL
+    Oracle to Aurora PostgreSQL
+
+What happens to source functions and procedures that aren't available on my target engine?
+
+    The AWS SCT Extension Pack is an add-on module that emulates functions present in the source database that are required when converting objects to the target database. Before you can install the AWS SCT Extension Pack, you need to convert your database schema.
+
+    For example, for data warehouse migrations to Amazon Redshift, AWS SCT provides an extension pack for every supported data warehouse source, including Teradata, Netezza, Oracle, and Microsoft SQL Server. 
+
+--------------------------------------------------------------------------
+Converting applications (AWS SCT)
+Step 3: Convert your application objects
+
+    Application conversion is the process of porting application code, written in languages such as Java or C, to your new target database.
+
+    For example, your database may support an order entry application that uses web forms. The application would use embedded SQL to query and update order information. If you switch database engines, these SQL statements must be ported to the target format.
+
+How can AWS SCT help with my application migration?
+
+    AWS SCT helps you modernize your SQL code to work with your new database. You can use AWS SCT to extract SQL statements that are embedded in your application code. AWS SCT will track all the places where SQL is present, convert the SQL to work with the target database, and rebuild your application program with the converted code.
+
+---------------------------------------------------------------------------
+Converting scripts (AWS SCT)
+Step 4: Convert scripts
+
+What is script conversion?
+
+    The script conversion step looks at batch scripts used for extract, transform, and load (ETL) processes; database maintenance; disaster recovery; and other processes. These scripts may not directly relate to the applications using the database, but require analysis to ensure that they work on the new database engine.
+
+How can AWS SCT help my script migration process?
+
+    AWS SCT can help you convert your database scripts. Use AWS SCT to convert Oracle, Microsoft, and Teradata scripts to run on PostgreSQL-derived databases, including Amazon Aurora with PostgreSQL compatibility and Amazon Redshift. As with other conversion features in AWS SCT, if the code cannot be converted for any reason, the tool will highlight the problem for manual intervention.
+
+---------------------------------------------------------------------------
+Integrating with third-party applications
+Step 5: Integrate with third-party applications
+
+What role do third-party applications play in my migration? 
+
+    Some applications might be written allowing for access to different databases, but you would still want to test them and make sure they work as expected. Other applications might need to be upgraded to allow for access to a different database system, and this upgrade needs to be considered.
+
+    What about your applications like third-party business intelligence and ETL tools? Will your utilities continue to work after the upgrade process? In this step, you identify these third-party applications, and validate that they continue to work post-migration. This process may involve upgrading the third-party tools, or changing adapters or APIs to connect to your new databases.
+
+    Other third-party applications might be tightly coupled to a third-party database. In that case, consider whether you will maintain a legacy database for these applications, or whether you want to migrate from them.
+
+---------------------------------------------------------------------------
+Migrating data (AWS DMS)
+Step 6: Migrate data
+
+What is the data migration process?
+
+        Icon of two databases, one in the cloud one outside
+        Data migration is the process of moving data records from the source to the target. It is the activity that most people think of when they hear “database migration.”
+
+        Data migration can be challenging if you are dealing with large data volumes and have to keep the source and target systems in sync until you can “cut over” your applications to the target system.
+
+        If your database also contains complex data types like large objects (LOBs) or spatial data, then you will need to consider how best to migrate those data values to the target. Lastly, if you’re changing the type of your target database, then you will have to translate most (if not all) data values to conform to the target system requirements.
+
+What are the reasons to use AWS DMS to migrate?
+
+        You can use AWS DMS to modernize your database to a cloud-ready, open-source engine. You can use AWS DMS to modernize your database to a cloud-ready, open-source engine, migrate it to the same engine, but on the cloud, or replicate it for additional availability.
+
+How does AWS DMS work? 
+
+        AWS DMS is a web service that helps you migrate data from a source data store to a target data store, as long as either the source or target databases reside within AWS. These two data stores are called endpoints. You can migrate between source and target endpoints that use the same database engine, such as from an on-premises PostgreSQL database to an Amazon RDS for PostgreSQL database.
+
+        You can also migrate between source and target endpoints that use different database engines, such as from an Oracle database to a PostgreSQL database. The only requirement to use AWS DMS is that one endpoint is on an AWS service. You cannot use AWS DMS to migrate from an on-premises database to another on-premises database.
+
+        AWS DMS will migrate your data records to the same database engine, or you can modernize your database to use a cloud-native or open-source engine. You can use AWS DMS to perform a one-time copy of the source data to the target. You can also use AWS DMS to keep your source and target synced by migrating ongoing transactions as they occur on the source.
+
+        If you are migrating to a new target database, you can continue replicating until you are ready to switch over your applications. If your use case requires ongoing data replication, then you can use AWS DMS to keep a source and target in sync indefinitely.
+
+How does AWS DMS move my data? 
+
+        AWS DMS moves your data in one of three ways: full-load migration, ongoing replication, or a combination of those. During a full-load migration, where existing data from the source is moved to the target, AWS DMS loads data from tables on the source data store to tables on the target data store.
+
+        AWS DMS also supports ongoing replication (known as change data capture, or CDC), which keeps your target in sync with a transactionally active source. AWS DMS can combine these two types of data transfer by using an initial full load, followed by ongoing replication.
+
+How can I check if the migration was successful? 
+
+        For relational migrations, AWS DMS can validate the migrated data, so you can be confident that the source and target databases match. Data validation is an option that you can choose to add to your replication task. Data validation tracks the progress of the migration and incrementally validates new data as it is written to the target. 
+
+--------------------------------------------------------------------------
+Functionally testing entire system
+Step 7: Functionally test entire system
+
+How can I confirm that my migration went as planned?
+
+        What is the next step after migrating all schema, data, and applications to the target database? You need to ensure that all applications interacting with the database perform as before, from a functional perspective.
+
+        For example, a retailing system would want to determine if orders are flowing correctly through the system, or if inventory is credited and debited correctly in response to inventory receipts and shipments. This phase typically involves business stakeholders and analysts who understand user-facing applications and can drive test cases that exercise system boundaries.
+
+--------------------------------------------------------------------------
+Tuning performance
+Step 8: Tune performance
+
+How do I know that my migration is working correctly?
+
+        Often, applications have specified performance criteria to meet as part of functional testing. For example, an interactive sales-order screen should have sub-second response time to ensure a quality customer experience.
+
+        Performance tuning sometimes occurs in parallel with functional testing. This activity involves both business stakeholders and technical personnel.
+
+        When a performance issue is discovered, each system level is checked for bottlenecks, from the user-facing application, to the SQL statements prepared by the application, to the database engine and associated storage layers. Business and technical teams work in tandem to verify that the issue is resolved, or to identify appropriate remediation to satisfy business needs.
+
+---------------------------------------------------------------------------
+Integrating and deploying (AWS DMS)
+Step 9: Integrate and deploy
+
+How do I minimize downtime when switching to a new database system?
+
+        Integration and deployment is the process of cutting over to your new database system. This typically involves a series of steps detailing how applications will be cut over to the new database system. Depending on business needs, the deployment may require minimized downtime. It might also need to fit into a specified time window or be performed in phases, where individual applications are cut over one by one.
+
+What happens if I need to roll back my data?
+
+        Once you are ready to switch over to production, it is important to plan for what to do in case you need to roll back changes. You may have to do this to meet business continuity requirements. You will want to test this plan in your preproduction environment as well, so the team is ready for any issues that occur during the rollout.
+
+---------------------------------------------------------------------------
+Training and transferring knowledge
+Step 10: Train and transfer knowledge
+
+How can I set up my team for success?
+
+
+        Training is a critical aspect in deploying any new system. If you perform a heterogeneous migration, then your team may not be as familiar with the engine you are moving to. They also may not be familiar with the cloud or AWS technologies.
+
+        Until all of the team understands the new technologies that you are moving to, consider adding training time on the database engine, AWS, and AWS RDS (depending on what you use).
+
+        Even when everyone is familiar with the technologies, chances are that, while migrating, you discovered useful information about your application and how it will behave from now on. You may have slightly changed tables, stored procedures, and application code while migrating. You now want to ensure that those changes are documented, and share that knowledge with team members who support and maintain the application.
+
+-------------------------------------------------------------------------
+Documenting and controlling versions
+Step 11: Document and control versions
+
+What kind of support will I need?
+
+
+        Although often overlooked, documentation is one of the most important tasks prior to putting a system into production. You need to document all changes that have been made to the system, and how the new system operates.
+
+        AWS provides tools like AWS CloudFormation and the AWS Cloud Development Kit, which allow you to easily manage all your AWS resources programmatically. You can script and manage the creation of Amazon RDS database instances and clusters and their backups. If you prefer to manage your database servers yourself, you can, in addition, use other services. 
+For example, you can use AWS OpsWorks to create, configure, and manage your database servers.
+
+---------------------------------------------------------------------------
+Planning for support in post-production
+Step 12: Plan for support in post-production
+
+What kind of support will I need after my migration is complete?
+
+
+        Once the migrated application is running, you will need at least some support. AWS allows you to automate backups and other support tasks, but it is a good idea to plan for support your application might need. Ensure that automated tasks are occasionally checked, and that you have personnel for tasks that are not automated.

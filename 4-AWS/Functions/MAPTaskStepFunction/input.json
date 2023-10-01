@@ -1,0 +1,34 @@
+{
+	"transactions":[
+		{
+			"transactionId": "R31",
+			"type": "PURCHASE",
+			"ammount": 1344
+		},
+		{
+			"transactionId": "J45",
+			"type": "REFUND",
+			"ammount": 40
+		},
+		{
+			"transactionId": "D51",
+			"type": "PURCHASE",
+			"ammount": 877
+		},
+		{
+			"transactionId": "R67",
+			"type": "REFUND",
+			"ammount": 329
+		},
+		{
+			"transactionId": "A32",
+			"type": "PURCHASE",
+			"ammount": 666
+		},
+		{
+			"transactionId": "B23",
+			"type": "PURCHASE",
+			"ammount": 1220
+		}
+	]
+}

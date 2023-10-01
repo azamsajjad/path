@@ -471,3 +471,58 @@ AWS Compute Optimizer
 
 
 Compute Optimizer uses Amazon CloudWatch metrics to analyze your EBS volumes and provide recommendations to assist you in optimizing your Amazon Elastic Block Store (Amazon EBS) costs. AWS Control Tower, Amazon Inspector, and AWS OpsWorks are other AWS services unrelated to managing EBS volumes. 
+
+
+
+A customer has a Linux based application which currently requires access to a shared storage solution for the application to work properly in a cluster. The application has been deployed in Placement Group due to the required node to node transaction throughputs. The application is latency sensitive.
+
+As a solutions architect which storage option would you choose to satisfy the latency requirement?
+
+
+Amazon S3
+
+Amazon Glacier
+
+````Amazon EBS Multi-attached
+
+Amazon EFS
+
+
+
+
+
+
+
+
+An application is hosted on an Amazon EC2 instance with multiple Amazon EBS volumes attached and uses Amazon Neptune as its database. To improve data security, you encrypted all of the Amazon EBS volumes attached to the instance to protect the confidential data stored in the volumes.
+
+Which of the following statement is true about encrypted Amazon EBS volumes?
+
+
+Snapshots are not automatically encrypted.
+
+`````All the data moving between Amazon EC2 instance and volume is encrypted.
+
+Only the data within volume is encrypted but the data moving from Amazon EC2 instance to volume is not encrypted.
+
+The volumes created from encrypted snapshots are not encrypted.
+
+The statement that is true about encrypted Amazon EBS volumes is:
+
+All the data moving between Amazon EC2 instance and volume is encrypted.
+
+When you encrypt an Amazon EBS volume, both data at rest (the data stored on the volume) and data in transit (the data moving between the EC2 instance and the volume) are encrypted. This helps to ensure the confidentiality and integrity of the data throughout the entire process.
+=========================================================================
+After a budget review, you have noticed your Amazon EBS charges make up a significant portion of your bill. Currently, all EBS volumes are in use and required to stay active. All unattached volumes have been deleted after creating snapshots. Snapshots are managed with lifecycle policies and a review has found no issue with retention.
+
+Which of the following options will best help you to reduce your EBS spending?
+
+
+Manually delete snapshots you are not currently using or anticipate using within the next year.
+
+Detach the Amazon EBS volume from the Amazon EC2 instance. This will make sure you are not being charged unless you are using the EBS volume by attaching it to an EC2 instance.
+
+Generate snapshots of all volumes and only create and Amazon EBS volume when the data is requested.
+
+"Review the Amazon EBS volume size to make sure you did not over provision EBS volumes."
+This is because over-provisioning EBS volumes can lead to unnecessary costs. By right-sizing your EBS volumes to match the actual storage requirements of your applications, you can potentially reduce costs while still meeting your performance needs.

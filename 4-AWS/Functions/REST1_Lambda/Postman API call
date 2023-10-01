@@ -1,0 +1,6 @@
+Postman API call
+POST method
+Body -> raw
+{ "personId": 329, "personName": "azamsajjad"}
+
+function returned 329

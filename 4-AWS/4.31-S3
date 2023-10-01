@@ -214,6 +214,13 @@ AWS Storage Gateway
 // You can use the AWS Storage Gateway, in File Gateway mode, to store your on premises data in an existing Amazon S3 bucket. You can deploy AWS Storage Gateway as a virtual appliance or purchase a hardware appliance version.
 
 // AWS Storage Gateway configured as a File Gateway enables you to connect your Amazon S3 bucket using either the Network File System (NFS) or Server Message Block (SMB) protocol with local caching. You can transfer your data using an AWS File Storage Gateway over the internet or over an AWS Direct Connect connection.
+The two requirements that must be met before using Amazon S3 File Gateway are:
+
+Configure your private networking, VPN, or AWS Direct Connect between your Amazon Virtual Private Cloud (Amazon VPC) and the on-premises environment where you are deploying your gateway.
+
+Configure Microsoft Active Directory (AD).
+
+These are essential steps to ensure proper connectivity and authentication between your on-premises environment and the AWS resources when using Amazon S3 File Gateway.
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
@@ -397,6 +404,8 @@ A cookie which is passed along with the request to cloudfront,
 adv- provide access to restricted files e.g. Video Streaming
 
 once a signed url passes a cookie, you can have access for as long as cookie is valid
+BLOCK INDIA.
+Amazon CloudFront: CloudFront can be used in combination with AWS WAF to restrict access based on geolocation. You can configure CloudFront to use AWS WAF rules for filtering traffic, including blocking or allowing access from specific countries.
 --------------------------------------------------------------------------
 ATHENA
 interactive query service using standard SQL
@@ -531,3 +540,78 @@ The condition above looks for a Null value for the s3:x-amz-server-side-encrypti
 Which S3 storage class is ideal for backup and disaster recovery use cases, when large sets of data occasionally need to be retrieved in minutes, without concern for costs?
         Amazon S3 Glacier Flexible Retrieval (Formerly S3 Glacier)
     S3 Glacier Flexible Retrieval (formerly S3 Glacier) is the ideal storage class for archive data that does not require immediate access but needs the flexibility to retrieve large sets of data at no cost, such as backup or disaster recovery use cases.
+
+
+-------------------------------------
+A storage specialist of a company created a bucket named 'demobucket2022' for the purpose of storing files for the creation of a proof of concept (POC). After the successful implementation of proof of concept, the team wanted to leverage the bucket for the development work because of the content which was generated during POC. However, they didn't want to name it 'demobucket2022'.
+
+What is the solution for the team to proceed with this implementation of the requirement?
+
+
+Raise a support ticket and work with AWS support to rename the bucket.
+
+``````````Amazon S3 buckets cannot be renamed once created. So, a new bucket needs to be created and copy the content using cp/sync command from the AWS CLI.
+
+Use the AWS Management Console and rename the bucket using rename bucket option.
+
+Use AWS CLI and update the name of the bucket using the update bucket api.
+
+=======================================
+A company runs a batch application in the AWS Cloud hosted on 200+ Amazon EC2 instances. As a solutions architect, you are asked to push debug logs to an Amazon S3 bucket every 2:00 AM for all the EC2 instances.
+
+What is the best possible solution from an operation point of view?
+
+
+Use Systems Manager Distributor to transfer the logs every 2:00 AM on all the AWS Systems Manager Managed instances.
+
+Inject a user script via Ops Work to all of the Amazon EC2 instances that will push the logs to this Amazon S3 bucket.
+
+``````Create a schedule in AWS Systems Manager Maintenance window to move the logs to S3 bucket every 2:00 AM in the morning.
+
+Use SSM Session Manager to run a shell script on all Amazon EC2 instances 2:00 AM in the morning.
+===========================================================================
+A customer wants to host their domain in AWS using Amazon Route 53 service. They plan to use Amazon CloudFront for distributing their website globally. All the static assets of the website will be served from Amazon S3 and Amazon EC2 will be used for serving the dynamic content via Amazon CloudFront. The customer needs a way to integrate Amazon Route 53 with AWS CloudFront and Amazon S3.
+
+Which strategy would you recommend that is the easiest to configure?
+
+
+"They are integrated by default."
+
+It is possible to integrate Amazon Route53 with other AWS services like CloudFront and S3 via creating an alias record in Route 53 that points to CloudFront distributions and S3 buckets.
+
+It is possible, however, we need to insert the code for the integration of other AWS Services in our application which will be using Amazon Route 53.
+
+Use an AWS Lambda function with API Gateway to redirect the API calls from Amazon Route53 to Amazon CloudFront and from there to Amazon S3 and Amazon EC2.
+============================================================================
+A multi-national company has services across the globe which has a web application as its customer-facing frontend. One of the features of the app is to allow users to be able to upload huge amounts of files. As part of their architecture, they use a single bucket in the us-east-1 region and all the data from users is uploaded to this bucket. Now, as the demand for applications has grown, more and more users are using the application, which has led to an increase in file uploads. Because the users are across the globe, the upload takes time when the users are geographically far from the us-east-1region, which leads to a degraded user experience. You need to improve the upload experience without making major code level changes.
+
+Which is the best service that you could use to achieve this requirement?
+
+
+AWS DataSync
+
+Amazon Partner Network
+
+``````Amazon S3 Transfer Acceleration
+
+AWS Transfer Family
+
+Amazon S3 Transfer Acceleration utilizes Amazon CloudFront's globally distributed edge locations to accelerate the upload of objects to an S3 bucket. This service optimizes the transport path and provides a faster and more consistent user experience for uploads, regardless of the user's location.
+
+This means that users from around the world can upload their files with improved speed and efficiency. It doesn't require significant code changes in your application, making it a suitable solution for your scenario.
+
+====================================================================
+Your organization's operational lead has decided to build a cost effective centralized logging solution for multiple AWS accounts. The solution includes an Amazon S3 bucket in the centralized logging account. The logs must be deleted after three months to minimize cost.
+
+What is the most operationally efficient way to accomplish this task?
+
+
+Transition objects to the S3 Standard-IA storage class 30 days after creating them and delete manually/
+
+````Expiration actions
+
+Transition actions
+
+Archive objects to the S3 Glacier Flexible Retrieval storage class for three months and delete manually.
+
+With expiration actions, you can set up a lifecycle policy in the S3 bucket to automatically delete objects that are older than a specified number of days. In this case, you would configure the policy to delete logs after three months, which helps minimize cost by removing outdated data.

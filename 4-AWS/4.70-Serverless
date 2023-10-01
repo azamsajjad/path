@@ -1,3 +1,40 @@
+MICROSERVICES PRINCIPALS:
+
+Use public APIs
+                Microservices communicate over APIs. In fact, doing so is the only way to realize the benefits of microservices. Don't be tempted to circumvent that rule. By communicating with the API, you can modify the database and maintain it without affecting communications or having to repoint  interfaces. The public API is a contract between your microservices and its clients.
+
+
+Use the right tool for the job
+                With every service being built for explicit functionality and with a microservices approach, you can choose the right tool for the job. The development team for Microservices B can add Amazon OpenSearch Service or swap out to Amazon Aurora without affecting Microservices A. You can also make changes to the entire language framework, which gives you the flexibility to code in the language best suited to the application. By choosing the programming framework that works for the team, development team B can avoid the dependence on other teams for knowledge of specific frameworks.
+
+Secure your services
+                Common security practices
+                • Defense-in-depth
+                • Gateway (front door)
+                • API throttling (rate limiting)
+                • Authentication and authorization
+                • Secrets management
+Be a good citizen
+                As this universe of microservices grows and expands, it becomes important to be a good citizen. As a service owner, you must understand how other services are calling you. The service owner will identify the client's use case and register them in the service registry. As a client of services, you must understand the service that you are calling.
+Shift to microservices
+                Favor small, focused development teams
+Automate everything
+                as much of the delivery pipeline as possible. The code services (AWS CodeCommit, AWS CodeBuild, AWS CodePipeline, and AWS CodeDeploy) provide automation and orchestration of the delivery pipeline.
+
+When building microservices architecture, you don't
+always need to use serverless services. It is common
+to use a blend of both serverless and nonserverless
+services.
+
+
+Compute serverless services
+AWS Lambda
+        AWS Lambda is an event-driven, pay-as-you-go compute service
+        that lets you run code without provisioning or managing servers.
+AWS Fargate
+        AWS Fargate is a serverless compute engine that works with
+        Amazon Elastic Container Service (Amazon ECS) and Amazon
+        Elastic Kubernetes Service (Amazon EKS).
 SQS 
 SES 
 SNS 

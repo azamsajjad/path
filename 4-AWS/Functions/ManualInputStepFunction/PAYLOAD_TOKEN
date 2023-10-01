@@ -1,0 +1,35 @@
+PAYLOAD for both functions in Configuration Section
+
+{
+  "type.$": "$.type",
+  "MyTaskToken.$": "$$.Task.Token"
+}
+
+
+INPUT at execution
+
+{
+    "type": "PURCHASE"
+}
+
+
+THEN GO TO LOGS OF LAMBDA FUNCTION i.e. EXECUTED AND WAITING....
+YOU NEED TO CALLBACK INTO STEPFUNCTION'S API WITH THIS TOKEN
+
+{'MyTaskToken': 'AQCUAAAAKgAAAAMAAAAAAAAAAe3DPvDQKOpi1j91NUtapPaZiHqHY9Nx75BWK9yCSdIFgrfRsx9XSQ/Dr3AnEh8Pyogh7koW+GD5YTcEjIIx3zF3oWmcouc5SoW7lOUv7Ms8FfyzqSzhYFJPibMRj7dle56TIa4DKmDw8fhnYWqPRTxslC4GDjk9i2i3ex1DUJ4O35TImU8F53v+FirDxPHoHERgwLhJl3TZtMlzMuF2iwRdJRTABo46ClKP2jbV4TJT5xzZdMBjufh+owEbZ2zAP17oxJit6wNiXFhTaEAkHMytDi0IU9v6JxJnllNjv6GJXaGjZZ/Ffhwi7bX1nFewez/l6YinwZRyW96CJ2b55tv8btFTOZfIzBTy4DcbdSMZML0QHJZ3fuf+sNaE2MsThBllyWmUQog4jDOYZOuv74bJmbpHSAf4WDW6CfXPkbQs/1YWCSbCgaypvghZvTiduG1Ud7BRI0VtP7ysmIOe3qxiE6IjcWdQcPuksc7JQuK+ot9meSMlQHZi+N4E585gDteq6eKMvyS076KFR2OWohg88LnU9QO6LjBpECrgNZL/EDnYDFDbzA10z1OtQ1mbVwWq1rGpdILH7+/YPDRABErh6Zpvrb1JKOPfqy2/z+OuNsJ0MoW0ykjIVpZK58KuM6LtgPD0Mu+5PyRS7eXL', 'type': 'PURCHASE'}
+
+
+
+CLOUDSHELL
+
+aws stepfunctions send-task-failure
+or
+aws stepfunctions send-task-success
+
+aws stepfunctions send-task-success
+
+
+aws stepfunctions send-task-success --task-token "AQCUAAAAKgAAAAMAAAAAAAAAAe3DPvDQKOpi1j91NUtapPaZiHqHY9Nx75BWK9yCSdIFgrfRsx9XSQ/Dr3AnEh8Pyogh7koW+GD5YTcEjIIx3zF3oWmcouc5SoW7lOUv7Ms8FfyzqSzhYFJPibMRj7dle56TIa4DKmDw8fhnYWqPRTxslC4GDjk9i2i3ex1DUJ4O35TImU8F53v+FirDxPHoHERgwLhJl3TZtMlzMuF2iwRdJRTABo46ClKP2jbV4TJT5xzZdMBjufh+owEbZ2zAP17oxJit6wNiXFhTaEAkHMytDi0IU9v6JxJnllNjv6GJXaGjZZ/Ffhwi7bX1nFewez/l6YinwZRyW96CJ2b55tv8btFTOZfIzBTy4DcbdSMZML0QHJZ3fuf+sNaE2MsThBllyWmUQog4jDOYZOuv74bJmbpHSAf4WDW6CfXPkbQs/1YWCSbCgaypvghZvTiduG1Ud7BRI0VtP7ysmIOe3qxiE6IjcWdQcPuksc7JQuK+ot9meSMlQHZi+N4E585gDteq6eKMvyS076KFR2OWohg88LnU9QO6LjBpECrgNZL/EDnYDFDbzA10z1OtQ1mbVwWq1rGpdILH7+/YPDRABErh6Zpvrb1JKOPfqy2/z+OuNsJ0MoW0ykjIVpZK58KuM6LtgPD0Mu+5PyRS7eXL" --task-output "{\"result\": \"PURCHASE_PROCESSED_SUCCESS\"}"
+
+
+put in the result which your lambda function would normally return

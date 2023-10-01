@@ -1,0 +1,28 @@
+def lambda_handler(event, context):
+
+	# 1: Log The Event
+	print(event)
+
+	# 2: See if the Person's Token is valid
+	auth = 'Deny'
+	if event['authorizationToken'] == 'kzl329':
+		auth = 'Allow'
+	else:
+		auth = 'Deny'
+
+	# 3: Construct and Return the Response
+	authResponse = { "principalId": "kzl329", 
+					"policyDocument": {
+						"Version": "2012-10-17",
+						"Statement": [
+							{
+								"Action": "execute-api:Invoke",
+								"Resource":[
+									"arn:aws:execute-api:us-east-1:767665886117:eb1neml8fe/*/*"
+								],
+								"Effect": auth
+							}
+						]
+					}
+				}
+	return authResponse
