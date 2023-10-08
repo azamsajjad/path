@@ -1043,3 +1043,63 @@ To fulfill the requirement of serving a high-performance web application with mi
 Use Amazon DynamoDB Global Tables.
 
 Amazon DynamoDB Global Tables provide a fully managed, multi-region, and globally distributed database that automatically replicates data across regions. This ensures low-latency access for customers in different geographic areas while providing high availability and fault tolerance.
+
+===========================================================================
+
+Your company is reaching the end of the financial year, and the finance team is running a lot of large database queries and scans against your DynamoDB tables. The database queries and scans are taking much longer to complete than expected. How can you make them more efficient?
+
+Filter your results based on the primary key and sort key.
+
+Filtering the results based on the primary and sort keys will not improve the efficiency of this task.
+
+Selected
+Reduce the page size to return fewer items per results page.````````````
+
+Reducing page size for queries and running scans in parallel are both recommended approaches for making DynamoDB operations more efficient.
+
+Reference: Best Practices for Querying and Scanning Data
+
+Selected
+Set your queries to be eventually consistent.
+
+Run parallel scans.`````````````````````````````
+
+Reducing the page size for queries and running scans in parallel are both recommended approaches for making DynamoDB operations more efficient. DynamoDB uses eventually consistent reads by default, and filtering the results will not improve efficiency.
+
+==========================================================================
+You are storing user profile data for a mobile gaming application in a DynamoDB table. The product owner asks you to generate a list of all registered users that are located in the USA. As you retrieve the information from DynamoDB, you receive a ProvisionedThroughputExceededException error. What does the error ProvisionedThroughputExceededException mean in DynamoDB?
+"
+You exceeded your maximum allowed provisioned throughput for a table or for one or more global secondary indexes."
+The ProvisionedThroughputExceededException means that you exceeded your maximum allowed provisioned throughput for a table or for one or more global secondary indexes.
+Reference: Class ProvisionedThroughputExceededException
+
+The DynamoDB table is unavailable.
+
+The DynamoDB table has exceeded the allocated space.
+
+This is not correct because it is not possible to exceed the allocated space.
+
+Selected
+The size of the query you tried to perform is too large. Find a way to split the query into a set of smaller queries.
+
+========================================================================
+A developer is working on a new JavaScript web application that allows users to post opinions to a shared forum and contribute to discussions about the latest innovations in cloud computing. Users have the ability to upvote their favorite posts, and at the end of each day, the top 250 posts are displayed in a leader board. The application makes a large batch request directly to DynamoDB using the BatchGetItem API call to report the most popular 250 posts. When a large request is made, the DynamoDB table frequently returns a partial result, accompanied by a value for UnprocessedKeys. Which of the following actions are ways that the developer can enable the application to receive all the remaining items when the BatchGetItem response includes a value for UnprocessedKeys?
+
+Update the application to use the AWS software development kit (AWS SDK) for JavaScript to make the API requests.`````````````````````````````
+
+AWS SDKs automatically implement retries using exponential backoff. If you delay the batch operation using exponential backoff, the individual requests in the batch are much more likely to succeed.
+
+Reference: Retry and Backoff with AWS SDKs
+
+Retry the batch operation immediately.
+
+Retry the operation using an exponential backoff algorithm.````````````````
+
+If DynamoDB returns any unprocessed items, you should retry the batch operation on those items. However, AWS strongly recommends that you use an exponential backoff algorithm. If you retry the batch operation immediately, the underlying read or write requests can still fail due to throttling on the individual tables. If you delay the batch operation using exponential backoff, the individual requests in the batch are much more likely to succeed.
+
+Reference: BatchGetItem API Call
+
+Selected
+Increase the provisioned write capacity of the DynamoDB table.
+
+BatchGetItem is a read operation, so increasing the write capacity of the table will not help.

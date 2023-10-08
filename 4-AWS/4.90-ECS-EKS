@@ -207,3 +207,18 @@ Amazon ECS is a fully managed container orchestration service, and when used in 
 AWS Fargate is a serverless compute engine for containers that works seamlessly with Amazon ECS. It removes the need to manage the underlying infrastructure, allowing you to concentrate on deploying your applications.
 
 Together, Amazon ECS and AWS Fargate provide a convenient and easy way to migrate and manage containerized Windows workloads on AWS.
+=======================================================================
+You are running a CI/CD pipeline using CodePipeline to deploy containers to Elastic Kubernetes Service (EKS). Container images are stored in Elastic Container Registry (ECR), for deployment to EKS. Before the image is deployed, you want to run a security check on the image, with the ability to fail the pipeline if the security check fails. How do you do this in CodePipeline?
+
+Create a test action in the deployment stage to perform security scanning prior to deploying the image.
+
+This is not the AWS recommended way of adding a test that needs to happen prior to a deployment.
+
+Selected
+Build the container image locally and perform a security scan before beginning the CD/CD pipeline. Push any changes to the source code repository.
+
+"Create a test stage with a test action that will happen before the deployment stage.
+CodePipeline allows you to create a test stage with a test action prior to the deployment stage.
+Reference: Add a CodeBuild Test Action to a Pipeline"
+
+Create a test action in the deployment stage to perform security scanning after deploying the image.

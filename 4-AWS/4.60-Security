@@ -688,3 +688,16 @@ Amazon Macie
 
 Correctly unselected
 Amazon GuardDuty
+
+---------------------------------------------------------------------------
+A company wants to store sensitive user data in Amazon S3 and encrypt this data at rest. The company must manage the encryption keys and use Amazon S3 to perform the encryption. Which solution meets these requirements?
+
+Use the option for server-side encryption with customer-provided encryption
+keys (SSE-C) to configure default encryption for the Amazon S3 bucket.
+
+Use an encryption key to configure client-side encryption. Upload the encrypted object to the Amazon S3 bucket.
+
+Use server-side encryption with Amazon S3 managed encryption keys (SSE-S3)
+to configure server-side encryption. Upload an object to the Amazon S3 bucket.
+"
+Use server-side encryption with customer-provided encryption keys (SSE-C) to configure server-side encryption. Upload an object to the Amazon S3 bucket."

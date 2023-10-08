@@ -672,3 +672,25 @@ False
 
 Correct Answer
 Amazon SNS supports a number of protocols, e.g. HTTP, HTTPS, email, email-json, etc. --> Amazon SNS API Reference
+
+===========================================================================
+Your application uses Kinesis to collect customer data from various sources, including web forms, mobile apps, and IoT devices. This data is analyzed in real time in order to gain insights and improve customer experience. Following a recent Black Friday event, your website experienced unprecedented traffic, and sales have doubled over the last quarter. This increase in traffic caused some issues, and your Kinesis stream is frequently throwing a ProvisionedThroughputExceededException error. What should you do to fix this problem?
+
+Provision a second Kinesis stream to handle the additional load. Use a Lambda function to merge the processed data from the two streams.
+
+It is not necessary to create a second stream to handle the additional load.
+
+Selected
+Retry the operation immediately.
+
+Reduce the frequency or size of your requests.`````````````````````
+
+ProvisionedThroughputExceededException means that the request rate for the stream is too high or the requested data is too large for the available throughput. Reducing the frequency or size of requests will reduce the throughput that is being used.
+
+Reference: ProvisionedThroughputExceededException
+
+Increase the number of consumers.
+
+Reshard your stream.``````````````````````````````````````````````````
+
+Resharding your stream to increase the number of shards in the stream allows you to adjust the number of shards in your stream to adapt to changes in the rate of data flow through the stream.

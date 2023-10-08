@@ -690,3 +690,28 @@ Incorrect. CodeCommit can use a trigger to send events to Amazon SNS, but Amazon
 
 Correct Answer
 Correct. You can set up notification rules for a repository so that repository users receive emails about the repository event types you specify. Notifications are sent when events match the notification rule settings. You can create an Amazon SNS topic to use for notifications or use an existing one in your AWS account. You can use the CodeCommit console and the AWS CLI to configure notification rules.
+-------------------------------------------------------
+
+A developer wants to use CodeBuild to set up continuous integration for their project. They would like to ensure the project is integrated with the latest code and that the DevOps team is automatically notified of a failure in the build process by receiving an SMS message. Which of the following should the developer implement?
+
+Use the CodePipeline dashboard to view the CodeBuild events log.
+
+Use CloudWatch Events and SES notifications to send a message to the DevOps team.
+
+Add the name of the email group to the notifications section of the CodeBuild console.
+
+The CodeBuild console does not enable you to configure notifications in this way.
+
+Selected
+Store the source code in EFS.
+
+Store the source code in CodeCommit.````````````````
+
+CodeCommit is a supported source code repository for CodeBuild.
+
+Reference: CodeBuild Project Source Repository Types
+
+Selected
+Use CloudWatch Events and an SNS topic to notify subscribers of build events.````````````````````````
+
+CodeBuild natively supports CloudWatch Events; SNS is a subscription-based notification service that integrates with CloudWatch.

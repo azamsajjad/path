@@ -1,3 +1,13 @@
+Which of the following is required in order to enable an existing Lambda function to access EC2 instances that are located in a private VPC?
+
+Configure the Lambda functions execution role to match the role applied to your EC2 instances.
+Update the permissions in your VPC to allow Lambda to access the EC2 instances.
+It is not possible to update VPC permissions to enable private VPC access for a Lambda function.
+Configure the function policy to allow EC2 to invoke the function.
+
+'Modify the function configuration, and choose the correct subnets and security groups.
+To configure private VPC access for an existing function, you will need to modify the function configuration, and select the correct subnets and security groups.'
+================================================================
 Lambda Charges: (pay only when your code executes)
 1 - Based on Requests
 first million requests per month are free 

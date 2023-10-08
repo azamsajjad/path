@@ -393,3 +393,126 @@ New Cleaner Input required now---
         "name": "azam sajjad"
 }
 // for customerid, $context.requestId generates a random customer id 16 digit unique
+===========================================================================
+Lambda authorizers
+–
+An API Gateway Lambda authorizer invokes a Lambda function to authenticate/validate a user against your existing IdP. This type of authorizer is useful for centralized authentication.
+TYPES:
+TOKEN-BASED LAMBDA AUTHORIZERS.
+REQUEST AUTHORIZER.
+
+you can also use cross-account lambda authorizer. 
+authorizer in one account, 
+===========================================================================
+2015
+REST APIs Introduced
+Resource + verb
+Customers + GET, POST, etc..
+first 333 million requests = $3.5/month/million
+
+2018
+WebSocket APIs Introduced
+Duplex communication
+Connection based
+Use Case Specific
+
+
+2020
+HTTP APIs Introduced
+Resource + verb OR rpc
+Parity is coming...
+Lightweight
+cheap
+first 300 million requests = $1/month/million
+70% cheaper than REST
+
+Feature                         REST.                           HTTP.
+Usage Plans & API Keys                                          X
+API Caching                                                     X
+Testing / Mocking                                               X
+Request Validation &                                            X
+Transformation
+Native OIDC / OAuth 2.0         X(use Lambda Authorizers)
+ALB Integrations                X
+
+
+o
+o
+o
+How to Switch from REST to HTTP
+Export your API Definitions using Swagger/OpenAPl
+Import them into new HTTP APIs
+Largely 1:1 changeover, but feature discrepancy will be highlighted
+
+
+TLDR
+Use HTTP everytime, except when the feature isn't supported
+
+
+USING HTTP API GATEWAY TO CALL A LAMBDA FUNCTION
+BOTH GET & POST REQUEST
+
+
+import json
+import uuid
+
+GET_RAW_PATH = "/getPerson"
+CREATE_RAW_PATH = "/createPerson"
+
+def lambda_handler(event, context):
+    if event['rawPath'] == GET_RAW_PATH:
+       #GetPerson Path - what happens?
+       print('Start request for GetPerson')
+       personId = event['queryStringParameters']['personId']
+       print('Received Request with personId= ' + personId)
+       return {"firstName": "azam", "lastName": "sajjad", "email": "azams@mail.com"}
+       
+    elif event['rawPath'] == CREATE_RAW_PATH:
+        #CreatePerson Path - what happens?
+        decodedEvent = json.loads(event['body'])
+        firstName = decodedEvent['firstName']
+        print('Received Request with firstName= ' + firstName)
+        # call database - NOT DOING IT HERE
+        return { "personId": str(uuid.uuid1())}
+
+
+'
+-------------------------------------------------------------------
+You have three separate environments in your AWS account and three corresponding stages in the API Gateway. You are using the API Gateway as a HTTP proxy to a backend endpoint. How do you direct traffic for each environment without creating separate API Gateways?
+
+
+Use a request transformation to transform the backend endpoint responses.
+
+
+Use custom authorizers for each stage.
+
+'
+Use stage variables and configure the stage variables in the HTTP integration request to interact with different backend endpoints.'
+You can use API Gateway stage variables to access the HTTP and Lambda backends for different API deployment stages.
+
+Update the integration response to update the backend endpoints.
+
+=====================================================================
+You are building a web application that uses API Gateway to expose a Lambda function to process requests from clients over the internet. While testing, the API Gateway frequently times out; however, when calling the Lambda function directly, it completes successfully every time.
+
+Which of the following API Gateway metrics in Amazon CloudWatch should you check in order to troubleshoot the issue?
+
+Count
+
+CacheMissCount
+
+CacheMissCount relates to the number of requests served from the backend in a given period, when API caching is enabled. A cache miss should not cause API Gateway to time out, so this metric will not help you to understand why the API is timing out.
+
+Reference: API Gateway metrics
+
+Selected
+Latency`````````````````````````````````````
+
+Latency relates to the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. This is useful because a latency issue could be causing the timeout.
+
+Reference: API Gateway metrics
+
+Selected
+IntegrationLatency````````````````````````````
+
+IntegrationLatency relates to the time between when API Gateway relays a request to the backend and when it receives a response from the backend. This is useful because a latency issue could be causing the timeout.
