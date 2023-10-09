@@ -286,3 +286,37 @@ O
 Choice
 o
 Wait
+
+==================================================================A company developed a warehouse fulfillment application by using AWS Step Functions. The Step Functions activity workers run on tablets that warehouse employees use. Some long-running activities fail because of problems with individual tablets. These problems include loss of battery power. The application must re-assign interrupted activities to another worker as soon as possible. If an activity fails three times, the state machine should fail.
+
+Which Step Functions configuration will meet these requirements?
+
+
+
+
+
+Set the state machine's States.Timeout attribute to 30 seconds. Set the state machine's Retry.MaxAttempts attribute to 3.
+Incorrect. You set the Retry field at the individual state level, not at the overall state machine level. States.Timeout is an error name and not a field that you can set.
+
+For more information about the Retry field, see Error Handling in Step Functions.
+
+For more information about how to configure a workflow to wait for a task to finish, see Waiting for an Activity Task to Complete.
+
+
+B
+Set the task's HeartbeatSeconds attribute to 30. Set the state machine's States.TaskFailed attribute to 3.
+Incorrect. States.TaskFailed is an error name. This error name is not a field that you can set.
+
+For more information about error handling, see Error Handling in Step Functions.
+
+
+C
+Set the tasks TimeoutSeconds attribute to 30. Set the Retry.MaxAttempts attribute to 3.
+Incorrect. The TimeoutSeconds attribute defines the maximum task duration before the task is considered failed. A value of 30 would cause any task that runs longer than 30 seconds to fail, even if there were no problems with the tablet.
+
+For more information about the TimeoutSeconds attribute, see Task.
+
+"
+D
+Set the tasks HeartbeatSeconds attribute to 30 seconds. Set the Retry.MaxAttempts attribute to 3.
+Correct. The HeartbeatSeconds attribute defines the maximum interval that the task will wait for a heartbeat signal. If an activity worker fails to send heartbeats within this interval, the state is failed. A retry policy on the state allows another activity worker to attempt to complete the state."

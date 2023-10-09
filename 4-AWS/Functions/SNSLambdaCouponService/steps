@@ -1,0 +1,69 @@
+Publish Message to the Topic
+{
+"customer_id": "customer01 ",
+"distance": 10,
+"coupon" : "3423-asdf-234",
+"timestamp": "1595877319",
+"cost" :3S9,
+"retum_area id": "123"
+}
+
+
+ACCOUNT_SERVICE FUNCTION: ---------------------------------
+import json
+print('Loading function')
+
+def lambda_handler(event, context):
+    # print('Received event: ' + json.dumps(event, indent=2))
+    message = event['Records'][0]['Sns']['Message']
+    print('[Service] Account Service received message: ' + message)
+
+    return 'success'
+
+
+
+
+Create Subscription -> Lambda -> ARN -> Subscription Filter
+{
+    "coupon": [{"exists": true}]
+}   
+
+{
+    "coupon": [
+      {
+        "exists": true
+      }
+    ]
+  }
+
+
+
+COUPON_SERVICE FUNCTION: ---------------------------------
+import json
+print('Loading function')
+
+def lambda_handler(event, context):
+    # print('Received event: ' + json.dumps(event, indent=2))
+    message = event['Records'][0]['Sns']['Message']
+    print('[Service] Coupon Service received message: ' + message)
+
+    return 'success'
+
+
+    -----------------------------------------------------
+
+now while publishing message , add attribute of coupon 
+it will trigger the function, verify it on cloudwatch logs 
+
+
+promotion function with same code 
+
+Create Subscription -> Lambda -> ARN -> Subscription Filter
+{
+    "distance": [
+      {
+        "numeric": [">", 10]
+      }
+    ]
+  }
+  

@@ -1491,3 +1491,77 @@ Amazon DynamoDB Accelerator (DAX) is a useful solution for offloading transactio
 
 Correctly unchecked
 The best option for connecting to traditional relational databases is to use concurrency limits to limit the number of concurrent database connections that AWS Lambda can invoke.
+
+=======================================================================
+A developer needs to query a relational database from an AWS Lambda function. The Lambda function will be called frequently. The developer needs to avoid the latency introduced by the initial JDBC connection to the database in subsequent invocations of the Lambda function.
+
+How can the developer ensure the database connection is reused by Lambda?
+
+A
+Initialize the database connection outside the Lambda function code as a Lambda function environment variable.
+Incorrect. Database connection details can be stored as an environment variable. However, the developer still needs to initialize the connection within the code for the connection to be used in queries.
+
+For more information about Lambda function environment variables, see Using AWS Lambda environment variables.
+
+"
+B
+Initialize the database connection within the Lambda function code but outside the handler method.
+Correct. The Lambda environment can reuse the same database connection for subsequent invocations when defining the database connection details in the code but outside the handler method.
+
+For more information about reusing the Lambda execution environment, see AWS Lambda execution environment."
+
+
+C
+Store the database connection string in AWS Systems Manager Parameter Store. Ensure the Lambda function handler initializes the database connection within the handler method.
+Incorrect. Database connection details can be stored in Systems Manager Parameter Store. However, initializing the connection within the handler method will result in it re-initializing each subsequent Lambda function invocation.
+
+For more information about storing parameters in AWS, see AWS Systems Manager Parameter Store.
+
+
+D
+Store the database connection string in the Lambda function code. Ensure the function handler initializes the database connection within the handler method.
+Incorrect. Initializing the connection within the handler method will result in it re-initializing each subsequent Lambda function invocation.
+
+=======================================================================
+A company is working on a project to enhance its serverless application development process. The company hosts applications on AWS Lambda. The development team regularly updates the Lambda code and wants to use stable code in production.
+
+Which combination of steps should the development team take to configure Lambda functions to meet both development and production requirements? (Select TWO.)
+
+Report Content Errors
+
+A
+Create a new Lambda layer every time a new code release needs testing.
+
+B````````````````````
+Create a new Lambda version every time a new code release needs testing.
+
+C
+Create two Lambda function aliases. Name one as Production and the other as Development. Point the Production alias to a production-ready Lambda layer Amazon Resource Name (ARN). Point the Development alias to the $LATEST layer ARN.
+
+D`````````````````````
+Create two Lambda function aliases. Name one as Production and the other as Development. Point the Production alias to a production-ready unqualified Amazon Resource Name (ARN) version. Point the Development alias to the $LATEST version.
+
+E
+Create two Lambda function aliases. Name one as Production and the other as Development. Point the Production alias to the production-ready qualified Amazon Resource Name (ARN) version. Point the Development alias to the variable LAMBDA_TASK_ROOT.
+
+======================================================================
+A company hosts its web application backend on Amazon Elastic Container Service (Amazon ECS). The applications Amazon ECS tasks run behind an Application Load Balancer (ALB). The application supports three environments: production, testing, and development. The application uses the ALB to route traffic to the correct environment.
+
+The company has configured three listener rules for the ALB to forward traffic to a different target group based on the port number (Port 80 for production target group, Port 8080 for testing target group, and Port 8081 for development target group).
+
+The company decides to migrate the application backend to a serverless architecture by using an Amazon API Gateway API backed by AWS Lambda functions. The company plans to use the URI path pattern to access the desired environment instead of the port number. The company has created the Lambda functions for the application backend. Each Lambda function has three aliases (production, testing, and development).
+
+Which option includes the next steps the company must take to complete the process?
+
+Report Content Errors
+"
+A
+Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the expression ${stageVariables.LambdaAlias}. Modify the Lambda resource-based policy by adding the permission lambda:InvokeFunction. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
+Correct. To add "stageVariable" to the Lambda ARN, you should use the following format: ${stageVariable.stageVariableName}.
+
+For more information about API Gateway stage variables, see Using Amazon API Gateway Stage Variables."
+
+
+B
+Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the name of the Lambda alias. Modify the Lambda resource-based policy by adding the permission lambda:InvokeFunction. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
+Incorrect. To add "stageVariable" to the Lambda ARN, you do not use the Lambda alias name. You should use the following format: ${stageVariable.stageVariableName}.

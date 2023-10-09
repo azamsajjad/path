@@ -40,6 +40,31 @@ create git key from IAM to be used for
     $aws codecommit create-repository --repository-name devopsfromcli
     username:
     password:
+
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment $ cd appfn/
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn $ aws codecommit create-repository --repository-name appfn
+{
+    "repositoryMetadata": {
+        "accountId": "582908443542",
+        "repositoryId": "5ceee032-4b85-41c1-8b77-911da11b43e0",
+        "repositoryName": "appfn",
+        "lastModifiedDate": "2023-10-09T10:23:13.330000+00:00",
+        "creationDate": "2023-10-09T10:23:13.330000+00:00",
+        "cloneUrlHttp": "https://git-codecommit.us-east-1.amazonaws.com/v1/repos/appfn",
+        "cloneUrlSsh": "ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/appfn",
+        "Arn": "arn:aws:codecommit:us-east-1:582908443542:appfn"
+    }
+}
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn $ git config --global credential.helper '!aws codecommit credential-helper $@'
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn $ git config --global credential.UseHttpPath true
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn $ git config --global init.defaultBranch main
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn $ 
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn $ git init
+Initialized empty Git repository in /home/ec2-user/environment/appfn/.git/
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn (main) $ git add .
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn (main) $ git commit -m "first commit"
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn (main) $ git remote add origin https://git-codecommit.us-east-1.amazonaws.com/v1/repos/appfn
+AWSLabsUser-uEWJyTWcmNB6kw66NbeLv:~/environment/appfn (main) $ git push -u origin main
 ---------------------------------------------------------------------------
 "CodeDeploy":
 2 deployment approaches -
@@ -715,3 +740,26 @@ Selected
 Use CloudWatch Events and an SNS topic to notify subscribers of build events.````````````````````````
 
 CodeBuild natively supports CloudWatch Events; SNS is a subscription-based notification service that integrates with CloudWatch.
+
+
+=======================================================================
+A developer wants to deploy an AWS Serverless Application Model (AWS SAM) application with the AWS SAM CLI. The developer is using the AWS CLI in an AWS Cloud9 environment for deployment and has run the sam build command to prepare the application for deployment. The next day, the developer connects to the same AWS Cloud9 environment and attempts to deploy the application. The sam deploy command returns the following error:
+
+Invalid (or missing) template file (path must be workspace-relative, or absolute)
+
+
+How can the developer resolve this error?
+
+Report Content Errors
+
+A
+Rename the template.yaml file that was created by the sam build command to deploy.yaml.
+
+B
+Place the template.yaml file that was created by the sam build command into the .deploy directory.
+
+C`````````````````````````
+Change the working directory to the root of the AWS SAM application.
+
+D
+Reinitialize the AWS SAM application with the sam init comment.

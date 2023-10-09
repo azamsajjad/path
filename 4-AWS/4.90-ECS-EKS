@@ -222,3 +222,53 @@ CodePipeline allows you to create a test stage with a test action prior to the d
 Reference: Add a CodeBuild Test Action to a Pipeline"
 
 Create a test action in the deployment stage to perform security scanning after deploying the image.
+
+
+========================================================================
+D:\devops\4-AWS\Functions\ECRapp
+0 - Instal DOCKER in Cloud9
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ ./install_scripts/install_docker.sh 
+1 - SET ENVIRONMENT VARIABLES
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ region=$(aws configure get region)
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ repo_name="my_app"
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ region=${region:-us-east-1}
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ repo_name="my_app"
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ account=${aws sts get-caller-identity --query Account --output text}
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ fullname="${account}.dkr.ecr.${region}.amazonaws.com/${repo_name}:latest"
+2 - CREATE REPOSITORY
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment $ aws ecr create-repository --repository-name "${repo_name}"
+{
+    "repository": {
+        "repositoryArn": "arn:aws:ecr:us-east-1:712089354051:repository/my_app",
+        "registryId": "712089354051",
+        "repositoryName": "my_app",
+        "repositoryUri": "712089354051.dkr.ecr.us-east-1.amazonaws.com/my_app",
+        "createdAt": "2023-10-06T13:58:08+00:00",
+        "imageTagMutability": "MUTABLE",
+        "imageScanningConfiguration": {
+            "scanOnPush": false
+        },
+        "encryptionConfiguration": {
+            "encryptionType": "AES256"
+        }
+    }
+}
+3- AUTHENTICATE DOCKER with ECR
+==>  aws ecr get-login-password —region ${region} | docker login --usemame AWS --password-stdin ${fullname}
+--    The AWS CLI "get-login-password" command authenticates Docker to an Amazon ECR registry.
+
+4- Create Build
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment/first_app $ docker build -t ${repo_name} .
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment/first_app $ docker images
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment/first_app $ docker tag ${repo_name} ${fullname}
+AWSLabsUser-wiUXB86KSwF7FayiaXqgNP:~/environment/first_app $ docker push ${fullname}
+
+
+OPEN Security Group Port 8443 for your VPC 0.0.0.0/0
+OPEN ECS
+ENTER Cluster 
+CREATE Task Definition 
+CREATE Task --> 
+in Networking -> attach proper VPC and editted Security Group
+in Task overrides -> use ecsTaskExecutionRole with AmazonECSTaskExecutionRolePolicy
+browser -> http://44.211.180.156:8443/

@@ -1,0 +1,16 @@
+ADV of IaaC - Cloudformation / CDK
+1-Mirror-like infrastructures
+2-Very audit-friendly
+3-Easy state management
+4-Easy to duplicate complex structures
+5-/aC— versioning, pu// requests, pipelines, etc
+6-Central big-picture view
+
+
+npm i -g aws-cdk 
+
+console > bash script -> IaaC CF -> DOMs (dataObjModels) -> CDK(components)
+
+mkdir project 
+cd
+cdk init --languages=python

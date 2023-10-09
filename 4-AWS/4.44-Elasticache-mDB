@@ -122,3 +122,33 @@ Amazon ElastiCache offers a fast, in-memory data store to power live streaming u
 In this use case, Amazon Simple Storage Service (Amazon S3) and Amazon CloudFront are managing and serving media content. ElastiCache manages the content index and token authentication for in-memory, sub-milliseconds responses at scale.
 
 Dream11 is India’s number one fantasy sports platform with over 14 million users in South Asia. The company has been using ElastiCache for Redis to support fantasy games including cricket and soccer. Dream11 has a peak demand of 1.5 million requests per minute and workloads that can quickly surge ten-fold. ElastiCache provides scaling on demand without downtime.
+
+========================================================================
+A developer migrates a web application from an on-premises data center to the AWS Cloud. Authenticated customers use the application from many different clients simultaneously, including laptops, smartphones, and tablets. The application runs on Amazon EC2 instances behind an Application Load Balancer. The instances run in an Amazon EC2 Auto Scaling group. Upon initial testing, users report that they have to reenter information when they use the web application on their laptops and then switch to using their smartphones.
+
+Which solution will make the session state information persist across devices?
+
+A
+Implement sticky sessions at the Application Load Balancer.
+Incorrect. The sticky session feature of the Application Load Balancer does not solve the problem across devices. Sticky sessions rely on a cookie that is not going to be consistent across devices.
+
+For more information about sticky sessions, see Sticky Sessions for your Application Load Balancer.
+
+
+B
+"Store session state information in an Amazon ElastiCache for Redis cluster.
+Correct. ElastiCache for Redis is a fast in-memory data store that provides sub-millisecond latency to power internet-scale applications in real time. The data will not be stored on the instance itself. This choice is ideal for ensuring that the session state information persists across devices."
+
+For more information about Well-Architected Framework principles, see Make services stateless where possible within Design Interactions in a Distributed System to Mitigate or Withstand Failures.
+
+For more information about using ElastiCache for Redis for session states, see Getting Started tutorial, Building a fast session store for your online applications.
+
+
+C
+Implement session state information storage in a local file on the webserver.
+Incorrect. A local file could store session state information persistently over time, but this does not solve the problem presented. If session state information is stored locally on the instance when a request is sent to another node behind the Application Load Balancer, the other node does not have access to the session state information.
+
+
+D
+Store session state information in AWS Systems Manager State Manager.
+Incorrect. Systems Manager State Manager is not for use of session state information management. Systems Manager State Manager is used to manage the state of an instance itself, such as specific instance configurations or software installations.

@@ -1,0 +1,2 @@
+COGNITO has a feature that it generates an authenticationToken upon login, which can also be used to secure your API, so basically we have two options when it comes to securing APIs, LambdaAuthorizer and Cognito User Pools
+C6 40 05 01 48 85 C9

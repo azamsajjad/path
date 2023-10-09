@@ -1,0 +1,125 @@
+Parameters:
+  StringTypeParam:
+    Type: String
+    Default: "Default String"
+    Description: A Literal String 
+  NumberTypeParam:
+    Type: Number
+    Default: 42 
+    Description: An integer or float 
+  ListNumTypeParam:
+    Type: List<Number>
+    Default: "42,32,22"
+    Description: Array of Numbers or floats 
+  CommaListTypeParam:
+    Type: CommaDelimitedList
+    Default: "Three,Two,One,Action"
+    Description: Comma Separated String Array
+  SSMTypeParam: #needs to match SSM param name
+    Type: AWS::SSM::::Parameter::Value<String>
+    Description: SSM Param Value 
+  AWSSpecificType:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: List of EC2 Subnet IDs
+
+# CONSTRAINED PARAMETERS:
+# These help restrict and guide user input for parameters
+# ConstrainDescription
+# AllowedPattern
+# AllowedValues
+# MaxLength/MinLength
+# MaxValue/MinValue
+# NoEcho
+Max 60 Parameters per template
+Parameters must be declared and referenced
+from within the same template.
+-------------------------------------------------------
+Parameters:
+  Environment:
+    Description: Environment
+    Type: String
+    Default: Dev 
+    AllowedValues:
+      - Dev
+      - Prod
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      Dev: ami-6087acf4dg
+      Prod: ami-3242kgtg5k
+    us-west-1:
+      Dev: ami-6087acf4dg
+      Prod: ami-3242kgtg5k
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", !Ref "Environment"]
+      InstanceType: m1.small
+
+-------------------------------------------------------
+Conditions: !If & !Equals & !Not & !Or & !And
+(optional)
+• Define conditions under which entities are created
+or configured. Associate these conditions with a
+resource or output so that CloudFormation only
+creates the resource or output if the condition is
+true. You can also associate a condition with a
+property so that it only sets the property if the
+condition is true, if conditionally set between two
+properties, for example.
+
+Conditions:
+  isProd: !And # both must be true, 2-10 conditions
+    - !Equals [!Ref EnvParam, Prod]
+    - !Condition SomeOtherCondition
+
+Conditions:
+  isProd: !Equals: [!Ref EnvParam, Prod]
+  isNotProd: !Not [!Equals [!Ref EnvParam, Prod]]
+Resources:
+  myS3bucket:
+    Type: AWS::S3::Bucket
+    Condition: isProd
+Outputs:
+  StorageBucket:
+    Description: Bucket to be used for storage 
+    Value: !If [ CreateNewBucket, !Ref NewBucket, !Ref ExistingBucket ]
+
+--------------------------------------------------------
+Export: & Import:
+Declare output values that you can import into other
+stacks, return in response, or view on the AWS
+CloudFormation console.
+• Must be unique per region, per AWS Account.
+• No cross-stack references across regions.
+• Name property of an Export can't use Ref or
+GetAtt functions that depend on a resource.
+• Important: You can't delete a stack if another
+stack references one of its outputs. You also can't
+modify or remove an output value that is
+referenced by another stack.
+
+Outputs:
+  StorageBucket :
+    Description: Bucket used for storage
+    Value: !Ref MyBucket
+    Export:
+      Name: !Sub ${AWS::StackName}-Bucket
+
+
+!ImportVaIue
+Returns the value of an output exported by another
+stack. Used in cross-stack references.
+• You can't create cross-stack references across regions.
+
+FutileFunction:
+  Type: AWS::Lambda::Function
+  Properties:
+    Handler: index. assimilate
+    Role: !GetAtt LambdaExecutionRole.Arn
+    Runtime: nodejs10.x
+    Environment :
+      STORAGE_BUCKET: !ImportValue Cube-Bucket

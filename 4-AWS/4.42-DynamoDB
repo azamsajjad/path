@@ -1103,3 +1103,78 @@ Selected
 Increase the provisioned write capacity of the DynamoDB table.
 
 BatchGetItem is a read operation, so increasing the write capacity of the table will not help.
+
+====================================================================
+A developer uses the AWS SDK for C++ to retrieve data from an Amazon DynamoDB table. The data is sometimes retrieved using a known key, and sometimes the key is not known, resulting in multiple items being returned. The developer wants to ensure the code returns only one item when retrieving data without keys.
+
+Which DynamoDB setting will meet these requirements?
+
+Report Content Errors
+
+A
+Set the parallel scan operation to 1.
+Incorrect. The parallel scan operation can logically divide a table into multiple segments, with multiple application workers scanning the segments in parallel. Parallel scan returns the same number of results as an ordinary scan, except the results can be returned more quickly. Parallel scan does not limit the number of items returned.
+
+For more information about using DynamoDB parallel scans, see Parallel Scan.
+
+
+B
+Set the query filter expression to 1.
+Incorrect. A filter expression applies additional matching criteria to limit the items returned. This expression does not provide a specific limit on the number of items returned.
+
+For more information about using query filter expression statements in DynamoDB, see Query.
+
+"
+C
+Set the scan limit parameter to 1.
+Correct. Set the limit parameter to 1 to set the maximum number of items that need to be retrieved with a DynamoDB scan operation.
+
+For more information about limiting the number of the results in a scan, see Limiting the Number of Items in the Result Set."
+
+
+D
+Set the query page-size value to 1.
+Incorrect. The page-size parameter will determine the number of items returned in each page of a query. This method is only relevant for queries that involve the key.
+
+=====================================================================
+A developer has written several custom applications that read and write to the same Amazon DynamoDB table. Each time the data in the DynamoDB table is modified, this change should be sent to an external API.
+
+Which combination of steps should the developer perform to accomplish this task? (Select TWO.)
+
+Report Content Errors
+
+A`````````````````````````````
+Configure an AWS Lambda function to poll the stream and call the external API.
+Correct. If you enable DynamoDB Streams on a table, you can associate the stream Amazon Resource Name (ARN) with an Lambda function that you write. Immediately after an item in the table is modified, a new record appears in the table's stream. Lambda polls the stream and invokes your Lambda function synchronously when it detects new stream records.
+
+For more information about how to use DynamoDB Streams to create an event that invokes a Lambda function, see Tutorial: Process New Items with DynamoDB Streams and Lambda.
+
+
+B
+Configure an event in Amazon EventBridge (Amazon CloudWatch Events) that publishes the change to an Amazon Managed Streaming for Apache Kafka (Amazon MSK) data stream.
+Incorrect. EventBridge (CloudWatch Events) is used to connect applications with a variety of data. It would not be able to detect updates to a DynamoDB table.
+
+For more information about EventBridge (CloudWatch Events), see What Is Amazon EventBridge?
+
+
+C
+Create a trigger in the DynamoDB table to publish the change to an Amazon Kinesis data stream.
+Incorrect. A trigger cannot be enabled on a DynamoDB table. To create a trigger, a DynamoDB stream should be enabled on the specific DynamoDB table.
+
+For more information about how to use DynamoDB Streams to create an event that invokes an AWS Lambda function, see DynamoDB Streams and AWS Lambda Triggers.
+
+
+D
+Deliver the stream to an Amazon Simple Notification Service (Amazon SNS) topic and subscribe the API to the topic.
+Incorrect. A DynamoDB stream cannot be used to create an Amazon SNS topic.
+
+For more information about how to capture changes to DynamoDB tables, see Change Data Capture with Amazon DynamoDB.
+
+For more information about how Amazon SNS works, see What is Amazon SNS?
+
+For more information about how to create a topic in Amazon SNS, see Creating an Amazon SNS topic.
+
+
+E`````````````````````````````
+Enable DynamoDB Streams on the table.
+Correct. You can enable DynamoDB Streams on a table to create an event that invokes an AWS Lambda function.

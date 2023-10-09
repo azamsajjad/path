@@ -701,3 +701,28 @@ Use server-side encryption with Amazon S3 managed encryption keys (SSE-S3)
 to configure server-side encryption. Upload an object to the Amazon S3 bucket.
 "
 Use server-side encryption with customer-provided encryption keys (SSE-C) to configure server-side encryption. Upload an object to the Amazon S3 bucket."
+
+======================================================================
+A company is developing a Python application that submits data to an Amazon DynamoDB table. The company requires client-side encryption of specific data items and end-to-end protection for the encrypted data in transit and at rest.
+
+Which combination of steps will meet the requirement to encrypt specific data items? (Select TWO.)
+
+Report Content Errors
+
+A``````````````````
+Generate symmetric encryption keys with AWS Key Management Service (AWS KMS).
+Correct. When you configure the DynamoDB Encryption Client to use AWS KMS, the DynamoDB Encryption Client uses a KMS key that is always encrypted when the key is used outside of AWS KMS. This cryptographic materials provider returns a unique encryption key and a signing key for every table item. This method of encryption uses a symmetric KMS key.
+
+B
+Generate asymmetric encryption keys with AWS Key Management Service (AWS KMS).
+
+C```````````````````````
+Use generated keys with the DynamoDB Encryption Client.
+Correct. When you configure the DynamoDB Encryption Client to use AWS KMS, the DynamoDB Encryption Client uses a KMS key that is always encrypted when the key is used outside of AWS KMS. This cryptographic materials provider returns a unique encryption key and a signing key for every table item. This method of encryption uses a symmetric KMS key.
+
+
+D
+Use generated keys to configure DynamoDB table encryption with AWS managed KMS keys.
+
+E
+Use generated keys to configure DynamoDB table encryption with AWS owned KMS keys.

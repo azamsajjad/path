@@ -258,3 +258,33 @@ Features high availability with brief downtime during failover.
 Supports up to four READ/WRITE nodes.
 `You can enable cross-Region replicas from multi-master clusters.
 Available with Amazon Aurora PostgreSQL-Compatible edition.
+============================================================================
+A developer built an application that stores data in an Amazon RDS Multi-AZ DB instance. The database performs reads and writes constantly and is responding slowly. The intensive read requests are received unpredictably several times each hour. The application cannot tolerate reading stale data. The developer must increase the retrieval speed for the intensive read requests.
+
+Which strategy will meet these requirements?
+
+Report Content Errors
+
+A```````````````````````````
+Use an Amazon ElastiCache cluster with a write-through strategy. Configure the application to direct the intensive read operations to ElastiCache.
+Correct. An ElastiCache cluster with a write-through strategy will allow for the read requests to be redirected to ElastiCache efficiently. The strategy will allow for the most up-to-date data to be retrieved.
+
+For more information about the ElastiCache write-through caching strategy, see Caching strategies.
+
+
+B
+Use an Amazon DynamoDB Accelerator (DAX) cluster with a write-through strategy. Configure the application to direct the intensive read operations to the DAX cluster.
+Incorrect. DAX is an in-memory acceleration service that accelerates DynamoDB tables. DAX cannot be used with RDS databases.
+
+For more information about DynamoDB read request acceleration, see In-Memory Acceleration with DynamoDB Accelerator (DAX).
+
+
+C
+Configure the application to direct the intensive read operations to the Multi-AZ standby replica in the second Availability Zone.
+Incorrect. An RDS Multi-AZ standby replica is intended for failover. A standby replica is not accessible for read or write operations.
+
+For more information about RDS Multi-AZ DB instances, see High availability (Multi-AZ) for Amazon RDS.
+
+
+D
+Add an RDS read replica. Configure the application to direct the intensive read operations to the read replica.

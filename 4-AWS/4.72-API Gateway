@@ -301,6 +301,13 @@ Distinct API endpoints can point to old vs. new components, and safe deployment 
 To learn more about different migration patterns, review the Migrating to Serverless lesson.
 
 ===========================================================================
+In Lambda proxy integration, when a client
+submits an API request, API Gateway passes
+to the integrated Lambda function the raw
+request as is, except that the order of the
+request parameters is not preserved.
+
+
 API GATEWAY - SERVICE PROXY.
 
 OLD WAYS:

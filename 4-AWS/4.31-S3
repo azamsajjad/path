@@ -537,13 +537,13 @@ You would like to configure your S3 bucket to deny put object requests that do n
 The condition above looks for a Null value for the s3:x-amz-server-side-encryption key. If this condition is true, it means the request is Null and does not include server-side encryption. Setting the condition in the condition policy to "s3:x-amz-server-side-encryption": "true" with "Effect": "Deny" and "Action": "s3:PutObject" would deny put object requests that do not use server-side encryption
 
 
-Which S3 storage class is ideal for backup and disaster recovery use cases, when large sets of data occasionally need to be retrieved in minutes, without concern for costs?
+Which S3 storage classq is ideal for backup and disaster recovery use cases, when large sets of data occasionally need to be retrieved in minutes, without concern for costs?
         Amazon S3 Glacier Flexible Retrieval (Formerly S3 Glacier)
-    S3 Glacier Flexible Retrieval (formerly S3 Glacier) is the ideal storage class for archive data that does not require immediate access but needs the flexibility to retrieve large sets of data at no cost, such as backup or disaster recovery use cases.
+    S3 Glacier Flexible Retrieval (formerly S3 Glacier) is the ideal storage classs for archive data that does not require immediate access but needs the flexibility to retrieve large sets of data at no cost, such as backup or disaster recovery use cases.
 
 
 -------------------------------------
-A storage specialist of a company created a bucket named 'demobucket2022' for the purpose of storing files for the creation of a proof of concept (POC). After the successful implementation of proof of concept, the team wanted to leverage the bucket for the development work because of the content which was generated during POC. However, they didn't want to name it 'demobucket2022'.
+A storage specialist of a company created a bucket named 'demobucket2022' for the purpose of storing files for the creation of a proof of concept (POC). After the successful implementation of proof of concept, the team wanted to leverage the bucket for the development work because of the content which was generated during POC. However, they didnt want to name it 'demobucket2022'.
 
 What is the solution for the team to proceed with this implementation of the requirement?
 
@@ -596,22 +596,36 @@ Amazon Partner Network
 
 AWS Transfer Family
 
-Amazon S3 Transfer Acceleration utilizes Amazon CloudFront's globally distributed edge locations to accelerate the upload of objects to an S3 bucket. This service optimizes the transport path and provides a faster and more consistent user experience for uploads, regardless of the user's location.
+Amazon S3 Transfer Acceleration utilizes Amazon CloudFronts globally distributed edge locations to accelerate the upload of objects to an S3 bucket. This service optimizes the transport path and provides a faster and more consistent user experience for uploads, regardless of the user's location.
 
 This means that users from around the world can upload their files with improved speed and efficiency. It doesn't require significant code changes in your application, making it a suitable solution for your scenario.
 
 ====================================================================
-Your organization's operational lead has decided to build a cost effective centralized logging solution for multiple AWS accounts. The solution includes an Amazon S3 bucket in the centralized logging account. The logs must be deleted after three months to minimize cost.
+Your organizations operational lead has decided to build a cost effective centralized logging solution for multiple AWS accounts. The solution includes an Amazon S3 bucket in the centralized logging account. The logs must be deleted after three months to minimize cost.
 
 What is the most operationally efficient way to accomplish this task?
 
 
-Transition objects to the S3 Standard-IA storage class 30 days after creating them and delete manually/
+Transition objects to the S3 Standard-IA storage classs 30 days after creating them and delete manually/
 
 ````Expiration actions
 
 Transition actions
 
-Archive objects to the S3 Glacier Flexible Retrieval storage class for three months and delete manually.
+Archive objects to the S3 Glacier Flexible Retrieval storage classs for three months and delete manually.
 
 With expiration actions, you can set up a lifecycle policy in the S3 bucket to automatically delete objects that are older than a specified number of days. In this case, you would configure the policy to delete logs after three months, which helps minimize cost by removing outdated data.
+
+
+========================================================================
+A public-facing weather application stores millions of weather forecast files in an Amazon S3 bucket. During bad weather, the bucket can experience tens of thousands of GET requests per second. The developer must avoid Amazon S3 reads throttling because of request rate limits. Which solutions meet the requirements? (Select TWO.)
+
+"Adopt an Object key naming pattern that distributes the objects across multiple prefixes."
+
+Open an AWS support ticket to increase the request-per-second quota on the Amazon S3 bucket.
+
+Create multiple access points for the Amazon S3 bucket. Adopt a naming pattern thatdistributes traffic to different access points. Adjust the application to use the multiple accesspoints.
+
+Adjust the Amazon S3 bucket settings for Minimum TTL, Maximum TTL, and Default TTL to control cache behavior.
+
+"Create an Amazon CloudFront web distribution with the Amazon S3 bucket as an origin. Set the distribution's Minimum TTL, Maximum TTL, and Default TTL to control cache behavior. Adjust the web application to use the CloudFront distribution domain name."

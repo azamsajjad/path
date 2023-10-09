@@ -1,0 +1,5 @@
+digraph "template" {
+MyEC2Instance [color=black, label="MyEC2Instance\n<AWS::EC2::Instance>", shape=ellipse, type=Resource];
+InstanceSecurityGroup [color=black, label="InstanceSecurityGroup\n<AWS::EC2::SecurityGroup>", shape=ellipse, type=Resource];
+MyEC2Instance -> InstanceSecurityGroup  [color=black, key=0, label=Ref, source_paths="['Properties', 'SecurityGroups', 0]"];
+}

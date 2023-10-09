@@ -1,0 +1,41 @@
+Parameters:
+  BucketNameParameter:
+    Type: String
+    Description: 'A bucket name to set.'
+  Environment:
+    Type: String
+    AllowedValues:
+      - Dev
+      - Test
+      - Prod
+    Description: 'Select an environment'
+
+Mappings:
+  EnvironmentToBucketSuffix:
+    Dev:
+      Suffix: 'this-is-dev-env'
+    Test:
+      Suffix: 'test-env'
+    Prod:
+      Suffix: 'be-careful-it-is-production'
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join [ '-', [ 
+        !Ref BucketNameParameter, !FindInMap [
+          EnvironmentToBucketSuffix,
+          !Ref Environment, Suffix
+        ]
+      ]
+    ]
+    
+Outputs:
+  BucketARN:
+    Description: 'The ARN of the Bucket'
+    Value: !GetAtt S3Bucket.Arn
+  BucketDomain:
+    Description: 'Domain Name of the bucket'
+    Value: !GetAtt S3Bucket.DomainName
+

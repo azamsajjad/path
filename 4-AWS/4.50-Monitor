@@ -836,7 +836,23 @@ go,java,nodejs,python,ruby,php,.net         no powershell
 
 
 ---------------------------------------------------------------------------
+A company notices performance degradation in one of its production web applications. The application is running on AWS services and uses a microservices architecture. The company suspects that one of these microservices is causing the performance issue.
 
+Which AWS solution should the company use to identify the service that is contributing to higher application latency?
+
+Report Content Errors
+
+A``````````````````
+AWS X-Ray service map
+
+B
+AWS CloudTrail event history
+
+C
+Amazon EventBridge (Amazon CloudWatch Events) events
+
+D
+AWS Trusted Advisor performance report
 
 
 ---------------------------------------------------------------------------
