@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "logs:CreateLogGroup"
+            ],
+            "Resource": [
+                "arn:aws:logs:us-east-1:582908443542:*"
+            ],
+            "Effect": "Allow",
+            "Sid": "Log1"
+        },
+        {
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                "arn:aws:logs:us-east-1:582908443542:/aws/*:*"
+            ],
+            "Effect": "Allow",
+            "Sid": "Log2"
+        },
+        {
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "lambda"
+        }
+    ]
+}

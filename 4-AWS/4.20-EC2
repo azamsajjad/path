@@ -174,8 +174,6 @@ Great for Multiplayer Video Games
 
 A Network Load Balancer is ideal for load balancing TCP and UDP traffic. It functions at Layer 4 of the OSI model, routing connections from a target in the target group based on IP protocol data.
 
-To learn more about some of the primary features of Network Load Balancers, flip each of the following flashcards by choosing them. 
-
 Sticky sessions
 \
 Routes requests from the same client to the same target.
@@ -330,31 +328,19 @@ What are the basic technical concepts of Gateway Load Balancer?
 The Gateway Load Balancer operates at the third layer of the Open Systems Interconnection (OSI) model, the network layer, or most commonly called Layer 3. 
 
 1
-
-1
 Listener: A listener is a process that checks for connection requests. Listeners for Gateway Load Balancers listen for all IP packets across all ports. You cannot specify a protocol or port when you create a listener for a Gateway Load Balancer.
-
-2
 
 2
 Target group: This is used to route requests to one or more registered targets. Traffic is forwarded to the target group that is specified in the listener rule.
 
 3
-
-3
 Target type: This determines the type of target in a target group (a possible target type is Geneve).
-
-4
 
 4
 Health check: The health check mechanism of the Gateway Load Balancer determines the status of a target in a target group by performing a Layer 4 or Layer 7 health check.
 
 5
-
-5
 Availability Zone: These are multiple isolated locations within an AWS Region. You can increase the fault tolerance of your applications by configuring multiple Availability Zones for your load balancer.
-
-6
 
 6
 Cross zone: If cross-zone load balancing is turned on, each load balancer node distributes traffic across the registered targets in all configured Availability Zones. If cross-zone load balancing is turned off, each node distributes traffic across the registered targets in its Availability Zone only.

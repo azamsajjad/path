@@ -694,3 +694,20 @@ Increase the number of consumers.
 Reshard your stream.``````````````````````````````````````````````````
 
 Resharding your stream to increase the number of shards in the stream allows you to adjust the number of shards in your stream to adapt to changes in the rate of data flow through the stream.
+
+===========================================================================
+You are developing an application using multiple AWS services. You need to find a solution to decouple the application components, so that they can fail independently of one another. Which of the following AWS services will enable this?
+
+SQS``````````
+
+SQS is an AWS-managed message queuing service that allows you to decouple and scale microservices, distributed systems, and serverless applications.
+
+Reference: SQS Developer Guide
+
+DynamoDB
+
+Lambda
+
+SNS
+
+SNS is a notification service used to send notifications like SMS text messages to end users. It is not the AWS service that is used to decouple application components, so that they can fail independently of one another.

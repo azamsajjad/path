@@ -1,0 +1,207 @@
+AWS WAF
+–
+AWS WAF is a web application firewall that helps protect web applications from attacks by allowing you to configure rules that allow, block, or monitor (count) web requests based on conditions that you define. These conditions include IP addresses, HTTP headers, HTTP body, uniform resource identifier (URI) strings, structured query language (SQL) injection, and cross-site scripting.  
+
+If you have request sampling enabled, you
+can view a sample of the requests that AWS
+WAF has inspected and either allowed or
+blocked. For each sampled request, you can
+view detailed data about the request, such as
+the originating IP address and the headers
+included in the request. You can also view
+the rules that matched the request, and the
+rule action settings.
+
+Intelligent Application Protection
+Concept
+The core rule set (CRS) rule group contains
+rules that are generally applicable to web
+applications. This provides protection against
+exploitation of a wide range of
+vulnerabilities, including some of the high
+risk and commonly occurring vulnerabilities
+described in OWASP publications, such as
+the OWASP Top 10. The SQL database rule
+group contains rules to block request
+patterns associated with exploitation of SQL
+databases, such as SQL injection attacks. This
+can help prevent remote injection of
+unauthorized queries.
+
+
+
+
+Step 18-2: This command sets the CLOUDFRONT_URL variable.
+
+CLOUDFRONT_URL=<CloudFront Distribution URL>
+
+
+Step 18-4: This request imitates query arguments that contain system file extensions that are unsafe to read or run.
+
+curl -I $CLOUDFRONT_URL?execute=http://sneaky-domain.io/file.ini
+
+
+
+
+Step 19: This request imitates a cross-site scripting attack.
+
+curl -X POST $CLOUDFRONT_URL -F "user='<script><alert>Hello></alert></script>'"
+
+
+
+
+Step 28-1: This request should be blocked due to the attack header being present.
+
+curl -I -H "X-Weak-Spot: Exploit" "${CLOUDFRONT_URL}"
+
+
+Step 28-3: This request should be blocked due to the presence of an attack query string.
+
+curl -I "${CLOUDFRONT_URL}?x-sneaky-attack=exploit"
+
+
+
+
+Step 29: For verification, this request should be allowed and return 200 OK.
+
+curl -I "${CLOUDFRONT_URL}"
+
+
+
+
+Step 45-1: This request imitates a SQL injection attack. The HTML response should return LOW.
+
+curl -X POST $CLOUDFRONT_URL -F "user='AND 1=1;"
+
+
+Step 45-3: This request imitates a SQL injection attack. The HTML response should return HIGH.
+
+curl -X POST $CLOUDFRONT_URL -F "1094 and 3=substring(version(),1,1)" 
+
+
+
+
+Step 51-1: For verification, this request should be allowed and return 200 OK.
+
+curl -I "${CLOUDFRONT_URL}/login"
+
+
+Step 51-3: This command makes 100 requests for the protected URI to reach the predefined limit in the AWS Cloud9 environment.
+
+for i in {1..100}; do curl -I "${CLOUDFRONT_URL}/login" | grep title; done
+
+
+
+
+Step 52: Send the verification request again. If the rate-based rule is invoked, you will get a 403 Forbidden response.
+
+curl -I "${CLOUDFRONT_URL}/login"
+
+
+
+
+
+======================================================
+WAF-Create AWS Managed Rule----------------------------
+Intelligent Application Protection
+Concept
+The core rule set (CRS) rule group contains
+rules that are generally applicable to web
+applications. This provides protection against
+exploitation of a wide range of
+vulnerabilities, including some of the high
+risk and commonly occurring vulnerabilities
+described in OWASP publications, such as
+the OWASP Top 10. The SQL database rule
+group contains rules to block request
+patterns associated with exploitation of SQL
+databases, such as SQL injection attacks. This
+can help prevent remote injection of
+unauthorized queries.
+
+
+WAF-Create Own Rule-----------------------------------
+
+block-header-and-query-string
+If a request
+matches at least one of the statements (OR)
+
+
+Inspect
+	Single header
+Header field name
+	X-Weak-spot
+Match type
+	Size greater than or equal to
+Size in bytes
+	0
+
+
+Inspect
+	Single query parameter
+Header field name
+	x-sneaky-attack
+Match type
+	Size greater than or equal to
+Size in bytes
+	0
+
+WAF-Create Own Rule-----------------------------------
+
+Name
+block-sql-injection-low
+The name must have 1-128 characters- Valid characters: A-Z a-z, 0-9, - (hyphen), and _ (underscore).
+Type
+	O Regular rule
+oRate-based rule
+
+If a request matches the statement
+Statement
+	Inspect Body
+Content type
+	O Plain text
+oJSON
+Match type
+	Contains SQL injection attacks
+Text transformation
+None
+
+Oversize handling
+AWS WAF applies oversize handling to web request contents that are larger than AWS WAF can inspect. Learn more
+Continue - Inspect the contents that are within the size limitations according to t...
+Sensitivity level
+		Specify how sensitive you want the inspection for SQL injection attacks to be. High detects more attacks and is recommended, but it might
+		require additional tuning to mitigate false positives. Low can be a better choice if you have other protections against SQL injection attacks
+		or a low tolerance for false positives.
+	O Low
+O High
+
+Action
+Choose an action to take when a request matches the statements above.
+Allow
+	Block
+Count
+CAPTCHA
+Challenge
+Custom response - optional
+ 	Enable
+	Response code
+	200
+
+Create a custom response body
+Response body object name
+Enter the name for the response body. You'll use the name to reference this response body in the web ACL
+rules.
+SQLi-Low
+The name must have 1-128 characters. Valid characters: A-Z. a-z, 0-9, - (hyphen), and _ (underscore).
+Content type
+O
+JSON
+O HTML
+O
+Plain text
+Response body
+The response body can be plain text, HTML, or JSON-
+SQLi "LOW" Sensitivity Level match
+
+i-0894013b4ba6e3448

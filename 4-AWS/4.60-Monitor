@@ -939,3 +939,23 @@ Access to other CloudWatch features such as metrics and alarms
 Systems Manager pricing:
 
 With AWS Systems Manager, you pay for what you use on the following priced features. There are no minimum fees or up-front commitments.
+
+
+
+
+==============================================================================================================
+EVENTBRIDGE 
+
+You are building an application that collects all the lifecycle events of EC2 instances across multiple AWS accounts. The application needs to store the lifecycle events in a single Amazon Simple Queue Service (Amazon SQS) queue in your company's main AWS account for further processing. Which of the following will best meet these requirements?
+
+Use the resource policies of the SQS queue in the main account to give each account permissions to write to the SQS queue. Add to the EventBridge event bus of each account an EventBridge rule that matches all EC2 instance lifecycle events. Add the SQS queue in the main account as a target of the rule.
+
+Configure the permissions on the main account event bus to receive events from all accounts. Create an EventBridge rule in each account to send all the EC2 instance lifecycle events to the main account event bus. Add an EventBridge rule to the main account event bus that matches all EC2 instance lifecycle events. Set the SQS queue as a target for the rule.````````````````````````````````````````````````````````````````````````````````````
+
+    You can easily configure EventBridge to send events to other AWS accounts. On the receiver account, edit the permissions on an event bus to allow specified AWS accounts, an organization, or all AWS accounts to send events to the receiver account. On the sender account, set up one or more rules that have the receiver account's event bus as the target. Reference: Sending and Receiving Amazon EventBridge Events between AWS Accounts
+
+Write a Lambda function that scans all EC2 instances in the company accounts to detect instance lifecycle changes. Configure the Lambda function to write a notification message to the SQS queue in the main account if the function detects an EC2 instance lifecycle change. Add an EventBridge scheduled rule that invokes the Lambda function every minute.
+
+Configure EC2 to deliver the lifecycle events from all accounts to the EventBridge event bus of the main account. Add an EventBridge rule to the event bus of the main account that matches all EC2 instance lifecycle events. Add the SQS queue as a target of the rule.
+
+EC2 will not be able to send events unless the main account EventBridge event bus is configured to receive events from the other accounts.

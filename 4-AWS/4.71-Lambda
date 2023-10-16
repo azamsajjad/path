@@ -1565,3 +1565,54 @@ For more information about API Gateway stage variables, see Using Amazon API Gat
 B
 Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the name of the Lambda alias. Modify the Lambda resource-based policy by adding the permission lambda:InvokeFunction. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
 Incorrect. To add "stageVariable" to the Lambda ARN, you do not use the Lambda alias name. You should use the following format: ${stageVariable.stageVariableName}.
+
+========================================================================================================================================================================================================================================================================================
+You are developing a Lambda function that processes data from a Kinesis stream, then writes the results to a DynamoDB table. Customers have lately been complaining about general performance issues, and your support team has recently observed slow processing of the data records, as well as occasional ProvisionedThroughputExceeded errors. After investigating, you also notice that the function is taking longer than expected to complete processing. Which actions should you take to increase the processing speed of the application?
+
+Decrease the number of shards of the Kinesis Data Stream.
+
+Increase the number of shards of the Kinesis Data Stream.````````````````
+
+Increasing the number of shards will increase capacity of the Kinesis stream, enabling it to handle more records.
+
+Decrease the timeout of the Lambda function.
+
+Increase the memory that is allocated to the Lambda function.`````````````
+
+Increasing function memory will also increase the CPU capacity. This usually enables a function to run faster.
+
+Selected
+Increase the timeout of the Lambda function.
+
+Increasing the function timeout will not enable the function to run faster.
+
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+You are trying to diagnose a performance problem with your serverless application, which uses Lambda, API Gateway, S3, and DynamoDB. Your DynamoDB table is performing well, and you suspect that your Lambda function is taking too long to execute. Which of the following could you use to investigate the source of the issue?
+
+Lambda invocations sum metric in CloudWatchXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX   WRONG
+
+    Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+AWS X-Ray```````````````````````
+
+    AWS X-Ray can be used to display a histogram showing the latency of your Lambda function. Latency is the amount of time between when a request starts and when it completes. API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend. API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+API Gateway integration latency metric in CloudWatch``````````````````````````
+
+    AWS X-Ray can be used to display a histogram showing the latency of your Lambda function. Latency is the amount of time between when a request starts and when it completes. API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend. API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+API Gateway latency metric in CloudWatch
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+
+API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend.
+
+API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client.
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------

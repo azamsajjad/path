@@ -523,3 +523,71 @@ Selected
 IntegrationLatency````````````````````````````
 
 IntegrationLatency relates to the time between when API Gateway relays a request to the backend and when it receives a response from the backend. This is useful because a latency issue could be causing the timeout.
+
+
+---------------------------------------------------------------------------------------------------------
+You are developing an application in API Gateway and need to categorize your APIs based on their status as: sandbox, test, or prod. You want to use a name-value pair system to define configuration attributes associated with deployment stages of your APIs, and use it in your API setup and mapping templates. What feature of API Gateway would you use to accomplish this task?
+
+
+Use stage variables based on the API deployment stage to interact with different backend endpoints.``````
+
+
+Use environment variables based on the API deployment stage to interact with different backend endpoints.
+
+
+Use tags based on stages. The tag can be set directly on the stage of the API.
+
+
+Use the API Gateway console to create a canary release deployment.
+---------------------------------------------------------------------------------------------------------
+You are a developer working on a brand new serverless application that teaches the world to cloud. You have performed your initial deployment using Lambda and API Gateway and would like to work toward adding API Gateway stages and associate them with your prod, dev, and test environments. Your stages will need to match a Lambda function variant that is different for each of the environments, allowing you to test across different stages of the software lifecycle. Which of the following features must you add to achieve this?
+
+Lambda layers
+
+Lambda aliases````````````````
+
+A Lambda alias is like a pointer to a specific function version. Users can access the function version using the alias Amazon Resource Name (ARN).
+
+Selected
+Lambda versions
+
+Lambda versions are used to manage the deployment of your functions. For example, you can publish a new version of a function for beta testing without affecting users of the stable production version. Lambda creates a new version of your function each time that you publish the function. A version can be used to create an alias but cannot be referenced using a stage variable. In order to have API Gateway reference a specific variant of a function, it needs to use an alias.
+
+Selected
+Stage variables```````````````````
+
+With deployment stages in API Gateway, you can manage multiple release stages for each API, such as dev, test, and production. Using stage variables, you can configure an API deployment stage to interact with different backend endpoints. Reference: API Gateway Stage Variables
+
+
+
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+You are trying to diagnose a performance problem with your serverless application, which uses Lambda, API Gateway, S3, and DynamoDB. Your DynamoDB table is performing well, and you suspect that your Lambda function is taking too long to execute. Which of the following could you use to investigate the source of the issue?
+
+Lambda invocations sum metric in CloudWatchXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX   WRONG
+
+    Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+AWS X-Ray```````````````````````
+
+    AWS X-Ray can be used to display a histogram showing the latency of your Lambda function. Latency is the amount of time between when a request starts and when it completes. API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend. API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+API Gateway integration latency metric in CloudWatch``````````````````````````
+
+    AWS X-Ray can be used to display a histogram showing the latency of your Lambda function. Latency is the amount of time between when a request starts and when it completes. API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend. API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client. The latency includes the integration latency and other API Gateway overhead. Lambda invocations sum measures the number of times a function is invoked in response to an event or invocation API call.
+
+API Gateway latency metric in CloudWatch
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+
+
+API Gateway integration latency is the time between when API Gateway relays a request to the backend and when it receives a response from the backend.
+
+API Gateway latency is the time between when API Gateway receives a request from a client and when it returns a response to the client.
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------

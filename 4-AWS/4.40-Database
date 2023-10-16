@@ -237,3 +237,23 @@ To perform a large-scale migration of an on-premises data warehouse to Amazon Re
 AWS DMS (Database Migration Service): AWS DMS is a fully managed service that enables you to migrate databases to AWS quickly and securely. It supports both homogeneous (e.g., Oracle to Oracle) and heterogeneous (e.g., Oracle to Amazon Redshift) migrations.
 
 AWS SCT agent (AWS Schema Conversion Tool agent): The AWS SCT agent is used in conjunction with the AWS Schema Conversion Tool. It assists in converting the schema of the source database to a format that can be used with the target database, including Amazon Redshift.
+
+
+=================================================================================================================
+You have developed a web application running on a number of EC2 instances running ASP.NET. You are using an S3 bucket to store product data, with customer transaction data held in an RDS database. You anticipate that the number of connections into your website will grow considerably over the next year, and you want to configure a scalable place to store session state data so that multiple web servers can share the session state. Which of the following are suitable options for this application?
+
+(Choose 2)
+
+Use ElastiCache to store session state.`````
+
+
+Lambda can store the session state.
+
+
+Store session state locally on each EC2 instance.
+
+
+Store the data in the same RDS database used for customer transactions.
+
+
+Store the session state data in a DynamoDB table.`````

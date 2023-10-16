@@ -1,0 +1,17 @@
+###Section 1
+
+TUNNEL_1_PRESHARED_KEY=J2rv8S_0i.lBtjwMkKY3ne4ZyYezmBFL
+TUNNEL_1_IP_ADDRESS=34.195.137.105
+TUNNEL_2_PRESHARED_KEY=GSJMcRusvcp1SAfAwBC6CvyYjtI6i2L1
+TUNNEL_2_IP_ADDRESS=54.89.92.134
+
+
+###Section 2
+
+sudo sed -i "s/TUNNEL_1_IP_ADDRESS/$TUNNEL_1_IP_ADDRESS/g" /etc/strongswan/ipsec.conf
+sudo sed -i "s/TUNNEL_2_IP_ADDRESS/$TUNNEL_2_IP_ADDRESS/g" /etc/strongswan/ipsec.conf
+sudo sed -i "s/TUNNEL_1_IP_ADDRESS/$TUNNEL_1_IP_ADDRESS/g" /etc/strongswan/ipsec.secrets
+sudo sed -i "s/TUNNEL_2_IP_ADDRESS/$TUNNEL_2_IP_ADDRESS/g" /etc/strongswan/ipsec.secrets
+sudo sed -i "s/TUNNEL_1_PRESHARED_KEY/$TUNNEL_1_PRESHARED_KEY/g" /etc/strongswan/ipsec.secrets
+sudo sed -i "s/TUNNEL_2_PRESHARED_KEY/$TUNNEL_2_PRESHARED_KEY/g" /etc/strongswan/ipsec.secrets
+

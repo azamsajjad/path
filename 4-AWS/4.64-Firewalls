@@ -1,0 +1,614 @@
+
+
+
+
+
+NETWORK FIREWALL
+Can you demonstrate how Network Firewall can filter outbound traffic?
+TRAFFIC MIRRORING 
+Resolve VPC Routing Conflicts
+Increase Security with VPC Endpoints
+DNS FIREWALL - DNS QUERY FILTERING
+
+===============================================================================================
+NETWORK FIREWALL
+- When you associate a firewall to your VPC, you must provide a subnet for each
+Availability Zone where you want to place a firewall endpoint to filter traffic.
+3. In the Firewall endpoints section, review the firewall endpoints.
+- To have your network traffc inspected by Network Firewall, you must direct traffic to
+firewall endpoints by using VPC route tables.
+
+Concept
+After you create your firewall, you insett its firewall endpoint into your VPC network
+traffc flow, in between your intemet gateway and your customer subnet. You
+create routing for the firewall endpoint so that it forwards traffic between the intemet
+gateway and your subnet. Then, you update the route tables for your intemet gateway
+and your subnet, to send traffic to the firewall endpoint instead of to each other.
+
+
+Configuration sync state    
+Resource name                   Resource type       Firewall policy     Availability Zone
+InspectionFirewall-Policy
+DomainAllow-RuleGroup           Stateful rule group
+lcmpAlert-RuleGroup             Stateful rule group
+
+
+
+- The public subnet sits behind the firewall and routes intemet-bound traffc to the
+firewall endpoint
+VPC CIDR = 10.1.0.0/16
+IGW 
+|
+FIREWALL 10.1.0.0/16 local---&&&---0.0.0.0/0 IGW
+|
+PUBLIC SUBNET 10.1.0.0/16 local---&&&---0.0.0.0/0 vpce-032432003432v432 (VPC firewall Endpoint)
+|
+PRIVATE SUBNET 10.1.0.0/16 local---&&&---0.0.0.0/0 NAT deployed in public subnet
+
+
+
+Concept
+Network Firewall uses a Suricata rules engine to process all stateful rules. You can write
+any of your stateful rules in Suricata compatible format Attemately, for domain
+list rules and for very basic rules, you can use an easy entry form provided by Network
+Firewall.
+/
+/
+/
+/
+/
+alert tcp any any <> any 443 (msg:"SURICATA Port 443 but not TLS";
+flow:to_server,established; app-layer-protocol:!tls; sid:2271003; rev:1;)
+/
+/
+/
+/
+/
+
+Concept
+This section defines intrusion prevention
+system (IPS) rules in the rule group, in
+Suricata compatible format. You can provide
+all of your stateful rules through this method
+if you want.
+
+
+Threat Hunting
+Concept
+You can record flow logs and alert logs from
+your Network Firewall stateful engine.
+- Flow logs are standard network traffic flow
+logs. Each flow log record captures the
+network flow for a specific standard stateless
+rule group.
+- Alett logs report traffic that matches your
+stateful rules that have an action that sends
+an alert. A stateful rule sends alerts for the
+rule actions DROP, ALERT, and REJECT.
+
+
+2023-10-12T16:01:01.000+05:00
+{
+    "firewall_name": "InspectionFirewall",
+    "availability_zone": "us-east-1a",
+    "event_timestamp": "1697108461",
+    "event": {
+        "app_proto": "ftp",
+        "src_ip": "10.1.1.80",
+        "src_port": 63906,
+        "event_type": "alert",
+        "alert": {
+            "severity": 3,
+            "signature_id": 2271003,
+            "rev": 1,
+            "signature": "SURICATA Port 443 but not TLS",
+            "action": "allowed",
+            "category": ""
+        },
+        "flow_id": 372012114334836,
+        "dest_ip": "54.158.83.12",
+        "proto": "TCP",
+        "app_proto_ts": "failed",
+        "dest_port": 443,
+        "timestamp": "2023-10-12T11:01:01.884429+0000"
+    }
+}
+
+Threat Hunting
+DIY ACTIVITIES
+Change the Suricata-RuleGroup rule to
+drop suspicious traffic instead of alerting
+on it.
+
+Suricata-Rulegroup
+/
+/
+/
+/
+/
+drop tcp any any <> any 443 (msg:"SURICATA Port 443 but not TLS";
+flow:to_server,established; app-layer-protocol:!tls; sid:2271003; rev:1;)
+/
+/
+/
+/
+/
+=====================================================================================
+Can you demonstrate how Network Firewall can filter outbound traffic?
+
+
+You can create domain-based rules and protocol-based
+rules. These rules can then be attached to a firewall
+policy, which is attached to Network Firewall.
+
+Finally, you would configure your VPCs to route traffic
+through the firewall endpoints to control traffic.
+
+* Create a Network Firewall rule group to filter outbound traffic
+* Create a firewall policy and attach the rules and the policy.
+* Update route tables with firewall endpoints.
+
+Egress_Traffic_Filtering.jpg 
+-----------------------------------------------------------------------------------------------
+LabVPC_A and LabVPC_B are attached with Transit Gateway for all east-west or north-south communication.
+___________________________________________         ___________________________________________
+VPCaaaaaaaaaaa                                      VPCbbbbbbbbbbbbbb
+AZ111111111111                                      AZ111111111111111
+Private(instance)                                   Private(instance)
+Private(TransitGatewayAttachmentA)                  Private(TransitGatewayAttachmentB)
+                                 0.0.0.0/0 -> VPCc_Egress
+
+-------------------------------------------   |     -------------------------------------------
+                                              |
+                                              |
+                                              |
+
+_______________________________________________________________________________________________
+                              10.1.0.0/16 -> VPCa_TGW Attachment & VPCb_TGW Att
+VPCc EGRESS                                                 VPCc EGRESS
+AZ1 1 1 1 1 1 1 1 1 1 1 1 1 1 1                             AZ2 2 2 2 2 2 2 2 2 2 2 2 2 2
+Private(TransitGatewayAttachmentA)  ^                       Private(TransitGatewayAttachmentB)
+Private(FirewallEndpointA)                                  Private(FirewallEndpointB)
+Public(NATGatewayA)                                         Public(NATGatewayB)
+_______________________________________________________________________________________________
+                                              |
+                                              |
+                                              |
+                                              IG
+Firewall endpoints are created for each Availability Zone listed in the firewall configuration. 
+An endpoint is associated to a firewall subnet
+Network Firewall covers east-west traffic filtering (inter-VPC inspection) and north-
+south traffic inspection and filtering (internet traffic filtering).
+Firewall rule group connectivity is tested by using an Amazon EC2 instance deployed in LabVPC_A
+-----------------------------------------------------------------------------------------------
+ Network Firewall supports inbound and outbound web filtering for unencrypted
+web traffic. For enaypted web traffic, Server Name Indication (SNI) is used for
+blocking access to specific sites.
+
+
+
+LabVPC_A        vpc-038740d2493f237f3   10.1.0.0/16
+LabVPC_B        vpc-06e7093d1a4800104   10.2.0.0/16
+LabVPC_Egress   vpc-Odde639cOd2dfcfae   10.0.0.0/16   ----->      Lab-TGW   tgw-0f00f529c39390d28	
+
+
+                                    Transit gateway attachment ID           Transit gateway ID
+VPC-A-TGW-Attachment                tgw-attach-Of90f8fec 15d8c339           tgw-OfOOf529c39390d28
+VPC-B-TGW-Attachment                tgw-attach-Ocae 192141754ec40           tgw-OfOOf529c39390d28
+VPC-Egress-TGW-Attachment           tgw-attach-Oafa3275476ef2f49            tgw-OfOOf529c39390d28
+      |__--> Appliance Mode support=Enable
+- You must enable appliance mode on the
+transit gateway VPC attachment for any VPC
+where Network Firewall endpoints reside.
+
+
+CREATE FIREWALL
+
+
+1- Network Firewall rule groups
+
+Resource name              Resource type       Firewall policy     Availability Zone
+
+DomainAllow-RuleGroup      Stateful rule group
+ICMP-RuleGroup             Stateful rule group
+
+2- Firewall policies
+3- Firewalls
+
+Firewall Subnets                 Availability Zone               Endpoint ID
+ subnet-093e887ff07104b04           us-east-1 a                     vpce-0387eOOadcd2ff224
+ subnet-03219e4dc36c38e82           us-east-1 b                     vpce-Oe8925462c7f2bc33
+Log type
+Log type
+You can choose to emit alert logs, flow logs, or both.
+Alert
+Flow
+
+4- Route tables
+    1vpca    VPCa Instance - 0.0.0.0/0 -> TGW-Attachment A
+    1vpcb    VPCb Instance - 0.0.0.0/0 -> TGW-Attachment B
+5- Transit Gateway Route Table 
+    2vpca    VPCa_TGW_A - 0.0.0.0/0 -> Egress-TGW-Attachment
+    2vpcb    VPCb_TGW_B - 0.0.0.0/0 -> Egress-TGW-Attachment
+4- Route tables
+    1egress  VPC_Egress_TGW_A - 0.0.0.0/0 -> Firewall Endpoint A
+    1        VPC_Egress_TGW_B - 0.0.0.0/0 -> Firewall Endpoint B
+                            |
+    2        VPC_Egress_FirewaII_A -> 10.0.0.0/8 -> VPC-Egress-TGW-Attachment
+    2        VPC_Egress_FirewaII_B -> 10.0.0.0/8 -> VPC-Egress-TGW-Attachment
+                            |
+    3        VPC_Egress_Public_Subnet_A -> 10.0.0.0/8 -> Firewall Endpoint B
+    3        VPC_Egress_Public_Subnet_B -> 10.0.0.0/8 -> Firewall Endpoint B
+5- Transit Gateway Route Table 
+   Create 2 Static Routes
+            VPC-Egress-TGW-Attachment RT -> 10.1.0.0/16 -> TGW_Attachment_A
+                                            10.2.0.0/16 -> TGW_Attachment_B
+            VPC-B-TGW-Attachment RT -> 0.0.0.0/0 -> Egress-TGW-Attachment
+            VPC-B-TGW-Attachment RT    0.0.0.0/0 -> Egress-TGW-Attachment
+            (both attachments have single Route Table)
+Concept
+When a static route and a propagated route have the same destination, the static route has a higher priority.
+Concept
+A static route routes traffic to the transit gateway attachment.
+
+
+
+TESTING 
+curl —vvv https://amazon.com —o /dev/null --max—time 5
+ping 1.1.1.1 —c 5
+======================================================================================
+TRAFFIC MIRRORING 
+
+
+Yes, let's talk about traffic mirroring, which copies traffic
+directly from your network and sends it out of the flow to
+other systems. Outside the flow, the traffic can be
+monitored and analyzed for problems without adding load
+to the main network.
+
+You identify a source or sources for your traffic and
+configure mirror targets to receive the traffic. A traffic
+mirror target can be a network interface, a Network
+Load Balancer, or a Gateway Load Balancer endpoint.
+
+A set of inbound and outbound rules that you create
+determines which traffic is copied from the traffic mirror
+source and sent to the traffic mirror target. You can also
+choose to mirror certain network services traffic, such as
+Amazon DNS traffic.
+
+Mirror sessions act as the control for traffic mirroring. While
+each packet is mirrored only once, you can use multiple traffic
+mirror sessions on the same mirror source. This is useful when
+you want to assign different priorities to different kinds of
+traffic, or direct some traffic to a specific device.
+
+1) A traffic source to be mirrored
+A traffic mirror source is the network interface, or interfaces, to monitor. Traffic
+is intercepted at the network interface level.
+
+2) A target to receive the mirrored traffic
+A traffic mirror target is the destination for mirrored traffic. The target can be a
+network interface, a Network Load Balancer, or a load balancer endpoint
+attached to another Amazon Elastic Compute Cloud (Amazon EC2) instance.
+
+3) A traffic filter that defines what traffic to mirror
+
+
+4) A traffic mirroring session to start the mirroring process
+The mirroring session establishes a relationship between a source, a filter, and a target.
+
+
+instances - 
+Source Server - eni-015b46a1170e644dc
+Target Server
+
+VPC -> set mirror target (select eni)
+VPC -> set mirror filters (EgressFilter)
+add inbound rule
+    Number-100
+    Rule action-accept
+    Protocol-ICMP (1)
+    Source port range -N/A
+    Destination port range -N/A
+    Source CIDR block-10.0.0.0/24
+    Destination CIDR block-0.0.0.0/0
+
+VPC -> mirror sessions (EgressOnly)
+
+Session number
+The order sessions for the same resource are evaluated
+1
+Number between 1 and 32766
+VNI - optional
+The unique VXLAN network identifier that is included in the encapsulated mirrored packet that is sent to the target.
+A random unique VNI will be chosen unless specified
+100
+ - - - - - - - - - -- - - - - - - - - - - - -- - - - - - - - -
+Target Server : sudo tcpdump —nni ethO —vvv udp dst port 4789
+
+Source Server : export PS1="[Source Server]$"
+                ping 1.1.1.1 -c2
+                ping 888.8 -c 2
+
+- These commands generate outbound ICMP traffic to two destinations, which should be
+mirrored to the target sever.
+
+1. Retum to the Target Setver terminal window in the offler browser tab.
+- Keep your current browser tab and Source Server terminal open. You will retum to it.
+2. Review to ensure that 2 packets of traffic have been captured, going to both 1.1.1.1 and 8.888.
+3. Review to ensure that the VNI shows 100, which was configured in an earlier step.
+4. Go to the next step.
+
+[Target Server] $ sudo ip link add vni100 type vxlan id 100 dataport 4789 local 10.0.0.20 dev ethO
+[Target Server] $ sudo ip link set vni100 up
+
+- These commands create a virtual interface
+on the Target Server and allows the
+separation of traffic from different VXLAN
+VNls if the mirror target is receiving traffic
+from multiple mirror sessions.
+
+[Target Server] $ sudo tcpdump -nnxi vni100
+- These commands start the persistent
+capture, again, but now with a new virtual
+interface 'vni100' and with the added
+option X showing packet contents.
+
+[Source Server) $ ping 1.1.1.1 -c 5
+
+in Target Server- Note that the VXLAN VNI identifier is no
+longer present in the capture, and the packet
+contents are displayed.
+
+[Source Server) $ ping 1.1.1.1 —p CODE —c 5
+- This command sends a packet, using ICMP
+with a custom hex-digit pattem in the data
+field.
+
+========================================================================================
+Resolve VPC Routing Conflicts
+
+Validate VPC peering and routing. Check the database server operation and traffic
+allowances. Confirm accurate ALB traffic routing. Ensure operational web servers with
+database connectivity.
+
+VPC Application Load Balancer--vpc-Oa0429c44f4a60d14--192.168.0.0/16
+VPC Application Servers--vpc-0279e6aecbf6b9bcI--10.0.0.0/16
+VPC Database--vpc-096679c6abc3dbf44--172.16.0.0/16
+
+
+we have 3 instances
+1- PROBE INSTANCE = 192.168.0.10
+sh—4.2$ curl —Iv http://10.O.O.9 (2Reachable
+> Trying 10.0.0.9:80.
+> Connected to IO .0.0.9 (10.0.0.9) port 80
+> HEAD / HTTP/1.1
+> Host: 10.0.0.9
+> User—Agent: curl/ 8 3 . O
+> Accept :
+< HTTP/I.1 200 0K
+HTTP/I.1 200 0K
+
+
+sh—4.2$ curl —Iv http://1O.O.1.161 (3notReachable
+• Trying 10.0.1.161:80...
+
+and .........ALB not reachable too
+
+
+sh-4.2$ curl -Iv http://ApplicationLoadBalancer-1250162058.us-east-1.elb.amazonaws.com
+*   Trying 54.157.214.36:80...
+* Connected to ApplicationLoadBalancer-1250162058.us-east-1.elb.amazonaws.com (54.157.214.36) port 80
+> HEAD / HTTP/1.1
+> Host: ApplicationLoadBalancer-1250162058.us-east-1.elb.amazonaws.com
+> User-Agent: curl/8.3.0
+> Accept: */*
+>
+< HTTP/1.1 503 Service Temporarily Unavailable
+HTTP/1.1 503 Service Temporarily Unavailable
+
+
+Check Target Group = Empty 
+IP address  Health status
+10.0.1.161  @unhealthy
+10.0.0.9    @healthy
+
+
+Check VPC Peering Connections & Their Associated Route Tables
+VPC ALB <--> VPC APP
+vpc-alb-public-1
+vpc-app-private-l
+
+VPC APP <--> VPC DB
+vpc-app-private-1
+
+
+Go To Route Tables
+vpc-alb-public-1
+                0.0.0.0/0--igw-Odcb5041f378e2b86
+                10.0.0.0/16--pcx-0578b12d9ac1420ce VPC ALB <--> VPC APP
+                192.168.0.0/16--local
+vpc-alb-public-2
+                0.0.0.0/0--igw-Odcb5041f378e2b86
+                10.0.0.0/16--pcx-0578b12d9ac1420ce VPC ALB <--> VPC APP ---MISSING
+                192.168.0.0/16--local
+vpc-app-private-l
+                0.0.0.0/0--nat-065d6d8aaf6996112
+                10.0.0.0/16--local
+                172.16.0.0/16--pcx-Oc9bffI471bc788ae VPC APP <--> VPC DB
+                192.168.0.0/16--pcx-0578b12d9ac1420ce VPC ALB <--> VPC APP
+vpc-app-private-2
+                0.0.0.0/0--nat-065d6d8aaf6996112
+                10.0.0.0/16--local
+                172.16.0.0/16--pcx-Oc9bffI471bc788ae VPC APP <--> VPC DB ---MISSING
+                192.168.0.0/16--pcx-0578b12d9ac1420ce VPC ALB <--> VPC APP ---MISSING
+vpc-db-private-1
+                0.0.0.0/0--nat-065d6d8aaf6996112
+                172.16.0.0/16--local
+                10.0.0.0/16--pcx-Oc9bffI471bc788ae VPC APP <--> VPC DB ---MISSING
+vpc-db-private-2
+                0.0.0.0/0--nat-065d6d8aaf6996112
+                172.16.0.0/16--local
+                10.0.0.0/16--pcx-Oc9bffI471bc788ae VPC APP <--> VPC DB ---MISSING
+
+========================================================================================
+Increase Security with VPC Endpoints
+
+Create VPC endpoints to access Amazon S3 from an Amazon EC2 instance located in a private subnet. Create a
+VPC endpoint policy to restrict use of the endpoint to specific resources to further improve
+data security.
+
+Configure VPC endpoints to connect a VPC to AWS services.
+Interact with S3 through a VPC endpoint in a private subnet.
+Create a VPC endpoint policy to restrict resource access.
+
+To avoid this problem, AWS provides VPC endpoints, which you can I Ise, to privately
+connect a virtual private cloud (VPC) to supported AWS services. Communication
+through the VPC endpoint does not require resources in the VPC to have public IP addresses.
+
+ENDPOINT_POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:List*",
+            "Resource": "arn:aws:s3:::*"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::<LabBucket>",
+                "arn:aws:s3:::<LabBucket>/*"
+            ]
+        },
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::<LabLoggingBucket>",
+                "arn:aws:s3:::<LabLoggingBucket>/*"
+            ]
+        }
+    ]
+}
+
+
+CANNOT CONNECT TO PRIVATE INSTANCE USING SSM :
+Can't connect to your instance
+To connect to an instance using Session Manager, Systems Manager requires an IAM instance profile. You can create an instance profile and assign it to your instance by using a Systems Manager Quick Setup
+PRIVATE SUBNET ROUTE TABLE: 10.0.0.0/16	local
+SECURITY GROUP ROUTE TABLE: 10.0.0.0/16	local & 0.0.0.0/0 IGW
+
+So we need 3 SSM Endpoints with Service names
+com.amazonaws.us-east-1.ssm
+com.amazonaws.us-east-1.ssmmessages
+com.amazonaws.us-east-1.ec2messages
+The EC2 VPC endpoint isn't required for connecting the instance to Session Manager. The EC2 VPC endpoint is required to create VSS-enabled snapshots of the instance.
+You can use three types of VPC endpoints:
+Interface endpoints, Gateway Load Balancer endpoints, and Gateway endpoints. Interface endpoints and Gateway Load Balancer
+endpoints are powered by AWS PrivateLink, and they use an Elastic Network Interface (ENI) as an entry point for traffic destined to
+the service. Interface endpoints are typically accessed using the public or private DNS name associated with the service, while
+Gateway endpoints and Gateway Load Balancer endpoints serve as a target for a route in your route table for traffic destined
+for the service.
+
+Now Connect
+
+
+NOW CREATE S3 Endpoint 
+com.amazonaws.us-east-1.s3	amazon	Gateway
+
+When you create an interface endpoint or a
+gateway endpoint, you can attach an
+endpoint policy. The endpoint policy is a
+JSON policy document that controls which
+AWS principals can use the VPC endpoint to
+access the endpoint service. You cannot
+attach more than one policy to an endpoint.
+However, you can modify an endpoint policy
+at any time.
+
+
+==============================================================================================================
+DNS FIREWALL
+DNS QUERY FILTERING
+Set up a rule in Amazon Route 53 Resolver DNS Firewall to prevent domain resolution to a given domain. Add a second
+rule, named AWSManagedAggregateThreatList, to restrict the domain list managed by AWS-
+
+Create a DNS Firewall rule group.
+Create a DNS Firewall domain list.
+Configure DNS query logging through CloudWatch.
+
+
+To ensure fault tolerance and allow for failover, we assign domain names and unique URLs so that spacecraft know
+where to send their data. However, we'd like to restrict access to other URLs that might present a security risk or
+negatively impact network traffic.
+
+0k, I understand what you are trying to accomplish. While we can restrict network traffic in multiple ways, for this
+situation I suggest we use Amazon Route 53 Resolver DNS Firewall. With Route 53 Resolver DNS Firewall, you can filter
+and regulate outbound DNS traffic for your VPC.
+
+
+
+
+Route 53 Resolver DNS Firewall is a
+feature within Route 53 that allows for
+the control of DNS resolution for
+associated VPCs.
+
+Route 53 Resolver query logging is
+another feature within Route 53 that can
+be configured to record query requests
+and results to a log group in Amazon
+CloudWatch Logs.
+
+VPC ->  DNS firewall
+
+Domain lists - 1st configure
+Rule groups - create a group - associate VPC with it
+
+then go to Amazon Route 53 Resolver
+The DNS Resolver service for VPCs
+that integrates easily with DNS on
+your network.
+
+Route 53 -> Resolver -> Query Logging
+to configure Cloudwatch Query Logging
+
+EC2 Test
+sh—4.2$ nslookup google.com
+Server : 10.0.0.2
+Address : 10.0.0.2#53
+
+server can't find google.com:NXDOMAIN
+
+sh—4.2$ curl —vvv https://google.com -o /dev/null --max—time 5
+url: (6) Could not resolve host: xn--vvv-5n0a
+
+go to cloudwatch - search event google.com
+{
+    "version": "1.100000",
+    "account_id": "240123890349",
+    "region": "us-east-1",
+    "vpc_id": "vpc-039319921294ffc78",
+    "query_timestamp": "2023-10-13T05:38:57Z",
+    "query_name": "google.com.",
+    "query_type": "A",
+    "query_class": "IN",
+    "rcode": "NXDOMAIN",
+    "answers": [],
+    "srcaddr": "10.0.0.76",
+    "srcport": "50312",
+    "transport": "UDP",
+    "srcids": {
+        "instance": "i-05046a78165ee8630"
+    },
+    "firewall_rule_action": "BLOCK",
+    "firewall_rule_group_id": "rslvr-frg-8ea51aba1290413e",
+    "firewall_domain_list_id": "rslvr-fdl-7eedad8a0e9f4697"
+}

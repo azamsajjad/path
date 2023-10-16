@@ -1178,3 +1178,43 @@ For more information about how to create a topic in Amazon SNS, see Creating an 
 E`````````````````````````````
 Enable DynamoDB Streams on the table.
 Correct. You can enable DynamoDB Streams on a table to create an event that invokes an AWS Lambda function.
+
+-----------------------------------------------------------------------------------------------------------------------
+
+You are in a development team working on a popular serverless web application that allows users to book late availability flights and hotels at a significant discount. You occasionally receive complaints that the website is running slowly. After some investigation, you notice that at the time of the complaints, DynamoDB reported a ProvisionedThroughputExceededException error. Which of the following approaches is a recommended way to handle this error?
+
+Ensure your application is using exponential backoff.`````````````````````````
+
+As the error only appears occasionally, the first thing to do is to ensure that the application is using exponential backoff to improve flow control. The ProvisionedThroughputExceededException exception is okay to retry, so you can submit the same request again. AWS recommends reducing the frequency of requests using error retries and exponential backoff. Reference: Error Retries and Exponential Backoff.
+
+Increase the read/write capacity of the DynamoDB table.
+
+Increasing the capacity on the DynamoDB table could be considered but only if the problem persists.
+
+Selected
+Increase the RAM capacity of the Lambda function.
+
+Increase the CPU capacity of the Lambda function.
+
+
+========================================================================
+================================================================================================================================================
+
+You have developed a web application running on a number of EC2 instances running ASP.NET. You are using an S3 bucket to store product data, with customer transaction data held in an RDS database. You anticipate that the number of connections into your website will grow considerably over the next year, and you want to configure a scalable place to store session state data so that multiple web servers can share the session state. Which of the following are suitable options for this application?
+
+Use ElastiCache to store session state.``````````````````
+
+ElastiCache is a great option for storing session data.
+
+Reference: Session Management in AWS.
+
+Selected
+Lambda can store the session state.
+
+Store session state locally on each EC2 instance.
+
+Store the data in the same RDS database used for customer transactions.
+
+Store the session state data in a DynamoDB table.````````````````````
+
+DynamoDB is a scalable and resilient solution for storing session data.

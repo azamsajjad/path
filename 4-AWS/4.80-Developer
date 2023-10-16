@@ -763,3 +763,19 @@ Change the working directory to the root of the AWS SAM application.
 
 D
 Reinitialize the AWS SAM application with the sam init comment.
+
+
+==================================================================================================
+You are using CodeBuild to build the source code for your new application and would like to reference a large number of environment variables in buildspec.yml. However, when you try to run the build, you see an error telling you that the parameters you have specified have exceeded the number of characters allowed by the buildspec file. You need to find an alternative way to store these parameters. Which of the following options would you recommend?
+
+
+Store the variables as dependencies within the application code.
+
+
+Store the variables as key-value pairs in DynamoDB.
+
+
+Use Systems Manager Parameter Store.`````````
+
+
+Store the variables as key-value pairs in S3.

@@ -1,0 +1,102 @@
+Resources:
+  LabVPCB2293DA7D:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.2.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: addtotransitgateway
+          Value: "true"
+        - Key: Name
+          Value: LabVPC_B
+  LabVPCBTGWSubnetDD36B3ED:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: LabVPCB2293DA7D
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - b
+      CidrBlock: 10.2.0.0/28
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: LabVPC_B_TGW_Subnet
+  LabVPCBTGWSubnetRouteTable4436E56B:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: LabVPCB2293DA7D
+      Tags:
+        - Key: Name
+          Value: LabVPC_B_TGW_Subnet
+  LabVPCBTGWSubnetRouteTableAssociation75D6E4B1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: LabVPCBTGWSubnetRouteTable4436E56B
+      SubnetId:
+        Ref: LabVPCBTGWSubnetDD36B3ED
+  LabVPCBWorkloadSubnetSecurityGroupABEF4E72:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CdkLab086B239EStackSecondary/LabVPC_B_Workload_Subnet_SecurityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      SecurityGroupIngress:
+        - CidrIp: 10.0.0.0/8
+          Description: from 10.0.0.0/8:ALL TRAFFIC
+          IpProtocol: "-1"
+      Tags:
+        - Key: Name
+          Value: LabVPC_B_Workload_Subnet_SecurityGroup
+      VpcId:
+        Ref: LabVPCB2293DA7D
+  TransitGatewayB:
+    Type: AWS::EC2::TransitGateway
+    Properties:
+      AmazonSideAsn: 65000
+      AutoAcceptSharedAttachments: enable
+      DefaultRouteTableAssociation: enable
+      Description: TGW B
+      DnsSupport: enable
+      Tags:
+        - Key: Name
+          Value: Lab-TGW-B
+      VpnEcmpSupport: enable
+  VPCBAttachment:
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - Ref: LabVPCBTGWSubnetDD36B3ED
+      TransitGatewayId:
+        Ref: TransitGatewayB
+      VpcId:
+        Ref: LabVPCB2293DA7D
+      Tags:
+        - Key: Name
+          Value: VPC-B-TGW-Attachment
+  TransitGatewayRouteTable:
+    Type: AWS::EC2::TransitGatewayRouteTable
+    Properties:
+      TransitGatewayId:
+        Ref: TransitGatewayB
+      Tags:
+        - Key: Name
+          Value: TransitGatewayRouteTable
+  TransitGatewayRouteTableAssociationVPCB:
+    Type: AWS::EC2::TransitGatewayRouteTableAssociation
+    Properties:
+      TransitGatewayAttachmentId:
+        Ref: VPCBAttachment
+      TransitGatewayRouteTableId:
+        Ref: TransitGatewayRouteTable
+Outputs:
+  TGWbRouteTableID:
+    Value: enable

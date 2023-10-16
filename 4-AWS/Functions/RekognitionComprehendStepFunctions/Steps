@@ -1,0 +1,31 @@
+arn:aws:lambda:us-east-1:582908443542:function:process_s3_event
+arn:aws:lambda:us-east-1:582908443542:function:rekognition_helper
+arn:aws:lambda:us-east-1:582908443542:function:comprehend_helper
+
+S3
+Create Bucket imagestorage329 ACL enabled, Object Owner
+S3 -> Properties -> Choose Create event notification to be notified when a specific event occurs.
+Name-Event types-Filters-Destination type-Destination
+S3Event	All object create events	-	Lambda function	process_s3_event
+
+Cloud9
+git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/lab
+
+Create State Machine
+arn:aws:states:us-east-1:582908443542:stateMachine:MyStateMachine-rekog
+
+paste State machine Arn into Lambda process s3 event function
+
+aws s3 cp lab/guitar.png s3://imagestorage329 --metadata '{"message":"I hate this song and the band"}'
+
+Add a Queue Step
+"SendToQueue": {
+      "Type": "Task",
+      "Resource":"arn:aws:states:::sqs:sendMessage",
+      "Next": "IntoDynamoDB",
+      "OutputPath": "$",
+      "ResultPath": "$.queue_response",
+      "Parameters": {
+        "QueueUrl": "https://sqs.us-east-1.amazonaws.com/582908443542/StateSqsqueue",
+        "MessageBody.$": "$"
+      }

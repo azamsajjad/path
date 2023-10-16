@@ -8,9 +8,11 @@ HOW TO IMPLEMENT NETWORK SECURITY:
 "Tools for monitoring and troubleshooting "
 Monitor NETWORK using Amazon CloudWatch
 VPC FLOW LOGS:
+AWS QUICKSIGHT
 VPC TRAFFIC MIRRORING:
 AWS REACHABILITY ANALYZER:
 AWS TRANSIT GATEWAY NETWORK MANAGER:
+
 
 
 
@@ -598,8 +600,48 @@ Flow logs do not capture IP traffic to and from Amazon reserved IPs. This includ
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+VPC Flow Logs Analysis Dashboards
+use VPC Flow Logs, Amazon Athena, and Amazon QuickSight to analyze network
+traffic to identify the root cause of potential networking issues.
 ------------------------------------------------------------------------
+AWS QUICKSIGHT - a Business Intelligence Service B.I.
+For this, we can use Amazon QuickSight to create interactive dashboards and visualizations based on the queried flow log
+data. QuickSight will provide a clear and concise representation of the network traffic so that we can visualize
+trends and patterns.
+We start with creating datasets in QuickSight from the Athena query data.
+To create datasets in QuickSight, you'll need to connect QuickSight to Athena as a data source. QuickSight can
+then access the queried flow log data.
+Finally, we can use analyses in QuickSight to create analysis dashboards. With the analysis capabilities in QuickSight, we
+can build visualizations that represent various aspects of the network traffic. This will help us identify any abnormal
+traffic patterns or trends affecting communication.
+QuickSight offers a range of visualization options, such as line charts, bar graphs, and heat maps, which can assist in
+our analysis. Ultimately, we want to use the QuickSight analysis dashboards to gain insights and devise a plan to
+address the cause of any network issues.
+Amazon QuickSight, a buisness
+intelligence (Bl) service, can connect to
+Athena and designate the relevant tables
+or views generated from Athena queries
+as datasets in QuickSight.
 
+Enable VPC Flow Logs on a VPC
+Use Amazon Athena to query raw flow log data.
+Create QuickSight datasets from Athena query data.
+Use QuickSight analyses to create analysis dashboards.
+
+arn:aws:s3:::vpc-flow-logs-240123890349-538
+arn:aws:s3:::athena-query-results-240123890349-538
+arn:aws:s3:::athena-cloudformation-240123890349-538
+
+create flow logs in VPC and send them to flow-log-bucket 
+in Actions -> Generate Athena integration - paste other 2 buckets
+Same Window link -> Create CloudFormation stack
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
 VPC Traffic Mirroring
 
 Traffic mirroring is commonly used by network engineers and developers who need to monitor and analyze the network traffic, diagnose network problems, balance traffic loads, block unwanted traffic, and spot intrusions.

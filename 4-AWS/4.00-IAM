@@ -165,7 +165,7 @@ Implicit grant
 Specifies that the client should get the access token (and, optionally, ID token, based on scopes) directly
 
 3- OpenID Connect scopesInfo
-Choose at least one OpenID Connect (OIDC) scope to specify the attributes this app client can retrieve for access tokens. We have populated suggested options based on the application type and required attributes you selected.
+Choose at least one OpenID Connect (OIDC) scope to specify the attributes this app client can retrieve for access tokens. 
 Select OIDC scopes
 OpenID
 -->
@@ -570,6 +570,13 @@ IAM Groups
 Good work!
 Amazon Cognito identity pools enable you to create unique identities for your users and authenticate them with identity providers. With an identity, you can obtain temporary, limited-privilege AWS credentials to access other AWS services. Amazon Cognito identity pools support public identity providers—Amazon, Apple, Facebook, and Google—as well as unauthenticated identities. It also supports developer authenticated identities, which let you register and authenticate users via your own back-end authentication process. Think of User Pools as providing authentication, and Identity Pools as providing authorization.
 
+
+
+Think of User Pools as providing authentication, and Identity Pools as providing authorization.
+
+
+
+
 --------------------------------------------------------------------------
 You are working on a mobile phone app for an online retailer that stores customer data in DynamoDB. You would like to allow new users to sign-up using their Facebook credentials. What is the recommended approach?
 
@@ -603,7 +610,7 @@ Amazon Directory Services allows you to connect your AWS resources to an existin
 
 
 
------------------------
+---------------------------------------------------------------------------------------------
 
 Your company uses an Identity Provider (IdP) for Single-sign on (SSO) and has tasked their solutions architect with connecting their AWS Account to the IdP so their users can leverage their corporate identity to access the environment.
 
@@ -616,4 +623,37 @@ Create an AWS IAM User with AWS Management Console Access, attach a policy with 
 Create an AWS IAM Identity Provider by uploading the JSON metadata document from your IdP.
 
 
--------------------------
+-----------------------------------------------------------------------------------------------
+You are developing a meme-sharing application that runs business login on a fleet of EC2 instances behind an Application Load Balancer. Your website is served by a CloudFront distribution. The security architect has asked you to decouple the user authentication process from the application servers, enable users to easily sign up and sign in to the website and use proper Identity and Access Management controls to allow access to a number of S3 buckets where they can upload images. Which of the following solutions would you recommend to address this use-case?
+
+Use Cognito for sign-up, and use resource policies to manage user permissions.
+
+Resource policies can be used to define access to certain resources in AWS, but they are not a substitute for proper IAM access controls.
+
+Selected
+Use MFA for sign-up and sign-in, and use IAM to manage user permissions.
+
+Use IAM for sign-up and use Cognito to manage user permissions.
+
+``````````Use Cognito for sign-up and use IAM to manage user permissions.
+
+Cognito can be used for sign-up and sign-in functionality. It integrates with IAM to control access to AWS resources.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Your application uses the STS API call AssumeRoleWithWebIdentity to enable access for users who have authenticated using a Web ID provider. Which of the following best describes what a successful call to AssumeRoleWithWebIdentity returns?
+
+AssumeRoleWithWebIdentity returns a set of temporary credentials (access key ID, secret access key, and security token) that give temporary access to AWS services.````````````````````````````````````````````````````````````
+
+AssumeRoleWithWebIdentity returns an access key ID, a secret access key, and a security token as temporary security credentials. These credentials can be used by applications to sign calls for AWS service API operations. Reference: [STS: AssumeRoleWithWebIdentity] (https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html)
+
+AssumeRoleWithWebIdentity returns an ARN of the IAM role that the user is allowed to assume temporarily.
+
+AssumeRoleWithWebIdentity returns an assumed role ID that the user is allowed to assume temporarily.
+
+AssumeRoleWithWebIdentity does not return an assumed role ID that the user is allowed to assume temporarily. Reference: STS: AssumeRoleWithWebIdentity
+
+Selected
+AssumeRoleWithWebIdentity returns an ARN of the IAM user that the user is allowed to assume temporarily.
+

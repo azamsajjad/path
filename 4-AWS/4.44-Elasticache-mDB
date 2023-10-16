@@ -152,3 +152,25 @@ Incorrect. A local file could store session state information persistently over 
 D
 Store session state information in AWS Systems Manager State Manager.
 Incorrect. Systems Manager State Manager is not for use of session state information management. Systems Manager State Manager is used to manage the state of an instance itself, such as specific instance configurations or software installations.
+
+========================================================================
+
+
+You have developed a web application running on a number of EC2 instances running ASP.NET. You are using an S3 bucket to store product data, with customer transaction data held in an RDS database. You anticipate that the number of connections into your website will grow considerably over the next year, and you want to configure a scalable place to store session state data so that multiple web servers can share the session state. Which of the following are suitable options for this application?
+
+Use ElastiCache to store session state.````````````
+
+ElastiCache is a great option for storing session data.
+
+Reference: Session Management in AWS.
+
+Selected
+Lambda can store the session state.
+
+Store session state locally on each EC2 instance.
+
+Store the data in the same RDS database used for customer transactions.
+
+Store the session state data in a DynamoDB table.`````````````
+
+DynamoDB is a scalable and resilient solution for storing session data.

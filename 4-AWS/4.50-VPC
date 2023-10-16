@@ -234,8 +234,52 @@ To make a highly available multiregional AWS environment using transit gateways,
 
 
 =========================================================================
+INTER_REGION TRANSIT GATEWAY PEERING CONNECTION.
+The primary Region transit gateway is
+peered with a remote Region transit
+gateway. AWS Transit Gateway uses the
+Autonomous System Number (ASN) to
+peer with another transit gateway. Border
+Gateway Protocol (BGP) is the routing
+protocol used for peering.
+tgw-05945b035565eb733
+tgw-0021df6e665b727d7 primary
 
+Blackhole routes are created for subnets
+in VPC B and VPC D to filter neOvork
+traffic. A blackhole route in a transit
+gateway route table drops traffc that
+matches the route. In the DIY section, a
+blackhole route for the subnet in VPC C is
+created.
+PRIMARY
+1- create Transit gateway attachments in Primay 
+REMOTE
+2- accept Transit gateway attachments in Remote.
+3- create Transit gateway route tables Association in Remote.
+4- replace Transit gateway route tables Route 0.0.0.0/0 to peering TGW 
+5- add Route in Remote VPCs Route Table 0.0.0.0/0 to its own TGW
+PRIMARY
+6- create Transit gateway route tables Association in Primary with rTGW
+7- create Transit gateway route tables Route in Primary.10.4.0.0/16 to rVPC
+8- create Transit gateway route tables Route pvtsubnt 10.2.0.0/24 blackhole
+   create Transit gateway route tables Route pvtsubnt 10.1.0.0/24 blackhole
+   create Transit gateway route tables Route pvtsubnt 10.3.0.0/24 blackhole
 ------------------------------------------------------------------------
+VPC FLOW LOGS 
+Create Log Group
+create flow log for instance A
+Configure session manager timeout preference from 20 to 60 minutes 
+open instance B -> iperf3 -s 
+open instance A -> iperf3 -c 10.1.0.182 -P 2 -t 30
+goto log group -> goto log insights -> Select log groups, and then run a query or choose a sample query -> top 10 bytes sent by src & dest addresses
+APPLY:
+eni-0a966b9abe44a8f5f
+44.194.189.223
+Tunnel 1	34.195.137.105
+Tunnel 2	54.89.92.134
+Pre-Shared Key   Tunnel 1        : J2rv8S_0i.lBtjwMkKY3ne4ZyYezmBFL
+-------------------------------------------------------------------------
 '
 High availability
 Achieved by implementing redundant components and eliminating single points of failure

@@ -1,0 +1,347 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Creates automated transit gateway peering connection",
+    "Parameters":
+    {
+      "S3BucketName":
+      {
+        "Type": "String",
+        "Description": "Bucket that contains lambda code",
+        "Default": "cf-templates-11111111111-us-east-1"
+      }
+    },
+    "Resources": {
+       "PeerTransitGateways": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": "peer-transit-gateway",
+                "Handler": "peer-transit-gateway.lambda_handler",
+                "Runtime": "python3.8",
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "S3BucketName"
+                    },
+                    "S3Key": "peer-transit-gateway.zip"
+                },
+                "Description": "Creates peering connection between transit gateways in active and passive region",
+                "MemorySize": 128,
+                "Timeout": 600,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "TransitGatewayAutomateLambdaRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+      "GetPeeringStatus": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": "get-transit-gateway-peering-status",
+                "Handler": "get-transit-gateway-peering-status.lambda_handler",
+                "Runtime": "python3.8",
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "S3BucketName"
+                    },
+                    "S3Key": "get-transit-gateway-peering-status.zip"
+                },
+                "Description": "Returns status for peering connection between transit gateways in active and passive region",
+                "MemorySize": 128,
+                "Timeout": 30,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "TransitGatewayAutomateLambdaRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "ModifyTGRequesterRoutes": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": "modify-transit-gateway-requester-routes",
+                "Handler": "requesterRegionRoute.lambda_handler",
+                "Runtime": "python3.8",
+                "Description": "Adds static routes to requester tgw route table",
+                "MemorySize": 128,
+                "Timeout": 600,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "TransitGatewayAutomateLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "S3BucketName"
+                    },
+                    "S3Key": "requesterRegionRoute.zip"
+                }
+            }
+        },
+        "ModifyTGWAllRoutes": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": "diy-modify-transit-gateway-all-routes",
+                "Handler": "modify-transit-gateway-routes.lambda_handler",
+                "Runtime": "python3.8",
+                "Description": "Adds static routes using cidrs from active to passive region's tgw routetable and viceversa",
+                "MemorySize": 128,
+                "Timeout": 600,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "TransitGatewayAutomateLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "S3BucketName"
+                    },
+                    "S3Key": "modify-transit-gateway-routes.zip"
+                }
+            }
+        },
+        "TransitGatewayAutomateLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "TransitGatewayAutomateLambdaRole",
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "TransitGatewayAutomateLambdaPolicy",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    }
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "Log1",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Sid": "ssm",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ssm:GetParameter",
+                                        "ssm:DescribeParameters",
+                                        "ssm:PutParameter"
+                                    ],
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Sid": "ec2",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2:CreateTransitGatewayRouteTable",
+                                        "ec2:ModifyTransitGateway",
+                                        "ec2:AcceptTransitGatewayVpcAttachment",
+                                        "ec2:CreateTransitGateway",
+                                        "ec2:SearchTransitGatewayRoutes",
+                                        "ec2:CreateTransitGatewayPeeringAttachment",
+                                        "ec2:AssociateTransitGatewayRouteTable",
+                                        "ec2:CreateTags",
+                                        "ec2:GetTransitGatewayAttachmentPropagations",
+                                        "ec2:CreateTransitGatewayRoute",
+                                        "ec2:DescribeTransitGatewayAttachments",
+                                        "ec2:CreateTransitGatewayVpcAttachment",
+                                        "ec2:GetTransitGatewayRouteTablePropagations",
+                                        "ec2:DescribeTransitGatewayPeeringAttachments",
+                                        "ec2:AcceptTransitGatewayPeeringAttachment",
+                                        "ec2:DescribeTransitGateways",
+                                        "ec2:ReplaceTransitGatewayRoute",
+                                        "ec2:DescribeVpcAttribute",
+                                        "ec2:DescribeTransitGatewayRouteTables",
+                                        "ec2:GetTransitGatewayRouteTableAssociations",
+                                        "ec2:ModifyTransitGatewayVpcAttachment",
+                                        "ec2:DescribeVpcs",
+                                        "ec2:DescribeTransitGatewayVpcAttachments"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "TransitGatewayLogs": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "LogGroupName": "/aws/stepfunction/transit-gateway-automation-Logs",
+                "RetentionInDays": 90
+            }
+        },
+      "PeerTransitGatewaysLogs": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "LogGroupName": "/aws/lambda/peer-transit-gateway",
+                "RetentionInDays": 90
+            }
+        },
+        "GetPeeringStatusLogs": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "LogGroupName": "/aws/lambda/get-transit-gateway-peering-status",
+                "RetentionInDays": 90
+            }
+        },
+        "ModifyTransitGatewayRoutesLogs": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "LogGroupName": "/aws/lambda/modify-transit-gateway-routes",
+                "RetentionInDays": 90
+            }
+        },
+        "TransitGatewayAutomateStepFunctionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "TransitGatewayAutomateStepFunctionRole",
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "states.amazonaws.com"
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "TransitGatewayAutomateStepFunctionPolicy",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    }
+                                ]
+                            ]
+                        },
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "Log1",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:logs:",
+                                                    {
+                                                        "Ref": "AWS::Region"
+                                                    },
+                                                    ":",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    ":*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Sid": "Log2",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:logs:",
+                                                    {
+                                                        "Ref": "AWS::Region"
+                                                    },
+                                                    ":",
+                                                    {
+                                                        "Ref": "AWS::AccountId"
+                                                    },
+                                                    ":/aws/*",
+                                                    ":*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Sid": "lambda",
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "lambda:InvokeFunction"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

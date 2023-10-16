@@ -18,6 +18,43 @@ And again, a stack is a living,
 breathing instantiation of that template.
 Contained in that stack are all of our resources.
 =======================================================================
+Parameters:
+• Parameters allow you to pass values into your template when you create a stack.
+• Each Parameter specified must contain a value when you create a stack.
+• Example Parameters: Instance Type, VPC ID, Subnet ID 
+• Pseudo parameters are parameters that are predefined by AWS CloudFormation.
+You do not declare them in your template. Use them the same way as you would a
+parameter, as the argument for the Ref function.
+• Pseudo Parameters:
+AWS::Region
+AWS::AccountId
+AWS::NotificationARNs
+AWS::NoValue
+AWS::Partition
+AWS::Stackld
+AWS::StackName
+AWS::URLSuffix
+AWS..
+Mappings:
+Mappings match a key to a corresponding set of named values.
+• A common use of Mappings is to map an instance type to an architecture or an AMI ID.
+
+Conditions:
+• Includes statements that define when a resource is created or when a property is defined.
+• You might use Conditions when you want to reuse a template that can create different resources in different contexts.
+• Example: Dev Environment vs Prod. You could use a Condition to deploy different sized instances based on the environment.
+Smaller instances for Dev = cost savings.
+• To use conditions, you need to incorporate 3 sections of the template: Parameters (what do you want to evaluate?), Condition,
+and Resource or Output (the resource or output you want to conditionall create.
+
+Transform:
+Specifies one or more Transforms that CloudFormation uses to
+process your template. You can simplify templates by condensing
+and reusing template components.
+• Two kinds of Transforms: AWS::ServerIess and AWS::IncIude
+• Serverless refers to Lambda Functions - much more on that later!
+• Includes are very much like includes in popular programming
+languages. You can include code snippets in your template (reuse!)
 =======================================================================
 
 Very useful CloudFormation Snippets:
@@ -769,3 +806,23 @@ in app.py...change this setting to deploy update to function Canary style
 sam validate
 sam build
 sam deploy
+
+
+
+===========================================================================================================
+You are using CloudFormation to build a number of different application environments to host development, test, UAT, pre-production, and production stacks. Your application is comprised of web servers, load balancers, application servers, and databases. Each web server, load balancer, and database needs to be configured identically across all environments. You would also like to reduce the duplication of code to avoid mistakes caused by human error. How can you achieve this with CloudFormation?
+
+Use a CloudFormation nested stack.```````````````````````````````
+
+Nested stacks provide the ability to configure multiple elements within your environment while reducing duplication of code. As your infrastructure grows, common patterns can emerge in which you declare the same components in multiple templates. You can separate out these common components and create dedicated templates for them. Then, use the resource in your template to reference other templates, creating nested stacks.
+
+Reference: Nested Stacks to Create Reusable Templates
+
+Copy and paste the configuration code that you want to reuse into the CloudFormation template for each environment.
+
+Use the Mappings section of the template to reference the code you want to reuse.
+
+The Mappings section of a CloudFormation template is used to match a key to a corresponding set of named values. For example, if you want to set values based on a Region, you can create a mapping that uses the Region name as a key and contains the values you want to specify for each specific Region. Mappings cannot be used to reduce the duplication of code when you need to provision components like web servers, load balancers, application servers, and databases that need to be configured identically across all environments.
+
+Selected
+Use environment variables.

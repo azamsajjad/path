@@ -167,6 +167,33 @@ AWS WAF
 –
 AWS WAF is a web application firewall that helps protect web applications from attacks by allowing you to configure rules that allow, block, or monitor (count) web requests based on conditions that you define. These conditions include IP addresses, HTTP headers, HTTP body, uniform resource identifier (URI) strings, structured query language (SQL) injection, and cross-site scripting.  
 
+If you have request sampling enabled, you
+can view a sample of the requests that AWS
+WAF has inspected and either allowed or
+blocked. For each sampled request, you can
+view detailed data about the request, such as
+the originating IP address and the headers
+included in the request. You can also view
+the rules that matched the request, and the
+rule action settings.
+
+Intelligent Application Protection
+Concept
+The core rule set (CRS) rule group contains
+rules that are generally applicable to web
+applications. This provides protection against
+exploitation of a wide range of
+vulnerabilities, including some of the high
+risk and commonly occurring vulnerabilities
+described in OWASP publications, such as
+the OWASP Top 10. The SQL database rule
+group contains rules to block request
+patterns associated with exploitation of SQL
+databases, such as SQL injection attacks. This
+can help prevent remote injection of
+unauthorized queries.
+
+
 Which of the following are benefits of integrating AWS Firewall Manager withAWS Organizations ? (Select TWO)
 
 ``Firewall Manager monitors for new resources created to ensure they comply with a mandatory set of security policies.
@@ -177,6 +204,7 @@ You can centrally manage Amazon S3 Lifecycle configuration on a bucket.
 AWS Firewall Manager
 +
 AWS Firewall Manager is a security management tool that makes it easier for you to configure your AWS WAF rules across your accounts. With Firewall Manager, security administrators of large organizations can write company-wide rules from one place, enforce them across applications protected by AWS WAF, and get the central visibility of attacks against their Application Load Balancers and Amazon CloudFront infrastructure. 
+
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
 4-4-4-4-4-4-4-4-4-44-4-4-4-4-4-4-4-4------DATA PROTECTION.
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-
