@@ -73,7 +73,7 @@ Noncontiguous I/O operations are not merged and handled as separate I/O operatio
 Along with the low latency, block storage can often obtain higher IOPS than other types of storage. SSDs are best suited for applications that require high IOPS. SSDs provide the benefit of low latency and higher read and write performance for random I/O. SSDs do not have the seek times required for HDDs and are able to perform operations much faster.
 
 THROUGHPUT
-Throughput is a statistical storage measurement used to measure the performance associated with reading large sequential data files. Large files, such as video files, must be read from beginning to end. Throughput operations are measured in megabytes per second (MB/s).
+Throughput is a statistical storage Measurement used to measure the performance associated with reading large sequential data files. Large files, such as video files, must be read from beginning to end. Throughput operations are measured in megabytes per second (MB/s).
 
 
 
@@ -110,7 +110,8 @@ The instance terminates
 Therefore, do not rely on an instance store for valuable, long-term data. Instead, use more durable data storage, such as Amazon EBS, for your block storage requirements.
 
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=Designed for mission-critical systems, EBS volumes are replicated within an AWS Availability Zone and can scale to store petabytes of data. Also, you can use EBS snapshots with automated lifecycle policies to back up your volumes in Amazon Simple Storage Service (Amazon S3). You can do this  while ensuring geographic protection of your data and business continuity.
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Designed for mission-critical systems, EBS volumes are replicated within an AWS Availability Zone and can scale to store petabytes of data. Also, you can use EBS snapshots with automated lifecycle policies to back up your volumes in Amazon Simple Storage Service (Amazon S3). You can do this  while ensuring geographic protection of your data and business continuity.
 
 With Amazon EBS, you pay only for the storage and resources that you provision.-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -347,11 +348,13 @@ Performance metrics, such as bandwidth, throughput, latency, and average queue l
 ---------------------------------------------------------------------------
 Workload characteristics questions
 
-Is your workload more IOPS-intensive or throughput-intensive? If your workload is IOPS- intensive, start with the SSD volume types and review the performance characteristics. If your workload is more throughput-intensive, you can start with HDD volume types to see if their performance can meet your performance requirements.
+Is your workload more Iops-Intensive or Throughput-Intensive? if your workload is IOPS- intensive, start with the SSD volume types and review the performance characteristics. if your workload is more throughput-intensive, you can start with HDD volume types to see if their performance can meet your performance requirements.
+
+        Throughput and IOPS are interrelated but there is a subtle difference between them. Throughput is a measurement of bits or bytes per second that can be processed by a storage device. IOPS refers to the number of read/write operations per second. both IOPS and throughput can be used together to describe performance.
 
 Do the workload requirements exceed the maximum performance characteristics for a selected EBS volume type? If yes, eliminate the volume type from consideration for that volume. Review characteristics for the next higher performing EBS volume type.
 
-What is the applications latency sensitivity? If it is very low and sub-millisecond to single-digit millisecond latency is needed, io2 Provisioned IOPS could be required. If single-digit to low two-digit latency is tolerable, gp3 General Purpose SSD could be the correct choice. 
+what is the applications Latency Sensitivity? if it is very low and sub-millisecond to single-digit millisecond latency is needed, io2 Provisioned IOPS could be required. If single-digit to low two-digit latency is tolerable, gp3 General Purpose SSD could be the correct choice. 
 
 If your workload is not latency sensitive, HDD volume types could be the most cost effective choice.
 
@@ -462,7 +465,7 @@ Your costs are calculated for the volume size, the provisioned IOPS, and the pro
 
 
 
-
+=======================================================================================================
 
 Which AWS service monitors configuration and utilization metrics for your Amazon EBS volumes and generates recommendations of which volumes to modify in order to provide the best price-performance trade-off?
 
@@ -490,6 +493,7 @@ Amazon EFS
 
 
 
+=======================================================================================================
 
 
 
@@ -512,7 +516,11 @@ The statement that is true about encrypted Amazon EBS volumes is:
 All the data moving between Amazon EC2 instance and volume is encrypted.
 
 When you encrypt an Amazon EBS volume, both data at rest (the data stored on the volume) and data in transit (the data moving between the EC2 instance and the volume) are encrypted. This helps to ensure the confidentiality and integrity of the data throughout the entire process.
-=========================================================================
+
+
+
+=======================================================================================================
+
 After a budget review, you have noticed your Amazon EBS charges make up a significant portion of your bill. Currently, all EBS volumes are in use and required to stay active. All unattached volumes have been deleted after creating snapshots. Snapshots are managed with lifecycle policies and a review has found no issue with retention.
 
 Which of the following options will best help you to reduce your EBS spending?

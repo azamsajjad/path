@@ -192,7 +192,8 @@ Recommendation on how to automatically converting your source servers from physi
 `````Recommend AWS services required for your target architecture.
 `````Provide configuration data about your on-premises servers.
 A breakdown of what went into the on-premises costs.
-Recommendation for the customer on next steps for a successful migration.`````An executive summary of the savings across a combination of scenarios applied to different workloads.
+Recommendation for the customer on next steps for a successful migration.
+`````An executive summary of the savings across a combination of scenarios applied to different workloads.
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 MIGRATION SERVICES.
@@ -274,33 +275,25 @@ Migration services
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 AWS Application Migration Service (AWS MGN), which includes CloudEndure Migration, is a highly automated lift-and-shift (rehost) solution. AWS MGN simplifies, expedites, and reduces the cost of migrating applications to the AWS Cloud, AWS GovCloud (US), and AWS Outposts.
 
-
-
 You can use AWS MGN or CloudEndure Migration by itself to quickly lift-and-shift physical, virtual, or cloud servers without compatibility issues, performance impact, or long cutover windows. AWS MGN continuously replicates your source servers to your AWS account. When you’re ready to migrate, it automatically converts and launches your servers on AWS.
-
 
 How it works
 
-Expand each section to learn more about how the service works. Select the + symbol next to each category.
-
-
 Agent installation
 –
-Implementation begins by installing the AWS Replication Agent on your source servers. After the agent is installed, you can view and define replication settings. AWS MGN uses these settings to create and manage a Staging Area Subnet. This subnet includes lightweight Amazon EC2 instances that act as replication servers and low-cost staging Amazon EBS volumes.
+    Implementation begins by installing the AWS Replication Agent on your source servers. After the agent is installed, you can view and define replication settings. AWS MGN uses these settings to create and manage a Staging Area Subnet. This subnet includes lightweight Amazon EC2 instances that act as replication servers and low-cost staging Amazon EBS volumes.
 
 
 Continuous replication
 –
-Replication Servers receive data from the agent running on your source servers and write this data to the staging Amazon EBS volumes. Your replicated data is compressed and encrypted in transit, and can be encrypted at rest using Amazon EBS encryption. 
+    Replication Servers receive data from the agent running on your source servers and write this data to the staging Amazon EBS volumes. Your replicated data is compressed and encrypted in transit, and can be encrypted at rest using Amazon EBS encryption. 
 
-
-
-AWS MGN keeps your source servers up to date on AWS by using continuous, block-level data replication. It uses your defined launch settings to launch instances when you conduct nondisruptive tests or perform a cutover.
+    AWS MGN keeps your source servers up to date on AWS by using continuous, block-level data replication. It uses your defined launch settings to launch instances when you conduct nondisruptive tests or perform a cutover.
 
 
 Testing and cutover
 –
-When you launch Test or Cutover instances, AWS MGN converts your source servers to boot and run natively on AWS automatically. After confirming that your launched instances are operating properly on AWS, you can decommission your source servers. You can then choose to modernize your applications by using additional AWS services and capabilities.
+    When you launch Test or Cutover instances, AWS MGN converts your source servers to boot and run natively on AWS automatically. After confirming that your launched instances are operating properly on AWS, you can decommission your source servers. You can then choose to modernize your applications by using additional AWS services and capabilities.
 
 
 CloudEndure Migration uses Amazon EC2 instances and Amazon EBS volumes. CloudEndure Migration copies and updates in real time your operating systems, applications, and data from your on-premises application servers to the AWS Cloud. CloudEndure first stages your application using low-cost EC2 instances and EBS volumes. When you are ready to migrate to the AWS Cloud, the low-cost EC2 instances and EBS volumes are upgrade to production level EC2 instances and EBS volumes.
@@ -538,6 +531,9 @@ Make decisions based on access patterns and metrics
 
 Choose storage systems based on your workload's access patterns. Configure them by determining how the workload accesses data. You can sometimes increase storage efficiency or increase a performance metric by choosing a different storage type. Configure the storage options you choose to match your data access patterns. 
 
-Optimize your storage usage and access patterns – Choose storage systems based on your workload's access patterns and the characteristics of the available storage options. Determine the best place to store data so that you can meet your requirements while reducing overhead. Use performance optimizations and access patterns when configuring and interacting with data based on the characteristics of your storage (for example, striping volumes or partitioning data).
-Select appropriate metrics for storage options – Ensure that you select the appropriate storage metrics for the workload. Each storage option offers various metrics to track how your workload performs over time. Make sure that you are measuring against any storage metrics indicating peak performance and trends. For storage systems that are fixed sized, such as Amazon Elastic Block Store (Amazon EBS) or Amazon FSx, ensure that you are monitoring the amount of storage used against the overall storage size. Create automation when possible to increase the storage size when reaching a threshold.
-Monitor metrics – Amazon CloudWatch can collect metrics across the resources in your architecture. You can also collect and publish custom metrics to surface business metrics or derived metrics. Use CloudWatch or third-party solutions to set alarms that indicate when thresholds are breached.
+Optimize your storage usage and access patterns – 
+            Choose storage systems based on your workload's access patterns and the characteristics of the available storage options. Determine the best place to store data so that you can meet your requirements while reducing overhead. Use performance optimizations and access patterns when configuring and interacting with data based on the characteristics of your storage (for example, striping volumes or partitioning data).
+Select appropriate metrics for storage options – 
+            Ensure that you select the appropriate storage metrics for the workload. Each storage option offers various metrics to track how your workload performs over time. Make sure that you are measuring against any storage metrics indicating peak performance and trends. For storage systems that are fixed sized, such as Amazon Elastic Block Store (Amazon EBS) or Amazon FSx, ensure that you are monitoring the amount of storage used against the overall storage size. Create automation when possible to increase the storage size when reaching a threshold.
+Monitor metrics – 
+            Amazon CloudWatch can collect metrics across the resources in your architecture. You can also collect and publish custom metrics to surface business metrics or derived metrics. Use CloudWatch or third-party solutions to set alarms that indicate when thresholds are breached.

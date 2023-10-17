@@ -1,0 +1,441 @@
+
+
+
+--------------------------------------------------------------------------
+----------------------------Route 53 
+[ROUTE 53]
+amazons DNS service
+Maps ip,s3 bucket, load balancer to domain name
+Hosted Zone - container for DNS records for your domain
+Alias - allows you to route traffic to top of DNS Namespace dhamaps.com
+
+                 |---app.pro.com ---------> ELB
+                 |---ami.pro.com ---------> EC2 instance
+Route 53--------->---api.pro.com ---------> API Gateway
+                 |---www.pro.com ---------> CloudFront
+                 |___minecraft.pro.com  --> elastic IP 2.213.54.67
+
+You create custom subdomains by CREATING RECORD SETS (Alias)
+Aliases are SMART, they can detect change in public IP of AWS Resource and keep that endpoint pointed to the correct resource
+Always use Alias
+e.g. we can point www subdomain using an A record to point to specific IP
+
+Routing Policies:
+7 Types of Routing Policies 
+1- Simple R - multiple addresses result in random selection
+2- Weighted R - route traffic based on weighted values to split traffic
+3- Latency-based R - route traffic to region resource with lowest latency
+4- Failover R - route traffic if primary endpoint is unhealthy
+5- Geolocation R - route based on location of your users
+6- Geo-Proximity R - route based on location of your resources,busy to idle
+7- Multi-value Answer R respond to DNS queries with upto eight healthy records selected at random - exactly like Simple R but with health checks
+
+Create Sophisticated Routing Policies based on Visuals 
+==== Route-53-Traffic-Flow
+$50 per policy record / month
+supports versioning so you can roll out or roll back updates
+
+
+6- Geo-Proximity R - route based on location of your resources,busy to idle
+Only be created through Traffic-flow  visualized 
+boudary based, 
+you create boundaries between regions through selecting as much as regions
+you give them a bias rating, from -99 to 99
+you can also provide custom cordinates over region
+
+
+
+Route 53 Health Checks 
+$0.50 per health check per month for aws endpoints 
+$0.750 per health check per month for non aws endpoints 
+for extra features: $1 / month (https, string matching, fast interval, latency measurement)
+can create upto 50 health checks for aws endpoints within or linked to same aws account
+health checks every 30s by default, can be reduce to every 10s 
+a health check can initialize a failover if status is returned unhealthy 
+a cloudwatch alrm can be created to alert you 
+a health check can monitor other health checks to create a chain of reactions
+
+
+Route 53 Resolver  (formerly known as .2 resolver)
+DNS resolution for Hybrid Environments (on-premise and cloud)
+A regional service that lets you route DNS queries b/w ur VPC and ur Network
+Direction of Queries:
+inbound and outbound - 
+       configure endpoints that allow DNS queries both to and from your VPC
+       aws vpc<-> local network
+inbound 
+       configure an endpoint that allows DNS queries to your VPC from your network or another VPC 
+       aws vpc<- local network
+outbound
+       configure an endpoint that allows DNS queries from your VPC from your network or another VPC
+       aws vpc-> local network
+
+
+
+Comparison of alias and CNAME records
+Alias records are similar to CNAME records, but there are some important differences. The following list compares alias records and CNAME records.
+
+Resources that you can redirect queries to
+Alias records
+An alias record can only redirect queries to selected AWS resources, such as the following:
+
+Amazon S3 buckets
+
+CloudFront distributions
+
+Another record in the same Route 53 hosted zone
+
+For example, you can create an alias record named acme.example.com that redirects queries to an Amazon S3 bucket that is also named acme.example.com. You can also create an acme.example.com alias record that redirects queries to a record named zenith.example.com in the example.com hosted zone.
+
+CNAME records
+A CNAME record can redirect DNS queries to any DNS record. For example, you can create a CNAME record that redirects queries from acme.example.com to zenith.example.com or to acme.example.org. You don't need to use Route 53 as the DNS service for the domain that you're redirecting queries to.
+
+Creating records that have the same name as the domain (records at the zone apex)
+Alias records
+In most configurations, you can create an alias record that has the same name as the hosted zone (the zone apex). The one exception is when you want to redirect queries from the zone apex (such as example.com) to a record in the same hosted zone that has a type of CNAME (such as zenith.example.com). The alias record must have the same type as the record you're routing traffic to, and creating a CNAME record for the zone apex isn't supported even for an alias record.
+
+CNAME records
+You can't create a CNAME record that has the same name as the hosted zone (the zone apex). This is true both for hosted zones for domain names (example.com) and for hosted zones for subdomains (zenith.example.com).
+
+Pricing for DNS queries
+Alias records
+Route 53 doesn't charge for alias queries to AWS resources. For more information, see Amazon Route 53 Pricing.
+
+CNAME records
+Route 53 charges for CNAME queries.'
+
+================================================================================================================
+SECURING LAMBDA.
+OBJECTIVES:                 TEST CODE WITH LAMBDA LAYER IS IN FUNCTIONS->SECURITY->LambdaS3RDSSecrets
+Create a Lambda function to connect to VPC private subnets.
+Lambda retrieves credentials from Secrets Manager.
+Create a gateway VPC endpoint to access the S3 bucket.
+
+Step1: copy Secrets Manager ARN and create an Environment Variable in Lambda
+"""
+This lambda function loads data to the mysql test server.
+The Lambda function also gets custom queries against the database.
+The results is then saved to the S3 Bucket.
+"""
+
+import json
+import sys
+import pymysql
+import os
+import csv
+import os
+import boto3
+import base64
+from botocore.exceptions import ClientError
+import logging
+import db
+
+# It is a good practice to use proper logging.
+# Here we are using the logging module of python.
+# https://docs.python.org/3/library/logging.html
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Initialize class DB
+database = db.DB()
+
+# Declare the secrets manager arn and region
+secret_name = os.environ['secret_arn']
+region_name = "us-east-1"
+
+def lambda_handler(event, context):
+    
+    # Call the get_secrets() function to get data from Secrets manager
+    result = get_secret()
+    result = json.loads(result)
+    
+    # Retreive RDS details from the Secrets manager response
+    host = result.get('host')
+    port = result.get('port')
+    username = result.get('username')
+    password = result.get('password')
+    db_name = result.get('dbname')
+    
+    logger.info(f"host = {host}")
+    logger.info(f"username = {username}")
+    logger.info(f"password = {password}") 
+    logger.info(f"db_name={db_name}") 
+    
+###### START: Uncomment below section to test RDS connection ######
+    
+    try:
+        conn = pymysql.connect(host=host, user=username, passwd=password, db=db_name, connect_timeout=5)
+        cursor = conn.cursor()
+    except pymysql.MySQLError as e:
+        logger.error("ERROR: Unexpected error: Could not connect to MySQL instance.")
+        logger.error(e)
+        sys.exit()
+    
+    logger.info("SUCCESS: Connection to RDS MySQL instance succeeded")
+    
+    cursor.execute("SHOW TABLES LIKE 'talentpool'")
+    result = cursor.fetchone()
+    
+    if not result:
+        load_data()
+    else:
+        custom_query(host,username,password,db_name,port)
+
+###### END: Uncomment section to test RDS connection ######
+
+def custom_query(host,username,password,db_name,port):
+    
+    custom_sql = """
+        SELECT * FROM talentpool
+        WHERE occupation LIKE 'Data scientist';
+        """
+    
+    custom_query = database.query(custom_sql,host,username,password,db_name,port)
+    logger.info(custom_query)
+    
+    with open('/tmp/results.json', 'w') as f:
+        f.write(json.dumps(custom_query))
+    filename = '/tmp/results.json'
+
+    # Boto3 - s3 Client
+    # You will use the client to upload files to S3 bucket
+    # More Info: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.put_object
+    
+###### START: Uncomment below section to test S3 connection ######
+
+    s3 = boto3.client('s3')
+    
+    try:
+        response = s3.upload_file(
+            filename,
+            Bucket='lambda-security-240123890349-716-diy',
+            Key='results.json'
+            )
+        logger.info('File Uploaded Successfully')
+    except ClientError as e:
+        logging.error(e)
+        logger.info('File Not Uploaded')
+        
+###### End: Uncomment above section to test S3 connection ######    
+    
+def load_data():
+    """
+    This code loads the data in the database server using the data.csv file.
+    The data.csv file contains the sample data generated using Faker.
+    """
+    
+    # Call the get_secrets() function to get data from Secrets manager
+    result = get_secret()
+    result = json.loads(result)
+    
+    # Retreive RDS details from the Secrets manager response
+    host = result.get('host')
+    port = result.get('port')
+    username = result.get('username')
+    password = result.get('password')
+    db_name = result.get('dbname')
+    
+    # Read the data.csv file
+    with open('data.csv', 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        talentpool = list(reader)
+    
+    # Define the SQL statement to create table
+    talentpool_sql = """
+        create table talentpool (
+        first_name nvarchar(200),
+        last_name nvarchar(200),
+        occupation nvarchar(200),
+        company nvarchar(200),
+        dob nvarchar(200),
+        country nvarchar(200)
+        );
+        """
+    
+    # Initiate connection to database    
+    conn = pymysql.connect(host=host, user=username, passwd=password, db=db_name, connect_timeout=5)
+    cursor = conn.cursor()
+
+    logger.info("Creating talentpool table")
+    conn.cursor().execute(talentpool_sql)
+    conn.commit()
+    logger.info('done')
+
+    logger.info("Populating talentpool table")
+    for item in talentpool:
+        sql = """INSERT INTO `talentpool` (first_name,last_name,occupation,company,dob,country) VALUES (%s,%s,%s,%s,%s,%s);"""
+        try:
+            with conn.cursor() as cur:
+                cur.execute(sql, (item["first_name"], item["last_name"], item["occupation"], item['company'], item['dob'],
+                                  item["country"]))
+                conn.commit()
+        except:
+            logger.info(("Unexpected error! ", sys.exc_info()))
+            sys.exit("Error!")
+    
+    conn.close()
+
+def get_secret():
+    """
+    This code retreives RDS details from the secrets manager.
+    ""<---------------------------
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+    
+    # Getting the secrets from secrets manager
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+        return get_secret_value_response.get('SecretString')
+    except ClientError as e:
+        print(e)
+
+
+
+Step 2: Create a gateway VPC endpoint to access the S3 bucket.
+now lambda can access bucket .
+
+TEST CODE WITH LAMBDA LAYER IS IN FUNCTIONS->SECURITY->LambdaS3RDSSecrets
+
+
+
+
+=======================================================================================================
+SECURING APIS.
+You can use an Amazon Cognito user pool to control who can access your API in Amazon API Gateway.
+When a user signs in to your application, Amazon Cognito verifies the login information. If the login is
+successful, it returns access tokens. You can then invoke your API with the tokens.
+API Gateway validates the token with Amazon Cognito. If valid, access to API Gateway is allowed.
+
+-> Create an Amazon Cognito user POOL
+-> Configure an authorizer and attach to your API method.
+-> Use the token to access Amazon API Gateway.
+
+
+Create an Amazon Cognito user POOL
+Configure an authorizer and attach it to an Amazon API Gateway method.
+Obtain Amazon Cognito user pool tokens.
+Use an Amazon Cognito user pool ID token to access your APIs in API
+DIY
+Configure API Gatewayto integrate with the DIY AWS Lambda function.
+Use the Amazon Cognito user pool ID token to access your API in API Gateway, which then invokes the DIY Lambda function.
+
+
+Create User Pool in Cognito and add API Gateway Url as Callback Url
+Allowed callback URLsInfo
+Enter at least one callback URL to redirect the user back to after authentication. This is typically the URL for the app receiving the authorization code issued by Cognito. You may use HTTPS URLs, as well as custom URL schemes.
+in ----> Advanced app client settings
+select -----> ALLOW ADMIN USER PASSWORD AUTH
+Username password auth for admin APIs for authentication
+
+Select all OpenID Connect Scopes
+Choose at least one OpenID Connect (OIDC) scope to specify the attributes this app client can retrieve for access tokens. We have populated suggested options based on the application type and required attributes you selected.
+
+Pool->AppIntegrations->App clients and analytics->HostedUI->SignUp->then API Callback url appears
+
+Now...
+API Gateway->Authorizer->Create CognitoAuthorizer->SelectPool
+Token Source *
+Authorization
+API Gateway->Resources->GET->MethodRequest->AddAuthorizer->Deploy
+
+Lambda-Validate-Function->Paste-Authorizer-Data
+"""
+This lambda function gets the token from Amazon Cognito. 
+Then invokes the API GW with the imbedded authorization token.
+"""
+import json
+import boto3
+import requests
+import logging
+
+# It is a good practice to use proper logging.
+# Here we are using the logging module of Python.
+# https://docs.python.org/3/library/logging.html
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# For training purposes, you are adding clear text credentials. 
+# As a standard practice, the credentials are saved in the AWS Secrets Manager.
+
+user_pool_id = 'us-east-1_VwvmTHUmo'
+client_id = 'qrdcih7j7eg2bna0gl9p9agfl'
+user_name = 'azam'
+password = 'Asdf!234'
+api_gateway_url = 'https://nl1nvfuwcc.execute-api.us-east-1.amazonaws.com/prod/lab'
+
+def lambda_handler(event, context):
+    logging.info(event)
+   
+    client = boto3.client('cognito-idp')
+    response = client.admin_initiate_auth(
+            UserPoolId=user_pool_id,
+            ClientId=client_id,
+            AuthFlow='ADMIN_USER_PASSWORD_AUTH',
+            AuthParameters={
+                'USERNAME': user_name,
+                'PASSWORD': password
+            }
+        )
+    token = response['AuthenticationResult'].get('IdToken')
+    logging.info(token)
+
+    ## Uncomment below line to invoke API GW with the authorization token.
+    #access_api(token)
+    return response
+    
+def access_api(token):
+    
+    auth_token=str(token)
+    header = {'Authorization': auth_token}
+    print(header)
+    
+    url = api_gateway_url
+    response = requests.get(url,headers=header)
+    logger.info(response)
+    
+    for item in response:
+        logger.info(item)
+
+
+
+----------------------------------------------------
+Test Event 
+Response
+{
+  "ChallengeParameters": {},
+  "AuthenticationResult": {
+    "AccessToken": "eyJraWQiOiJMa3c2MW14MTRQYmw3WDJvNmd6UWl2TFcxT2UweUI3dFdmYVpTSkh4dnBrPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5MWRjMDUyNy1kMzU4LTRiNDMtYjRiMC0wNTc3NTUxYWFiYjAiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9Wd3ZtVEhVbW8iLCJjbGllbnRfaWQiOiJxcmRjaWg3ajdlZzJibmEwZ2w5cDlhZ2ZsIiwib3JpZ2luX2p0aSI6ImZjOTI3Yjk0LTMyMzMtNDBhYi1hOWVmLTY1MzFmOWI0MTdkYSIsImV2ZW50X2lkIjoiZjBmMGZjOWEtNTFhZi00YmYyLTkzZDAtNDAzMjI5NmNjZDU3IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiIsImF1dGhfdGltZSI6MTY5NzU4NDg1MCwiZXhwIjoxNjk3NTg4NDUwLCJpYXQiOjE2OTc1ODQ4NTAsImp0aSI6IjZjOWNkZTFkLTNjN2ItNDAwZi1hYzJkLWU0NjVjYWUzMDRjNCIsInVzZXJuYW1lIjoiYXphbSJ9.ODnuiX2WTDMoeajHyxkduDgTKrnyMUD-UaaZwf7WSEdizH_POJcyDCCn5-RcJh-YwNPfMVNrtMLVaokiat2UJTCmJnODRRl6IvkekFje38-QmfIWBVu5Ru3fo4mL3_Xk_J_cG9GnzXtyqFPIwu9htr60l1iVh_v6_OHyb4nt08CaFy5y134um2Fy2fwQHXm2VbOiGoVJspYwNDYeMLVLFtb0nuajfm8f5wQTMOSa6TuLEXzPiba0VfBcMFiOaIfp_YymW4Ox3sWujZedUc6Aftrljjx0c_zdyEQctpElS9OxgZB5SQeqTi1dVN5iEr1Gp4GbqjmUAmbSAXL-5lNyrg",
+    "ExpiresIn": 3600,
+    "TokenType": "Bearer",
+    // "RefreshToken": "eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.1pIYprcn-Pvuwci7e18iJgUyaObTyBivWXhLmHJwoNlnSEewWJG9INXr5l15a-KvEBeKR28KWlblZ0YuybjM8xL0z5tHBtca98G_AbOw825QDY0Edm5zGIu2dfGvhxOomA8iXH_QLTXkhJaXjMZuW2Jd2D6OE9u2IfqAnnluxiqLWd8-1_nThy5ebgDz6cPaYjWJXThc9cbF5kRl5rBkutz2v5vSN1Ax9mBkLP0EohsCwboIad5CM8dORrzWSsdjpVjCwykbeKLGcvU7PZq7S2D8hqEtTwzKO0-0OZp5aLcWHcQiNngImRpF7Ejfc_g_2N4sbLFluGh27KKNVnJGVg.PRf2UmhCaijNjfpR.fp31s8xwCV9D9TkqbCqXReH2ivw9hWC3qycLVyjNT2RGV5p5Rw-W5v28rJtUQB_8KSAQ_g31ymEPpNbG6yXR8Uvfp63i4A_FSoxKClqafzKWPWNuoa3ToJtrhF2qQkbt3EWAkkwm93FQg3HB--QVVGjKXkIgnqCqJ9eAIq3yt3kF0IiHpvdrCXPR8KWiLz8ASQwk-VIPt7tOZJsiRgxqy7KYKIrV5dO4o5sm_4P5z3TdwKre3NoNEDCIozxClx2jiZ9QRoJcjRbNPlOmDu512uv6c-naRfmF3JTsMhDEM1si_wrLQ5j12L5TkZtrwe3m3BPgNRWRG5gHDkHaQj1sr5nn0M1_NtxIbZx4oxw4woUPj40L3-ReMtZ7zDmyUb2as5E27JylZmyYimACtM0bwL1eU1U6ROjCIEdWJVek39mf4gjY17jinP_Gp3Go-Qft-SQx_FciY0beSLpID21fzTYiuAVUI6nHDmf8f4M9SZDlqNlxBEVnlljDiwLAX22Ty_gkffWkJGic0q-X_-4CJhGAOdDfO6rCjYglvaP2n72DrC6lldpdu35fpmnBiXNPElVT1K9NKaGOAyDXoNXaY9doVJeM-B6EI_u8m4RL-wI8vr48u9AghQ6sFe9P59eBNKltF0h6dnKvdMHr1c85K1bDR1emDeOCcaHwb3G0zAk_7K7xnz0Yxc1JSHiWysAsymIgz00o5Gk5zPWdXn9lIrOBYa6IYA58p2lrXVP0gUi8JGu8eEJdoFV9NWNEhvG2Eqshc3_K1U5QvgGZuwJMimalgMDkz4JISjJTt0m9p1Kem4bLR2URZJlZuVdct5M4aVbZagwYMZEdUZZYYpQmvAjMVzrRpw-5_jRvyOFyAIEAMXICKMyPLZK7km7fJgLMx7peX-CUVLBoyVeQOlB5hqUTMUPLiwYzRkPmx0_RAimlV2Oz0kCuWYpvaMl9aLPUaD164RULGC3RQnbvZjkG80XaH9i7gHSx7XjRElngADmrR4Q3yIVeY9v0sFYH4czpcj76YdifGimc4VD_TGugRi3UgBd_L6RhzlnYy2pd_DmGmZyr3phDcLTGfztJGSkzJ7-EjGQCiwkkJyHJAqVp1rkMgxH_5qzPrUJ8-P1HrFJkXuy1zDbjQFsWQwH86QKXPO7qTZ8O5P-LI2F3hMCdp9CenArGRG3HV2_OfyuUW2YTssA-wcl1glWqG11z27VkSUntKWz1jI669-P9EGJAyB9KOxpzG3dBz_gQ4scIpcvp7TEiYsq9iVFOq6HJKuOZvPo.uRNELadDDt-K0cNd_fB27g",
+    // "IdToken": "eyJraWQiOiJtYzVKT1JMU0RUenA4S05UckwwUm9aMzRTUldicWpIQlwvNFVLeWFIZnFuOD0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5MWRjMDUyNy1kMzU4LTRiNDMtYjRiMC0wNTc3NTUxYWFiYjAiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfVnd2bVRIVW1vIiwiY29nbml0bzp1c2VybmFtZSI6ImF6YW0iLCJvcmlnaW5fanRpIjoiZmM5MjdiOTQtMzIzMy00MGFiLWE5ZWYtNjUzMWY5YjQxN2RhIiwiYXVkIjoicXJkY2loN2o3ZWcyYm5hMGdsOXA5YWdmbCIsImV2ZW50X2lkIjoiZjBmMGZjOWEtNTFhZi00YmYyLTkzZDAtNDAzMjI5NmNjZDU3IiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2OTc1ODQ4NTAsImV4cCI6MTY5NzU4ODQ1MCwiaWF0IjoxNjk3NTg0ODUwLCJqdGkiOiIzZjk1ZTM5Zi0zMWZkLTQ0YjItYTczZS0xZDM4NzliM2QwYmQiLCJlbWFpbCI6InN5ZWRzYWpqYWQucmhAZ21haWwuY29tIn0.PSRLhN8lhHj4BV74jATNJe9s68HRVH7OEZquK8G4LNBo97lZmCqPr3LYQiYmnUrert4icdbaU5kbZ0aTB5e-VWcEReOnzVvBcMckABG5r7nGkdsimWJxu64-YI9vTUN-IeOkff9KhiecDk2CJKM5kmLFdQUqJThzSQ-9dmMI77XN4YCHm6D4iknv9ONUftzxld1iqnOFuJEmmqY623hhynFZLm1IUJ2JOWy8H5vNPqGpvcoUWzhnqvHMwXxEydoaJzRB3gdEy6U0iE9gjpubkzRyCNFm1KpWleBp3M4mi128nIa4j4FqJnLPshRv61UN3FmaGzyg-WHZsXHVvY9ngw"
+  },
+  "ResponseMetadata": {
+    "RequestId": "f0f0fc9a-51af-4bf2-93d0-4032296ccd57",
+    "HTTPStatusCode": 200,
+    "HTTPHeaders": {
+      "date": "Tue, 17 Oct 2023 23:20:50 GMT",
+      "content-type": "application/x-amz-json-1.1",
+      "content-length": "3940",
+      "connection": "keep-alive",
+      "x-amzn-requestid": "f0f0fc9a-51af-4bf2-93d0-4032296ccd57"
+    },
+    "RetryAttempts": 0
+  }
+}
+
+Function Logs
+START RequestId: a8a8b17b-24c3-405d-9194-74239ed17f32 Version: $LATEST
+[INFO]	2023-10-17T23:20:48.273Z	a8a8b17b-24c3-405d-9194-74239ed17f32	{'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+[INFO]	2023-10-17T23:20:48.425Z	a8a8b17b-24c3-405d-9194-74239ed17f32	Found credentials in environment variables.
+[INFO]	2023-10-17T23:20:50.611Z	a8a8b17b-24c3-405d-9194-74239ed17f32	<Response [200]>
+[INFO]	2023-10-17T23:20:50.611Z	a8a8b17b-24c3-405d-9194-74239ed17f32	b'<html><title>TestLambda</title></head><h1>You have successfully connected to Amazon API Gateway and invoked the AWS Lambda funct'
+[INFO]	2023-10-17T23:20:50.611Z	a8a8b17b-24c3-405d-9194-74239ed17f32	b'ion.</h1><body></body></html>'

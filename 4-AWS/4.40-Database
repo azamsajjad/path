@@ -1,30 +1,41 @@
+
 Amazon RDS
-+
 Amazon Relational Database Service (Amazon RDS) is a web service that makes it easier to set up, operate, and scale relational databases in the cloud. With Amazon RDS, you can manage common database administration tasks like OS patching, database updates, and backups. Supported database engines include PostgreSQL, MySQL, MariaDB, Oracle, and Microsoft SQL Server.
 
+
 Amazon Aurora
-+
 Amazon Aurora is part of the managed database service Amazon RDS. Aurora is MySQL and PostgreSQL compatible. With Aurora, you can combine the performance and availability of traditional enterprise databases with the simplicity and cost-effectiveness of open-source databases.
 
-Amazon DynamoDB
-+
+
+Amazon Redshift - data warehousing - sql
+Amazon Redshift is an enterprise-level, petabyte scale, fully managed data warehousing service. With Amazon Redshift, you can achieve efficient storage and optimum query performance through a combination of massively parallel processing, columnar data storage, and very efficient, targeted data compression encoding schemes.
+
+
+Amazon DynamoDB - serverless nosql
 Amazon DynamoDB is a fully managed key-value, non-relational database service that provides fast and predictable performance with seamless scalability. With DynamoDB, you can create database tables that store and retrieve data and serve any level of request traffic. You can scale up or scale down your tables throughput capacity without downtime or performance degradation.
 
-Amazon DocumentDB
-+
+
+Amazon DocumentDB - instance-based nosql
 Amazon DocumentDB (with MongoDB compatibility) is designed from the ground up to give you the performance, scalability, and availability you need when operating mission-critical MongoDB workloads at scale. In Amazon DocumentDB, the storage and compute are decoupled, allowing each to scale independently.
 
-Amazon ElastiCache
-+
+
+Amazon Keyspaces - wide-column nosql
+Amazon Keyspaces (for Apache Cassandra) is a scalable, highly available, and managed Apache Cassandra–compatible database service. With Amazon Keyspaces, you can run your Cassandra workloads on AWS using the same Cassandra application code and developer tools that you use today. You don’t have to provision, patch, or manage servers, and you don’t have to install, maintain, or operate software. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic. You can build applications that serve thousands of requests per second with virtually unlimited throughput and storage. Data is encrypted by default and Amazon Keyspaces enables you to back up your table data continuously using point-in-time recovery. Amazon Keyspaces gives you the performance, elasticity, and enterprise features you need to operate business-critical Cassandra workloads at scale.
+
+
+Amazon ElastiCache -
 Amazon ElastiCache offers fully managed Redis and Memcached in-memory data stores. You can build data-intensive apps or improve the performance of your existing apps by retrieving data from high throughput and low latency in-memory data stores.
 
-Amazon Neptune
-+
+
+Amazon MemoryDB - 
+Amazon MemoryDB for Redis is a Redis-compatible, durable, in-memory database service that delivers ultra-fast performance. It is purpose-built for modern applications with microservices architectures.
+Amazon MemoryDB is compatible with Redis, a popular open source data store, enabling customers to quickly build applications using the same flexible and friendly Redis data structures, APIs, and commands that they already use today. With Amazon MemoryDB, all of your data is stored in memory, which enables you to achieve microsecond read and single-digit millisecond write latency and high throughput. Amazon MemoryDB also stores data durably across multiple Availability Zones (AZs) using a distributed transactional log to enable fast failover, database recovery, and node restarts. Delivering both in-memory performance and Multi-AZ durability, Amazon MemoryDB can be used as a high-performance primary database for your microservices applications eliminating the need to separately manage both a cache and durable database.
+
+
+Amazon Neptune - graphdb
 Amazon Neptune is a fast, reliable, fully managed graph database service for applications that work with highly connected datasets. Neptune offers read replicas for highly availability. You can create point-in-time copies, configure continuous backup to Amazon Simple Storage Service (Amazon S3) with replication across Availability Zones.
 
-Amazon Redshift
-–
-Amazon Redshift is an enterprise-level, petabyte scale, fully managed data warehousing service. With Amazon Redshift, you can achieve efficient storage and optimum query performance through a combination of massively parallel processing, columnar data storage, and very efficient, targeted data compression encoding schemes.
+
 
 
 
