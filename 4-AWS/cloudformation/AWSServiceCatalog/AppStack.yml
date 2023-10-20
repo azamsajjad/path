@@ -1,0 +1,124 @@
+'AWSTemplateFormatVersion': '2010-09-09'
+'Description': 'Networking template'
+'Parameters':
+  'NetworkStackName':
+    'Type': 'String'
+    'Default': 'Enter your stack name'
+  'AmazonLinuxAMIID':
+    'Description': 'ECS-Optimized AMI ID'
+    'Type': 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    'Default': '/aws/service/ecs/optimized-ami/amazon-linux/recommended/image_id'
+  'LatestAL2AmiId':
+    'Type': 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    'Default': '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  'MasterUserName':
+    'Type': 'String'
+    'Default': 'Admin'
+  'MasterPassword':
+    'Type': 'String'
+    'Default': 'password1234!'
+  'AppInstanceProfile':
+    'Type': 'String'
+    'Default': 'app_instance_profile'
+'Resources':
+  'RDSDBClusterParameterGroup':
+    'Type': 'AWS::RDS::DBClusterParameterGroup'
+    'Properties':
+      'Description': 'CloudFormation Sample Aurora Cluster Parameter Group'
+      'Family': 'Aurora-MySQL5.7'
+      'Parameters':
+        'time_zone': 'US/Eastern'
+  'AuroraCluster':
+    'Type': 'AWS::RDS::DBCluster'
+    'Properties':
+      'MasterUsername':
+        'Ref': 'MasterUserName'
+      'MasterUserPassword':
+        'Ref': 'MasterPassword'
+      'DBSubnetGroupName':
+        'Fn::ImportValue':
+          'Fn::Sub': '${NetworkStackName}-DBSubnetGroup'
+      'DatabaseName': 'Population'
+      'Engine': 'aurora-mysql'
+      'EngineMode': 'serverless'
+      'EngineVersion': '5.7.mysql_aurora.2.10.2'
+      'DBClusterParameterGroupName':
+        'Ref': 'RDSDBClusterParameterGroup'
+      'VpcSecurityGroupIds':
+      - 'Fn::ImportValue':
+          'Fn::Sub': '${NetworkStackName}-DBSecurityGroup'
+  'AppServer':
+    'Type': 'AWS::EC2::Instance'
+    'DependsOn': 'AuroraCluster'
+    'Properties':
+      'ImageId':
+        'Ref': 'AmazonLinuxAMIID'
+      'InstanceType': 't3.micro'
+      'IamInstanceProfile':
+        'Ref': 'AppInstanceProfile'
+      'BlockDeviceMappings':
+      - 'DeviceName': '/dev/xvda'
+        'Ebs':
+          'VolumeSize': !!int '8'
+          'DeleteOnTermination': !!bool 'true'
+          'VolumeType': 'gp2'
+      'NetworkInterfaces':
+      - 'AssociatePublicIpAddress': !!bool 'false'
+        'DeviceIndex': '0'
+        'GroupSet':
+        - 'Fn::ImportValue':
+            'Fn::Sub': '${NetworkStackName}-EC2InstanceSecurityGroup'
+        'SubnetId':
+          'Fn::ImportValue':
+            'Fn::Sub': '${NetworkStackName}-PrivateSubnet1'
+      'Tags':
+      - 'Key': 'Name'
+        'Value': 'AppServer'
+      'UserData':
+        'Fn::Base64':
+          'Fn::Sub': "#!/bin/bash \nsudo yum update -y\nsudo yum -y install jq\nsudo\
+            \ yum install -y python3\naws s3 cp s3://pu-base-buckets-v1-provision-lab/97736115-45a6-45f1-a87a-35150b256469/vpcapp.zip\
+            \ .\nunzip vpcapp.zip\ncd vpcapp\npip3 install -r requirements.txt\nexport\
+            \ REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document%7Cjq\
+            \ -r .region)\nexport DATABASE_HOST=$(aws rds describe-db-clusters \\\n\
+            \    --query 'DBClusters[*].[Endpoint]' \\\n    --output text --region\
+            \ $REGION\\\n    )\nexport DATABASE_USER=Admin\nexport DATABASE_PASSWORD=password1234!\n\
+            export DATABASE_DB_NAME=Population\ncd loaddatabase\npython3 database_populate.py\n\
+            cd ..\npython3 application.py\n"
+  'LoadBalancer':
+    'Type': 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    'Properties':
+      'Name': 'ApplicationLoadBalancer'
+      'SecurityGroups':
+      - 'Fn::ImportValue':
+          'Fn::Sub': '${NetworkStackName}-LoadBalancerSecurityGroup'
+      'Subnets':
+      - 'Fn::ImportValue':
+          'Fn::Sub': '${NetworkStackName}-PublicSubnet1'
+      - 'Fn::ImportValue':
+          'Fn::Sub': '${NetworkStackName}-PublicSubnet2'
+  'TargetGroup':
+    'Type': 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    'Properties':
+      'Port': !!int '8443'
+      'Protocol': 'HTTP'
+      'VpcId':
+        'Fn::ImportValue':
+          'Fn::Sub': '${NetworkStackName}-VPC'
+      'TargetType': 'instance'
+      'Targets':
+      - 'Id':
+          'Ref': 'AppServer'
+        'Port': !!int '8443'
+  'LoadBalancerListener':
+    'Type': 'AWS::ElasticLoadBalancingV2::Listener'
+    'Properties':
+      'DefaultActions':
+      - 'Type': 'forward'
+        'TargetGroupArn':
+          'Ref': 'TargetGroup'
+      'LoadBalancerArn':
+        'Ref': 'LoadBalancer'
+      'Port': '80'
+      'Protocol': 'HTTP'
+'Rules': {}

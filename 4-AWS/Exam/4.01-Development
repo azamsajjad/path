@@ -232,3 +232,461 @@ With deployment stages in API Gateway, you can manage multiple release stages fo
 A Lambda alias is like a pointer to a specific function version. Users can access the function version using the alias Amazon Resource Name (ARN)."
 
 API Gateway methods
+
+---------------------------------------------------------------------------
+
+
+
+
+
+3
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+
+
+When developing and testing a Lambda function, you would like to email a copy of the invocation record of any failed Lambda invocations to the support team so that they can investigate. Which of the following options would you recommend?
+
+Configure an SNS topic and subscribe the support team email address to the SNS topic. Configure an SQS queue as a Lambda dead letter queue to receive details of the failed invocations. Have the SNS topic poll the queue periodically and email the support team with details of any failed invocations.
+
+It is not possible to configure an SNS topic to poll an SQS queue.
+
+Selected
+Configure an SQS queue as a Lambda dead letter queue to receive details of the failed invocations and subscribe the support team email address to the SQS queue.
+
+"Configure an SNS topic as a destination for failed invocations and subscribe the support team email address to the SNS topic."
+
+    Lambda destinations can be configured to receive a copy of the function invocation record for failed and successful invocations. This allows failed invocations to be investigated or processed.
+
+Configure an SNS topic and subscribe the support team email address to the SNS topic. Configure a CloudWatch alarm to send any failed invocation records to the SNS topic.
+
+---------------------------------------------------------------------------
+A developer is working on a new application that will use DynamoDB. One of the DynamoDB tables that the developer must create requires an index sort key. When creating this DynamoDB table, the developer must select an attribute type for the sort key. Which of the following DynamoDB data types can the developer use for their index sort key?
+
+List
+List is not a supported data type for a DynamoDB sort key attribute.
+
+String`````````````
+Both partition and sort keys attributes can be defined as a string.
+
+Binary````````````
+Both partition and sort keys attributes can be defined as a binary value.
+
+Boolean
+
+Number``````````````
+Both partition and sort keys attributes can be defined as a number.
+
+Map
+---------------------------------------------------------------------------
+A developer is configuring CodeDeploy to deploy an application to an EC2 instance. The applications source code is stored within AWS CodeCommit.
+
+How do you need to set up and configure your IAM policy to allow CodeDeploy to perform the deployment to EC2?
+
+Create an IAM policy with an action to allow codecommit:GitPull on the required repository. Attach the policy to your IAM user.
+
+"Create an IAM policy with an action to allow codecommit:GitPull on the required repository. Attach the policy to the EC2 instance profile role.
+
+    CodeDeploy interacts with EC2 via the CodeDeploy agent, which must be installed and running on the EC2 instance. During a deployment, the CodeDeploy agent running on EC2 pulls the source code from CodeCommit. The EC2 instance accesses CodeCommit using the permissions defined in its instance profile role; therefore, it is the EC2 instance itself that needs CodeCommit access. The specific CodeCommit permission needed to pull code is codecommit:GitPull.
+"
+Reference: CodeCommit Permissions Reference: Configure an Amazon EC2 Instance to Work with CodeDeploy
+
+Create an IAM policy with an action to allow codecommit:GitPull on the required repository. Attach the policy to the CodeDeploy service role.
+
+This will not work, because it is not the CodeDeploy service role that needs to have the permissions.
+
+Selected
+Create an IAM policy with an action to allow codecommit:GitPull on the required repository. Attach the policy to the CodeCommit service role.
+---------------------------------------------------------------------------
+You are developing an online hotel booking application that makes a number of requests to different backend applications to get quotes for travel-related add-on services. You are using API Gateway to handle all the API calls, and you notice that the majority of requests are for the same five or six services. How can you most simply optimize the configuration to ensure the best performance for your application?
+
+"Implement API caching to cache the endpoint's response for the most popular requests.
+
+    You can enable API caching to cache your endpoint's responses. This reduces the number of calls made to your endpoint and improves the latency of requests to your API."
+
+Reference: Enabling API Caching to Enhance Responsiveness
+
+Configure Auto Scaling for the API Gateway.
+
+Add an ElastiCache cluster in front of your database to cache the most frequently accessed data.
+
+Configure a CloudFront CDN in front of API Gateway to cache the most frequent HTTP requests.
+
+CloudFront is mainly used to optimize performance for content that is served by S3, EC2, or on-premises servers. CloudFront would not be the simplest solution to provide optimal performance for the application.
+---------------------------------------------------------------------------
+You are working on a serverless application written in Python and running in Lambda. You have uploaded multiple versions of your code to Lambda, but would like to make sure your test environment always utilizes the latest version. Which methods can achieve this with the least amount of development effort?
+
+Configure the alias to automatically update to point to the latest version of the code every time it is updated.
+
+An alias is a pointer to a specific Lambda function version. Aliases will not be updated automatically when a new version of the function becomes available.
+
+"Selected
+Reference the function using an unqualified ARN.
+        When you create a Lambda function, there is only one version: $LATEST. You can refer to the function using its Amazon Resource Name (ARN). The unqualified ARN is the function ARN without the version suffix. The function version for an unqualified function always maps to $LATEST, so you can access the latest version using the unqualified function ARN."
+
+Reference: Using Versions
+
+Create another function to automatically update your function alias to point to the latest version of the code every time it is updated.
+
+"Reference the function using a qualified ARN and the $LATEST suffix.
+        When you create a Lambda function, there is only one version: $LATEST. You can refer to the function using its Amazon Resource Name (ARN) plus a version suffix (e.g., $LATEST) or the unqualified ARN, which is the function ARN without the version suffix."
+
+Reference: Using Versions
+
+"Selected
+Create an alias and provide the name of the most recent version of your function. Configure the alias to automatically update the version name whenever a new version is published.
+        Lambda supports creating aliases for each of your Lambda function versions. You can point an alias to a maximum of two Lambda function versions. It is possible to create an alias that points to $LATEST."
+---------------------------------------------------------------------------
+You are developing a web application that has been deployed using Lambda. Today, you updated the code and uploaded the new version of your code to the Lambda console. Your test team has begun their testing, and has reported that the application seems to still be using the original code. What could be the reason for this?
+
+Your application is referencing the function using $LATEST.
+
+Your application is referencing the function using an unqualified ARN.
+
+'Your application is referencing the function using an alias that points to a previous version of the code.
+
+        The problem could be that the application is referencing the function using an alias pointing to a previous version of the code. When you use versioning in AWS Lambda, you can publish one or more versions of your function so that you can use different variations of your Lambda function in your development workflow, such as development, beta, and production. Lambda also supports creating aliases for each of your Lambda function versions. Conceptually, an AWS Lambda alias is a pointer to a specific Lambda function version. You can update aliases to point to different versions of functions.'
+
+Reference: Using Aliases Reference: Lambda Function Versions
+
+Selected
+'Your application is referencing the function using a qualified ARN which is pointing to the previous version of the code.
+
+        You can reference your Lambda function using a qualified ARN with a version suffix. If the version suffix points to the previous version of the code, the application wont use the new version of your code.'
+
+Reference: Using Versions
+
+Selected
+"You forgot to publish the new version of your function.
+
+        Lambda creates a new version of your function each time that you publish it. If the new version is not published, the application will point to the previous $LATEST version of the code."
+        
+---------------------------------------------------------------------------
+
+You are working on a serverless application written in Node.js. You have updated the Node.js code and uploaded a new zip file containing your code to Lambda. Your application references the function using the alias Prod; however, it does not seem to be using the new code. Which of the following is likely to fix this?
+
+You need to call the new version of the function.
+
+You need to update your application to use an unqualified ARN.
+
+"You need to update the Prod alias to reference the new version of your function.
+
+A Lambda alias is like a pointer to a specific Lambda function version. The problem is that the application is referencing the function using an alias pointing to a previous version of the code. You need to update the alias to point to the newer version of the function."
+
+
+
+Selected
+You need to call the function using $LATEST.
+---------------------------------------------------------------------------
+Your application runs on Lambda and EC2, with HTTP requests being routed and processed by API Gateway. You have been asked to modify the HTTP headers for each request received by API Gateway so that you can properly track the requests and correlate all requests with your application logs. Which of the following can be used to modify the HTTP request header for requests that are processed by API Gateway?
+
+Use staging variables with a response transformation to change the HTTP header.
+
+Use staging variables with a request transformation to change the HTTP header.
+
+Use parameter mapping with a response transformation to change the HTTP header.
+
+"Use parameter mapping with a request transformation to change the HTTP header.
+
+Parameter mapping is used to configure API Gateway request and response transformations, such as changing an HTTP header or status code. A request transformation can be used to modify an HTTP request that is being processed by API Gateway, such as changing an HTTP header."
+---------------------------------------------------------------------------
+An organization wishes to use CodeDeploy to automate its application deployments. The organization has asked a developer to advise on which of their services can integrate with CodeDeploy. Which of the following services can the developer advise are compatible with CodeDeploy-managed deployments?
+
+Lambda``````````````````````````````````````````````
+
+CodeDeploy supports Lambda.
+
+Reference: CodeDeploy Compute Platforms
+
+Selected
+On-premises servers``````````````````````````````````
+
+CodeDeploy supports on-premises servers.
+
+Reference: CodeDeploy Compute Platforms
+
+Selected
+S3 static website hosting
+
+EC2``````````````````````````````````````````````````
+
+CodeDeploy supports EC2.
+
+Reference: CodeDeploy Compute Platforms
+
+Selected
+ECS Fargate`````````````````````````````````````````
+
+CodeDeploy supports EC2 and ECS (both EC2 and Fargate).
+
+Reference: CodeDeploy Compute Platforms
+---------------------------------------------------------------------------
+You are developing a serverless application and you need somewhere to persist user state data. Which of the following would you recommend?
+
+DynamoDB```````````````````````````
+
+Out of the possible answers, DynamoDB is the only solution that can be used to save state.
+
+Reference: What Is DynamoDB?
+
+Selected
+API Gateway
+
+Lambda ephemeral storage
+
+Serverless Application Model
+---------------------------------------------------------------------------
+A developer is implementing a solution that must leverage a service for messaging-oriented applications, with multiple subscribers requesting and receiving push notifications of time-critical messages via a choice of transport protocols, including HTTP, Amazon SQS, and email. Which AWS service is the best option for implementing this functionality?
+
+'Amazon SNS
+
+Amazon Simple Notification Service (Amazon SNS) is a web service that coordinates and manages the delivery or sending of messages to subscribing endpoints or clients. In Amazon SNS, there are two types of clients: publishers and subscribers, which are also referred to as producers and consumers. Publishers communicate asynchronously with subscribers by producing and sending a message to a topic, which is a logical access point and communication channel. Subscribers (that is, web servers, email addresses, Amazon SQS queues, AWS Lambda functions) consume or receive the message or notification over one of the supported protocols (that is, Amazon SQS, HTTP/S, email, SMS, Lambda) when they are subscribed to the topic.'
+
+Reference: What Is Amazon Simple Notification Service?
+
+Selected
+Amazon WorkMail
+
+Amazon SES
+
+Amazon SQS
+---------------------------------------------------------------------------
+A company is developing its first Lambda function. The function needs access to their existing EC2 instances, which are all hosted in private subnets within a custom VPC. What must the company do to ensure their function can access the EC2 instances?
+
+'Configure the Lambda execution role to have permissions for managing an ENI within the VPC.
+
+    The function execution role needs a policy that allows it to manage an ENI within the given VPC. This includes permissions to create, describe, and delete network interfaces.'
+
+
+
+Selected
+'Configure the Lambda function to connect to the private subnets used by the EC2 instances using security group configuration.
+
+    To configure a Lambda to connect to a VPC, you must define one or more subnets into which it can connect. The Lambda function creates an elastic network interfacee in one of the given subnets. The elastic network interface through which the Lambda connects should then be associated with one or more security groups that allow network communication to the desired destinations, over the desired ports.'
+
+
+
+Selected
+'Configure the Lambdas security group so it has access to the EC2 instances.
+
+    The elastic network interfacee through which the Lambda connects should be associated with one or more security groups that allow network communication to the desired destinations, over the desired ports.'
+
+
+
+Configure the Lambdas function policy to allow EC2 to invoke the function.
+
+Configure the Lambdas execution role to match the role applied to your EC2 instances.
+---------------------------------------------------------------------------
+
+
+
+
+
+4
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+A CustomerOrders DynamoDB table contains attributes, Customer Name (PK), Order Item, and Cost. What DynamoDB operation would be used to find all orders with cost greater than $10?
+
+'Scan operation with --filter-expression parameter
+
+    A scan operation reads every item in a table. A filter expression parameter can be used to narrow down the results based on your required criteria (Cost of the item in this case).'
+
+
+Query operation with --key-condition-expression parameter
+
+Query operation with --filter-expression parameter
+
+A query operation is used to search for an item using a primary key value and so requires a Customer Name value to be specified. This would limit results to a specific customer and would not return all items with cost greater than $10.
+
+Reference: Working with Queries in DynamoDB
+
+Selected
+Scan operation with --projection-expression parameter
+---------------------------------------------------------------------------
+A developer has just finished amending a Lambda function. Originally, the function ran outside of a VPC, but after the update, it now connects to a VPC. Since the change, part of the function that accesses a HTTPS endpoint on a third-party website has stopped working. What is the most likely cause of the Lambda function no longer being able to access the third-party endpoint?
+
+'The Lambda function no longer has any route out to the internet. A NAT Gateway and associated route should be added.
+
+        If a Lambda function is connected to a VPC, it must have a route out to the internet via a NAT gateway or NAT instance in order to connect to external services. You must also ensure that the relevant security groups and network access control lists are configured to allow the required ports.
+
+        From the perspective of the third-party web server, a request that originates from a Lambda function is no different from any other request, so no changes are needed.
+
+        Lambda functions connect to a VPC via an elastic network interface. Security controls are therefore managed by network security groups and NACLs, not IAM policies. The functions execution role does, however, need permissions to initially connect to the VPC. This can be done with the AWS-managed AWSLambdaVPCAccessExecutionRole policy, for example.'
+
+Reference: Configuring a Lambda Function to Access Resources in a VPC
+
+The third-party web server does not support access from a Lambda function that is connected to a VPC. Contact the third party to request they create a VPC endpoint.
+
+It is not possible to access external web services from a Lambda function that is connected to a VPC. The amend should be rolled back.
+
+The Lambdas execution role does not have the required permissions. Attach the AWS-managed AWSLambdaInternetAccess policy to the Lambdas execution role.
+
+Lambda functions connect to a VPC via an elastic network interface. Security controls are therefore managed by network security groups and NACLs, not IAM policies. The functions execution role does, however, need permissions to initially connect to the VPC. This can be done with the AWS-managed AWSLambdaVPCAccessExecutionRole policy, for example.
+---------------------------------------------------------------------------
+You are responsible for developing an application that processes IoT data generated by car number plate recognition systems used in a number of large shopping mall parking lots. Visitors are charged a premium for parking, according to how long their vehicle remained in the parking lot. The application runs as a Lambda function that receives the IoT data through an exposed REST API. The IoT devices add a unique identification number to each data record that is included in the API call. It is important to ensure that no records are missed, because that could result in customers being billed incorrectly or not at all. During periods of peak activity, the IoT devices in the remote locations have been observed to send duplicate records to the API, causing records to be processed more than once, and resulting in some customers receiving multiple charges. Duplicate charges need to be avoided because customers have been complaining and asking for refunds. Which of the following would you implement to meet the requirements of this application?
+
+Before each record is processed, store the unique identifier in /tmp. Configure Lambda to check if the record has already been processed before completing processing.
+
+/tmp is temporary storage, so it doesn't make sense to store the unique identifier there. After the execution environment is gone, /tmp will be deleted. Storing the unique identifier before the record has successfully been processed will likely cause some records to be missed if processing does not complete successfully the first time.
+
+Selected
+'Create a DynamoDB table. After a record has successfully processed, store its unique identifier in the table. Configure the Lambda function to check the table for the identifier before processing the next record.
+
+    DynamoDB can be used to persistently store each unique identifier after records have successfully processed. The, you can modify your Lambda code to check if the unique identifier of a record exists in the DynamoDB table before processing it. If a record already exists in the table, the application will not process it a second time.
+'
+Create a DynamoDB table. Before processing each record, store its unique identifier in the table. Configure the Lambda function to check the table for the identifier after processing the next record.
+
+Create an RDS for PostgreSQL database instance. Store the unique identifier for each request in a database table. Modify the Lambda function to check the table for the identifier before processing the request.
+---------------------------------------------------------------------------
+You have created a DynamoDB table for your application with one partition key and no local secondary index. The table has the following attributes:
+
+`AccountID` (partition key)
+`AccountName`
+`CustomerName`
+`ReportingPeriod`
+`TotalRevenue`
+You have an application running on EC2 that displays revenue data as a dashboard for your sales organization. The dashboard requires a view of total revenue over multiple reporting periods by customer name as a readable format. What secondary index will you need to add to your table?
+
+Global secondary index with a partition key of ReportingPeriod and sort key of CustomerName; project the TotalRevenue attribute
+
+Local secondary index with a partition key of CustomerName and sort key of ReportingPeriod; project the TotalRevenue attribute
+
+Local secondary index with a partition key of ReportingPeriod and sort key of CustomerName; project the TotalRevenue attribute
+
+'Global secondary index with a partition key of CustomerName and sort key of ReportingPeriod; project the TotalRevenue attribute
+
+    The requirement is for a particular CustomerName, as it would be difficult for a reader to identity customers by their ID. We need a global secondary index for a different partition key because a local secondary index must be created at the time you create a table. To retrieve only the time of interest, the ReportingPeriod must be the sort key. Finally, projecting TotalRevenue into the index will provide the necessary data to fulfill the requirement.'
+---------------------------------------------------------------------------
+The GetItem operation reads data from DynamoDB tables. Amazon DynamoDB returns all the item attributes by default. What can you use to get only some, rather than all of the attributes?
+
+'Use projection expression.
+
+A projection expression is an Amazon DynamoDB string that identifies the attributes that you want and can be used to limit the attributes returned by operations such as GetItem, Query, or Scan. Thus, this can be used to reduce the size of the payload returned by a read operation.'
+
+Reference: Projection Expressions.
+
+Selected
+Use filter expression.
+
+Use parallel scan.
+
+Use pagination.
+---------------------------------------------------------------------------
+An enterprise company is migrating their ERP system from on-premises to AWS. The ERP system consists of a stateful web application operating over HTTP. Various components of the system are being implemented as microservices utilizing Docker. What load balancer configuration would be a suitable solution for the ERP system migration to AWS?
+
+Classic Load Balancer with sticky sessions
+
+Network Load Balancer with an Elastic IP.
+
+Route53 with a CNAME and a CloudFront distribution.
+
+'Application Load Balancer with sticky sessions.
+
+An AWS Application Load Balancer receives incoming traffic and distributes the requests across targets based on evaluation of listener rules. As such, it serves as a load balancer service in AWS. More specifically, an AWS Application Load Balancer works at layer 7 of the OSI model and supports HTTP traffic. Additionally, it provides path-based routing, thus enabling forwarding of requests based on URL. This functionality supports the microservices architecture proposed in the question. Lastly, an AWS Application Load Balancer supports sticky sessions, enabling stateful applications. This meets all the requirements specified in the question scenario.'
+---------------------------------------------------------------------------
+You are responsible for configuring an API Gateway REST API. Customers call the API through a frontend UI, and the application uses Cognito to authenticate account holders. You now need to deploy a new version of the API, which includes new endpoints and changes to the back end integrations. The teams that are responsible for conducting testing in your organization have requested beta access to the new API, and you would like to provide this without affecting your customers, who need to continue using the current version. Which solution will meet these requirements with the least operational overhead?
+
+Define a new API Gateway API that points to the new API application code. Instruct the test team to point to the new API.
+
+'Define a test stage on the API Gateway API. Instruct the test team to point to the test stage.
+
+    An API Gateway stage is a named reference to a deployment, which is a snapshot of the API. You use a stage to manage and optimize a particular deployment. For example, you can configure stage settings to enable caching, customize request throttling, configure logging, define stage variables, or attach a canary release for testing.'
+
+Selected
+Define a new API Gateway API that points to the new API application code. Use Route 53 to route test team requests to the new API.
+
+Define an environment variable that determines which version of the API to route traffic to based on the request header.
+---------------------------------------------------------------------------
+You are leading a small team of DevOps engineers. The team requires a secure and scalable mechanism for centrally storing and sharing compiled code and software packages, as well as a source-control solution for collaborating on their source code. Which of the following do you recommend?
+
+Use CodeCommit to store the compiled code and software packages. Use CodeArtifact as a source-control system to store the source code.
+
+Use CodePipeline to store the compiled code and software packages. Use CodeDeploy as a source-control system to store the source code.
+
+Use CodeDeploy to store the compiled code and software packages. Use CodePipeline as a source-control system to store the source code.
+
+'Use CodeArtifact to store the compiled code and software packages. Use CodeCommit as a source-control system to store the source code.
+
+    CodeArtifact is a fully managed, centralized artifact repository service that is used to securely store, share, and publish software packages and other artifacts that are used in the software development process. CodeCommit is a secure, scalable, managed source-control service that hosts private Git repositories.'
+---------------------------------------------------------------------------
+Your organization wants you to lead a development project that will perform real-time processing. The application requires the analytics and field teams to respond promptly to emerging situations based on server activity, website clicks, geolocation of devices, people, and service usage. As the development lead, what combination of services would you recommend to build out this project most efficiently and cost effectively?
+
+Use Amazon Aurora to store data in real time. Aurora will automatically replicate the data in multiple Availability Zones. Build an application on EC2 that users can call using APIs to retrieve the relevant information they need.
+
+Store all data in an S3 bucket with the correct prefixes. Develop Lambda functions for each prefix that will routinely scan and extract necessary information to another S3 bucket that will be the source for an Amazon QuickSight dashboard.
+
+Store the data on Amazon Redshift. Run queries on the Redshift cluster regularly to refresh a dashboard built on Amazon QuickSight.
+
+'Use Amazon Kinesis to capture and store streaming data. Process streaming data with Lambda.
+
+    Streaming data capture and processing is called real-time processing. The best AWS solution in this case is Amazon Kinesis. You can process data captured and stored with Kinesis sequentially and incrementally on a record-by-record basis or over sliding time windows, and use the processed data for a wide variety of analytics including correlations, aggregations, filtering, and sampling. Use AWS Lambda to process streaming data in real time. Lambda can process the data directly from Kinesis Streams, and lets you run code without provisioning or managing servers to help reduce costs.'
+---------------------------------------------------------------------------
+A document management application stores a catalogue of documents, each uniquely identified by its Document Number. Each document is also described by additional attributes: Document Title, Publication Date, Publisher Name, Country of Origin, and Length. Functional requirements specify that the application should be able to produce a listing of all documents for each country of origin. What would be the optimal DynamoDB data model for this application, using high cardinality partition keys, so that the required queries can be efficiently be performed?
+
+'Table Partition Key=Document Number; Table Sort Key=Document Title; GSI Partition Key=Random Prefix; GSI Sort Key=Country of Origin
+
+    Document Number is unique for each item, thus making it a good choice for the table partition key. Using a random prefix for the GSI partition key and Country of Origin as the sort key enables us to have high cardinality for the partition key (thus avoiding any hot partitions) while still allowing for fast querying based on the Country of Origin.'
+
+Reference: Designing Partition Keys to Distribute Your Workload Evenly Reference: Choosing the Right DynamoDB Partition Key
+
+
+Table Partition Key=Publication Date; Table Sort Key=Document Number; GSI Partition Key=Publisher Name; GSI Sort Key=Country of Origin
+
+Table Partition Key=Document Number; Table Sort Key=Document Type; GSI Partition Key=Publication Date; GSI Sort Key=Country of Origin
+
+Table Partition Key=Document Number; Table Sort Key=Document Type; GSI Partition Key=Country of Origin; GSI Sort Key=Publisher Name
+---------------------------------------------------------------------------
+You are developing a gaming website that stores all players scores in a DynamoDB table. Youre thinking of using a partition key of user_ID and a sort key of game_ID, as well as storing the user_score, which is the users highest score for the game, and also a timestamp. You need to find a way to get the game IDs for a specific user ID where the score is over 50,000 points. Which of the following will allow you to find this information in the most efficient way?
+
+'Use a local secondary index with a partition key of user_ID and a sort key of user_score.
+
+    A local secondary index maintains an alternate sort key for a given partition key value. A local secondary index also contains a copy of some or all of the attributes from its base table. You specify which attributes are projected into the local secondary index when you create the table. The data in a local secondary index is organized by the same partition key as the base table, but with a different sort key. This lets you access data items efficiently across different dimensions. For greater query or scan flexibility, you can create up to five local secondary indexes per table. Reference: Scenario: Using a Local Secondary Index.'
+
+Selected
+Scan the table and order by score.
+
+Query the table using a partition key of user_ID and sort by game_ID.
+
+Use a global secondary index with a partition key of game_ID and a sort key of user_ID.
+---------------------------------------------------------------------------
+You have a load balancer configuration that you use for most of your CloudFormation stacks. This load balancer always sits in front of your application running on EC2, as it has the important function of forwarding HTTPS requests on port 443 to HTTP requests on port 80 on the instance. As demand for the application grows, you need to reuse this load balancer configuration in multiple other deployments of the application, and you need to use CloudFormation to do this in an automated way. What is the most efficient way to deploy the load balancer configuration?
+
+Instead of CloudFormation, use Lambda. Let the load balancer trigger a Lambda function that has the infrastructure code embedded to deploy the configuration when prompted.
+
+Use AWS CloudFormation change sets to change the load balancer configuration based on Region/Availability Zone where you want to deploy a copy of the application.
+
+'Use AWS CloudFormation nested stacks by creating a dedicated template for the load balancer and refer to that template within other templates.
+
+    Nested stacks are stacks created as part of other stacks. You create a nested stack within another stack by using the AWS::CloudFormation::Stack resource. For example, for a load balancer configuration that you use for most of your stacks, rather than copying and pasting the same configuration into your templates, you can create a dedicated template for the load balancer. You can then reference that template from within other templates. Lambda would not be able to deploy infrastructure resources as efficiently as CloudFormation nested stacks. AWS CloudFormation provides two methods for updating stacks: direct update or creating and executing change sets.'
+
+Reference: Working with Nested Stacks.
+
+Selected
+Use AWS CloudFormation direct updates to quickly deploy the same load balancer configuration in multiple environments.
+
+You are developing an application in API Gateway and need to categorize your APIs based on their status as: sandbox, test, or prod. You want to use a name-value pair system to define configuration attributes associated with deployment stages of your APIs, and use it in your API setup and mapping templates. What feature of API Gateway would you use to accomplish this task?
+
+'Use stage variables based on the API deployment stage to interact with different backend endpoints.
+
+    Stage variables are name-value pairs that you can define as configuration attributes associated with a deployment stage of a REST API. They act like environment variables and can be used in your API setup and mapping templates. With deployment stages in API Gateway, you can manage multiple release stages for each API, such as alpha, beta, and production. Using stage variables, you can configure an API deployment stage to interact with different backend endpoints. Environment variables apply to AWS Lambda. Canary release is a software development strategy in which a new version of an API (as well as other software) is deployed as a canary release for testing purposes, and the base version remains deployed as a production release for normal operations on the same stage. (This would be appropriate when your application is live and you'd want to reduce the risk inherent in a new software version release.) A tag is a metadata label that you assign or that AWS assigns to an AWS resource and would not impact the functionality of your APIs.
+
+Reference: Set Up Stage Variables for a REST API Deployment
+
+Selected
+Use environment variables based on the API deployment stage to interact with different backend endpoints.
+
+Use tags based on stages. The tag can be set directly on the stage of the API.
+
+Use the API Gateway console to create a canary release deployment.

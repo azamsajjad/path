@@ -174,3 +174,22 @@ Store the data in the same RDS database used for customer transactions.
 Store the session state data in a DynamoDB table.`````````````
 
 DynamoDB is a scalable and resilient solution for storing session data.
+
+---------------------------------------------------------------------------
+Your application interacts with an RDS database for storing customer data relating to your online gaming application. You have noticed that during times of intensive read activity, the database and whole application slows down, causing customers to complain. Which of the following could you implement to improve performance?
+
+'Add a read replica to improve performance for read queries. Point the application servers to the read replica.
+
+A read replica will improve performance for read-only queries to an RDS database.'
+
+Selected
+Move the dataset to DynamoDB for faster response times.
+
+Add a DynamoDB Accelerator (DAX) cluster to improve performance for read queries. Point the application servers to the DAX cluster.
+
+Add a MemoryDB for Redis instance to improve performance for read queries. Point the application servers to MemoryDB for Redis.
+
+'Add an ElastiCache cluster to improve performance for read queries. Point the application servers to the ElastiCache cluster.
+
+ElastiCache is an in-memory caching service that can be used to cache the results of I/O-intensive database queries, which helps improve performance for database reads.'
+---------------------------------------------------------------------------

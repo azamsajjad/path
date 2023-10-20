@@ -216,3 +216,175 @@ Which of the following AWS services enables you to capture a time-ordered sequen
 
 DynamoDB Streams captures a time-ordered sequence of modifications that are made to items in a DynamoDB table. It stores the information for a maximum of 24 hours."
 ---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+
+
+
+
+3
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+You are working for an investment bank and have been asked to help the application support team with their annual disaster recovery testing. The main production PostgreSQL database is hosted in a RDS Multi-AZ deployment, with multiple applications running on a combination of EC2 and Lambda. You have been asked to help the team demonstrate the impact that a failed Availability Zone (AZ) will have on the database. Which of the following would you suggest?
+
+'Simulate an AZ failure by performing a reboot with forced failover on the RDS instance.
+
+        If the Amazon RDS instance is configured for Multi-AZ, you can perform the reboot with a failover. An Amazon RDS event is created when the reboot is completed. If your DB instance is a Multi-AZ deployment, you can force a failover from one AZ to another when you reboot. When you force a failover of your DB instance, Amazon RDS automatically switches to a standby replica in another Availability Zone, and updates the DNS record for the DB instance to point to the standby DB instance. As a result, you need to clean up and re-establish any existing connections to your DB instance. Rebooting with failover is beneficial when you want to simulate a failure of a DB instance for testing, or restore operations to the original AZ after a failover occurs.'
+
+Reference: Rebooting a DB Instance
+
+Simulate an AZ failure by rebooting the underlying EC2 instance that is running the database.
+
+Simulate an AZ failure by deleting the primary RDS instance.
+
+Simulate an AZ failure by disconnecting your RDS instance from the network.
+
+Simulate an AZ failure by moving your RDS instance to a different subnet.
+
+Moving your RDS instance to a different subnet is not the AWS recommended way to simulate an AZ failure.
+---------------------------------------------------------------------------
+Your application is using Kinesis to ingest data from a number of environmental sensors that continuously monitor for pollution within a one-mile radius of a local primary school. An EC2 instance consumes the data from the stream using the Kinesis Client Library (KCL). You have recently increased the number of shards in your stream to six, and your project manager is now suggesting that you need to add at least six additional EC2 instances to cope with the new shards. What would be your response to this suggestion?
+
+The number of instances should be greater than the number of shards.
+
+You should decrease the number of shards to match the number of consumer instances.
+
+'One worker can process any number of shards, so its fine if the number of shards exceeds the number of instances.
+
+    Resharding enables you to increase or decrease the number of shards in a stream in order to adapt to changes in the rate of data flowing through the stream. You should ensure that the number of instances does not exceed the number of shards (except for failure standby purposes). Each shard is processed by exactly one KCL worker and has exactly one corresponding record processor, so you never need multiple instances to process one shard. However, one worker can process any number of shards, so its fine if the number of shards exceeds the number of instances. When resharding increases the number of shards in the stream, the corresponding increase in the number of record processors increases the load on the EC2 instances that are hosting them. If the instances are part of an Auto Scaling group, and the load increases sufficiently, the Auto Scaling group adds more instances to handle the increased load.'
+
+Reference: Kinesis Data Streams Terminology and Concepts Reference: Resharding, Scaling, and Parallel Processing
+
+Selected
+You should increase the number of instances to match the number of shards.
+---------------------------------------------------------------------------
+Your application is using Kinesis to ingest clickstream data relating to your products from a variety of social media sites. Your company has been trending this quarter because a high-profile movie star has recently signed a contract to endorse your products. As a result, the amount of data flowing through Kinesis has increased, requiring you to increase the number of shards in your stream from four to six. The application consuming the data runs on a single EC2 instance in an Auto Scaling group in us-east-1a. How many consumer instances will you now need in total to cope with the increased number of shards?
+
+'One instance in us-east-1a and one instance in us-east-1b.
+
+Resharding enables you to increase or decrease the number of shards in a stream in order to adapt to changes in the rate of data flowing through the stream. You should ensure that the number of instances does not exceed the number of shards (except for failure standby purposes). Each shard is processed by exactly one Kinesis Client Library (KCL) worker and has exactly one corresponding record processor, so you never need multiple instances to process one shard. However, one worker can process any number of shards, so its fine if the number of shards exceeds the number of instances. When resharding increases the number of shards in the stream, the corresponding increase in the number of record processors increases the load on the EC2 instances that are hosting them. If the instances are part of an Auto Scaling group and the load increases sufficiently, the Auto Scaling group adds more instances to handle the increased load. Having the instances in different Availability Zones helps with availability within the Region.'
+
+Reference: Kinesis Data Streams Terminology and Concepts Reference: Resharding, Scaling, and Parallel Processing
+
+Selected
+Six instances in us-east-1a and six instances in us-east-1b.
+
+Six instances in us-east-1a and one instance in us-east-1b.
+
+Three instances in us-east-1a and three instances in us-east-1b.
+---------------------------------------------------------------------------
+
+You are developing a website which allows customers to purchase tickets to popular sporting events. Your application uses S3 for static web hosting, Lambda for business logic, RDS to store transaction data, and DynamoDB for product and stock information. After the customer has paid for their purchase, a message is sent to an SQS queue to trigger a confirmation email to be sent out to the customer including an e-ticket for their chosen event. You want to send out the email as soon as the payment has been processed; however, during testing, you discover that the confirmation emails are being processed a few seconds before the stock control database has finished updating. This sometimes results in selling the same ticket twice. How can you quickly fix this without re-engineering the application?
+
+Use a First-In-First-Out (FIFO) queue to ensure the messages are always processed in the correct order.
+
+'Modify the SQS queue to become a delay queue by setting the delivery delay to 5 seconds. This will allow the database to update before the confirmation emails are processed.
+
+Delay queues let you postpone the delivery of new messages to a queue for a number of seconds. If you create a delay queue, any messages that you send to the queue remain invisible to consumers for the duration of the delay period. The default (minimum) delay for a queue is zero seconds. The maximum is 15 minutes.'
+
+Reference: SQS Delay Queues
+
+Selected
+Use Kinesis to stream the SQS messages, adding a delay of a few seconds.
+
+Refactor the application to append a message timer to events as they are sent to the SQS queue. Set the message timers DelaySeconds parameter to 5. This will allow the database to update before the confirmation emails are processed.
+---------------------------------------------------------------------------
+You are working on a flight booking application that runs on a number of EC2 instances. Recently, one of your servers crashed, which meant all of your users lost their sessions and had to log in again. Many of your customers have complained that they had to start their session again from the beginning because your application does not store session state anywhere. Which of the following could you use to persist session state and prevent this from happening?
+
+Elastic Block Storage
+
+'DynamoDB
+
+Many applications store session state data in memory. However, this approach doesnt scale well. After the application grows beyond a single web server, the session state must be shared between servers. Amazon DynamoDB provides an effective and scalable solution for sharing session state across web servers.'
+
+Reference: Managing ASP.NET Session State with Amazon DynamoDB
+
+Selected
+S3 Glacier
+
+S3
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+
+
+
+
+4
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+An application connects to an external third-party service with API keys being managed by AWS Secrets Manager. The development team uses CodeBuild for source code compilation activities in their CI/CD process. Where should the reference to the third-party service API keys be specified?
+
+CloudFormation template
+
+'Buildspec file
+
+    CodeBuild uses the Buildspec file as a specification of build commands and settings. secrets-manager syntax can be used to retrieve API keys stored in AWS Secrets Manager.'
+
+
+
+'CodeBuild environment variable
+
+    A valid way to use CodeBuild environment variables securely is to use secrets-manager syntax to retrieve API keys stored in AWS Secrets Manager. If secrets-manager syntax is not used, items would be in plain text.'
+
+Selected
+AppSpec file
+
+The AppSpec file is used by CodeDeploy to specify and manage deployments.
+---------------------------------------------------------------------------
+You are working on two CloudFormation templates. The first, named mynetwork.yml, creates a new VPC with a public subnet and security group that allows traffic from port 443 from the internet. The second template, named myinstances.yml, will launch a number of EC2 instances into the VPC and public subnet created by the first template, and it will also associate the security group. How can you share the VPC, public subnet, and security group ID so that they can be used in your second template?
+
+'Use the Export field in the Output section of mynetwork.yml.
+
+The Export section can be used to export stack outputs so that they can be used by other templates.'
+
+Selected
+Use the Import field in the Input section of myinstances.yml.
+
+Use the Fn:OutputValue function in myinstances.yml.
+
+'Use the Fn::ImportValue function in myinstances.yml.
+
+To import values from another CloudFormation template, you can use the Fn::ImportValue function.'
+---------------------------------------------------------------------------
+A developer is creating a CloudFormation template to deploy an application stack. The administrator password for the application needs to be configured at CloudFormation runtime. What CloudFormation section should be used for this requirement?
+
+Metadata
+
+Mappings
+
+'Parameters
+
+CloudFormation template parameters section is used to pass input values to the template. The template parameters can be set to custom values when the template is used to create a new stack.'
+
+Reference: Template Anatomy Reference: Parameters
+
+Selected
+Resources
+---------------------------------------------------------------------------
+A business-critical application is deployed using CloudFormation. The team would like to prevent accidental deletion of the stack. How can this be achieved most efficiently?
+
+Set the DeletionProtection to True in the CloudFormation template.
+
+Set the DeletionPolicy to Retain in the CloudFormation template.
+
+'Set stack termination protection to Enable.
+
+    Termination protection stack option can be enabled to prevent accidental deletion of an entire CloudFormation stack.'
+
+
+
+Selected
+Create IAM policy with Effect of Deny for cloudformation:DeleteStack action.

@@ -239,3 +239,181 @@ Secrets Manager is designed to store secrets like access tokens, passwords and o
 ---------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+
+
+
+
+3
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+You are developing a Lambda function written in Python that uploads a number of sensitive files to S3. The application architect has told you to use client-side encryption to protect the files. How can you do this?
+
+Select the Encryption checkbox in the Lambda console.
+
+Encrypt your local root disk before uploading the files.
+
+'Encrypt the files using the AWS Encryption SDK.
+
+Client-side encryption means you need to encrypt the files where they are currently stored before uploading them to S3. You can do this in Lambda by using the AWS Encryption SDK.'
+
+Use SSL to upload the files.
+
+Select S3 default encryption.
+
+S3 default encryption will encrypt the data when it is stored in S3, which is known as server-side encryption.
+---------------------------------------------------------------------------
+An organization has mandated that all files stored in their newly created S3 bucket, top-secret-documents, must be encrypted using a customer master key stored in KMS. Which of the following could be used to enforce this requirement?
+
+Enable S3 default encryption and select AWS-KMS.
+
+Setting a default encryption type on the bucket is not sufficient as the default only applies to uploaded objects that do not specify any encryption type. For example, if the default encryption is set to AWS-KMS, but an object is uploaded with the header x-amz-server-side-encryption: AES256, the resulting object is encrypted using SSE-S3, not SSE-KMS.
+
+Reference: Protecting S3 Data Using Server-Side Encryption Reference: Example Bucket Policy for Enforcing SSE
+
+Selected
+Add a bucket policy that denies PUT operations that dont contain the HTTP header x-amz-server-side-encryption: AES256.
+
+Add a bucket policy that denies PUT operations that dont contain the HTTP header x-amz-server-side-encryption: SSE:C.
+
+'Add a bucket policy that denies PUT operations that dont contain the HTTP header x-amz-server-side-encryption: aws:kms.
+
+To ensure objects are stored using a specific type of server-side encryption, you must use a bucket policy. In this case, the bucket policy must ensure the encryption type matches SSE-KMS.'
+---------------------------------------------------------------------------
+You work for a health insurance company that is storing large amounts of customer data in an S3 bucket. Many of the files that are being stored are customer contracts that include client bank details, addresses, and social security numbers. A new head of security has requested that you find a solution to identify files containing personally identifiable information (PII) and ensure that the files are encrypted using an encryption key that is owned and administered by the security team and automatically rotated on an annual basis. Which of the following solutions do you recommend?
+
+Create a new SSE-C encryption key in KMS using imported key material supplied by the security team. Create a Lambda function to scan the files and identify personally identifiable information that is stored in S3, and trigger another function to encrypt the data using the SSE-C key. Configure automatic key rotation in KMS.
+
+Use Macie to identify personally identifiable information. Use S3 default encryption to encrypt the files, with automatic rotation enabled for the KMS key.
+
+'Use Macie to identify personally identifiable information. Create an SSE-KMS key that is administered by the security team, and enable automatic rotation for the KMS key. Encrypt the files using SSE-KMS.
+
+        Macie is the service that helps you identify any PII that is stored in S3. An SSE-KMS key is an encryption key that can be administered by you. Automatic key rotation can be enabled for SSE-KMS keys.'
+
+Use Macie to identify personally identifiable information. Create an SSE-KMS key that is administered by the security team. Create an EventBridge rule to trigger a Lambda function that rotates the encryption key on an annual basis. Encrypt the files using SSE-KMS.
+
+        It is not necessary to create a Lambda function to perform the key rotation. This can be done automatically by KMS for SSE-KMS keys.
+---------------------------------------------------------------------------
+You have an application running on multiple EC2 instances; however, every time an instance fails, your users complain that they lose their session. What can you do to prevent this from happening?
+
+'Store session state in Amazon ElastiCache, then disable sticky sessions.
+
+There are various ways to manage user sessions, including storing those sessions locally to the node responding to the HTTP request or designating a layer in your architecture that can store those sessions in a scalable and robust manner. Common approaches used include utilizing sticky sessions or using a distributed cache for your session management. In order to address scalability and to provide a shared data storage for sessions that can be accessed from any individual web server, you can abstract the HTTP sessions from the web servers themselves. A common solution for this is to leverage an in-memory key-value store such as ElastiCache.'
+
+
+Store session state in S3.
+
+Store session state in Amazon RDS.
+
+Store session state on the Elastic Load Balancer.
+
+Elastic Load Balancing automatically distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, containers, IP addresses, Lambda functions, and virtual appliances. It isnt suitable for session management.
+
+Selected
+Store session state on a dedicated EC2 instance.
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+You are working on a flight booking application that runs on a number of EC2 instances. Recently, one of your servers crashed, which meant all of your users lost their sessions and had to log in again. Many of your customers have complained that they had to start their session again from the beginning because your application does not store session state anywhere. Which of the following could you use to persist session state and prevent this from happening?
+
+Elastic Block Storage
+
+'DynamoDB
+
+Many applications store session state data in memory. However, this approach doesnt scale well. After the application grows beyond a single web server, the session state must be shared between servers. Amazon DynamoDB provides an effective and scalable solution for sharing session state across web servers.'
+
+Reference: Managing ASP.NET Session State with Amazon DynamoDB
+
+Selected
+S3 Glacier
+
+S3
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+
+
+
+
+4
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+A developer is looking to implement a load balancing solution for a web-based, service-oriented application deployed in Amazon EC2. The solution must support path-based routing and traffic encryption between the load balancer, and the clients must be encrypted. What is the most performant method to achieve these requirements?
+
+Use an Application Load Balancer. Deploy SSL certificates on the EC2 instances.
+
+An Application Load Balancer does support path-based routing; however, for best performance, you should deploy the SSL certificates on the load balancer. This implements SSL termination on the load balancer and offloads this task from the application, thus reducing the load on EC2 instances.
+
+Selected
+'Use an Application Load Balancer. Deploy SSL certificates on the Application Load Balancer.
+
+    The application requirement states support for path-based routing. This means that you must use an Application Load Balancer, as a Network Load Balancer does not have this feature. It is best practice to deploy the SSL certificates on the load balancer. This implements SSL termination on the load balancer and offloads this task from the application, thus reducing the load on EC2 instances. Additionally, it removes the requirement of distributing the certificate to all target EC2 instances.'
+
+Reference: Create an HTTPS Listener for Your Application Load Balancer
+
+Use a Network Load Balancer. Deploy SSL certificates on the Network Load Balancer.
+
+Use a Network Load Balancer. Deploy SSL certificates on the EC2 instances.
+---------------------------------------------------------------------------
+As a developer, you have been asked to help to scale out an existing an application to run in multiple AWS Regions. The application runs on a fleet of EC2 instances located in us-east-1. The solutions architect has requested that you use the same Amazon Machine Image with the latest security updates and create a new application stack in us-east-2. The security architect has requested that all AMIs that are in use in the company must be encrypted. However, after checking which AMI was used in us-east-1, you discover that the AMI that was used was not encrypted. Which of the following should you implement in order to meet the requirements of the project?
+
+Copy the unencrypted AMI to us-east-2. Add the latest security updates and check that the AMI boots successfully. Then, enable encryption on the new AMI.
+
+It is not possible to enable encryption on an AMI after it has been created.
+
+Selected
+Use CloudFormation to create a new AMI in us-east-2 with the security updates included. Specify that the new AMI will be encrypted. Delete the original unencrypted AMIs.
+
+Delete the unencrypted AMIs. Copy the AMI to us-east-2. Enable KMS encryption on the unencrypted AMIs. Add the latest security updates to the AMI.
+
+'Use EC2 Image Builder to create new AMIs with the security updates included. Specify that the new AMI will be encrypted. Configure the new AMIs to be distributed to us-east-2. Delete the original unencrypted AMIs.
+
+    You can use EC2 Image Builder to create new encrypted AMIs with the security updates included and distribute them to your chosen regions. You should delete the unencrypted AMIs to prevent anybody from using them in us-east-1.'
+---------------------------------------------------------------------------
+A developer needs to replace an item that is stored in an existing DynamoDB table. Which of the following DynamoDB API calls will they need permissions for to enable them to successfully replace the item?
+
+UpdateItem
+
+PutItem
+
+PutItem adds a new item into a table or replaces an old item with a new one.
+
+'UpdateTable
+
+UpdateTable is used to modify a table (e.g., modify the provisioned throughput settings of the table).
+'
+Selected
+DynamoDB full access
+---------------------------------------------------------------------------
+A developer has created an S3 bucket to store sensitive files. They would like to configure the S3 bucket to only serve content over HTTPS/SSL and explicitly deny all unencrypted HTTP access. They would also like to enforce that server-side encryption is always used. Which of the following should they include in the bucket policy in order to configure this?
+
+The bucket policy should deny traffic that meets the following condition: "s3:x-amz-server-side-encryption": "true".
+
+The bucket policy should deny traffic that meets the following condition: "aws:SecureTransport": "true".
+
+The bucket policy should deny traffic that meets the following condition: "aws:SSLTransport": "true".
+
+'The bucket policy should deny traffic that meets the following condition: "s3:x-amz-server-side-encryption": "false".
+
+    Explicitly denying requests that are identified as "s3:x-amz-server-side-encryption": "false" would deny requests that do not use server-side encryption.'
+
+Selected
+'The bucket policy should deny traffic that meets the following condition: "aws:SecureTransport": "false".
+
+    Explicitly denying requests that are identified as "aws:SecureTransport": "false" would deny requests that are using HTTP and are unencrypted.'
+
+Selected
+The bucket policy should deny traffic that meets the following condition: "s3:x-amz-sse-encryption": "false".

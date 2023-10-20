@@ -278,3 +278,234 @@ CloudWatch should trigger the alarm if an error message appears in the applicati
 
 Selected
 Update your application code to send application log data to CloudWatch logs. Use a CloudWatch alarm to trigger an SNS notification if an error appears in the application log file.
+---------------------------------------------------------------------------
+
+
+
+
+
+3
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+A developer wants to track the average time it takes to complete customer transactions for an application running on a group of EC2 instances, including the ability to view and track statistics, like how long it takes to complete an average customer request and the maximum request latency, across the all instances. The support team would like to receive an immediate notification if the average transaction completion time exceeds three seconds for one minute or longer. Which of the following will meet these requirements?
+
+/Configure the application to record transaction completion times to an application log file/. 'Install and configure the CloudWatch agent on the EC2 instances, and send the application log to CloudWatch Logs. Use a metric filter based on transaction completion time, and create a CloudWatch dashboard based on the metric to view the latest statistics. Configure a CloudWatch alarm to send an SNS notification to the support team if the average transaction completion time exceeds three seconds for one minute or longer.
+
+    The CloudWatch agent is used to send logs to CloudWatch. You can create a metric filter to filter the information contained in the logs.'
+
+Configure the application to record transaction completion times to the operating system log file. Install and configure the Amazon CloudWatch agent on the EC2 instances and send the operating system log to CloudWatch Logs. Use a metric filter based on transaction completion time, and create a CloudWatch dashboard based on the metric to view the latest statistics. Configure a CloudWatch alarm to send an SQS notification to the support team if the average transaction completion time exceeds three seconds for one minute or longer.
+
+Install and configure the Amazon CloudWatch agent on the EC2 instances to send operating system metric data to CloudWatch. Use a metric filter based on transaction completion time, and create a CloudWatch dashboard based on the metric to view the latest statistics. Configure a CloudWatch alarm to send an SNS notification to the support team if the average transaction completion time exceeds three seconds for one minute or longer.
+
+The transaction completion is related to the application, therefore data relating to transaction completion times would not be included in the operating system metric data provided by the CloudWatch agent.
+
+Selected
+Configure a Lambda function to record transaction completion times, and add them to a log file stored in S3. Use Athena to query the S3 data based on transaction completion time, and create a CloudWatch dashboard based on the completion times to view the latest statistics. Configure a CloudWatch alarm to send an SNS notification to the support team if the average transaction completion time exceeds three seconds for one minute or longer.
+---------------------------------------------------------------------------
+Your API Gateway endpoint is experiencing server errors indicated by a 5xx HTTP response code. How can you increase the reliability of the application while reducing operational costs?
+
+This indicates an internal problem with your API. Fix the issue in your API and try the request again.
+
+This does not indicate an internal problem with your API.
+
+Reference: Error Retries and Exponential Backoff in AWS.
+
+Selected
+'Configure your application to use retry logic with exponential backoff.
+
+        Server errors are indicated by a 5xx HTTP response code and need to be resolved by Amazon. You can resubmit or retry the request until it succeeds. Numerous components on a network, such as DNS servers, switches, load balancers, and others can generate errors anywhere in the life of a given request. The usual technique for dealing with these error responses in a networked environment is to implement retries in the client application. Each AWS SDK implements automatic retry logic with an exponential backoff algorithm for better flow control. If you are not using an AWS SDK, you should retry original requests that receive server (i.e., 5xx) or throttling errors. However, client errors (i.e., 4xx) indicate that you need to revise the request to correct the problem before trying again.'
+
+Reference: Error Retries and Exponential Backoff in AWS.
+
+Increase capacity by scaling the backend of your API.
+
+Distribute the load by adding an Elastic Load Balancer in front of the API Gateway.
+---------------------------------------------------------------------------
+
+You are testing a new serverless application that uses Lambda, S3, DynamoDB and API Gateway. You are suddenly seeing a large number of 4XX HTTP response codes coming from API Gateway. What could be the problem, and what should you do about this?
+
+This indicates an internal problem with your API. Fix the issue in your API and try the request again.
+
+This indicates an internal problem with your API Gateway instance. Provision a new API Gateway instance and try the request again.
+
+'This is a client error. You should fix the issue in your application and retry the request.
+
+Client errors: Client errors are indicated by a 4xx HTTP response code. Client errors indicate that Amazon API Gateway found a problem with the client request, such as an authentication failure or missing required parameters. Fix the issue in the client application before submitting the request again. Server errors: Server errors are indicated by a 5xx HTTP response code, and need to be resolved by Amazon. You can resubmit or retry the request until it succeeds.'
+
+Reference: Handling Errors in Amazon API Gateway Reference: API Gateway Response Codes
+
+Selected
+This is an AWS error. You should wait for AWS to fix the issue and retry the request.
+---------------------------------------------------------------------------
+
+Your application interacts with an RDS database for storing customer data relating to your online gaming application. You have noticed that during times of intensive read activity, the database and whole application slows down, causing customers to complain. Which of the following could you implement to improve performance?
+
+'Add a read replica to improve performance for read queries. Point the application servers to the read replica.
+
+A read replica will improve performance for read-only queries to an RDS database.'
+
+Selected
+Move the dataset to DynamoDB for faster response times.
+
+Add a DynamoDB Accelerator (DAX) cluster to improve performance for read queries. Point the application servers to the DAX cluster.
+
+Add a MemoryDB for Redis instance to improve performance for read queries. Point the application servers to MemoryDB for Redis.
+
+'Add an ElastiCache cluster to improve performance for read queries. Point the application servers to the ElastiCache cluster.
+
+ElastiCache is an in-memory caching service that can be used to cache the results of I/O-intensive database queries, which helps improve performance for database reads.'
+
+---------------------------------------------------------------------------
+You are running an online fitness tracker application on a number of EC2 instances behind an Elastic Load Balancer. You have noticed some anomalies with the way the application is performing lately and would like to collect the application logs from all of your application servers into one central location. Which of the following will you need to do for each instance?
+
+'Ensure the CloudWatch agent is installed and running on your EC2 instance.'
+
+You need the agent installed and running on your EC2 instance.
+
+Reference: Collect Metrics and Logs from Amazon EC2 Instances and On-Premises Servers with the CloudWatch Agent.
+
+Selected
+Ensure the CloudWatch agent has permission to write the application log files on your EC2 instance.
+
+Ensure the instance role associated with your EC2 instance has permission to write the application logs to S3.
+
+Ensure the instance role associated with your EC2 instance has read permission for CloudWatch.
+
+'Ensure the instance role associated with your EC2 instance has permission to write the application logs to CloudWatch.
+
+You need to configure permission for the EC2 instance role to write your application logs to CloudWatch i.e., permission' to /CreateLogGroup/
+                /CreateLogStream/
+                    /PutLogEvents/ 
+                        /DescribeLogStreams/
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+
+
+
+
+4
+---------------------------------------------------------------------------
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+Your application is running on EC2 and sending metrics to CloudWatch. You would like to create a single custom view to display the data relating to the production instances of your application so that you can view application health at a glance. How can you do this using CloudWatch?
+
+Create a namespace to display the metrics that you would like to view. Use a dimension to filter the results to only show the EC2 instances that are in your production environment.
+
+Create a dashboard to display the metrics that you would like to view. Use a namespace to filter the results to only show the EC2 instances that are in your production environment.
+
+A namespace is a container for CloudWatch metrics (e.g., EC2 uses the AWS/EC2 namespace). A namespace cannot be used to filter the results to only show the EC2 instances that are in your production environment.
+
+Selected
+'Create a dashboard to display the metrics that you would like to view. Use a dimension to filter the results to only show the EC2 instances that are in your production environment.
+
+    A dashboard is like a custom homepage that you create in CloudWatch (e.g., you can display important metrics for all of your production systems in one place). A dimension is like a filter (e.g., you can use the InstanceId dimension to search for metrics related to a specific EC2 instance).'
+
+Create a namespace to display the metrics that you would like to view. Use a filter expression to filter the results to only show the EC2 instances that are in your production environment.
+
+---------------------------------------------------------------------------
+You have developed a CloudFormation stack in the AWS Management Console. You have a few CloudFormation stacks saved in the Region in which you are operating in. When you launch your stack that contains many EC2 resources, you receive the error Status=start_failed. How would you troubleshoot this issue?
+
+Use the Support Center in the AWS Management Console to request an increase in the number of CloudFormation stacks.
+
+The default limit for CloudFormation stacks is 200, and the question explicitly states that there are only a very small number of existing stacks.
+
+Reference: Troubleshooting AWS CloudFormation
+
+Selected
+'Verify that you didnt reach a resource limit, then use the Support Center in the AWS Management Console to request an increase in the number of EC2 instances.
+
+    You should verify that you didnt reach a resource limit. The default number of EC2 instances that you can launch is 20. If you try to create more Amazon EC2 instances than your account limit, the instance creation fails, and you receive the error Status=start_failed. Also, during an update, if a resource is replaced, AWS CloudFormation creates a new resource before it deletes the old one. This replacement might put your account over the resource limit, which would cause your update to fail. You can delete excess resources or request a limit increase.
+'
+Reference: Troubleshooting AWS CloudFormation
+
+Wait a few minutes before saving the template and retry the process.
+
+Save the template via the AWS CLI.
+---------------------------------------------------------------------------
+A high-traffic news website is experiencing performance issues during peak times. Investigation reveals that the top news stories are impacting the database performance. Top news stories must be updated every 15 minutes. What would be an optimal and non-intrusive solution to fix this performance problem?
+
+Upgrade the database instance to a more powerful instance type.
+
+Create read replicas of the database. Distribute the read traffic to the read replicas.
+
+'Create a CloudFront distribution. Configure TTL to 900 seconds.
+
+    The optimal solution is to create a CloudFront distribution and configure the TTL to 900 seconds. CloudFront can cache the top news stories. It is a highly available and highly scalable service, ensuring that any sudden increase in web traffic can be accommodated. Setting the TTL to 900 seconds ensures that the news stories are refreshed in the CloudFront distribution according to the specified requirements.'
+
+Reference:
+
+What Is Amazon CloudFront?
+Managing How Long Content Stays in an Edge Cache (Expiration)
+Implement ElastiCache in front of the database.
+
+Implementing ElastiCache is not an optimal solution, as it would require application re-engineering to take advantage of the service.
+---------------------------------------------------------------------------
+An application developer finds that performing a scan operation on a large DynamoDB table is taking a long time to execute. What can be used to improve the performance and decrease the execution time of the scan operation?
+
+Use of pagination
+
+Pagination can be used to divide the result set into multiple pages, but it does not increase the performance of the scan operation.
+
+Selected
+Use of a filter expression
+
+'Use of parallel scans
+
+    Parallel scans can be used by multiple worker threads in an application to perform a scan of a DynamoDB table much faster.'
+
+Reference: Parallel Scan
+
+Use of projection expression
+---------------------------------------------------------------------------
+You have developed an application that automatically tracks home deliveries for online orders from a number of different websites. You would like your application to send metrics to CloudWatch any time a critical error occurs, and you want CloudWatch to notify you if more than two critical errors occur within a time period of 15 minutes. Which of the following CloudWatch actions can you use to configure this?
+
+Use InputMetricData to publish metric data relating to critical errors to CloudWatch. Use CreateMetricAlarm to create an alarm and notify you if the threshold is reached.
+
+There are no CloudWatch actions named InputMetricData or CreateMetricAlarm.
+
+Selected
+Use GetMetricData to fetch metrics relating to critical errors from the application. Use PutMetricAlarm to create an alarm and notify you if the threshold is reached.
+
+Use PutMetricAlarm to publish metric data relating to critical errors and alert you if the threshold is reached.
+
+'Use PutMetricData to publish metric data relating to critical errors to CloudWatch. Use PutMetricAlarm to create an alarm and notify you if the threshold is reached.
+
+    PutMetricData is used to publish metric data points to CloudWatch. PutMetricAlarm can be used to create an alarm and associate it with a metric and threshold.'
+---------------------------------------------------------------------------
+You are building an application that generates a new online word puzzle every day and allows players to share their scores on social media. You would like to configure your application to send custom metric data to CloudWatch. Which of the following CloudWatch actions could you use to achieve this?
+
+PutMetricStream
+
+ImportMetricData
+
+'PutMetricData
+
+PutMetricData is used to publish metric data points to CloudWatch.'
+
+Selected
+PutMetricAlarm
+---------------------------------------------------------------------------
+Your application reads data from an SQS queue. The reads are then forwarded to a Lambda function for processing critical customer information, including purchasing and inventory data. It is critical that no data is ever lost. How could you ensure that no data is lost in the event of a malfunction with the Lambda processing?
+
+Requeue failed messages with a VisibilityTimeout of 30 seconds.
+
+Requeue the failed message with DelaySeconds set to 3.
+
+Create a FIFO queue and set DelaySeconds to 3.
+
+'Create a dead-letter queue and set the Maximum Receives to 3.
+
+    A dead-letter queue would allow you to prevent data loss. After a message is taken from the queue and returned for the maximum number of retries, it is automatically sent to a dead letter queue, if one has been configured. It stays there until you retrieve it for forensic purposes. You can configure the number of times that a message can be received before being sent to a dead-letter queue. This is the Maximum Receives parameter, which can be any value between 1 and 1,000.'

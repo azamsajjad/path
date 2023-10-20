@@ -157,7 +157,8 @@ def lambda_handler(event, context):
     password = result.get('password')
     db_name = result.get('dbname')
     
-    logger.info(f"host = {host}")
+    logger.info(f"host = {host}//")
+    
     logger.info(f"username = {username}")
     logger.info(f"password = {password}") 
     logger.info(f"db_name={db_name}") 
@@ -277,7 +278,7 @@ def load_data():
     conn.close()
 
 def get_secret():
-    """
+    ""
     This code retreives RDS details from the secrets manager.
     ""<---------------------------
     # Create a Secrets Manager client
@@ -439,3 +440,975 @@ START RequestId: a8a8b17b-24c3-405d-9194-74239ed17f32 Version: $LATEST
 [INFO]	2023-10-17T23:20:50.611Z	a8a8b17b-24c3-405d-9194-74239ed17f32	<Response [200]>
 [INFO]	2023-10-17T23:20:50.611Z	a8a8b17b-24c3-405d-9194-74239ed17f32	b'<html><title>TestLambda</title></head><h1>You have successfully connected to Amazon API Gateway and invoked the AWS Lambda funct'
 [INFO]	2023-10-17T23:20:50.611Z	a8a8b17b-24c3-405d-9194-74239ed17f32	b'ion.</h1><body></body></html>'
+
+
+
+
+
+=======================================================================================================
+SECURING S3.
+Configure an S3 bucket to be compliant with requirements.
+Enable senuer-side encryption and logging on the bucket.
+Enable bucket versioning and set up bucket replication.
+Create a lifecycle rule to use less expensive storage.
+
+Amazon S3->Buckets->mybucketis329->Lifecycle configuration->Create lifecycle rule
+Archive Files Older Than One Year
+
+
+Transition current versions of objects between storage classes
+
+
+2- logging 
+Amazon S3 > Buckets > mybucketis329 > properties > Edit server access logging
+
+
+goto Log Bucket 
+Amazon S3 > Buckets > log-582908443542-931 > Edit access control list (ACL)
+S3 log delivery group
+Group:
+http://acs.amazonaws.com/groups/s3/LogDelivery
+
+Write<---------Give This permission
+
+
+
+3- replication
+Amazon S3 > Buckets > mybucketis329 > Replication rules > Create replication rule
+attach this role
+
+S3ReplicationRoleDefaultPolicy70F2A590
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetObjectLegalHold",
+                "s3:GetObjectRetention",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionForReplication",
+                "s3:GetObjectVersionTagging",
+                "s3:GetReplicationConfiguration",
+                "s3:ListBucket",
+                "s3:ObjectOwnerOverrideToBucketOwner",
+                "s3:ReplicateDelete",
+                "s3:ReplicateObject",
+                "s3:ReplicateTags"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+
+
+=======================================================================================================
+Serverless Authentication.
+
+Create a user pool in Amazon Cognito.
+Integrate Cognito with Ul apps deployed by Amplify.
+Add Cognito ID details to the Ul configuration.
+Customize password rules to use letters, characters, and numbers.
+
+
++ Deploy a serverless backend application.
++ Configure an Amazon Cognito user pool.
++ Build the frontend application by using AWS Cloud9.
+—5 Deploy the frontend application by using AWS Amplify.
+Create a user account in Amazon Cognito.
+Log in and create iterns using the application.
+
+DIY
+Build on what you have leamed Add an AWS Lambda function to the Amazon Cognito user pool to remove the validation code process.
+
+1st Script---------------------
+sudo yum -y install jq
+cd ~/environment/app-code/backend
+export BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'resource-bucket')].Name" --output text)
+sed -Ei "s|<BUCKET_NAME>|${BUCKET_NAME}|g" samconfig.toml
+export AWS_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
+sed -Ei "s|<AWS_REGION>|${AWS_REGION}|g" samconfig.toml
+export LAMBDA_ROLE_ARN=$(aws iam  list-roles --query "Roles[?contains(RoleName, 'LambdaDeployment')].Arn" --output text)
+sed -Ei "s|<LAMBDA_ROLE_ARN>|${LAMBDA_ROLE_ARN}|g" samconfig.toml
+// - This script retrieves the S3 bucket name, the AWS Region, and ffle Lambda role Amazon Resource Narne (ARN) that were created during the lab startup process. These variables are used in a backend configuration file to deploy the backend API components.
+----------------------------------
+
+sam deploy 
+
+`````````````````````````````````````````create cognito user pool `````````````````````````````````````
+
+cd /frontend 
+npm install
+~/environment/app-code/frontend/src
+2nd Script---------------------
+cd ~/environment/app-code/frontend/src
+export API_GATEWAY_ID=$(aws apigateway get-rest-apis --query 'items[?name==`Bookmark App`].id' --output text)  
+export AWS_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
+sed -Ei "s|<AWS_REGION>|${AWS_REGION}|g" aws-exports.js
+export API_GATEWAY_URL=https://${API_GATEWAY_ID}.execute-api.${AWS_REGION}.amazonaws.com/dev 
+sed -Ei "s|<API_GATEWAY_URL>|${API_GATEWAY_URL}|g" aws-exports.js
+export COGNITO_USER_POOL_ID=$(aws cognito-idp list-user-pools --query "UserPools[?contains(Name, 'bookmark-app-userpool')].Id"  --max-results 1 --output text)
+sed -Ei "s|<COGNITO_USER_POOL_ID>|${COGNITO_USER_POOL_ID}|g" aws-exports.js
+export APP_CLIENT_ID=$(aws cognito-idp list-user-pool-clients --user-pool-id ${COGNITO_USER_POOL_ID}  --query "UserPoolClients[?contains(ClientName, 'AppClientForBookmarkUserPool')].ClientId"  --output text)
+sed -Ei "s|<APP_CLIENT_ID>|${APP_CLIENT_ID}|g" aws-exports.js
+cd ..
+
+THIS SCRIPT REPLACED CONTENTS IN ..../frontend/aws-exports.js
+
+const awsmobile = {
+    "aws_project_region": "us-east-1",
+    "aws_cognito_region": "us-east-1",
+    "aws_user_pools_id": "us-east-1_NjKIAMyoe",
+    "aws_user_pools_web_client_id": "24c4k14g2ku86kqtq511hbc6ut",
+    "oauth": {},
+    "aws_cloud_logic_custom": [
+        {
+            "name": "Bookmark App",
+            "endpoint": "https://0qnsid5afh.execute-api.us-east-1.amazonaws.com/dev",
+            "region": "us-east-1"
+        }
+    ]
+};
+
+export default awsmobile;
+---------------------------------------
+
+~/environment/app-code/frontend $ cd ..
+~/environment/app-code/frontend $ npm run build
+
+
+~/environment/app-code/frontend/     $ cd dist
+~/environment/app-code/frontend/dist $ zip -r bookmarkapp.zip *
+
+3rd Script---------------------
+export BUCKET_NAME=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'resource-bucket')].Name" \
+--output text)
+aws s3 cp bookmarkapp.zip s3://${BUCKET_NAME}
+-------------------------------
+
+DIY ACTIVITIES
+Add an AWS Lambda function to the Amazon Cognito user pool to remove the validation code process.
+Solution Validation Method
+Validation Process:
+Our test servers will validate the Amazon Cognito user pool. The test servers will also validate that the AWS Lambda trigger is added correctly to the user POOL Hint You will need to add the Pre-SignUp Lambda trigger to the Amazon Cognito user pool.
+
+Amazon CognjtQ > User > bookmark-app_-20Ql > Add Lambda trigger
+
+import json
+
+def lambda_handler(event, context):
+    # Confirm the user
+    event['response']['autoConfirmUser'] = True
+
+    # Set the email as verified if it is in the request
+    if 'email' in event['request']['userAttributes']:
+        event['response']['autoVerifyEmail'] = True
+
+    # Set the phone number as verified if it is in the request
+    if 'phone_number' in event['request']['userAttributes']:
+        event['response']['autoVerifyPhone'] = True
+
+    # Return to Amazon Cognito
+    return event
+
+
+
+=======================================================================================================
+Incident RESPONSE.
+
+Is it possible to automatically isolate a resource if an intrusion is suspected?
+
+Yes, but we can further automate it. We can invoke an Amazon CloudWatch alarm anytime the threshold is
+breached. The alarm can automatically publish a message to an Amazon Simple Notification Sens/ice topic. We call it
+Amazon SNS for short.
+
+Well create an AWS Lambda function that isolates the EC2 instance by removing the IAM instance profile, and any
+security groups attached to it. The SNS topic can be used as the trigger to run the isolating AWS Lambda function.
+
+
+Install and configure the Amazon CloudWatch agent.
+Create a CloudWatch Logs metric filter.
+Create an Amazon CloudWatch alarm and SNS topic.
+Configure an SNS topic to invoke a Lambda function.
+
+
+When an intrusion is detected on an Amazon EQ instance, one action you can take is to remove the AWS Identity and
+Access Management (IAM) instance profile and security group to restrict resource access. This action prevents a
+malicious actor from gaining access to other resources through the Amazon EC2 instance.
+
+You can create an Amazon Simple Notification Service (Amazon SNS) topic as a mechanism for notifying stakeholders and other downstream systems of a security event
+
+Use the Run Command, a capability of AWS Systems Manager, to install the Amazon CloudWatch agent on your entire fleet of Amazon EC2 instances at scale.
+
+Using the AWS Command Line Interface (AWS CLI), you can configure the Amazon CloudWatch agent to send critical
+operating system and application logs to Amazon CloudWatch Logs.
+
+You can use Amazon CloudWatch Logs to create metric filters that can query logs for specific keywords, such as Invalid Password, that could indicate an intrusion attempt.
+
+You can create Amazon CloudWatch alarms from custom metric filters. You might configure an alarm to notify an
+Amazon SNS topic when a threshold is breached.
+
+The AWS Lambda function can be invoked by configuring the Amazon SNS topic as a trigger. The AWS Lambda
+function can then take steps to isolate an Amazon EQ instance by removing IAM instance profiles and attaching security groups that have no access to other resources.
+
+
+Create SNS Topic 
+System Manager->FleetManager->NodeActions->RunCommand->InstallAWSPackage
+AmazonCloudWatchAgent
+
+SessionManager->login
+sh-4.2$ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status
+
+  "status": "stopped",
+  "starttime": "",
+  "configstatus": "not configured",
+  "version": "1.300026.3b189"
+}
+
+
+sh-4.2$ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+================================================================
+= Welcome to the Amazon CloudWatch Agent Configuration Manager =
+=                                                              =
+= CloudWatch Agent allows you to collect metrics and logs from =
+= your host and send them to CloudWatch. Additional CloudWatch =
+= charges may apply.                                           =
+================================================================
+            linux (1)
+            EQ(I)
+            root (I)
+            no (2)
+            no (2)
+            no (2)
+            no (2)
+            yes (1)
+
+            Which AWS credential should be used to send json config to parameter store?
+            1. ASIAYPOAM7OLIC2VXHTM(From SDK)
+            2. Other
+            default choice: [1]:
+            1
+            Successfully put config to parameter store AmazonCloudWatch-linux.
+
+sh-4.2$ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -s -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+****** processing amazon-cloudwatch-agent ******
+            I! Trying to detect region from ec2 D! [EC2] Found active network interfacee Successfully fetched the config and saved in /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_config.json.tmp
+            Start configuration validation...
+            2023/10/18 21:25:06 Reading json config file path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_config.json.tmp ...
+            2023/10/18 21:25:06 I! Valid Json input schema.
+            2023/10/18 21:25:06 Configuration validation first phase succeeded
+            I! Detecting run_as_user...
+            I! Trying to detect region from ec2
+            D! [EC2] Found active network interface
+            /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent -schematest -config /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.toml
+            Configuration validation second phase succeeded
+            Configuration validation succeeded
+            amazon-cloudwatch-agent has already been stopped
+            Created symlink from /etc/systemd/system/multi-user.target.wants/amazon-cloudwatch-agent.service to /etc/systemd/system/amazon-cloudwatch-agent.service.
+
+            Concept
+A log stream is a sequence of log events that share the same source. Each separate source of logs in CloudWatch Logs makes up a separate log stream.
+A log group is a group of log streams that share the same retention, monitoring, and access control settings. You can define log groups and specify which streams to put into each group. There is no limit on the number of log streams that can belong to one log group.
+
+CloudWatch->Log->search 401->CreateMetricFilter(count based)
+====================================
+Lambda->Create Function 
+
+"""
+This lambda function generates login logs
+"""
+/*
+import os, json
+import boto3
+import logging
+import requests
+
+# It is a good practice to use proper logging.
+# Here we are using the logging module of python.
+# https://docs.python.org/3/library/logging.html
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Importing EC2 boto3 client and resources.
+# For additional info: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#client
+ec2_client = boto3.client('ec2')
+ec2_resource = boto3.resource('ec2')
+
+def lambda_handler(event, context):
+    #logger.info(event)
+    pub_ip = get_pub_ip_from_tags("App-Server")
+    
+    url = f"http://{pub_ip}:8443/"
+    print(url)
+    for num in range(40):
+        response = requests.post(url,data="username=admin&password=test123")
+        print(response)
+
+def get_pub_ip_from_tags(Tags):
+
+    logger.info(Tags)
+    response = ec2_client.describe_instances(
+        Filters=[
+            {
+                'Name': 'tag:Name',
+                'Values': [
+                    Tags,
+                ]
+            },
+            {
+                'Name': 'instance-state-name',
+                'Values': [
+                    'running',
+                ]
+            }
+        ],
+        MaxResults=5
+    )
+    logger.info(response['Reservations'])
+    logger.info(len(response['Reservations'][0]['Instances']))
+
+
+    if len(response['Reservations'][0]['Instances']) > 1 :
+        logger.info(len(response['Reservations'][0]['Instances']))
+        logger.info(f"Too many EC2 instances match tags, try again {len(response)}")
+    else:
+        #logger.info(len(response['Reservations'][0]['Instances']))
+        logger.info(response['Reservations'][0]['Instances'])
+
+    #aws:cloudformation:stack-name	IncidentResponse-LabStack
+    #Name	App-Server
+    logger.info(response['Reservations'][0]['Instances'][0]['PublicIpAddress'])
+    
+    return response['Reservations'][0]['Instances'][0]['PublicIpAddress']
+*/
+
+===========================
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+<Response [401]>
+
+
+Create Cloudwatch Alarm from that Metric 
+
+Lambda->labFunction-isolator
+- When this Lambda function is invoked, it will isolate the AWS resource (the App- Server EQ instance).
+Add Trigger SNS Topic.
+
+"""
+This lambda function isolates the instance 
+for further forensic analysis.
+"""
+/* 
+import os, json
+import boto3
+import logging
+
+# It is a good practice to use proper logging.
+# Here we are using the logging module of python.
+# https://docs.python.org/3/library/logging.html
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+ec2_client = boto3.client('ec2')
+ec2_resource = boto3.resource('ec2')
+instance_list = []
+
+def lambda_handler(event, context):
+    print(json.dumps(event))
+    
+    # Find the instance ID from MetricName defined 
+    # in the Cloudwatch Alarm configuration. MetricName should be set to the instance-id.
+    
+    message = json.loads(event['Records'][0]["Sns"].get('Message'))
+    instance_id = message['Trigger'].get('MetricName')
+    logger.info(instance_id)
+    
+    # Get the VPC of the instance
+    vpcId = get_instace_vpc_id(instance_id)
+    
+    # Call the get_instance function to generate list of all the available instances.
+    get_instances()
+    
+    # If the instance is in the list, remove role 
+    # and attach the Isolated_SG
+    if instance_id in instance_list:
+        try:
+            remove_role(instance_id)
+        except Exception as e:
+            print(e)
+    
+        # Attach the isolated Security group
+        try:
+            sg_response = ec2_client.describe_security_groups(
+            Filters=[
+                    {
+                        'Name': 'group-name',
+                        'Values': [
+                            'Isolated_SG',
+                        ]
+                    },
+                ]
+                )
+            logger.info(sg_response)    
+            if sg_response.get('SecurityGroups'):
+                security_group_id = sg_response.get('SecurityGroups')[0].get("GroupId")
+                logger(security_group_id)
+                attach_isolated_sg(instance_id, security_group_id)
+            else:
+                security_group_id = create_sg(vpcId)
+                attach_isolated_sg(instance_id, security_group_id)
+        except Exception as e:
+            print(e)
+    
+
+def get_instances():
+    """
+    This function gets the list of all the EC2 instances in the region.
+    """
+    get_instances = ec2_client.describe_instances()
+    instances = get_instances['Reservations'][0].get('Instances')
+    print(instances)
+    for instance in instances:
+        print(instance['InstanceId'])
+        # print(instance['VpcId'])
+        instance_id = instance['InstanceId']
+        instance_list.append(instance_id)
+    print(f"instance-List:{instance_list}")
+    
+def remove_role(instance_id):
+    """
+    This function removed the instance proflie attached to the instance.
+    """
+    describe_instance_profile_association_response = ec2_client.describe_iam_instance_profile_associations(
+        Filters=[
+                {
+                    'Name': 'instance-id',
+                    'Values': [
+                        instance_id,
+                    ]
+                },
+            ]
+        )
+    print(describe_instance_profile_association_response)
+    association_id = describe_instance_profile_association_response['IamInstanceProfileAssociations'][0].get('AssociationId')
+    
+    print(association_id)
+    response = ec2_client.disassociate_iam_instance_profile(
+            AssociationId=association_id
+            )
+    
+    logger.info(response)
+    
+    
+def get_instace_vpc_id(instanceId):
+    """
+    This function gets the VPC Id of the instance.
+    """
+    instanceReservations = ec2_client.describe_instances(InstanceIds=[instanceId])['Reservations']
+    for instanceReservation in instanceReservations:
+        instancesDescription = instanceReservation['Instances']
+        for instance in instancesDescription:
+            return instance['VpcId']
+            
+def create_sg(vpcId):
+    """
+    This function creates the isolated security group with no egress access.
+    """
+    security_group_id = ec2_resource.create_security_group(GroupName="Isolated_SG", 
+                                                     Description="Isolated SG for forensic analysis", 
+                                                     VpcId=vpcId)
+    security_group_id.revoke_egress(IpPermissions= [{'IpProtocol': '-1','IpRanges': [{'CidrIp': '0.0.0.0/0'}],'Ipv6Ranges': [],'PrefixListIds': [],'UserIdGroupPairs': []}])
+    return security_group_id
+
+def attach_isolated_sg(instance_id, security_group_id):
+    """
+    This function attach the isolated security group to the instance.
+    """
+
+    logger.info("Inside attach_sg")
+    logger.info(security_group_id.id)
+    
+    
+    response = ec2_client.modify_instance_attribute(
+        Groups=[security_group_id.id],
+        InstanceId=instance_id)
+*/
+==========================================================================================================
+Securing Your SERVERS.
+
+Can you explain more about instance profiles? I thought that IAM roles were all that was needed.
+An instance profile is used to pass an IAM role to an EC2 instance. In the AWS Management Console, when you're
+working with roles, instance profiles are handled behind the scenes. However, when you're using the AWS Command Line Interface or AWS API, managing profiles is a separate action.
+
+Create an IAM policy with only the necessary permissions.
+Create an IAM role and associate the newly created policy.
+Associate the newly create role with the EC2 instance.
+
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": "ec2:DescribeInstances",
+			"Resource": "*"
+		},
+		{
+			"Sid": "VisualEditor1",
+			"Effect": "Allow",
+			"Action": [
+				"s3:PutObject",
+				"s3:GetObject",
+				"dynamodb:PartiQLSelect",
+				"s3:ListBucket",
+				"s3:DeleteObject"
+			],
+			"Resource": [
+				"arn:aws:s3:::corp-582908443542-493/*",
+				"arn:aws:s3:::corp-582908443542-493",
+				"arn:aws:dynamodb:*:582908443542:table/forms"
+			]
+		}
+	]
+}
+==========================================================================================================
+Application LOGS.
+
+During the incident, we lost significant time trying to find the access logs on the application server. We want
+to find a better way to quickly analyze server logs. Do you know of such a solution?
+
+Absolutely! You can install the Amazon Kinesis agent on the application server and configure it to send access log data to a Kinesis Data Firehose delivery stream, which can be configured to send the access log data to an Amazon S3 bucket.
+
+With the logs in Amazon S3, you can use AWS Glue, a serverless data integration service, to discover properties
+of the data and prepare it for analytics.
+
+AWS Glue provides all the capabilities needed for data integration, so you can start analyzing your data and
+putting it to use in minutes instead of months.
+
+You can quickly find and access data using the AWS Glue Data Catalog, which is a central repository to store
+structural and operational metadata for all your data assets.
+
+You can configure an AWS Glue crawler to automatically scan Amazon S3, identify data formats and suggest
+schemas and transformations, and then populate the Data Catalog with this metadata.
+
+That sounds great. How will I be able to access the DataCatalog?
+
+Thats where Amazon Athena comes in. Athena is an interactive query service that you can use to analyze data in
+S3 using standard SQL Athena works with the Data Catalog to read the schema information and apply it to the log data in S3.
+
+You can use Athena to help analyze the access log data stored in S3 by running interactive analytics using SQL
+queries, without the need to aggregate or load the data into Athena.
+
+Configure the Kinesis agent on an EC2 instance.
+Create an AWS Glue crawler to generate a data schema.
+Use Amazon Athena to query and analyze the log data.
+
+USER->EC2->KINESIS-logs->S3->AWS GLUE<-ATHENA
+kinesis agent config
+
+
+sudo yum install —y https://s3.amazonaws.com/streaming-data-agent/aws-kinesis-agent-latest.amzn2.noarch.rpm
+sh-4.2$ sudo sh -c 'cat <<EOF >  /etc/aws-kinesis/agent.json
+> {
+>   "flows": [
+>     {
+>       "filePattern": "/var/log/httpd/access_log",
+>       "deliveryStream": "delivery-stream"
+>     }
+>   ]
+> }
+> EOF'
+sh-4.2$ sudo systemctl start aws-kinesis-agent
+sh-4.2$ tail -f /var/log/httpd/access_log
+
+Concept
+The agent is now running as a system service in the background. It continuously monitors the specified files and sends data to the specified delivery stream. 
+Agent activity is logged in /var/log/aws-kinesis-agent/aws-kinesis-agent.log.
+
+
+Browser->public IP refresh to generate logs
+Check Logs in S3
+AWS Glue > Crawlers > Add crawler > log-bucket
+add glue service role =
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutObject"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+AND
+AWSGlueServiceRole	AWS managed
+Create and Add a Database 
+Create Crawler
+Run Crawler
+
+ATHENA->settings->addOutputS3location
+query =
+SELECT COUNT(clientip) FROM "logdb"."log_bucket_240123890349_444";
+
+DIY ACTIVITIES
+Use AWS Glue to create a new crawler to crawl the Athena query results.
+Run the crawler to create a new AWS Glue Data Catalog table.
+
+
+==============================================================================================================
+Playing with ENCRYPTION.
+
+Yes, it is very safe. AWS KMS uses hardware security modules that have been validated under FIPS 140-2. Your encryption keys are only used inside these devices and can never leave them unencrypted. You can also use AWS Identity and Access Management, or IAM, policies in combination with key policies to control access to your AWS KMS keys.
+
+First, you want to create a symmetric encryption KMS key. Symmetric encryption keys are used in symmetric encryption, in which the same key is used for encryption and decryption.
+
+We have two main types of data. Our customer case files can be quite big in size. We also have smaller-sized data, such as database passwords, that need to be encrypted. All the data is in text format.
+
+I see. To encrypt your customer case files, I recommend using KMS keys to generate a data key to perform encryption operations. Data keys are symmetric keys you can use to encrypt a large amount of data.
+
+For data less than 4 kilobytes, you can use KMS keys to encrypt and decrypt data directly, without generating a data key.
+
+>Create a symmetric encryption AWS KMS key.
+>Generate a data key to perform cryptographic operations.
+>Use an AWS KMS key to perform cryptographic operations.
+
+An AWS Identity and Access Management (IAM) policy is created to grant Amazon
+Elastic Compute Cloud (Amazon EC2) permissions to use and access AWS KMS
+keys. This policy is attached to an IAM role.
+You can use the AWS KMS API to create and manage KMS keys. The EC2 instance
+sends a KMS API request to create a symmetric encryption KMS key.
+For symmetric encryption, in which the same key is used for encryption and
+decryption, AWS KMS creates a symmetric encryption KMS key.
+
+
+'The EC2 instance can also send a KMS API request to generate a data key. Data keys
+are symmetric keys you can use to encrypt data, including large amounts of
+data and other data encryption keys.'
+/AWS KMS returns a plaintext data key for immediate use (optional) and a copy that/
+/is encrypted under a KMS key that you specify./
+'You can use the plaintext data key to enctypt data outside of AWS KMS and
+store the encrypted data key with the encrypted data. For optimal security, we
+recommend that you immediately delete the plaintext data key after encryption.'
+/To decrypt the data, you must first decrypt the encrypted data key to a plaintext data key./
+/The decrypt operation on the data can then take place using the plaintext data key./
+You can also use the KMS keyto encrypt
+and decrypt data up to 4 kilobytes,
+without the need to generate a data key.
+// Cryptographic best practices discourage extensive reuse of encryption keys. AWS KMS supports automatic key rotation, which generates new cryptographic material for the KMS key every year.
+// AWS KMS saves all previous versions of the cryptographic material in perpetuity, so you can deaypt any data encrypted with that KMS key. AWS KMS does not delete any rotated key material until you delete the KMS key.
+// Using AWS KMS, you can replicate keys from one AWS Region into another. With multi-Region keys, you can move encrypted data between AWS Regions without having to decrypt and re-encrypt with different keys in each AWS Region.
+
+IAM Role ATTACHED TO INSTANCE
+ lab_provisioning_role 
+ EC2InstanceConnect	AWS managed
+ AND
+ {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:DescribeInstances",
+                "kms:*",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutObject"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+
+KMS > Customer managed keys > Create key
+
+sh-4.2$ echo "This is my Secret Text to encrypt." > samplesecret.txt
+
+[ec2-user@ip-10-10-0-IO]$ aws generate-data-key --key-id alias/myKMSKey —key-spec AES_256 --enayption-context project=practice --region us-east-I
+RESULT = "Plaintext . "Qlt9SIKVZE4GmhED9KU1n2sb80JM6qtS356X9pm2SIE=" ,"
+        " Keyld= :jiarn:aws:kms:us-east-1:649673252033:key/5d9bdef7"
+         "CiphertextBlob" :
+         "AQIDAHgtlMpm12+cUn0900CV9fZ1mlF7yMj gktkk7b5ktprXWEVzQR+p8JB2bHzfnTRYh9LAAAAfj B8Bgkqhki
+         9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMYSbuFh4L71zih+lPAgEQgDsSMh43Ci2SkUUXzaMlJOHVyhj sC2fbBelPOcCrxNVd1rGrRikcE15AURkaYCRc71G/G"
+
+// - This command generates a symmetric data key with 256-bit encryption with the KMS key identified by its alias myKMSKey. - Encryption-context is an optional key-pair value that provides additional context about the data. If submitted, the value also needs to be provided when decrypting the data.
+
+// - The obtained plaintext data key is in base64 format.
+                // 3. To decode the data key and save it into a file named datakeyPlainText.txt, run the following command, replacing <Your Plaintext data key> with the plaintext data key that you just generated:
+
+[ec2-user@ip-10-10-0-IO]$ echo 'Qlt9SIKVZE4GmhED9KU1n2sb80JM6qt9pm2SIE=' | base64 --decode > datakeyplaintext.txt
+
+                // 4. To decode the enaypted data key and save it into a file named datakeyEncryptedText.txt, run the following command, replacing <Your CiphertextBIob> with the enaypted copy Of the data key that you just generated:
+
+[ec2-user@ip-10-10-0-IO]$ echo 'AQIDAHgtlMpm12+cUn0900CV9fZ1mlF7yMj gktkk7b5ktprXWEVzQR+p8JB2bHzfnTRYh9LAAAAfj B8Bgkqhki9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMYSbuFh4L71zih+lPAgEQgDsSMh43Ci2SkUUXzaMlJOHVyhj sC2fbBelPOcCrxNVd1rGrRikcE15AURkaYCRc71G/G' | base64 --decode > datakeyencrypted.txt
+
+Concept: When AWS KMS generates data keys, it
+retums a plaintext data key for immediate
+use (optional) and an encrypted copy of the
+data key that you can safely store with the
+data.
+
+1. To use OpenSSL and encrypt the file
+samplesecret.txt with the plaintext data key,
+and save the output in a file named
+enayptedSecret.txt, run:
+
+
+[ec2-user@ip-10-10-0-IO]$ openssl enc -e -aes256 -in samplesecret.txt -out encryptedSecret.txt -k \
+                          fileb:/./datakeyplaintext.txt
+[ec2-user@ip-10-10-0-10]$ more encryptedSecret. txt
+Salted-Q : ?3178Zv . t -
+
+Concept
+AWS KMS does not store, manage, or track
+your data keys, or perform cryptographic
+operations with data keys. You must use and
+manage data keys outside of AWS KMS. For
+example, you might use OpenSSL or a
+cryptographic library such as the AWS
+Encryption SDK.
+
+IF YOU DELETED YOUR PLAIN TEXT KEY 
+2. To obtain the plaintext data key from its enaypted copy, run:
+[ec2-user@ip-10-10-0-10]$ aws kms deaypt —enayption-context project—practice —ciphettext-blob
+                          fileb://datakeyEnctypted.txt --region us-east-1
+Concept
+After using the plaintext data key to encrypt
+data, we recommend that you remove it
+from memory as soon as possible. You can
+safely store the encrypted data key with the
+encrypted data so that it is available to
+decrypt the data.
+
+
+1. To decrypt the encrypted data with the
+plaintext data key, run:
+[ec2-user@ip-10-10-0-10]$ openssl enc -d -aes256 -in encryptedSecret.txt -k
+                            fileb://datakeyPlainText.txt
+
+// - You do not need to provide the Key ID that was used to enaypt the data key. The encrypted data contains metadata to provide this information to AWS KMS.
+
+
+
+2. To encrypt by directly using your KMS key, run:
+[ec2-user@ip-10-10-0-10]$ aws kms encrypt --key-id alias/myKMSKey —plaintext fileb://NewSecretFiletxt \
+                        —encryption-context project=practice --output text --query CiphertextBlob —region-us-east-1 | base64 --decode > NewSecretsEnayptedFile.txt
+
+aws kms decrypt for decrypting.................
+
+- The KMS key used is referred by its alias.
+- The input file needs the 'fileb' prefix to be processed in binary.
+===================================================================================================================
+Protecting DATA AT REST.
+
+
+
+Learning Objectives
+>Create an encrypted Amazon EBS snapshot.
+>Use AWS KMS to manage encryption.
+>Create an AMI from an encrypted snapshot.
+>Replace unencrypted application server with encrypted instance.
+
+EC2 > Snapshots > snap-08f6ecc2959105dcd > Create image from snapshot
+EC2 > AMIs > ami-04dc020ef2aaafedb > Launch instance from AMI
+
+===================================================================================================================
+Securing a Three-Tiered ARCHITECTURE
+
+
+Rather than open the security groups to all traffic, allow in only what is needed. For instance, because you are
+using Amazon Aurora with MySQL compatibility, you will have incoming database traffic on port 3306.
+
+We usually shorten the name to network ACL While security groups control network traffic to whatever resource they are attached to, network ACLs control traffic in and out of an entire subnet. Also, while the rules that you can create in network ACLs are very similar to security groups, some major differences exist.
+
+Network ACLs are wide open by default, so they allow all traffic to enter and leave the subnet that they are associated with. Another difference is that they are not stateful like security groups. So, if you use network ACLs to lock down your traffic, be sure to open both inbound and outbound ports so that the traffic can flow.
+
+>Review the concept of security at every layer.
+>Learn security group properties and how to use them.
+>Learn network ACL properties and how to use them.
+
+
+If you do not also open the appropriate range of ports for outbound traffic, the web application's response will not reach the requester.
+Security groups control network traffic to the assigned service regardless of source, even if that source is in the same subnet'
+
+
+EC2 > Auto Scaling groups > LabStack-3232dh3f9u
+Check Subnet
+
+
+
+RDS > Databases > [absta ck-c4a98c7d-8c5d
+Connectivity & security > Endpoint & port > Endpoint (copy)
+labstack-c4a98c7d-8c5d-41f0-8359-databaseb269d8bb-6v31ucdrzwbx.cluster-c7yedpfxh2t8.us-east-1.rds.amazonaws.com
+Port > 3306
+SECURITY GROUPS
+EC2 > Security Groups > sg-01feeOe403ace5933 - Database-SG > Edit inbound rules
+add aurora port to allow inbound of sg-32n3od34 App-Servers
+
+VPC->NACL->CreateNew->Inbound rules-Outbound rules-Subnet associations
+10.10.4.0/24(AppServers) inbound&outbound allow - subnett associations=dbSubnet1&2
+===================================================================================================================
+Secrets MANAGEMENT
+
+I see. I would recommend AWS Secrets Manager, which can store and protect secrets needed to access your applications, services, and IT resources. Users and applications can retrieve secrets programmatically, removing the need to hardcode sensitive information in plain text.
+
+Sounds good! However, our applications and databases are deployed in a VPC. How can Secrets Manager access resources in a VPC without going through the internet?
+
+No problem! You can establish a private connection between your VPC and Secrets Manager by creating an interface VPC endpoint.
+
+Absolutely! Secrets Manager offers built-in integrations for MySQL, PostgreSQL, and Amazon Aurora on Amazon RDS, and Secrets Manager can rotate credentials for these databases automatically.
+
+>Configure Secrets Manager to store a new secret.
+>Create an interface VPC endpoint for Secrets Manager.
+>Configure Secrets Manager to rotate a secret automatically.
+
+A virtual private cloud (VPC) endpoint enables connections between a VPC and supported services. You do not need an internet gateway, network address translation (NAT) device, virtual private network (VPN) connection, or AWS Direct Connect connection.
+
+You can create an interface VPC endpoint to establish a private connection between your VPC and Secrets Manager. All traffic through this connection stays on the AWS network and does not traverse the internet.
+
+Rotation is the process of periodically updating a secret. When you rotate a secret, you update the credentials in both the secret and the database or service. In Secrets Manager, you can set up automatic rotation for your secrets.
+
+To rotate a secret, Secrets Manager calls a Lambda function to initiate rotation. You can rotate secrets on a schedule or on demand.
+
+Secrets Manager offers built-in integrations for MySQL, PostgreSQL, and Amazon Aurora on Amazon RDS. Secrets
+Manager can rotate credentials for these databases NATIVELY.
+
+RDS > Databases > resources-database > Security VPC security groups > LabStack-c4a98c7d-8c5d-41 fO-8359-76b793e22a4e-
+
+AWS Secrets Managgc > Secrets >create credential secret
+
+VPC > Endpoints > Create endpoint
+Service Name com.amazonaws.us-east-l.lambda
+Owner amazon
+Type interface
+
+
+AWS Secrets Managgc > Secrets > resourcesdb_credentials > Enable Rotation by Creating lambda function from within Secret Manager , then go to that function and Upload Rotate_Key.zip file from functions/ folder
+
+Also Add a Layer > Custom layers > rotate_key_layer
+===================================================================================================================
+Edge PROTECTION
+
+Good day! I am the security officer of a new book-sharing company. In the past few months, we have experienced several network-based attacks. We are struggling to find ways to protect our web applications against these  attacks. This is why I called for your help.
+Hi! A good way to protect your web applications is by using AWS WAF.
+AWS WAF is a web application firewall that helps protect your web applications or APIs against common web exploits and bots that can affect availability, compromise security, or consume excessive resources.
+
+To set up AWS WAF, you need to create a web access
+control list, or web ACL, and define its protection strategy
+by adding rules. AWS WAF protects your web applications
+from attacks by filtering traffic based on these rules.
+
+No worries. You can quickly get started and protect your
+web applications by using managed rules for AWS WAF.
+Managed rules are collections of preconfigured and ready-
+to-use rules that AWS or AWS Marketplace sellers manage
+and maintain for you.
+
+You can select from many rule types, such as ones that
+address issues in the Open Web Application Security Project,
+or OWASP, Top 10 security risks. Using these rule types, you
+can block common attack patterns, such as cross-site
+scripting and SQL injection.
+
+Absolutely! You can deploy AWS WAF on Amazon
+CloudFront as part of your content delivery network
+solution. You only need to specify the CloudFront
+distributions that you want AWS WAF to inspect.
+
+>Use AWS WAF to set up a web application firewall.
+>Create a web ACL in AWS WAF.
+>Configure a managed rule and custom rule in a web ACL
+>Create and associate a CloudFront distribution with the web ACL
+
+Create WAF - Assign Rules - Create Cloudfront Distribution - Assign WAF during CreateDistribution
+
+===================================================================================================================
+Infrastructure as CODE
+Is there anything we can do to help automate the compliance of IT resources?
+You can! In AWS Lambda, you can create a function that monitors for drift and remediates any drift that is detected.
+
+Learn about provisioning resources with CloudFormation.
+Review the concept of drift detection in CloudFormation.
+Use a Lambda function to detect and remediate drift.
+===================================================================================================================
+Secure Self-Service Infrastructure
+We have very few people in our IT Sen,'ices department, and they end up working late hours, deploying services for various departments. I'd like to find a way to hand off deployments to the departments themselves, something like a self-service tool. 
+Absolutely. You can use AWS Service Catalog to free up your staff from these deployments.
+
+With Service Catalog, you define your own catalog of AWS
+services with specific configurations that you have approved.
+You then make this catalog, or portfolio, available to your
+departments. The end users can quickly discover and deploy
+approved IT services on their own.
+
+You create what are known as products for your portfolio. A product
+defines what services and versions are available, what is configured in
+each of the available services, and who gets access permission. Every
+Service Catalog product is launched as an AWS CloudFormation stack,
+which is a set of resources provisioned for that instance of the product.
+
+A product can deploy a single Amazon EC2 instance all
+the way up to multi-tiered applications. You can grant
+access by individual, group, department, or cost center.
+
+Yes, you can create different portfolios, and add
+different products to those portfolios.
+
+You can grant user access to the portfolios by using IAM permissions. By
+assigning an IAM role to each product, you can avoid giving users
+permissions to perform unapproved operations. You can allow them to
+only provision resources using the catalog. You can also define
+constraints that restrict the ways that specific AWS resources can be
+deployed for a product.
+
+Learn about AWS Service Catalog.
+Configure a portfolio and assign a product.
+Create networking infrastructure by using the catalog.
+
+Configuring AWS Service Catalog involves creating products and arranging products into portfolios.
+                A product is an IT service that you want to make available for deployment on AWS.
+                A product consists of one or more AWS resources, such as EC2 instances, storage
+                volumes, databases, monitoring configurations, and networking
+                components, or packaged AWS Marketplace products.
+                You create a product by importing an AWS
+                CloudFormation template.
+
+        A portfolio is a collection of products that contains configuration information.
+        Portfolios help manage who can use specific products and how they can use
+        them. With AWS Service Catalog, you can create a customized portfolio for each
+        type of user in your organization and selectively grant access to the appropriate portfolio.
+
+                To provision and configure portfolios and products, you use CloudFormation
+                templates, which are JSON or YAML formatted text files.
+
+        To provide users with products, begin by creating a portfolio for those products.
+        After you have created a portfolio, you're 'ready to add a product.
+
+                Constraints add another layer of control over products at the portfolio level.
+                Constraints can control the launch context of a product (launch constraints)
+                or add rules to the CloudFormation template (template constraints).
+
+                A launch constraint designates an AWS Identity and Access Management (IAM)
+                role that Service Catalog assumes when an end user launches a product This
+                launch constraint enables the end user to launch the product and, after launch,
+                manage it as a provisioned product
+
+Portofolio > Products (1) > Constraints (1) > Access (1)
