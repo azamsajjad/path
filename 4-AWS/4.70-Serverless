@@ -586,7 +586,7 @@ on data received by Kinesis Data Streams
 and Kinesis Data Firehose.
 And it goes on to store the processed data
 in an AWS data store,
-like S3, Redshift, or OpenSearch.'
+like S3, Redshift, or OpenSearch.
 
 Input Stream ---> DATA ANALYTICS ---> Output Stream
 input & output streams can be kinesis data streams or firehose
@@ -608,7 +608,84 @@ Best PRactice: use an Auto Scaling Group and base scaling decisions on CPU load.
 KPL (Kinesis Producer Library) is a Java Library to write data to a stream 
 you can write data to stream using AWS SDK, but KPL is more efficient
 ---------------------------------------------------------------------------
+A data analytics company has installed sensors to track the number of people that goes to the mall. The data sets are collected in real-time by an Amazon Kinesis Data Stream which has a consumer that is configured to process data every other day and store the results to S3. Your team noticed that your S3 bucket is only receiving half of the data that is being sent to the Kinesis stream but after checking, you have verified that the sensors are properly sending the data to Amazon Kinesis in real-time without any issues.
 
+Which of the following is the MOST likely root cause of this issue?
+
+The Amazon Kinesis Data Stream automatically deletes duplicate data.
+By default, the data records are only accessible for 24 hours from the time they are added to a Kinesis stream.````
+The sensors are having intermittent connection issues.
+The Amazon Kinesis Data Stream has too many open shards.
+
+
+Incorrect
+Amazon Kinesis Data Streams supports changes to the data record retention period of your stream. A Kinesis data stream is an ordered sequence of records meant to be written to and read from in real-time. Data records are therefore stored in shards in your stream temporarily. The time period from when a record is added to when it is no longer accessible is called the retention period. A Kinesis data stream stores record for up to 24 hours by default.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+A developer has a set of EC2 instances that runs the Amazon Kinesis Client Library to process a data stream in AWS. Based on the custom metrics, it shows that the instances are maxing out their CPU Utilization, and there are insufficient Kinesis shards to handle the rate of data flowing through the stream.
+
+Which of the following is the BEST course of action that the developer should take to solve this issue and prevent this situation from re-occurring in the future?
+
+Increase both the instance size and the number of open shards.`````````````````
+Increase the instance size to a larger type.
+Increase the number of instances up to the number of open shards.
+Increase the number of shards.
+
+
+Incorrect
+Resharding enables you to increase or decrease the number of shards in a stream in order to adapt to changes in the rate of data flowing through the stream. The Kinesis Client Library (KCL) ensures that for every shard there is a record processor running and processing that shard. It also tracks the shards in the stream using an Amazon DynamoDB table. When new shards are created as a result of resharding, the KCL discovers the new shards and populates new rows in the table. The workers automatically discover the new shards and create processors to handle the data from them. The KCL also distributes the shards in the stream across all the available workers and record processors.
+
+By increasing the instance size and number of shards in your Kinesis stream, the developer allows the instances to handle more record processors, which are running in parallel within the instance. It also allows the stream to properly accommodate the rate of data being sent in. The data capacity of your stream is a function of the number of shards that you specify for the stream. The total capacity of the stream is the sum of the capacities of its shards.
+---------------------------------------------------------------------------
+The developer has built a real-time IoT device monitoring application that leverages Amazon Kinesis Data Stream to ingest data. The application uses several EC2 instances for processing. Recently, the developer has observed a steady increase in the rate of data flowing into the stream, indicating that the stream’s capacity must be scaled up to sustain optimal performance.
+
+What should the developer do to increase the capacity of the stream?
+
+Integrate Amazon Kinesis Data Firehose with the Amazon Kinesis Data Stream to increase the capacity of the stream.
+Merge every shard in the stream.
+Upgrade the instance type of the EC2 instances.
+Split every shard in the stream.```````````````````
+Incorrect
+Amazon Kinesis Data Streams is a massively scalable, highly durable data ingestion and processing service optimized for streaming data. You can configure hundreds of thousands of data producers to continuously put data into a Kinesis data stream. Data will be available within milliseconds to your Amazon Kinesis applications, and those applications will receive data records in the order they were generated.
+
+The purpose of resharding in Amazon Kinesis Data Streams is to enable your stream to adapt to changes in the rate of data flow. You split shards to increase the capacity (and cost) of your stream. You merge shards to reduce the cost (and capacity) of your stream.
+
+One approach to resharding could be to split every shard in the stream—which would double the stream’s capacity. However, this might provide more additional capacity than you actually need and therefore create unnecessary costs.
+
+
+
+You can also use metrics to determine which are your “hot” or “cold” shards, that is, shards that are receiving much more data, or much less data, than expected. You could then selectively split the hot shards to increase capacity for the hash keys that target those shards. Similarly, you could merge cold shards to make better use of their unused capacity.
+
+You can obtain some performance data for your stream from the Amazon CloudWatch metrics that Kinesis Data Streams publishes. However, you can also collect some of your own metrics for your streams. One approach would be to log the hash key values generated by the partition keys for your data records. Recall that you specify the partition key at the time that you add the record to the stream.
+
+Hence, the correct answer is to split every shard in the stream to increase the capacity of the data stream.
+
+Upgrading the instance type of the EC2 instances is incorrect. Although it will improve the processing time of the data in the stream, it will not increase the capacity of the stream itself. You have to reshard the stream in order to increase or decrease its capacity, and not just upgrade the EC2 instances which process the data in the stream.
+
+Merging every shard in the stream is incorrect because merging shards will actually decrease the capacity of the stream rather than increase it. This is only useful if you want to save costs or if the data stream is underutilized, which are both not indicated in the scenario.
+
+Integrating Amazon Kinesis Data Firehose with the Amazon Kinesis Data Stream to increase the capacity of the stream is incorrect because Kineses Data Firehose just provides a way to reliably transform and load streaming data into data stores and analytics tools. This method will not increase the capacity of the stream as it doesn’t mention anything about resharding.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+A developer has instrumented an application using the X-Ray SDK to collect all data about the requests that an application serves. There is a new requirement to develop a custom debug tool which will enable them to view the full traces of their application without using the X-Ray console.
+
+What should the developer do to accomplish this task?
+
+
+Use the GetGroup API to get the list of trace IDs of the application and then retrieve the list of traces using BatchGetTraces API.
+
+Use the BatchGetTraces API to get the list of trace IDs of the application and then retrieve the list of traces using GetTraceSummaries API.
+
+Use the GetTraceSummaries API to get the list of trace IDs of the application and then retrieve the list of traces using BatchGetTraces API.````````````
+
+Use the GetServiceGraph API to get the list of trace IDs of the application and then retrieve the list of traces using GetTraceSummaries API.
+
+
+Incorrect
+X-Ray compiles and processes segment documents to generate queryable trace summaries and full traces that you can access by using the GetTraceSummaries and BatchGetTraces APIs, respectively. In addition to the segments and subsegments that you send to X-Ray, the service uses information in subsegments to generate inferred segments and adds them to the full trace. Inferred segments represent downstream services and resources in the service map.
+
+
+---------------------------------------------------------------------------
 Which of the following are scenarios where you might select Amazon Kinesis Data Firehose for data processing? (Select THREE.)
 
 
@@ -631,6 +708,7 @@ You want to simplify retry handling on streaming data, and the order of records 
 ---------------------------------------------------------------------------
 Q
 Which Amazon service can you use in conjunction with SQS to "fan out" SQS messages to multiple queues?
+
 SNS
 Create two SQS queues — one for premium members, and one for free members. Program your EC2 fleet to poll the premium queue first and, if empty, to then poll your free members SQS queue.
 
@@ -711,3 +789,31 @@ Lambda
 SNS
 
 SNS is a notification service used to send notifications like SMS text messages to end users. It is not the AWS service that is used to decouple application components, so that they can fail independently of one another.
+
+
+
+=============================================================================================================
+
+A developer monitors multiple sensors inside a data center which detects various environmental conditions that may affect their running servers. In the current architecture, the data is initially processed by an AWS Lambda function and then stored in a remote data warehouse. To make the system more durable and scalable, the developer plans to use an Amazon SQS FIFO queue to store the data, which will be polled by the Lambda function. There is a known issue with the sensor devices sending duplicate data intermittently.
+
+What action can the developer take to lessen the chances of processing duplicate messages?
+
+Use an Amazon SQS Standard queue instead of a FIFO queue to avoid any duplicate messages.
+
+'Add a MessageDeduplicationId parameter to the SendMessage API request.'
+
+Configure the Amazon SQS queue to automatically drop a duplicate message whenever it arrives within the message’s VisibilityTimeout.
+
+Refactor the Lambda function to store the messages content and drop the incoming messages with similar content within a 5-minute period.
+
+Incorrect
+Amazon SQS FIFO First-In-First-Out queues are designed to enhance messaging between applications when the order of operations and events is critical or where duplicates can’t be tolerated.
+
+
+Amazon SQS FIFO queues follow exactly-once processing. It introduces a parameter called Message Deduplication ID, which is the token used for deduplication of sent messages. Suppose a message with a particular message deduplication ID is sent successfully. In that case, any messages sent with the same message deduplication ID are accepted successfully but aren’t delivered during the 5-minute deduplication interval.
+
+SQS remembers the MessageDeduplicationId values it’s seen for at least five minutes, which means deduplication Ids can only reduce, not completely eliminate, the chances of duplication occurring. For example, if a producer was unable to receive an acknowledgment after sending a message due to a network issue and then regains connection after 10 minutes and attempts to resend the message, there is a risk of duplication occurring.
+
+In this scenario, you can lessen the chances of the Lambda function processing duplicate messages by storing data in an SQS FIFO queue. You may provide a MessageDeduplicationId value so SQS can distinguish one message from another. Optionally, you may enable ContentBasedDeduplication to let SQS create an SHA-256 hash based on the message body and use it as the value for MessageDeduplicationId.
+
+Hence, in this scenario, the correct answer is to: Add a MessageDeduplicationId parameter to the SendMessage API request.

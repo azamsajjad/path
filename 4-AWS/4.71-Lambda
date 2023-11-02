@@ -421,7 +421,7 @@ AWS Event Fork Pipelines—available from the Serverless Application Repository�
 ========================================================================
 ========================================================================
 Distributed tracing with AWS X-Ray
-
+========================================================================
 Another important best practice for event-driven, decoupled applications is the use of distributed tracing to give you insight into issues or bottlenecks across your distributed architecture. 
 
 Example: AWS X-Ray service graph
@@ -742,7 +742,7 @@ You have the same security issues, but AWS manages more of them on your behalf. 
 
 
 
-AWS manages the platform where Lambda functions reside and are executed, so you are also freed from managing the runtimes, unless you develop custom runtimes. You can find more details about how security is implemented in Lambda in the Lambda security whitepaper, linked beneath the video.
+AWS manages the platform where Lambda functions reside and are executed, so you are also freed from managing the runtimes, unless you develop custom runtimes. You can find more details about how security is implemented in Lambda in the Lambda security whitepaper.
 
 
 
@@ -1566,7 +1566,50 @@ B
 Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the name of the Lambda alias. Modify the Lambda resource-based policy by adding the permission lambda:InvokeFunction. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
 Incorrect. To add "stageVariable" to the Lambda ARN, you do not use the Lambda alias name. You should use the following format: ${stageVariable.stageVariableName}.
 
-========================================================================================================================================================================================================================================================================================
+======================================================================================================================================================================================================================================
+You are developing a serverless application in AWS composed of several Lambda functions and a DynamoDB database. The requirement is to process the requests asynchronously.
+
+Which of the following is the MOST suitable way to accomplish this?
+
+
+Use the InvokeAsync API to call the Lambda function and set the invocation type request parameter to Event.
+
+Use the Invoke API to call the Lambda function and set the invocation type request parameter to RequestResponse.
+
+Use the Invoke API to call the Lambda function and set the invocation type request parameter to Event.``````
+
+Use the InvokeAsync API to call the Lambda function and set the invocation type request parameter to RequestResponse.
+
+
+
+
+Correct
+AWS Lambda supports synchronous and asynchronous invocation of a Lambda function. You can control the invocation type only when you invoke a Lambda function (referred to as on-demand invocation). The following examples illustrate on-demand invocations:
+
+-Your custom application invokes a Lambda function.
+
+-You manually invoke a Lambda function (for example, using the AWS CLI) for testing purposes.
+
+In both cases, you invoke your Lambda function using the Invoke operation, and you can specify the invocation type as synchronous or asynchronous. 
+
+When you use AWS services as a trigger, the invocation type is predetermined for each service. You have no control over the invocation type that these event sources use when they invoke your Lambda function.
+
+In the Invoke API, you have 3 options to choose from for the InvocationType:
+
+RequestResponse (default) – Invoke the function synchronously. Keep the connection open until the function returns a response or times out. The API response includes the function response and additional data.
+
+Event – Invoke the function asynchronously. Send events that fail multiple times to the function’s dead-letter queue (if it’s configured). The API response only includes a status code.
+
+DryRun – Validate parameter values and verify that the user or role has permission to invoke the function.
+
+Hence, the correct answer is the option that says: Use the Invoke API to call the Lambda function and set the invocation type request parameter to Event.
+
+The option that says: Use the InvokeAsync API to call the Lambda function and set the invocation type request parameter to RequestResponse is incorrect because the InvokeAsync API is already deprecated. In addition, using the RequestResponse type will invoke the Lambda function synchronously.
+
+The option that says: Use the Invoke API to call the Lambda function and set the invocation type request parameter to RequestResponse is incorrect because this is the default value of the invocation type that will invoke the Lambda function synchronously.
+
+The option that says: Use the InvokeAsync API to call the Lambda function and set the invocation type request parameter to Event is incorrect. Although it uses the correct invocation type, the InvokeAsync API that it uses is already deprecated.
+==================================================
 You are developing a Lambda function that processes data from a Kinesis stream, then writes the results to a DynamoDB table. Customers have lately been complaining about general performance issues, and your support team has recently observed slow processing of the data records, as well as occasional ProvisionedThroughputExceeded errors. After investigating, you also notice that the function is taking longer than expected to complete processing. Which actions should you take to increase the processing speed of the application?
 
 Decrease the number of shards of the Kinesis Data Stream.
@@ -1616,3 +1659,27 @@ API Gateway latency is the time between when API Gateway receives a request from
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
+A developer has a Node.js function running in AWS Lambda. Currently, the code initializes a database connection to an Amazon RDS database every time the Lambda function is executed, and closes the connection before the function ends.
+
+What feature in AWS Lambda will allow the developer to reuse the already existing database connection instead of initializing it each time the function is run?
+
+AWS Lambda is not capable of maintaining existing database connections due to its transient data store.
+Event source mapping
+Environment variables
+Execution context```````````````````````
+Incorrect
+When AWS Lambda executes your Lambda function, it provisions and manages the resources needed to run your Lambda function. When you create a Lambda function, you specify configuration information, such as the amount of memory and maximum execution time that you want to allow for your Lambda function. When a Lambda function is invoked, AWS Lambda launches an execution context based on the configuration settings you provide.
+
+The execution context is a temporary runtime environment that initializes any external dependencies of your Lambda function code, such as database connections or HTTP endpoints. This affords subsequent invocations better performance because there is no need to “cold-start” or initialize those external dependencies. After a Lambda function is executed, AWS Lambda maintains the execution context for some time in anticipation of another Lambda function invocation. In effect, the service freezes the execution context after a Lambda function completes, and thaws the context for reuse, if AWS Lambda chooses to reuse the context when the Lambda function is invoked again.
+
+Hence, the correct answer is: Execution context.
+
+====================================================================
+A developer is building an AI-based traffic monitoring application using Lambda in AWS. Due to the complexity of the application, the developer must do certain modifications such as the way Lambda runs the function’s setup code and how the invocation events are read from the Lambda runtime API.
+
+In this scenario, which feature of Lambda should you take advantage of to meet the above requirement?
+
+Lambda@Edge
+Layers
+DLQ
+Custom Runtime```````````````

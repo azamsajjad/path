@@ -1,0 +1,593 @@
+Question #1 Topic 1
+A company is implementing an application on Amazon EC2 instances. The application needs to process incoming transactions. When the application detects a transaction that is not valid, the application must send a chat message to the companys support team. To send the message, the application needs to retrieve the access token to authenticate by using the chat API.
+A developer needs to implement a solution to store the access token. The access token must be encrypted at rest and in transit. The access token must also be accessible from other AWS accounts.
+Which solution will meet these requirements with the LEAST management overhead?
+
+A. Use an AWS Systems Manager Parameter Store SecureString parameter that uses an AWS Key Management Service (AWS KMS) AWS managed key to store the access token. Add a resource-based policy to the parameter to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Parameter Store. Retrieve the token from Parameter Store with the decrypt flag enabled. Use the decrypted access token to send the message to the chat.
+B. Encrypt the access token by using an AWS Key Management Service (AWS KMS) customer managed key. Store the access token in an Amazon DynamoDB table. Update the IAM role of the EC2 instances with permissions to access DynamoDB and AWS KMS. Retrieve the token from DynamoDDecrypt the token by using AWS KMS on the EC2 instances. Use the decrypted access token to send the message to the chat.
+C. Use AWS Secrets Manager with an AWS Key Management Service (AWS KMS) customer managed key to store the access token. Add a resource-based policy to the secret to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Secrets Manager. Retrieve the token from Secrets Manager. Use the decrypted access token to send the message to the chat. Most Voted
+"D. Encrypt the access token by using an AWS Key Management Service (AWS KMS) AWS managed key. Store the access token in an Amazon S3 bucket. Add a bucket policy to the S3 bucket to allow access from other accounts. Update the IAM role of the EC2 instances with permissions to access Amazon S3 and AWS KMS. Retrieve the token from the S3 bucket. Decrypt the token by using AWS KMS on the EC2 instances. Use the decrypted access token to send the massage to the chat."
+// LEAST management Overhead and No Rotation Required
+==================================================================================================================
+Question #2 Topic 1
+A company is running Amazon EC2 instances in multiple AWS accounts. A developer needs to implement an application that collects all the lifecycle events of the EC2 instances. The application needs to store the lifecycle events in a single Amazon Simple Queue Service (Amazon SQS) queue in the companys main AWS account for further processing.
+Which solution will meet these requirements?
+
+A. Configure Amazon EC2 to deliver the EC2 instance lifecycle events from all accounts to the Amazon EventBridge event bus of the main account. Add an EventBridge rule to the event bus of the main account that matches all EC2 instance lifecycle events. Add the SQS queue as a target of the rule.
+B. Use the resource policies of the SQS queue in the main account to give each account permissions to write to that SQS queue. Add to the Amazon EventBridge event bus of each account an EventBridge rule that matches all EC2 instance lifecycle events. Add the SQS queue in the main account as a target of the rule.
+C. Write an AWS Lambda function that scans through all EC2 instances in the company accounts to detect EC2 instance lifecycle changes. Configure the Lambda function to write a notification message to the SQS queue in the main account if the function detects an EC2 instance lifecycle change. Add an Amazon EventBridge scheduled rule that invokes the Lambda function every minute.
+'D. Configure the permissions on the main account event bus to receive events from all accounts. Create an Amazon EventBridge rule in each account to send all the EC2 instance lifecycle events to the main account event bus. Add an EventBridge rule to the main account event bus that matches all EC2 instance lifecycle events. Set the SQS queue as a target for the rule. Most Voted'
+==================================================================================================================
+Question #3 Topic 1
+An application is using Amazon Cognito user pools and identity pools for secure access. A developer wants to integrate the user-specific file upload and download features in the application with Amazon S3. The developer must ensure that the files are saved and retrieved in a secure manner and that users can access only their own files. The file sizes range from 3 KB to 300 MB.
+Which option will meet these requirements with the HIGHEST level of security?
+
+A. Use S3 Event Notifications to validate the file upload and download requests and update the user interface (UI).
+B. Save the details of the uploaded files in a separate Amazon DynamoDB table. Filter the list of files in the user interface (UI) by comparing the current user ID with the user ID associated with the file in the table.
+C. Use Amazon API Gateway and an AWS Lambda function to upload and download files. Validate each request in the Lambda function before performing the requested operation.
+'D. Use an IAM policy within the Amazon Cognito identity prefix to restrict users to use their own folders in Amazon S3. Most Voted'
+==================================================================================================================
+Question #4Topic 1
+A company is building a scalable data management solution by using AWS services to improve the speed and agility of development. The solution will ingest large volumes of data from various sources and will process this data through multiple business rules and transformations.
+The solution requires business rules to run in sequence and to handle reprocessing of data if errors occur when the business rules run. The company needs the solution to be scalable and to require the least possible maintenance.
+Which AWS service should the company use to manage and automate the orchestration of the data flows to meet these requirements?
+
+A. AWS Batch
+'B. AWS Step Functions Most Voted'
+C. AWS Glue
+D. AWS Lambda 
+==================================================================================================================
+A developer has an application that makes batch requests directly to Amazon DynamoDB by using the BatchGetItem low-level API operation. The responses frequently return values in the UnprocessedKeys element.
+Which actions should the developer take to increase the resiliency of the application when the batch response includes values in UnprocessedKeys? (Choose two.)
+
+A. Retry the batch operation immediately.
+'B. Retry the batch operation with exponential backoff and randomized delay.'
+C. Update the application to use an AWS software development kit (AWS SDK) to make the requests.
+'D. Increase the provisioned read capacity of the DynamoDB tables that the operation accesses.'
+E. Increase the provisioned write capacity of the DynamoDB tables that the operation accesses.
+
+BatchGetItem
+• Return items from one or more tables
+• Up to 100 items, up to 16 MB of data
+• Items are retrieved in parallel to minimize latency
+• UnprocessedKeys for failed read operations (exponential backoff or add RCU)
+==================================================================================================================
+ Question #8Topic 1
+A company is running a custom application on a set of on-premises Linux servers that are accessed using Amazon API Gateway. AWS X-Ray tracing has been enabled on the API test stage.
+How can a developer enable X-Ray tracing on the on-premises servers with the LEAST amount of configuration?
+
+A. Install and run the X-Ray SDK on the on-premises servers to capture and relay the data to the X-Ray service.
+'B. Install and run the X-Ray daemon on the on-premises servers to capture and relay the data to the X-Ray service. Most Voted'
+C. Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTraceSegments API call.
+D. Capture incoming requests on-premises and configure an AWS Lambda function to pull, process, and relay relevant data to X-Ray using the PutTelemetryRecords API call.
+==================================================================================================================
+ Question #9Topic 1
+A company wants to share information with a third party. The third party has an HTTP API endpoint that the company can use to share the information. The company has the required API key to access the HTTP API.
+The company needs a way to manage the API key by using code. The integration of the API key with the application code cannot affect application performance.
+Which solution will meet these requirements MOST securely?
+
+'A. Store the API credentials in AWS Secrets Manager. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call. Most Voted'
+B. Store the API credentials in a local code variable. Push the code to a secure Git repository. Use the local code variable at runtime to make the API call.
+C. Store the API credentials as an object in a private Amazon S3 bucket. Restrict access to the S3 object by using IAM policies. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call.
+D. Store the API credentials in an Amazon DynamoDB table. Restrict access to the table by using resource-based policies. Retrieve the API credentials at runtime by using the AWS SDK. Use the credentials to make the API call.
+==================================================================================================================
+Question #10Topic 1
+A developer is deploying a new application to Amazon Elastic Container Service (Amazon ECS). The developer needs to securely store and retrieve different types of variables. These variables include authentication information for a remote API, the URL for the API, and credentials. The authentication information and API URL must be available to all current and future deployed versions of the application across development, testing, and production environments.
+How should the developer retrieve the variables with the FEWEST application changes?
+
+'A. Update the application to retrieve the variables from AWS Systems Manager Parameter Store. Use unique paths in Parameter Store for each variable in each environment. Store the credentials in AWS Secrets Manager in each environment. Most Voted'
+B. Update the application to retrieve the variables from AWS Key Management Service (AWS KMS). Store the API URL and credentials as unique keys for each environment.
+C. Update the application to retrieve the variables from an encrypted file that is stored with the application. Store the API URL and credentials in unique files for each environment.
+D. Update the application to retrieve the variables from each of the deployed environments. Define the authentication information and API URL in the ECS task definition as unique names during the deployment process. 
+==================================================================================================================
+Question #11Topic 1
+A company is migrating legacy internal applications to AWS. Leadership wants to rewrite the internal employee directory to use native AWS services. A developer needs to create a solution for storing employee contact details and high-resolution photos for use with the new application.
+Which solution will enable the search and retrieval of each employees individual details and high-resolution photos using AWS APIs?
+
+A. Encode each employees contact information and photos using Base64. Store the information in an Amazon DynamoDB table using a sort key.
+'B. Store each employees contact information in an Amazon DynamoDB table along with the object keys for the photos stored in Amazon S3. Most Voted'
+C. Use Amazon Cognito user pools to implement the employee directory in a fully managed software-as-a-service (SaaS) method.
+D. Store employee contact information in an Amazon RDS DB instance with the photos stored in Amazon Elastic File System (Amazon EFS). 
+==================================================================================================================
+Question #12Topic 1
+A developer is creating an application that will give users the ability to store photos from their cellphones in the cloud. The application needs to support tens of thousands of users. The application uses an Amazon API Gateway REST API that is integrated with AWS Lambda functions to process the photos. The application stores details about the photos in Amazon DynamoDB.
+Users need to create an account to access the application. In the application, users must be able to upload photos and retrieve previously uploaded photos. The photos will range in size from 300 KB to 5 MB.
+Which solution will meet these requirements with the LEAST operational overhead?
+
+A. Use Amazon Cognito user pools to manage user accounts. Create an Amazon Cognito user pool authorizer in API Gateway to control access to the API. Use the Lambda function to store the photos and details in the DynamoDB table. Retrieve previously uploaded photos directly from the DynamoDB table.
+'B. Use Amazon Cognito user pools to manage user accounts. Create an Amazon Cognito user pool authorizer in API Gateway to control access to the API. Use the Lambda function to store the photos in Amazon S3. Store the objects S3 key as part of the photo details in the DynamoDB table. Retrieve previously uploaded photos by querying DynamoDB for the S3 key. Most Voted'
+C. Create an IAM user for each user of the application during the sign-up process. Use IAM authentication to access the API Gateway API. Use the Lambda function to store the photos in Amazon S3. Store the objects S3 key as part of the photo details in the DynamoDB table. Retrieve previously uploaded photos by querying DynamoDB for the S3 key.
+D. Create a users table in DynamoDB. Use the table to manage user accounts. Create a Lambda authorizer that validates user credentials against the users table. Integrate the Lambda authorizer with API Gateway to control access to the API. Use the Lambda function to store the photos in Amazon S3. Store the objects S3 key as par of the photo details in the DynamoDB table. Retrieve previously uploaded photos by querying DynamoDB for the S3 key. 
+==================================================================================================================
+Question #14Topic 1
+A financial company must store original customer records for 10 years for legal reasons. A complete record contains personally identifiable information (PII). According to local regulations, PII is available to only certain people in the company and must not be shared with third parties. The company needs to make the records available to third-party organizations for statistical analysis without sharing the PII.
+A developer wants to store the original immutable record in Amazon S3. Depending on who accesses the S3 document, the document should be returned as is or with all the PII removed. The developer has written an AWS Lambda function to remove the PII from the document. The function is named removePii.
+What should the developer do so that the company can meet the PII requirements while maintaining only one copy of the document?
+
+A. Set up an S3 event notification that invokes the removePii function when an S3 GET request is made. Call Amazon S3 by using a GET request to access the object without PII.
+B. Set up an S3 event notification that invokes the removePii function when an S3 PUT request is made. Call Amazon S3 by using a PUT request to access the object without PII.
+'C. Create an S3 Object Lambda access point from the S3 console. Select the removePii function. Use S3 Access Points to access the object without PII. Most Voted'
+D. Create an S3 access point from the S3 console. Use the access point name to call the GetObjectLegalHold S3 API function. Pass in the removePii function name to access the object without PII. 
+
+// Under Transformation configuration, you can add a function that transforms your data for your Object Lambda Access Point. Do one of the following:
+
+// If you already have a AWS Lambda function in your account you can choose it under Invoke Lambda function. Here you may enter the Amazon Resource Name (ARN) of an Lambda function in your AWS account or choose a Lambda function from the drop-down menu.
+
+// If you wish to use a AWS built function choose the function name under AWS built function and select Create Lambda function. This will take you to the Lambda console where you can deploy a built function into your AWS account. For more information about built functions, see Using AWS built Lambda functions.
+
+// Under S3 APIs, choose one or more API operations to invoke. For each API selected you must specify a Lambda function to invoke.
+
+// (Optional) Under Payload, add JSON text that you want to provide to your Lambda function as input. You can configure payloads with different parameters for different Object Lambda Access Points that invoke the same Lambda function, thereby extending the flexibility of your Lambda function.
+
+// Important
+// When you're using Object Lambda Access Points, make sure that the payload does not contain any confidential information.
+==================================================================================================================
+ Question #19Topic 1
+A company is offering APIs as a service over the internet to provide unauthenticated read access to statistical information that is updated daily. The company uses Amazon API Gateway and AWS Lambda to develop the APIs. The service has become popular, and the company wants to enhance the responsiveness of the APIs.
+Which action can help the company achieve this goal?
+
+'A. Enable API caching in API Gateway. Most Voted'
+B. Configure API Gateway to use an interfaace VPC endpoint.
+C. Enable cross-origin resource sharing (CORS) for the APIs.
+D. Configure usage plans and API keys in API Gateway.
+==================================================================================================================
+Question #20Topic 1
+A developer wants to store information about movies. Each movie has a title, release year, and genre. The movie information also can include additional properties about the cast and production crew. This additional information is inconsistent across movies. For example, one movie might have an assistant director, and another movie might have an animal trainer.
+The developer needs to implement a solution to support the following use cases:
+For a given title and release year, get all details about the movie that has that title and release year.
+For a given title, get all details about all movies that have that title.
+For a given genre, get all details about all movies in that genre.
+Which data store configuration will meet these requirements?
+
+'A. Create an Amazon DynamoDB table. Configure the table with a primary key that consists of the title as the partition key and the release year as the sort key. Create a global secondary index that uses the genre as the partition key and the title as the sort key. Most Voted'
+B. Create an Amazon DynamoDB table. Configure the table with a primary key that consists of the genre as the partition key and the release year as the sort key. Create a global secondary index that uses the title as the partition key.
+C. On an Amazon RDS DB instance, create a table that contains columns for title, release year, and genre. Configure the title as the primary key.
+D. On an Amazon RDS DB instance, create a table where the primary key is the title and all other data is encoded into JSON format as one additional column. 
+==================================================================================================================
+ Question #21Topic 1
+A developer maintains an Amazon API Gateway REST API. Customers use the API through a frontend UI and Amazon Cognito authentication.
+The developer has a new version of the API that contains new endpoints and backward-incompatible interface changes. The developer needs to provide beta access to other developers on the team without affecting customers.
+Which solution will meet these requirements with the LEAST operational overhead?
+
+'A. Define a development stage on the API Gateway API. Instruct the other developers to point the endpoints to the development stage. Most Voted'
+B. Define a new API Gateway API that points to the new API application code. Instruct the other developers to point the endpoints to the new API.
+C. Implement a query parameter in the API application code that determines which code version to call.
+D. Specify new API Gateway endpoints for the API endpoints that the developer wants to add.
+==================================================================================================================
+Question #23Topic 1
+A company has a multi-node Windows legacy application that runs on premises. The application uses a network shared folder as a centralized configuration repository to store configuration files in .xml format. The company is migrating the application to Amazon EC2 instances. As part of the migration to AWS, a developer must identify a solution that provides high availability for the repository.
+Which solution will meet this requirement MOST cost-effectively?
+
+A. Mount an Amazon Elastic Block Store (Amazon EBS) volume onto one of the EC2 instances. Deploy a file system on the EBS volume. Use the host operating system to share a folder. Update the application code to read and write configuration files from the shared folder.
+B. Deploy a micro EC2 instance with an instance store volume. Use the host operating system to share a folder. Update the application code to read and write configuration files from the shared folder.
+'C. Create an Amazon S3 bucket to host the repository. Migrate the existing .xml files to the S3 bucket. Update the application code to use the AWS SDK to read and write configuration files from Amazon S3. Most Voted'
+D. Create an Amazon S3 bucket to host the repository. Migrate the existing .xml files to the S3 bucket. Mount the S3 bucket to the EC2 instances as a local volume. Update the application code to read and write configuration files from the disk.
+==================================================================================================================
+Question #24Topic 1
+A company wants to deploy and maintain static websites on AWS. Each websites source code is hosted in one of several version control systems, including AWS CodeCommit, Bitbucket, and GitHub.
+The company wants to implement phased releases by using development, staging, user acceptance testing, and production environments in the AWS Cloud. Deployments to each environment must be started by code merges on the relevant Git branch. The company wants to use HTTPS for all data exchange. The company needs a solution that does not require servers to run continuously.
+Which solution will meet these requirements with the LEAST operational overhead?
+
+'A. Host each website by using AWS Amplify with a serverless backend. Conned the repository branches that correspond to each of the desired environments. Start deployments by merging code changes to a desired branch. Most Voted'
+B. Host each website in AWS Elastic Beanstalk with multiple environments. Use the EB CLI to link each repository branch. Integrate AWS CodePipeline to automate deployments from version control code merges.
+C. Host each website in different Amazon S3 buckets for each environment. Configure AWS CodePipeline to pull source code from version control. Add an AWS CodeBuild stage to copy source code to Amazon S3.
+D. Host each website on its own Amazon EC2 instance. Write a custom deployment script to bundle each websites static assets. Copy the assets to Amazon EC2. Set up a workflow to run the script when code is merged.
+
+ The solution that will meet these requirements with the LEAST operational overhead is option A: Host each website by using AWS Amplify with a serverless backend. AWS Amplify is a fully managed service that allows developers to build and deploy web applications and static websites. With Amplify, developers can easily connect their repositories, such as AWS CodeCommit, Bitbucket, and GitHub, to automatically build and deploy changes to the website based on code merges. Amplify also supports phased releases with multiple environments, including development, staging, user acceptance testing, and production, which can be linked to specific branches in the repository. Additionally, Amplify uses HTTPS for all data exchange by default and has a serverless backend, which means there are no servers to maintain. Overall, this solution provides the least operational overhead while meeting all the specified requirements.
+==================================================================================================================
+Question #25Topic 1
+A company is migrating an on-premises database to Amazon RDS for MySQL. The company has read-heavy workloads. The company wants to refactor the code to achieve optimum read performance for queries.
+Which solution will meet this requirement with LEAST current and future effort?
+
+A. Use a multi-AZ Amazon RDS deployment. Increase the number of connections that the code makes to the database or increase the connection pool size if a connection pool is in use.
+B. Use a multi-AZ Amazon RDS deployment. Modify the code so that queries access the secondary RDS instance.
+'C. Deploy Amazon RDS with one or more read replicas. Modify the application code so that queries use the URL for the read replicas. Most Voted'
+D. Use open source replication software to create a copy of the MySQL database on an Amazon EC2 instance. Modify the application code so that queries use the IP address of the EC2 instance. 
+==================================================================================================================
+Question #26Topic 1
+A developer is creating an application that will be deployed on IoT devices. The application will send data to a RESTful API that is deployed as an AWS Lambda function. The application will assign each API request a unique identifier. The volume of API requests from the application can randomly increase at any given time of day.
+During periods of request throttling, the application might need to retry requests. The API must be able to handle duplicate requests without inconsistencies or data loss.
+Which solution will meet these requirements?
+
+A. Create an Amazon RDS for MySQL DB instance. Store the unique identifier for each request in a database table. Modify the Lambda function to check the table for the identifier before processing the request.
+'B. Create an Amazon DynamoDB table. Store the unique identifier for each request in the table. Modify the Lambda function to check the table for the identifier before processing the request. Most Voted'
+C. Create an Amazon DynamoDB table. Store the unique identifier for each request in the table. Modify the Lambda function to return a client error response when the function receives a duplicate request.
+D. Create an Amazon ElastiCache for Memcached instance. Store the unique identifier for each request in the cache. Modify the Lambda function to check the cache for the identifier before processing the request. 
+==================================================================================================================
+Question #30Topic 1
+A company has an application that uses Amazon Cognito user pools as an identity provider. The company must secure access to user records. The company has set up multi-factor authentication (MFA). The company also wants to send a login activity notification by email every time a user logs in.
+What is the MOST operationally efficient solution that meets this requirement?
+
+A. Create an AWS Lambda function that uses Amazon Simple Email Service (Amazon SES) to send the email notification. Add an Amazon API Gateway API to invoke the function. Call the API from the client side when login confirmation is received.
+'B. Create an AWS Lambda function that uses Amazon Simple Email Service (Amazon SES) to send the email notification. Add an Amazon Cognito post authentication Lambda trigger for the function. Most Voted'
+C. Create an AWS Lambda function that uses Amazon Simple Email Service (Amazon SES) to send the email notification. Create an Amazon CloudWatch Logs log subscription filter to invoke the function based on the login status.
+D. Configure Amazon Cognito to stream all logs to Amazon Kinesis Data Firehose. Create an AWS Lambda function to process the streamed logs and to send the email notification based on the login status of each user. 
+==================================================================================================================
+Question #33Topic 1
+A developer is creating an application that includes an Amazon API Gateway REST API in the us-east-2 Region. The developer wants to use Amazon CloudFront and a custom domain name for the API. The developer has acquired an SSL/TLS certificate for the domain from a third-party provider.
+How should the developer configure the custom domain for the application?
+
+A. Import the SSL/TLS certificate into AWS Certificate Manager (ACM) in the same Region as the API. Create a DNS A record for the custom domain.
+B. Import the SSL/TLS certificate into CloudFront. Create a DNS CNAME record for the custom domain.
+C. Import the SSL/TLS certificate into AWS Certificate Manager (ACM) in the same Region as the API. Create a DNS CNAME record for the custom domain.
+'D. Import the SSL/TLS certificate into AWS Certificate Manager (ACM) in the us-east-1 Region. Create a DNS CNAME record for the custom domain. Most Voted '
+==================================================================================================================
+Question #36Topic 1
+A development team maintains a web application by using a single AWS CloudFormation template. The template defines web servers and an Amazon RDS database. The team uses the Cloud Formation template to deploy the Cloud Formation stack to different environments.
+During a recent application deployment, a developer caused the primary development database to be dropped and recreated. The result of this incident was a loss of data. The team needs to avoid accidental database deletion in the future.
+Which solutions will meet these requirements? (Choose two.)
+
+'A. Add a CloudFormation Deletion Policy attribute with the Retain value to the database resource. Most Voted
+B. Update the CloudFormation stack policy to prevent updates to the database. Most Voted'
+C. Modify the database to use a Multi-AZ deployment.
+D. Create a CloudFormation stack set for the web application and database deployments.
+E. Add a Cloud Formation DeletionPolicy attribute with the Retain value to the stack. 
+==================================================================================================================
+Question #37Topic 1
+A company has an Amazon S3 bucket that contains sensitive data. The data must be encrypted in transit and at rest. The company encrypts the data in the S3 bucket by using an AWS Key Management Service (AWS KMS) key. A developer needs to grant several other AWS accounts the permission to use the S3 GetObject operation to retrieve the data from the S3 bucket.
+How can the developer enforce that all requests to retrieve the data provide encryption in transit?
+
+'A. Define a resource-based policy on the S3 bucket to deny access when a request meets the condition “aws:SecureTransport”: “false”. Most Voted'
+B. Define a resource-based policy on the S3 bucket to allow access when a request meets the condition “aws:SecureTransport”: “false”.
+C. Define a role-based policy on the other accounts roles to deny access when a request meets the condition of “aws:SecureTransport”: “false”.
+D. Define a resource-based policy on the KMS key to deny access when a request meets the condition of “aws:SecureTransport”: “false”. 
+==================================================================================================================
+Question #40Topic 1
+A company has deployed infrastructure on AWS. A development team wants to create an AWS Lambda function that will retrieve data from an Amazon Aurora database. The Amazon Aurora database is in a private subnet in companys VPC. The VPC is named VPC1. The data is relational in nature. The Lambda function needs to access the data securely.
+Which solution will meet these requirements?
+
+'A. Create the Lambda function. Configure VPC1 access for the function. Attach a security group named SG1 to both the Lambda function and the database. Configure the security group inbound and outbound rules to allow TCP traffic on Port 3306. Most Voted'
+B. Create and launch a Lambda function in a new public subnet that is in a new VPC named VPC2. Create a peering connection between VPC1 and VPC2.
+C. Create the Lambda function. Configure VPC1 access for the function. Assign a security group named SG1 to the Lambda function. Assign a second security group named SG2 to the database. Add an inbound rule to SG1 to allow TCP traffic from Port 3306.
+D. Export the data from the Aurora database to Amazon S3. Create and launch a Lambda function in VPC1. Configure the Lambda function query the data from Amazon S3. 
+==================================================================================================================
+Question #45Topic 1
+A developer is writing an AWS Lambda function. The developer wants to log key events that occur while the Lambda function runs. The developer wants to include a unique identifier to associate the events with a specific function invocation. The developer adds the following code to the Lambda function:
+image2
+Which solution will meet this requirement?
+
+'A. Obtain the request identifier from the AWS request ID field in the context object. Configure the application to write logs to standard output. Most Voted'
+B. Obtain the request identifier from the AWS request ID field in the event object. Configure the application to write logs to a file.
+C. Obtain the request identifier from the AWS request ID field in the event object. Configure the application to write logs to standard output.
+D. Obtain the request identifier from the AWS request ID field in the context object. Configure the application to write logs to a file. 
+
+Selected Answer A:
+Handler function https://docs.aws.amazon.com/lambda/latest/dg/nodejs-handler.html
+Context object awsRequestId – The identifier of the invocation request. https://docs.aws.amazon.com/lambda/latest/dg/nodejs-context.html
+==================================================================================================================
+Question #47Topic 1
+An application uses an Amazon EC2 Auto Scaling group. A developer notices that EC2 instances are taking a long time to become available during scale-out events. The UserData script is taking a long time to run.
+The developer must implement a solution to decrease the time that elapses before an EC2 instance becomes available. The solution must make the most recent version of the application available at all times and must apply all available security updates. The solution also must minimize the number of images that are created. The images must be validated.
+Which combination of steps should the developer take to meet these requirements? (Choose two.)
+
+'A. Use EC2 Image Builder to create an Amazon Machine Image (AMI). Install all the patches and agents that are needed to manage and run the application. Update the Auto Scaling group launch configuration to use the AMI. Most VotedMost Voted'
+B. Use EC2 Image Builder to create an Amazon Machine Image (AMI). Install the latest version of the application and all the patches and agents that are needed to manage and run the application. Update the Auto Scaling group launch configuration to use the AMI.
+C. Set up AWS CodeDeploy to deploy the most recent version of the application at runtime. 
+D. Set up AWS CodePipeline to deploy the most recent version of the application at runtime.
+'E. Remove any commands that perform operating system patching from the UserData script. Most Voted'
+
+Why choose A over B? Problem is that B will tie an AMI with a specific version, so if there is a new version, we need to create a new AMI, and that contradicts with "minimize the number of images that are created".
+
+Then E over C, D? E is obviously complementary to A, where removing commands from User Data will make the instance booting process much faster (and of course with A you don't need that anymore).
+
+C and D also works but 1/not complementary with any other options; 2/CodeDeploy takes time to execute.
+
+Hope this helps somebody struggling with this question. 
+==================================================================================================================
+Question #50Topic 1
+A developer is creating a mobile app that calls a backend service by using an Amazon API Gateway REST API. For integration testing during the development phase, the developer wants to simulate different backend responses without invoking the backend service.
+Which solution will meet these requirements with the LEAST operational overhead?
+
+A. Create an AWS Lambda function. Use API Gateway proxy integration to return constant HTTP responses.
+B. Create an Amazon EC2 instance that serves the backend REST API by using an AWS CloudFormation template.
+C. Customize the API Gateway stage to select a response type based on the request.
+'D. Use a request mapping template to select the mock integration response. Most Voted '
+==================================================================================================================
+Question #53Topic 1
+A developer is using an AWS Lambda function to generate avatars for profile pictures that are uploaded to an Amazon S3 bucket. The Lambda function is automatically invoked for profile pictures that are saved under the /original/ S3 prefix. The developer notices that some pictures cause the Lambda function to time out. The developer wants to implement a fallback mechanism by using another Lambda function that resizes the profile picture.
+Which solution will meet these requirements with the LEAST development effort?
+
+'A. Set the image resize Lambda function as a destination of the avatar generator Lambda function for the events that fail processing. Most Voted'
+B. Create an Amazon Simple Queue Service (Amazon SQS) queue. Set the SQS queue as a destination with an on failure condition for the avatar generator Lambda function. Configure the image resize Lambda function to poll from the SQS queue.
+C. Create an AWS Step Functions state machine that invokes the avatar generator Lambda function and uses the image resize Lambda function as a fallback. Create an Amazon EventBridge rule that matches events from the S3 bucket to invoke the state machine.
+D. Create an Amazon Simple Notification Service (Amazon SNS) topic. Set the SNS topic as a destination with an on failure condition for the avatar generator Lambda function. Subscribe the image resize Lambda function to the SNS topic. 
+==================================================================================================================
+Question #56Topic 1
+A company is using an AWS Lambda function to process records from an Amazon Kinesis data stream. The company recently observed slow processing of the records. A developer notices that the iterator age metric for the function is increasing and that the Lambda run duration is constantly above normal.
+Which actions should the developer take to increase the processing speed? (Choose two.)
+
+'A. Increase the number of shards of the Kinesis data stream. Most Voted'
+B. Decrease the timeout of the Lambda function.
+'C. Increase the memory that is allocated to the Lambda function. Most Voted'
+D. Decrease the number of shards of the Kinesis data stream.
+E. Increase the timeout of the Lambda function. 
+
+https://repost.aws/knowledge-center/lambda-iterator-age
+==================================================================================================================
+ Question #58Topic 1
+A developer is testing a new file storage application that uses an Amazon CloudFront distribution to serve content from an Amazon S3 bucket. The distribution accesses the S3 bucket by using an origin access identity (OAI). The S3 buckets permissions explicitly deny access to all other users.
+The application prompts users to authenticate on a login page and then uses signed cookies to allow users to access their personal storage directories. The developer has configured the distribution to use its default cache behavior with restricted viewer access and has set the origin to point to the S3 bucket. However, when the developer tries to navigate to the login page, the developer receives a 403 Forbidden error.
+The developer needs to implement a solution to allow unauthenticated access to the login page. The solution also must keep all private content secure.
+Which solution will meet these requirements?
+
+'A. Add a second cache behavior to the distribution with the same origin as the default cache behavior. Set the path pattern for the second cache behavior to the path of the login page, and make viewer access unrestricted. Keep the default cache behaviors settings unchanged. Most Voted'
+B. Add a second cache behavior to the distribution with the same origin as the default cache behavior. Set the path pattern for the second cache behavior to *, and make viewer access restricted. Change the default cache behaviors path pattern to the path of the login page, and make viewer access unrestricted.
+C. Add a second origin as a failover origin to the default cache behavior. Point the failover origin to the S3 bucket. Set the path pattern for the primary origin to *, and make viewer access restricted. Set the path pattern for the failover origin to the path of the login page, and make viewer access unrestricted.
+D. Add a bucket policy to the S3 bucket to allow read access. Set the resource on the policy to the Amazon Resource Name (ARN) of the login page object in the S3 bucket. Add a CloudFront function to the default cache behavior to redirect unauthorized requests to the login pages S3 URL.
+
+If you create additional cache behaviors, the default cache behavior is always the last to be processed.
+https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesCacheBehavior
+==================================================================================================================
+A developer is using AWS Amplify Hosting to build and deploy an application. The developer is receiving an increased number of bug reports from users. The developer wants to add end-to-end testing to the application to eliminate as many bugs as possible before the bugs reach production.
+Which solution should the developer implement to meet these requirements?
+
+A. Run the amplify add test command in the Amplify CLI.
+B. Create unit tests in the application. Deploy the unit tests by using the amplify push command in the Amplify CLI.
+'C. Add a test phase to the amplify.yml build settings for the application. Most Voted'
+D. Add a test phase to the aws-exports.js file for the application.
+
+Explanation: Adding a test phase to the amplify.yml build settings allows the developer to define and execute end-to-end tests as part of the build and deployment process in AWS Amplify Hosting. This will help ensure that bugs are caught and fixed before the application reaches production, improving the overall quality of the application. 
+==================================================================================================================
+Question #60Topic 1
+A company needs to harden its container images before the images are in a running state. The company's application uses Amazon Elastic Container Registry (Amazon ECR) as an image registry. Amazon Elastic Kubernetes Service (Amazon EKS) for compute, and an AWS CodePipeline pipeline that orchestrates a continuous integration and continuous delivery (CI/CD) workflow.
+Dynamic application security testing occurs in the final stage of the pipeline after a new image is deployed to a development namespace in the EKS cluster. A developer needs to place an analysis stage before this deployment to analyze the container image earlier in the CI/CD pipeline.
+Which solution will meet these requirements with the MOST operational efficiency?
+
+A. Build the container image and run the docker scan command locally. Mitigate any findings before pushing changes to the source code repository. Write a pre-commit hook that enforces the use of this workflow before commit.
+'B. Create a new CodePipeline stage that occurs after the container image is built. Configure ECR basic image scanning to scan on image push. Use an AWS Lambda function as the action provider. Configure the Lambda function to check the scan results and to fail the pipeline if there are findings. Most Voted'
+C. Create a new CodePipeline stage that occurs after source code has been retrieved from its repository. Run a security scanner on the latest revision of the source code. Fail the pipeline if there are findings.
+D. Add an action to the deployment stage of the pipeline so that the action occurs before the deployment to the EKS cluster. Configure ECR basic image scanning to scan on image push. Use an AWS Lambda function as the action provider. Configure the Lambda function to check the scan results and to fail the pipeline if there are findings. 
+==================================================================================================================
+Question #61Topic 1
+A company is building a web application on AWS. When a customer sends a request, the application will generate reports and then make the reports available to the customer within one hour. Reports should be accessible to the customer for 8 hours. Some reports are larger than 1 MB. Each report is unique to the customer. The application should delete all reports that are older than 2 days.
+Which solution will meet these requirements with the LEAST operational overhead?
+
+A. Generate the reports and then store the reports as Amazon DynamoDB items that have a specified TTL. Generate a URL that retrieves the reports from DynamoDB. Provide the URL to customers through the web application.
+B. Generate the reports and then store the reports in an Amazon S3 bucket that uses server-side encryption. Attach the reports to an Amazon Simple Notification Service (Amazon SNS) message. Subscribe the customer to email notifications from Amazon SNS.
+'C. Generate the reports and then store the reports in an Amazon S3 bucket that uses server-side encryption. Generate a presigned URL that contains an expiration date Provide the URL to customers through the web application. Add S3 Lifecycle configuration rules to the S3 bucket to delete old reports. Most Voted'
+D. Generate the reports and then store the reports in an Amazon RDS database with a date stamp. Generate an URL that retrieves the reports from the RDS database. Provide the URL to customers through the web application. Schedule an hourly AWS Lambda function to delete database records that have expired date stamps. 
+==================================================================================================================
+A company has deployed an application on AWS Elastic Beanstalk. The company has configured the Auto Scaling group that is associated with the Elastic Beanstalk environment to have five Amazon EC2 instances. If the capacity is fewer than four EC2 instances during the deployment, application performance degrades. The company is using the all-at-once deployment policy.
+What is the MOST cost-effective way to solve the deployment issue?
+
+A. Change the Auto Scaling group to six desired instances.
+B. Change the deployment policy to traffic splitting. Specify an evaluation time of 1 hour.
+'C. Change the deployment policy to rolling with additional batch. Specify a batch size of 1. Most Voted'
+D. Change the deployment policy to rolling. Specify a batch size of 2.
+
+Explanation: The rolling with additional batch deployment policy allows Elastic Beanstalk to launch additional instances in a new batch before terminating the old instances. In this case, specifying a batch size of 1 means that Elastic Beanstalk will deploy the application updates to 1 new instance at a time, ensuring that there are always at least 4 instances available during the deployment process. This method maintains application performance while minimizing the additional cost. 
+==================================================================================================================
+Question #63Topic 1
+A developer is incorporating AWS X-Ray into an application that handles personal identifiable information (PII). The application is hosted on Amazon EC2 instances. The application trace messages include encrypted PII and go to Amazon CloudWatch. The developer needs to ensure that no PII goes outside of the EC2 instances.
+Which solution will meet these requirements?
+
+A. Manually instrument the X-Ray SDK in the application code. Most Voted
+'B. Use the X-Ray auto-instrumentation agent.'
+C. Use Amazon Macie to detect and hide PII. Call the X-Ray API from AWS Lambda.
+D. Use AWS Distro for Open Telemetry.
+
+Using the X-Ray auto-instrumentation agent (Option B) is the best choice in this scenario because it will automatically instrument the application without requiring any manual code changes. Additionally, when using X-Ray with auto-instrumentation, you can control the sampling rate to ensure that only a subset of trace data (and encrypted PII) is sent to X-Ray and CloudWatch, reducing the risk of sensitive data being exposed outside of the instances. 
+==================================================================================================================
+Question #68Topic 1
+A company is building a serverless application that uses AWS Lambda functions. The company needs to create a set of test events to test Lambda functions in a development environment. The test events will be created once and then will be used by all the developers in an IAM developer group. The test events must be editable by any of the IAM users in the IAM developer group.
+
+Which solution will meet these requirements?
+
+A. Create and store the test events in Amazon S3 as JSON objects. Allow S3 bucket access to all IAM users. Most Voted
+'B. Create the test events. Configure the event sharing settings to make the test events shareable. Most Voted'
+C. Create and store the test events in Amazon DynamoDB. Allow access to DynamoDB by using IAM roles.
+D. Create the test events. Configure the event sharing settings to make the test events private. 
+==================================================================================================================
+Question #69Topic 1
+A developer is configuring an application's deployment environment in AWS CodePipeline. The application code is stored in a GitHub repository. The developer wants to ensure that the repository package's unit tests run in the new deployment environment. The developer has already set the pipeline's source provider to GitHub and has specified the repository and branch to use in the deployment.
+
+Which combination of steps should the developer take next to meet these requirements with the LEAST overhead? (Choose two.)
+
+A. Create an AWS CodeCommit project. Add the repository packages build and test commands to the projects buildspec.
+'B. Create an AWS CodeBuild project. Add the repository packages build and test commands to the projects buildspec.yml file Most Voted'
+C. Create an AWS CodeDeploy project. Add the repository packages build and test commands to the projects buildspec.
+D. Add an action to the source stage. Specify the newly created project as the action provider. Specify the build artifact as the actions input artifact.
+'E. Add a new stage to the pipeline after the source stage. Add an action to the new stage. Specify the newly created project as the action provider. Specify the source artifact as the actions input artifact. Most Voted '
+==================================================================================================================
+Question #70Topic 1
+An engineer created an A/B test of a new feature on an Amazon CloudWatch Evidently project. The engineer configured two variations of the feature (Variation A and Variation B) for the test. The engineer wants to work exclusively with Variation A. The engineer needs to make updates so that Variation A is the only variation that appears when the engineer hits the applications endpoint.
+
+Which solution will meet this requirement?
+
+'A. Add an override to the feature. Set the identifier of the override to the engineers user ID. Set the variation to Variation A. Most Voted'
+B. Add an override to the feature. Set the identifier of the override to Variation A. Set the variation to 100%.
+C. Add an experiment to the project. Set the identifier of the experiment to Variation B. Set the variation to 0%.
+D. Add an experiment to the project. Set the identifier of the experiment to the AWS accounts account ISet the variation to Variation A.
+
+Overrides let you pre-define the variation for selected users. to always receive the editable variation. https://aws.amazon.com/blogs/aws/cloudwatch-evidently/ 
+==================================================================================================================
+Question #73Topic 1
+A company runs an application on AWS. The company deployed the application on Amazon EC2 instances. The application stores data on Amazon Aurora.
+
+The application recently logged multiple application-specific custom DECRYP_ERROR errors to Amazon CloudWatch logs. The company did not detect the issue until the automated tests that run every 30 minutes failed. A developer must implement a solution that will monitor for the custom errors and alert a development team in real time when these errors occur in the production environment.
+
+Which solution will meet these requirements with the LEAST operational overhead?
+
+A. Configure the application to create a custom metric and to push the metric to CloudWatch. Create an AWS CloudTrail alarm. Configure the CloudTrail alarm to use an Amazon Simple Notification Service (Amazon SNS) topic to send notifications.
+B. Create an AWS Lambda function to run every 5 minutes to scan the CloudWatch logs for the keyword DECRYP_ERROR. Configure the Lambda function to use Amazon Simple Notification Service (Amazon SNS) to send a notification.
+'C. Use Amazon CloudWatch Logs to create a metric filter that has a filter pattern for DECRYP_ERROR. Create a CloudWatch alarm on this metric for a threshold >=1. Configure the alarm to send Amazon Simple Notification Service (Amazon SNS) notifications. Most Voted'
+D. Install the CloudWatch unified agent on the EC2 instance. Configure the application to generate a metric for the keyword DECRYP_ERROR errors. Configure the agent to send Amazon Simple Notification Service (Amazon SNS) notifications. 
+==================================================================================================================
+Question #74Topic 1
+A developer created an AWS Lambda function that accesses resources in a VPC. The Lambda function polls an Amazon Simple Queue Service (Amazon SQS) queue for new messages through a VPC endpoint. Then the function calculates a rolling average of the numeric values that are contained in the messages. After initial tests of the Lambda function, the developer found that the value of the rolling average that the function returned was not accurate.
+
+How can the developer ensure that the function calculates an accurate rolling average?
+
+A. Set the functions reserved concurrency to 1. Calculate the rolling average in the function. Store the calculated rolling average in Amazon ElastiCache. Most Voted
+B. Modify the function to store the values in Amazon ElastiCache. When the function initializes, use the previous values from the cache to calculate the rolling average. Most Voted
+'C. Set the functions provisioned concurrency to 1. Calculate the rolling average in the function. Store the calculated rolling average in Amazon ElastiCache.'
+D. Modify the function to store the values in the functions layers. When the function initializes, use the previously stored values to calculate the rolling average.
+
+// Heres why:
+
+// Provisioned Concurrency: By setting the functions provisioned concurrency to 1, you ensure that only one instance of the Lambda function will be running at any given time. This means that there wont be multiple instances concurrently processing messages and potentially causing inconsistencies in the rolling average calculation.
+
+// Calculate Rolling Average in the Function: This is the core of the process. The Lambda function should correctly calculate the rolling average based on the values it receives from the SQS queue.
+
+// Store Calculated Rolling Average in ElastiCache: Storing the rolling average in Amazon ElastiCache ensures that the value is retained between invocations of the Lambda function. This way, when a new message arrives, the function can retrieve the previous rolling average from the cache, update it with the new value, and store it back in the cache. 
+==================================================================================================================
+Question #75Topic 1
+A developer is writing unit tests for a new application that will be deployed on AWS. The developer wants to validate all pull requests with unit tests and merge the code with the main branch only when all tests pass.
+
+The developer stores the code in AWS CodeCommit and sets up AWS CodeBuild to run the unit tests. The developer creates an AWS Lambda function to start the CodeBuild task. The developer needs to identify the CodeCommit events in an Amazon EventBridge event that can invoke the Lambda function when a pull request is created or updated.
+
+Which CodeCommit event will meet these requirements?
+C.
+{"source": ["aws.codecommit"]
+"detail": {
+    "event": ["puiIRequestSourceBranchUpdated", "pullRequestCreated") 
+    }
+}
+==================================================================================================================
+Question #76Topic 1
+A developer deployed an application to an Amazon EC2 instance. The application needs to know the public IPv4 address of the instance.
+
+How can the application find this information?
+
+'A. Query the instance metadata from http://169.254.169.254/latest/meta-data/. Most Voted'
+B. Query the instance user data from http://169.254.169.254/latest/user-data/.
+C. Query the Amazon Machine Image (AMI) information from http://169.254.169.254/latest/meta-data/ami/.
+D. Check the hosts file of the operating system. 
+==================================================================================================================
+Question #77Topic 1
+An application under development is required to store hundreds of video files. The data must be encrypted within the application prior to storage, with a unique key for each video file.
+
+How should the developer code the application?
+
+A. Use the KMS Encrypt API to encrypt the data. Store the encrypted data key and data.
+B. Use a cryptography library to generate an encryption key for the application. Use the encryption key to encrypt the data. Store the encrypted data.
+'C. Use the KMS GenerateDataKey API to get a data key. Encrypt the data with the data key. Store the encrypted data key and data. Most Voted'
+D. Upload the data to an S3 bucket using server side-encryption with an AWS KMS key. 
+==================================================================================================================
+Question #79Topic 1
+A developer wants to debug an application by searching and filtering log data. The application logs are stored in Amazon CloudWatch Logs. The developer creates a new metric filter to count exceptions in the application logs. However, no results are returned from the logs.
+
+What is the reason that no filtered results are being returned?
+
+A. A setup of the Amazon CloudWatch interface VPC endpoint is required for filtering the CloudWatch Logs in the VPC.
+'B. CloudWatch Logs only publishes metric data for events that happen after the filter is created. Most Voted'
+C. The log group for CloudWatch Logs should be first streamed to Amazon OpenSearch Service before metric filtering returns the results.
+D. Metric data points for logs groups can be filtered only after they are exported to an Amazon S3 bucket. 
+==================================================================================================================
+Question #81Topic 1
+A company hosts a batch processing application on AWS Elastic Beanstalk with instances that run the most recent version of Amazon Linux. The application sorts and processes large datasets.
+
+In recent weeks, the applications performance has decreased significantly during a peak period for traffic. A developer suspects that the application issues are related to the memory usage. The developer checks the Elastic Beanstalk console and notices that memory usage is not being tracked.
+
+How should the developer gather more information about the application performance issues?
+
+A. Configure the Amazon CloudWatch agent to push logs to Amazon CloudWatch Logs by using port 443.
+'B. Configure the Elastic Beanstalk .ebextensions directory to track the memory usage of the instances.'
+C. Configure the Amazon CloudWatch agent to track the memory usage of the instances. Most Voted
+D. Configure an Amazon CloudWatch dashboard to track the memory usage of the instances. 
+==================================================================================================================
+Question #84Topic 1
+A developer is creating a Ruby application and needs to automate the deployment, scaling, and management of an environment without requiring knowledge of the underlying infrastructure.
+
+Which service would best accomplish this task?
+
+A. AWS CodeDeploy
+B. AWS CloudFormation
+C. AWS OpsWorks
+'D. AWS Elastic Beanstalk Most Voted '
+==================================================================================================================
+Question #85Topic 1
+A company has a web application that is deployed on AWS. The application uses an Amazon API Gateway API and an AWS Lambda function as its backend.
+
+The application recently demonstrated unexpected behavior. A developer examines the Lambda function code, finds an error, and modifies the code to resolve the problem. Before deploying the change to production, the developer needs to run tests to validate that the application operates properly.
+
+The application has only a production environment available. The developer must create a new development environment to test the code changes. The developer must also prevent other developers from overwriting these changes during the test cycle.
+
+Which combination of steps will meet these requirements with the LEAST development effort? (Choose two.)
+
+A. Create a new resource in the current stage. Create a new method with Lambda proxy integration. Select the Lambda function. Add the hotfix alias. Redeploy the current stage. Test the backend.
+'B. Update the Lambda function in the API Gateway API integration request to use the hotfix alias. Deploy the API Gateway API to a new stage named hotfix. Test the backend. Most Voted'
+C. Modify the Lambda function by fixing the code. Test the Lambda function. Create the alias hotfix. Point the alias to the $LATEST version.
+'D. Modify the Lambda function by fixing the code. Test the Lambda function. When the Lambda function is working as expected, publish the Lambda function as a new version. Create the alias hotfix. Point the alias to the new version. Most Voted'
+E. Create a new API Gateway API for the development environment. Add a resource and method with Lambda integration. Choose the Lambda function and the hotfix alias. Deploy to a new stage. Test the backend. 
+==================================================================================================================
+Question #86Topic 1
+A developer is implementing an AWS Cloud Development Kit (AWS CDK) serverless application. The developer will provision several AWS Lambda functions and Amazon API Gateway APIs during AWS CloudFormation stack creation. The developers workstation has the AWS Serverless Application Model (AWS SAM) and the AWS CDK installed locally.
+
+How can the developer test a specific Lambda function locally?
+
+A. Run the sam package and sam deploy commands. Create a Lambda test event from the AWS Management Console. Test the Lambda function.
+B. Run the cdk synth and cdk deploy commands. Create a Lambda test event from the AWS Management Console. Test the Lambda function.
+'C. Run the cdk synth and sam local invoke commands with the function construct identifier and the path to the synthesized CloudFormation template. Most Voted'
+D. Run the cdk synth and sam local start-lambda commands with the function construct identifier and the path to the synthesized CloudFormation template. 
+
+// Run cdk synth to synthesize the AWS CDK app into a CloudFormation template.
+// Use sam local invoke to run the specific Lambda function locally, providing the functions logical identifier and the path to the synthesized CloudFormation template as arguments.
+==================================================================================================================
+Question #88Topic 1
+A company caches session information for a web application in an Amazon DynamoDB table. The company wants an automated way to delete old items from the table.
+
+What is the simplest way to do this?
+
+A. Write a script that deletes old records; schedule the script as a cron job on an Amazon EC2 instance.
+'B. Add an attribute with the expiration time; enable the Time To Live feature based on that attribute. Most Voted'
+C. Each day, create a new table to hold session data; delete the previous day's table.
+D. Add an attribute with the expiration time; name the attribute ItemExpiration.
+==================================================================================================================
+Question #96Topic 1
+A developer is creating a service that uses an Amazon S3 bucket for image uploads. The service will use an AWS Lambda function to create a thumbnail of each image. Each time an image is uploaded, the service needs to send an email notification and create the thumbnail. The developer needs to configure the image processing and email notifications setup.
+
+Which solution will meet these requirements?
+
+'A. Create an Amazon Simple Notification Service (Amazon SNS) topic. Configure S3 event notifications with a destination of the SNS topic. Subscribe the Lambda function to the SNS topic. Create an email notification subscription to the SNS topic. Most Voted'
+B. Create an Amazon Simple Notification Service (Amazon SNS) topic. Configure S3 event notifications with a destination of the SNS topic. Subscribe the Lambda function to the SNS topic. Create an Amazon Simple Queue Service (Amazon SQS) queue. Subscribe the SQS queue to the SNS topic. Create an email notification subscription to the SQS queue.
+C. Create an Amazon Simple Queue Service (Amazon SQS) queue. Configure S3 event notifications with a destination of the SQS queue. Subscribe the Lambda function to the SQS queue. Create an email notification subscription to the SQS queue.
+D. Create an Amazon Simple Queue Service (Amazon SQS) queue. Send S3 event notifications to Amazon EventBridge. Create an EventBridge rule that runs the Lambda function when images are uploaded to the S3 bucket. Create an EventBridge rule that sends notifications to the SQS queue. Create an email notification subscription to the SQS queue. 
+==================================================================================================================
+Question #97Topic 1
+A developer has designed an application to store incoming data as JSON files in Amazon S3 objects. Custom business logic in an AWS Lambda function then transforms the objects, and the Lambda function loads the data into an Amazon DynamoDB table. Recently, the workload has experienced sudden and significant changes in traffic. The flow of data to the DynamoDB table is becoming throttled.
+
+The developer needs to implement a solution to eliminate the throttling and load the data into the DynamoDB table more consistently.
+
+Which solution will meet these requirements?
+
+'A. Refactor the Lambda function into two functions. Configure one function to transform the data and one function to load the data into the DynamoDB table. Create an Amazon Simple Queue Service (Amazon SQS) queue in between the functions to hold the items as messages and to invoke the second function. Most Voted'
+B. Turn on auto scaling for the DynamoDB table. Use Amazon CloudWatch to monitor the tables read and write capacity metrics and to track consumed capacity.
+C. Create an alias for the Lambda function. Configure provisioned concurrency for the application to use.
+D. Refactor the Lambda function into two functions. Configure one function to store the data in the DynamoDB table. Configure the second function to process the data and update the items after the data is stored in DynamoDB. Create a DynamoDB stream to invoke the second function after the data is stored. Most Voted
+==================================================================================================================
+A company uses AWS Lambda functions and an Amazon S3 trigger to process images into an S3 bucket. A development team set up multiple environments in a single AWS account.
+
+After a recent production deployment, the development team observed that the development S3 buckets invoked the production environment Lambda functions. These invocations caused unwanted execution of development S3 files by using production Lambda functions. The development team must prevent these invocations. The team must follow security best practices.
+
+Which solution will meet these requirements?
+
+A. Update the Lambda execution role for the production Lambda function to add a policy that allows the execution role to read from only the production environment S3 bucket.
+B. Move the development and production environments into separate AWS accounts. Add a resource policy to each Lambda function to allow only S3 buckets that are within the same account to invoke the function. Most Voted
+'C. Add a resource policy to the production Lambda function to allow only the production environment S3 bucket to invoke the function. Most Voted'
+D. Move the development and production environments into separate AWS accounts. Update the Lambda execution role for each function to add a policy that allows the execution role to read from the S3 bucket that is within the same account. 
+==================================================================================================================
+ 
+==================================================================================================================
+ 
+==================================================================================================================
+
+==================================================================================================================
+ 
+==================================================================================================================
+
+==================================================================================================================
+ 
+================================================================================================================== 
+
+==================================================================================================================
+ 
+==================================================================================================================
+
+==================================================================================================================
+ 
+==================================================================================================================
+
+==================================================================================================================
+ 
+==================================================================================================================      

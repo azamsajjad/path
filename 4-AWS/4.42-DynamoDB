@@ -467,11 +467,10 @@ DynamoDB would then automatically replicate data changes among
 those tables. Thus, changes to CustomerProfiles data in one Region
 would be propagated to the other Regions. In addition, if one of the
 AWS Regions should become temporarily unavailable, your customers
-could still access the same CustomerProfiles data in the other Regions.
+could still access the same CustomerProfiles data in the other Regions.'
 ------------------------------------------------------------------------
 DynamDB Accelerator DAX:
-DynamoDB Accelerator (DAX) reduces latency at scale by providing a write-through in-memory caching service. DAX provides sub-millisecond response times for eventually consistent read workloads. Read-heavy or bursty workloads benefit from increased throughput and reduced RCU provisioning, especially for repeated reads of individual keys. This technique is more efficient than a side cache such as Amazon ElastiCache because no code change is required. You need to get only a
-new endpoint to use.
+DynamoDB Accelerator (DAX) reduces latency at scale by providing a write-through in-memory caching service. DAX provides sub-millisecond response times for eventually consistent read workloads. Read-heavy or bursty workloads benefit from increased throughput and reduced RCU provisioning, especially for repeated reads of individual keys. This technique is more efficient than a side cache such as Amazon ElastiCache because no code change is required. You need to get only a /new endpoint to use./
 
 The DAX cluster, which consists of a primary node and optional read replicas, houses the cache, including the following:
 • Item cache — Eventually consistent item data stored by primary key values
@@ -481,7 +480,7 @@ billing is per node-hour consumed, based on the EC2 instance type. For a three-n
 nodes. There is no charge for data transfer between Amazon EC2 and DAX within the same Availability Zone. Standard Amazon EC2 data transfer charges apply across Availability Zones within the same Region. No additional charge is incurred for traffic into or out of the DAX node itself.
 
 
-The DAX client directs all the application's DynamoDB API requests to the DAX cluster endpoint. The DAX cluster either processes the request directly (cache hit) or passes it through to DynamoDB (cache miss).
+The DAX client directs all the applications DynamoDB API requests to the DAX cluster endpoint. The DAX cluster either processes the request directly (cache hit) or passes it through to DynamoDB (cache miss).
 
 1. The client requests data from the cache.
 2. The data is not present in the cache, and the request is sent to the database.
@@ -1218,3 +1217,293 @@ Store the data in the same RDS database used for customer transactions.
 Store the session state data in a DynamoDB table.````````````````````
 
 DynamoDB is a scalable and resilient solution for storing session data.
+
+
+========================================================================================================
+A company is developing a Python application that submits data to an Amazon DynamoDB table. The company requires client-side encryption of specific data items and end-to-end protection for the encrypted data in transit and at rest.
+
+Which combination of steps will meet the requirement to encrypt specific data items? (Select TWO.)
+
+A`````````````````````````
+Generate symmetric encryption keys with AWS Key Management Service (AWS KMS).
+Correct. When you configure the DynamoDB Encryption Client to use AWS KMS, the DynamoDB Encryption Client uses a KMS key that is always encrypted when the key is used outside of AWS KMS. This cryptographic materials provider returns a unique encryption key and a signing key for every table item. This method of encryption uses a symmetric KMS key.
+
+For more information about the Direct KMS Materials Provider that the DynamoDB Encryption Client uses, see Direct KMS Materials Provider.
+
+For more information about KMS keys, see AWS KMS Concepts.
+
+
+B
+Generate asymmetric encryption keys with AWS Key Management Service (AWS KMS).
+Incorrect. When you configure the DynamoDB Encryption Client to use AWS KMS, the DynamoDB Encryption Client uses a KMS key that is always encrypted when the key is used outside of AWS KMS. This cryptographic materials provider returns a unique encryption key and a signing key for every table item. This method of encryption would require a symmetric KMS key, not an asymmetric key.
+
+
+C```````````````````
+Use generated keys with the DynamoDB Encryption Client.
+Correct. The DynamoDB Encryption Client provides end-to-end protection for your data in transit and at rest. You can encrypt selected items or attribute values in a table.
+
+For more information about DynamoDB client-side and server-side encryption, see Client-Side and Server-Side Encryption.
+
+For more information about the DynamoDB Encryption Client, see What Is the Amazon DynamoDB Encryption Client?
+
+For more information about how the DynamoDB Encryption Client works, see How the DynamoDB Encryption Client Works.
+
+
+D
+Use generated keys to configure DynamoDB table encryption with AWS managed KMS keys.
+Incorrect. You can use this method for server-side encryption at rest. This solution does not meet the requirement for client-side encryption.
+
+
+E
+Use generated keys to configure DynamoDB table encryption with AWS owned KMS keys.
+Incorrect. You can use this method for server-side encryption at rest. This solution does not meet the requirement for client-side encryption.
+
+
+======================================================================================
+A developer has written several custom applications that read and write to the same Amazon DynamoDB table. Each time the data in the DynamoDB table is modified, this change should be sent to an external API.
+
+Which combination of steps should the developer perform to accomplish this task? (Select TWO.)
+
+
+A``````````````````
+Configure an AWS Lambda function to poll the stream and call the external API.
+Correct. If you enable DynamoDB Streams on a table, you can associate the stream Amazon Resource Name (ARN) with an Lambda function that you write. Immediately after an item in the table is modified, a new record appears in the table's stream. Lambda polls the stream and invokes your Lambda function synchronously when it detects new stream records.
+
+For more information about how to use DynamoDB Streams to create an event that invokes a Lambda function, see Tutorial: Process New Items with DynamoDB Streams and Lambda.
+
+
+B
+Configure an event in Amazon EventBridge (Amazon CloudWatch Events) that publishes the change to an Amazon Managed Streaming for Apache Kafka (Amazon MSK) data stream.
+Incorrect. EventBridge (CloudWatch Events) is used to connect applications with a variety of data. It would not be able to detect updates to a DynamoDB table.
+
+For more information about EventBridge (CloudWatch Events), see What Is Amazon EventBridge?
+
+
+C
+Create a trigger in the DynamoDB table to publish the change to an Amazon Kinesis data stream.
+Incorrect. A trigger cannot be enabled on a DynamoDB table. To create a trigger, a DynamoDB stream should be enabled on the specific DynamoDB table.
+
+For more information about how to use DynamoDB Streams to create an event that invokes an AWS Lambda function, see DynamoDB Streams and AWS Lambda Triggers.
+
+
+D
+Deliver the stream to an Amazon Simple Notification Service (Amazon SNS) topic and subscribe the API to the topic.
+Incorrect. A DynamoDB stream cannot be used to create an Amazon SNS topic.
+
+For more information about how to capture changes to DynamoDB tables, see Change Data Capture with Amazon DynamoDB.
+
+For more information about how Amazon SNS works, see What is Amazon SNS?
+
+For more information about how to create a topic in Amazon SNS, see Creating an Amazon SNS topic.
+
+
+E```````````````````````````
+Enable DynamoDB Streams on the table.
+Correct. You can enable DynamoDB Streams on a table to create an event that invokes an AWS Lambda function.
+
+For more information about how to use DynamoDB Streams, see DynamoDB Streams and AWS Lambda Triggers.
+
+========================================================================================================
+
+A developer uses the AWS SDK for C++ to retrieve data from an Amazon DynamoDB table. The data is sometimes retrieved using a known key, and sometimes the key is not known, resulting in multiple items being returned. The developer wants to ensure the code returns only one item when retrieving data without keys.
+
+Which DynamoDB setting will meet these requirements?
+
+A
+Set the parallel scan operation to 1.
+Incorrect. The parallel scan operation can logically divide a table into multiple segments, with multiple application workers scanning the segments in parallel. Parallel scan returns the same number of results as an ordinary scan, except the results can be returned more quickly. Parallel scan does not limit the number of items returned.
+
+For more information about using DynamoDB parallel scans, see Parallel Scan.
+
+
+B
+Set the query filter expression to 1.
+Incorrect. A filter expression applies additional matching criteria to limit the items returned. This expression does not provide a specific limit on the number of items returned.
+
+For more information about using query filter expression statements in DynamoDB, see Query.
+
+
+C``````````````````````````````````
+Set the scan limit parameter to 1.
+Correct. Set the limit parameter to 1 to set the maximum number of items that need to be retrieved with a DynamoDB scan operation.
+
+For more information about limiting the number of the results in a scan, see Limiting the Number of Items in the Result Set.
+
+
+D
+Set the query page-size value to 1.
+Incorrect. The page-size parameter will determine the number of items returned in each page of a query. This method is only relevant for queries that involve the key.
+
+===========================================================================================
+
+A developer needs to query a relational database from an AWS Lambda function. The Lambda function will be called frequently. The developer needs to avoid the latency introduced by the initial JDBC connection to the database in subsequent invocations of the Lambda function.
+
+How can the developer ensure the database connection is reused by Lambda?
+
+A
+Initialize the database connection outside the Lambda function code as a Lambda function environment variable.
+Incorrect. Database connection details can be stored as an environment variable. However, the developer still needs to initialize the connection within the code for the connection to be used in queries.
+
+For more information about Lambda function environment variables, see Using AWS Lambda environment variables.
+
+
+B```````````````````````
+Initialize the database connection within the Lambda function code but outside the handler method.
+Correct. The Lambda environment can reuse the same database connection for subsequent invocations when defining the database connection details in the code but outside the handler method.
+
+For more information about reusing the Lambda execution environment, see AWS Lambda execution environment.
+
+
+C
+Store the database connection string in AWS Systems Manager Parameter Store. Ensure the Lambda function handler initializes the database connection within the handler method.
+Incorrect. Database connection details can be stored in Systems Manager Parameter Store. However, initializing the connection within the handler method will result in it re-initializing each subsequent Lambda function invocation.
+
+For more information about storing parameters in AWS, see AWS Systems Manager Parameter Store.
+
+
+D
+Store the database connection string in the Lambda function code. Ensure the function handler initializes the database connection within the handler method.
+Incorrect. Initializing the connection within the handler method will result in it re-initializing each subsequent Lambda function invocation.
+
+===========================================================================================
+A write-heavy data analytics application is using DynamoDB database which has global secondary index. Whenever the application is performing heavy write activities on the table, the DynamoDB requests return a ProvisionedThroughputExceededException.
+
+Which of the following is the MOST likely cause of this issue?
+
+The provisioned throughput exceeds the current throughput limit for your account.
+The provisioned write capacity for the global secondary index is greater than the write capacity of the base table.
+The rate of requests exceeds the allowed throughput.
+The provisioned write capacity for the global secondary index is less than the write capacity of the base table.``````
+Incorrect
+When you create a global secondary index on a provisioned mode table, you must specify read and write capacity units for the expected workload on that index. The provisioned throughput settings of a global secondary index are separate from those of its base table. A Query operation on a global secondary index consumes read capacity units from the index, not the base table. When you put, update, or delete items in a table, the global secondary indexes on that table are also updated; these index updates consume write capacity units from the index, not from the base table.
+
+===========================================================================================
+A company has a global multi-player game with a multi-master DynamoDB database topology which stores data in multiple AWS regions. You were assigned to develop a real-time data analytics application which will track and store the recent changes on all the tables from various regions. Only the new data of the recently updated item is needed to be tracked by your application.
+
+Which of the following is the MOST suitable way to configure the data analytics application to detect and retrieve the updated database entries automatically?
+
+
+Enable DynamoDB Streams and set the value of StreamViewType to NEW_IMAGE. Use Kinesis Adapter in the application to consume streams from DynamoDB.```````````````````````````````
+
+Enable DynamoDB Streams and set the value of StreamViewType to NEW_AND_OLD_IMAGE. Use Kinesis Adapter in the application to consume streams from DynamoDB.
+
+Enable DynamoDB Streams and set the value of StreamViewType to NEW_IMAGE. Create a trigger in AWS Lambda to capture stream data and forward it to your application.
+
+Enable DynamoDB Streams and set the value of StreamViewType to NEW_AND_OLD_IMAGE. Create a trigger in AWS Lambda to capture stream data and forward it to your application.
+
+
+
+Incorrect
+DynamoDB Streams provides a time-ordered sequence of item-level changes in any DynamoDB table. The changes are de-duplicated and stored for 24 hours. Applications can access this log and view the data items as they appeared before and after they were modified, in near real time.
+
+The Kinesis Adapter is the recommended way to consume streams from DynamoDB for real-time processing. The DynamoDB Streams API is intentionally similar to that of Kinesis Streams, a service for real-time processing of streaming data at a massive scale. You can write applications for Kinesis Streams using the Kinesis Client Library (KCL). The KCL simplifies coding by providing useful abstractions above the low-level Kinesis Streams API. As a DynamoDB Streams user, you can leverage the design patterns found within the KCL to process DynamoDB Streams shards and stream records. To do this, you use the DynamoDB Streams Kinesis Adapter. The Kinesis Adapter implements the Kinesis Streams interface, so that the KCL can be used for consuming and processing records from DynamoDB Streams.
+
+===========================================================================================
+
+
+A Java web application built using AWS SDK for Java with a DynamoDB database is concurrently accessed by thousands of users during peak time. The application is highly write-intensive and there are a lot of incidents where it overwrites stale data from the DynamoDB table.
+
+How can you ensure your database writes are protected from being overwritten by other write operations that are occurring at the same time without affecting the application performance?
+
+Implement overly optimistic locking (OOL).
+Implement optimistic locking with version number.```````````````
+Implement pessimistic locking with write locking.
+Implement pessimistic locking with read locking.
+Correct
+Databases employ locking mechanisms to ensure that data is always updated to the latest version and is concurrent. There are multiple types of locking strategies that benefit different use cases. Some of these are:
+
+– Optimistic Locking
+
+– Pessimistic Locking
+
+– Overly Optimistic Locking
+
+Optimistic locking is a strategy to ensure that the client-side item that you are updating (or deleting) is the same as the item in DynamoDB. If you use this strategy, then your database writes are protected from being overwritten by the writes of others — and vice-versa.
+
+With optimistic locking, each item has an attribute that acts as a version number. If you retrieve an item from a table, the application records the version number of that item. You can update the item, but only if the version number on the server side has not changed. If there is a version mismatch, it means that someone else has modified the item before you did; the update attempt fails, because you have a stale version of the item. If this happens, you simply try again by retrieving the item and then attempting to update it. Optimistic locking prevents you from accidentally overwriting changes that were made by others; it also prevents others from accidentally overwriting your changes.
+
+
+
+Since the application is already using the AWS SDK for Java, it can support optimistic locking by simply adding the @DynamoDBVersionAttribute annotation to the objects. In the mapping classs for your table, you designate one property to store the version number, and mark it using this annotation. When you save an object, the corresponding item in the DynamoDB table will have an attribute that stores the version number. The DynamoDBMapper assigns a version number when you first save the object, and it automatically increments the version number each time you update the item. Your update or delete requests will succeed only if the client-side object version matches the corresponding version number of the item in the DynamoDB table.
+
+Hence, implementing optimistic locking with version number is the correct answer in this scenario.
+
+    Implementing pessimistic locking with read locking is incorrect because this type of locking can interrupt user operations. This is an approach where an entity is locked in the database for the entire time that it is in application memory (often in the form of an object). This can prevent certain users from reading, updating, or deleting an entry depending on the lock type.
+
+    Implementing pessimistic locking with write locking is incorrect because just as explained above, pessimistic locking will significantly affect the performance of your application. Although it will ensure that your data writes are not overwritten on the fly, this type of locking will not meet the performance requirements mentioned in the scenario.
+
+    Implementing overly optimistic locking (OOL) is incorrect because this strategy is completely inappropriate for multi-user systems since it is used for systems that have only one user or operation performing changes at a single time.
+
+===============================================================================================================
+A software engineer is developing a serverless application which will use a DynamoDB database. One of the requirements is that each write request should return the total number of write capacity units consumed, with subtotals for the table and any secondary indexes that were affected by the operation.
+
+What should be done to accomplish this feature?
+
+
+Add the ReturnValues parameter with a value of INDEXES in every write request.
+
+Add the ReturnConsumedCapacity parameter with a value of TOTAL in every write request.
+
+Add the ReturnConsumedCapacity parameter with a value of INDEXES in every write request.```````````
+
+Add the ReturnValues parameter with a value of TOTAL in every write request.
+Incorrect
+To create, update, or delete an item in a DynamoDB table, use one of the following operations:
+
+- PutItem
+
+- UpdateItem
+
+- DeleteItem
+
+For each of these operations, you need to specify the entire primary key, not just part of it. For example, if a table has a composite primary key (partition key and sort key), you must supply a value for the partition key and a value for the sort key.
+
+To return the number of write capacity units consumed by any of these operations, set the ReturnConsumedCapacity parameter to one of the following:
+
+TOTAL — returns the total number of write capacity units consumed.
+
+INDEXES — returns the total number of write capacity units consumed, with subtotals for the table and any secondary indexes that were affected by the operation.
+
+NONE — no write capacity details are returned. (This is the default.)
+
+==============================================================================================================
+A developer is creating a new global secondary index on a provisioned mode DynamoDB table. Since the application will store large quantities of data, the write capacity units must be specified for the expected workload on both the base table and its secondary index.
+
+Which of the following should the developer do to avoid any potential request throttling?
+
+Ensure that the global secondary index's provisioned RCU is equal or less than the RCU of the base table.
+Ensure that the global secondary index's provisioned WCU is equal or less than the WCU of the base table.
+Ensure that the global secondary index's provisioned RCU is equal or greater than the RCU of the base table.
+/Ensure that the global secondary index's provisioned WCU is equal or greater than the WCU of the base table./
+Incorrect
+A global secondary index (GSI) is an index with a partition key and a sort key that can be different from those on the base table. It is considered “global” because queries on the index can span all of the data in the base table, across all partitions.
+
+Every global secondary index has its own provisioned throughput settings for read and write activity. Queries or scans on a global secondary index consume capacity units from the index, not from the base table. The same holds true for global secondary index updates due to table writes.
+
+When you create a global secondary index on a provisioned mode table, you must specify read and write capacity units for the expected workload on that index. The provisioned throughput settings of a global secondary index are separate from those of its base table. A Query operation on a global secondary index consumes read capacity units from the index, not the base table. When you put, update, or delete items in a table, the global secondary indexes on that table are also updated; these index updates consume write capacity units from the index, not from the base table.
+
+
+
+For example, if you Query a global secondary index and exceed its provisioned read capacity, your request will be throttled. If you perform heavy write activity on the table but a global secondary index on that table has insufficient write capacity, then the write activity on the table will be throttled.
+
+To avoid potential throttling, the provisioned write capacity for a global secondary index should be equal or greater than the write capacity of the base table since new updates will write to both the base table and global secondary index.
+
+Hence, the correct answer in this scenario is to ensure that the global secondary index’s provisioned WCU is equal to or greater than the WCU of the base table.
+
+Ensuring that the global secondary index’s provisioned WCU is equal or less than the WCU of the base table is incorrect because it should be the other way around, just as what is mentioned above. The provisioned write capacity for a global secondary index should be equal to or greater than the write capacity of the base table.
+
+Ensuring that the global secondary index’s provisioned RCU is equal to or greater than the RCU of the base table is incorrect because you have to set the WCU and not the RCU.
+
+Ensuring that the global secondary index’s provisioned RCU is equal or less than the RCU of the base table is incorrect because this should be WCU and in addition, the global secondary index’s provisioned WCU should be set to a value that is equal or greater than the WCU of the base table to prevent request throttling.
+
+
+===============================================================================================================
+A developer is planning to add a global secondary index in a DynamoDB table. This will allow the application to query a specific index that can span all of the data in the base table, across all partitions.
+
+Which of the following should the developer consider when using this type of index? (Select TWO.)
+
+/Queries or scans on this index consume capacity units from the index, not from the base table./
+/Queries on this index support eventual consistency only./
+When you query this index, you can choose either eventual consistency or strong consistency.
+Queries or scans on this index consume read capacity units from the base table.
+For each partition key value, the total size of all indexed items must be 10 GB or less.

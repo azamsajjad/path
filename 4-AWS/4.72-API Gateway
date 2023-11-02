@@ -5,7 +5,96 @@ API : Application Programming Interface
 we use APIs to interact with web applications 
 Applications use APIs to communicate with each other
 APIs are mechanisms that facilitate two software components communicating with each other. APIs act as the front door for applications to access data, business logic, or functionality from backend services. 
+2015
+REST APIs Introduced
+Resource + verb
+Customers + GET, POST, etc..
+first 333 million requests = $3.5/month/million
 
+2018
+WebSocket APIs Introduced
+Duplex communication
+Connection based
+Use Case Specific
+
+
+2020
+HTTP APIs Introduced
+Resource + verb OR rpc
+Parity is coming...
+Lightweight
+cheap
+first 300 million requests = $1/month/million
+70% cheaper than REST
+
+Feature                         REST.                           HTTP.
+Usage Plans & API Keys                                          X
+API Caching                                                     X
+Testing / Mocking                                               X
+Request Validation &                                            X
+Transformation
+Native OIDC / OAuth 2.0         X(use Lambda Authorizers)
+ALB Integrations                X
+
+
+o
+o
+o
+How to Switch from REST to HTTP
+Export your API Definitions using Swagger/OpenAPl
+Import them into new HTTP APIs
+Largely 1:1 changeover, but feature discrepancy will be highlighted
+
+
+TLDR
+Use HTTP everytime, except when the feature isn't supported
+
+
+USING HTTP API GATEWAY TO CALL A LAMBDA FUNCTION
+BOTH GET & POST REQUEST
+
+
+import json
+import uuid
+
+GET_RAW_PATH = "/getPerson"
+CREATE_RAW_PATH = "/createPerson"
+
+def lambda_handler(event, context):
+    if event['rawPath'] == GET_RAW_PATH:
+       #GetPerson Path - what happens?
+       print('Start request for GetPerson')
+       personId = event['queryStringParameters']['personId']
+       print('Received Request with personId= ' + personId)
+       return {"firstName": "azam", "lastName": "sajjad", "email": "azams@mail.com"}
+       
+    elif event['rawPath'] == CREATE_RAW_PATH:
+        #CreatePerson Path - what happens?
+        decodedEvent = json.loads(event['body'])
+        firstName = decodedEvent['firstName']
+        print('Received Request with firstName= ' + firstName)
+        # call database - NOT DOING IT HERE
+        return { "personId": str(uuid.uuid1())}
+
+'
+-----------------------------------------------------
+API GATEWAY CACHING:
+CACHES your endpoints response (this reduces no. of calls made to endpoint)
+TTL (when u enable caching, api gateway caches responses from endpoints for a specified TTL, default is 300 seconds)
+API GATEWAY returns cached response to new requests, instead of making new request to endpoint. 
+THIS REDUCES LATENCY
+
+API GATEWAY THROTTLING is to prevent your API from being overwhelmed by too many requests
+by-default, API Gateway limits the steady-state request rate to 10,000 requests per second,per region.
+by-default, API Gateway limits the concurrent request to 5,000 across all APIs per second,per region.
+if you exceed any of these limits, you get 429 ERROR (Too Many Requests)
+
+Throttling Example 
+5,000 requests in 1st millisecond 
+5,000 requests evenly spread across 999 milliseconds
+this is within limits of 10,000 req per second and 5,000 concurrent request
+this will happen without any errors
+-------------------------------------------------------------------
 ======================="API Gateway features"===========================
 
 ----------------"Developer features in API Gateway"----------------------
@@ -38,6 +127,38 @@ If you’re using REST APIs, API Gateway helps you manage the ecosystem of third
 
 ========================================================================
 REST APIs are intended for APIs that require API proxy functionality and API management features in a single solution. HTTP APIs are optimized for building APIs that proxy to Lambda functions or HTTP backends, making them ideal for serverless workloads. HTTP APIs are a cheaper and faster alternative to REST APIs, but they do not currently support API management functionality. Unlike a REST API, which receives and responds to requests, a WebSocket API supports two-way communication between client apps and your backend. The backend can send callback messages to connected clients.
+
+API Gateway integration types
+
+When you choose an integration type, that determines how method request data is passed to the backend. As part of creating the method, you must choose an integration type. To learn more, expand each of the following five categories.
+
+
+Lambda Function
+    When you are using API Gateway as the gateway to a Lambda function, you’ll use the Lambda integration. This will result in requests being proxied to Lambda with request details available to your function handler in the event parameter, supporting a streamlined integration setup. The setup can evolve with the backend without requiring you to tear down the existing setup.
+
+    For integrations with Lambda functions, you will need to set an IAM role with required permissions for API Gateway to call the backend on your behalf.
+
+
+HTTP Endpoint
+    HTTP integration endpoints are useful for public web applications where you want clients to interact with the endpoint. This type of integration lets an API expose HTTP endpoints in the backend.
+
+    When the proxy is not configured, you’ll need to configure both the integration request and the integration response, and set up necessary data mappings between the method request-response and the integration request-response.
+
+    If the proxy option is used, you don’t set the integration request or the integration response. API Gateway passes the incoming request from the client to the HTTP endpoint and passes the outgoing response from the HTTP endpoint to the client.
+
+AWS Service
+    AWS Service is an integration type that lets an API expose AWS service actions. For example, you might drop a message directly into an Amazon Simple Queue Service (Amazon SQS) queue.
+
+Mock
+    Mock lets API Gateway return a response without sending the request further to the backend. This is a good idea for a health check endpoint to test your API. Anytime you want a hardcoded response to your API call, use a Mock integration.
+
+VPC Link
+    With VPC Link, you can connect to a Network Load Balancer to get something in your private VPC. For example, consider an endpoint on your EC2 instance that’s not public. API Gateway can’t access it unless you use the VPC link and you have to have a Network Load Balancer on your backend.
+
+    For an API developer, a VPC Link is functionally equivalent to an integration endpoint.
+
+========================================================================
+    Testing a method with the API Gateway console is the same as calling the method outside of the API Gateway console. Changes can’t be undone. For example, if you use the API Gateway console to call a method that deletes an API's resources, if the method call is successful, the API's resources will be deleted.
 ========================================================================
 WebSocket APIs are often used in real-time application use cases such as:
 
@@ -61,6 +182,8 @@ ADDITIONAL CHARGES
 You may also incur additional charges if you use API Gateway in conjunction with other AWS services or transfer data out of AWS.
 ========================================================================
 ===========Maintaining connections to WebSocket APIs====================
+There are three predefined routes that can be used with WebSocket APIs: $connect, $disconnect, and $default. In addition to the predefined routes, you can also create custom routes.
+
 
 To understand how the WebSocket connections are maintained, you need to understand how the client connects, sends messages, and disconnects from the API. To learn more, expand each of the following three categories.
 
@@ -89,7 +212,7 @@ Deploys a fully managed Amazon CloudFront distribution
 Private endpoint
 Requests are only routable within a single virtual private cloud (VPC) that you control
 
-
+The API Gateway optional cache configuration is only available for REST APIs.
 Q
 Which of the following REST API endpoint type changes is not supported by API Gateway? Select the correct answer and choose SUBMIT. 
 From private to edge-optimized
@@ -195,6 +318,16 @@ status code and message
 forms the mock integration response 
 ---------------------------------------------------
 API GATEWAY STAGEs 
+Differentiate your APIs with stages
+Some options for you to differentiate your APIs with stages include:
+
+Use different stages by environment or customer.
+Use stage variables to increase deployment flexibility.
+Use stages with canary deployments to test new versions.
+
+A stage is a snapshot of the API that represents a unique identifier for a version of a deployed API. With stages, you can have multiple versions and roll back versions. Anytime you update anything about the API, you need to redeploy it to an existing stage or to a new stage that you create as part of the deploy action.
+
+
 references the lifecycle state of the API e.g. dev,prod 
 Each stage can be associated with a different endpoint e.g. dev,prod
 each stage has a unique invoke url e.g. 
@@ -226,6 +359,71 @@ CREATE->prod
 STAGE VARIABLE->key=lmbfunction value=stageProdFunction
 CREATE->dev
 STAGE VARIABLE->key=lmbfunction value=stageDevFunction
+
+Simplify version management with stage variables
+
+As you define variables in the stage settings in the console, you can reference them with the $stageVariables.[variable name] notation. You can also inject stage-dependent items at runtime such as:
+
+URLs
+Lambda functions
+Any necessary variables
+
+This is a great way for you to perform actions such as invoking different endpoints and different backends for different stages. For example, if you have different endpoints with different URLs or different Lambda function aliases based on environment, you can use stage variables to inject those variables.
+
+Name                Value
+lambdaFn            myLarnbdaFn:demo
+url                 http://www.myendpoint.com/demo
+
+Name                Value
+lambdaFn            myLarnbdaFn:prod
+url                 http://www.myendpoint.com/prod
+
+-----------------------------------------------------
+Creating METHODS Setup 
+
+Lambda Function Integration
+The first integration point is integrating with a
+Lambda Function type. Rather than specifying the
+function name in the setup, the stage variable
+notation is used with the lambdaFn variable.
+
+Lambda Integration 
+Lambda Function = ${StageVariables.LambdaFn}
+
+HTTP Integration
+Endpoint URL = $(stageVariables.url}
+
+By performing these actions, at runtime, the proper value is retrieved dynamically for both of those variables. Using stage variables is especially valuable as you move toward an automated continuous integration and continuous delivery (CI/CD) pipeline.
+-----------------------------------------------------
+Building AND Deploying best practices
+
+Now that you understand how to build and deploy an API into API Gateway, here are some best practices for you to consider using in your API Gateway architecture.
+
+Use API Gateway stages with Lambda aliases - - - - - - - - -
+
+To highlight something that was mentioned in the previous example, Lambda and API Gateway are both designed to support flexible use of versions. You can do this by using aliases in Lambda and stages in API Gateway. When you couple that with stage variables, you dont have to hard-code components, which leads to having a smooth and safe deployment.
+
+----> In Lambda, enable versioning and use aliases to reference.
+----> In API Gateway, use stages for environments.
+----> Point API Gateway stage variables at the Lambda aliases.
+
+USE Canary deployments - - - - - - - - -
+
+With Canary deployments, you can send a percentage of traffic to your "canary" while leaving the bulk of your traffic on a known good version of your API until the new version has been verified. API Gateway makes a base version available and updated versions of the API on the same stage. This way, you can introduce new features in the same environment for the base version.
+
+To set up a Canary deployment through the console, select a stage and then select the Canary tab for that stage.
+
+Consider you want to add a new GET method to a petStore API with a /store/products API resource without impacting clients. To do this, you can create a canary that sends 10 percent of traffic to the canary with the new method.
+
+Use AWS SAM to simplify deployments - - - - - - - - -
+Using AWS SAM templates
+–
+AWS SAM provides templates that help you define your serverless applications. These template specifications provide you with a straightforward and clean syntax to describe your functions, APIs, permissions, configurations, and events. You use an AWS SAM template file to operate on a single, deployable, versioned entity that makes up your serverless application.
+
+Use Swagger and OpenAPI for more complex APIs - - - - - - - - -
+–
+AWS SAM also supports OpenAPI to define more complex APIs. This can either be 2.0 for the Swagger specification, or one of the OpenAPI 3.0 versions, like 3.0.1. OpenAPI is an industry-standard way to document and design your APIs. 
+With SAM, you can document your API in an external OpenAPI or Swagger file, and then reference that in a SAM template.
 -----------------------------------------------------
 API RESPONSE TRANSFORMATIONS
 AppFrontend->APIRequest->  APIGateway  ->APIRequest->AppBackend
@@ -238,23 +436,7 @@ HTTP APIs:
 parameter mapping is used to modify API requests and responses
 we can change the Header, Query String, Request Path in API Request
 we can change the Header, Status Code,               in API Response
------------------------------------------------------
-API GATEWAY CACHING:
-CACHES your endpoints response (this reduces no. of calls made to endpoint)
-TTL (when u enable caching, api gateway caches responses from endpoints for a specified TTL, default is 300 seconds)
-API GATEWAY returns cached response to new requests, instead of making new request to endpoint. 
-THIS REDUCES LATENCY
 
-API GATEWAY THROTTLING is to prevent your API from being overwhelmed by too many requests
-by-default, API Gateway limits the steady-state request rate to 10,000 requests per second,per region.
-by-default, API Gateway limits the concurrent request to 5,000 across all APIs per second,per region.
-if you exceed any of these limits, you get 429 ERROR (Too Many Requests)
-
-Throttling Example 
-5,000 requests in 1st millisecond 
-5,000 requests evenly spread across 999 milliseconds
-this is within limits of 10,000 req per second and 5,000 concurrent request
-this will happen without any errors
 
 ------------------------------------------------------
 X-Ray
@@ -274,31 +456,57 @@ sdk sends data to daemon, which uploads them to X-Ray in batches
 for docker container, install X-Ray daemon in its own docker container, and your application in its own container, all in same ECS cluster
 
 ---------------------------------------------------------------------------
+-------------------------------------------------------------------
+Set up a PROXY INTEGRATION with a proxy resource
 
-Which of these migrations patterns helps an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application?
+To set up a proxy integration in an API Gateway API with a proxy resource, you perform the following tasks:
 
-Leapfrog
+Create a proxy resource with a greedy path variable of {proxy+}.
 
-Correctly unselected
-Strangler
+Set the ANY method on the proxy resource.
+- - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - 
 
-Correctly selected
-Organic
+Integrate the resource and method with a backend using the HTTP or Lambda integration type.
+API Gateway enacts certain restrictions and limitations when handling methods with either a Lambda proxy integration or an HTTP proxy integration.
+A proxy resource is most powerful when it is integrated with a backend using either HTTP proxy integration or Lambda proxy integration.
+- - - - - - - - - - - - - - - - - - - - - - - - 
 
-Correctly unselected
-Saga
+The HTTP proxy integration, designated by HTTP_PROXY in the API Gateway REST API, is for integrating a method request with a backend HTTP endpoint. With this integration type, API Gateway simply passes the entire request and response between the frontend and the backend, subject to certain restrictions and limitations.
 
-Correctly unselected
-Correct
-With the strangler pattern, an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application.
+Note
+HTTP proxy integration supports multi-valued headers and query strings.
 
+When applying the HTTP proxy integration to a proxy resource, you can set up your API to expose a portion or an entire endpoint hierarchy of the HTTP backend with a single integration setup. For example, suppose the backend of the website is organized into multiple branches of tree nodes off the root node (/site) as: /site/a0/a1/.../aN, /site/b0/b1/.../bM, etc. If you integrate the ANY method on a proxy resource of /api/{proxy+} with the backend endpoints with URL paths of /site/{proxy}, a single integration request can support any HTTP operations (GET, POST, etc.) on any of [a0, a1, ..., aN, b0, b1, ...bM, ...]. If you apply a proxy integration to a specific HTTP method, for example, GET, instead, the resulting integration request works with the specified (that is, GET) operations on any of those backend nodes.
+- - - - - - - - - - - - - - - - - - - - - - - - 
+Lambda proxy integration with a proxy resource
+The Lambda proxy integration, designated by AWS_PROXY in the API Gateway REST API, is for integrating a method request with a Lambda function in the backend. With this integration type, API Gateway applies a default mapping template to send the entire request to the Lambda function and transforms the output from the Lambda function to HTTP responses.
 
+Similarly, you can apply the Lambda proxy integration to a proxy resource of /api/{proxy+} to set up a single integration to have a backend Lambda function react individually to changes in any of the API resources under /api.
+- - - - - - - - - - - - - - - - - - - - - - - - 
 
-Distinct API endpoints can point to old vs. new components, and safe deployment options (like canary deployments) let you point back to the legacy version with very little risk.
+Understand API Gateway Lambda proxy integration
+Amazon API Gateway Lambda proxy integration is a simple, powerful, and nimble mechanism to build an API with a setup of a single API method. The Lambda proxy integration allows the client to call a single Lambda function in the backend. The function accesses many resources or features of other AWS services, including calling other Lambda functions.
 
+In Lambda proxy integration, when a client submits an API request, API Gateway passes to the integrated Lambda function an event object, except that the order of the request parameters is not preserved. This request data includes the request headers, query string parameters, URL path variables, payload, and API configuration data. The configuration data can include current deployment stage name, stage variables, user identity, or authorization context (if any). The backend Lambda function parses the incoming request data to determine the response that it returns. For API Gateway to pass the Lambda output as the API response to the client, the Lambda function must return the result in this format.
 
+Because API Gateway doesnt intervene very much between the client and the backend Lambda function for the Lambda proxy integration, the client and the integrated Lambda function can adapt to changes in each other without breaking the existing integration setup of the API. To enable this, the client must follow application protocols enacted by the backend Lambda function.
 
-To learn more about different migration patterns, review the Migrating to Serverless lesson.
+You can set up a Lambda proxy integration for any API method. But a Lambda proxy integration is more potent when it is configured for an API method involving a generic proxy resource. The generic proxy resource can be denoted by a special templated path variable of {proxy+}, the catch-all ANY method placeholder, or both. The client can pass the input to the backend Lambda function in the incoming request as request parameters or applicable payload. The request parameters include headers, URL path variables, query string parameters, and the applicable payload. The integrated Lambda function verifies all of the input sources before processing the request and responding to the client with meaningful error messages if any of the required input is missing.
+
+When calling an API method integrated with the generic HTTP method of ANY and the generic resource of {proxy+}, the client submits a request with a particular HTTP method in place of ANY. The client also specifies a particular URL path instead of {proxy+}, and includes any required headers, query string parameters, or an applicable payload.
+
+The following list summarizes runtime behaviors of different API methods with the Lambda proxy integration:
+
+    ANY /{proxy+}: The client must choose a particular HTTP method, must set a particular resource path hierarchy, and can set any headers, query string parameters, and applicable payload to pass the data as input to the integrated Lambda function.
+
+    ANY /res: The client must choose a particular HTTP method and can set any headers, query string parameters, and applicable payload to pass the data as input to the integrated Lambda function.
+
+    GET|POST|PUT|... /{proxy+}: The client can set a particular resource path hierarchy, any headers, query string parameters, and applicable payload to pass the data as input to the integrated Lambda function.
+
+    GET|POST|PUT|... /res/{path}/...: The client must choose a particular path segment (for the {path} variable) and can set any request headers, query string parameters, and applicable payload to pass input data to the integrated Lambda function.
+
+    GET|POST|PUT|... /res: The client can choose any request headers, query string parameters, and applicable payload to pass input data to the integrated Lambda function.
 
 ===========================================================================
 In Lambda proxy integration, when a client
@@ -411,80 +619,242 @@ REQUEST AUTHORIZER.
 you can also use cross-account lambda authorizer. 
 authorizer in one account, 
 ===========================================================================
-2015
-REST APIs Introduced
-Resource + verb
-Customers + GET, POST, etc..
-first 333 million requests = $3.5/month/million
+Managing ACCESS to APIs
 
-2018
-WebSocket APIs Introduced
-Duplex communication
-Connection based
-Use Case Specific
+The next important step for you to consider after you have successfully designed and deployed your API is how you will manage access and authorization for the API. API Gateway provides you with multiple, customizable options for:
+
+Authorizing an entity to access your APIs
+Providing more granular control
+Controlling the amount of access through throttling
+Before discussing these different use cases, you need to understand the different options for authenticating and authorizing your APIs in API Gateway.
 
 
-2020
-HTTP APIs Introduced
-Resource + verb OR rpc
-Parity is coming...
-Lightweight
-cheap
-first 300 million requests = $1/month/million
-70% cheaper than REST
+TYPES:                          Authentication | Authorization | Signature V4| Cognito User Pools | 3rdParty Auth
+Aws Iam-------------------------------y-----------------y-------------y------------------------------------------
+Lambda Authorizer Token---------------y-----------------y------------------------------y-----------------y-------
+Lambda Authorizer Request-------------y-----------------y------------------------------y-----------------y-------
+Amazon Cognito------------------------y-----------------y------------------------------y-------------------------
+===========================================================================
+Aws Iam------------------------------None
+Lambda Authorizer Token--------------Pay per authorizer invoke
+Lambda Authorizer Request------------Pay per authorizer invoke----------------------Multiple Header Support
+Amazon Cognito-----------------------Pay based on your monthly active users
 
-Feature                         REST.                           HTTP.
-Usage Plans & API Keys                                          X
-API Caching                                                     X
-Testing / Mocking                                               X
-Request Validation &                                            X
-Transformation
-Native OIDC / OAuth 2.0         X(use Lambda Authorizers)
-ALB Integrations                X
+As shown in the comparison table, there are three main ways to authorize API calls to your API Gateway endpoints:
 
+1
 
-o
-o
-o
-How to Switch from REST to HTTP
-Export your API Definitions using Swagger/OpenAPl
-Import them into new HTTP APIs
-Largely 1:1 changeover, but feature discrepancy will be highlighted
+1
+Use IAM and Signature version 4 (also known as Sig v4) to authenticate and authorize entities to access your APIs.
 
+2
 
-TLDR
-Use HTTP everytime, except when the feature isn't supported
+2
+Use Lambda Authorizers, which you can use to support bearer token authentication strategies such as OAuth or SAML.
+
+3
+
+3
+Use Amazon Cognito with user pools.
 
 
-USING HTTP API GATEWAY TO CALL A LAMBDA FUNCTION
-BOTH GET & POST REQUEST
+Authorizing with IAM
+If you have an internal service or a restricted number of customers, IAM is a great choice for
+authorization, especially for applications that use IAM to interact with other AWS services using IAM roles. 
+
+Lambda Authorizers
+You also need to consider what you already have in place that should be used. If you are using an OAuth strategy as an organization, you may want to consider Lambda Authorizer. 
+To make it easy to get started with this method, you can choose the API Gateway Lambda Authorizer blueprint when creating your authorizer function from the Lambda console.
+
+Lambda function console creation using API Gateway Lambda Authorizer blueprint to create the Lambda Authorizer.
+To summarize, a Lambda Authorizer is simply a Lambda function that you can write to perform any custom authorization that you need. There are two types of Lambda Authorizers you should be aware of: Token and Request.
+
+For token-type Lambda Authorizers, API Gateway passes the source token to the Lambda function as a JSON input. Based on the value of this token, your Lambda function will determine whether to allow the request. 
+Request-type Lambda Authorizers are useful if you need more information about the request itself before authorizing it.
+
+IAM Authorizer          All requests are required to be signed using AWS Sig v4.
+Lambda Authorizer       Amazon API Gateway supplies an authorization token to a Lambda function.
+Cognito Authorizer      After a user is authenticated against the user pool, they obtain an OIDC token.
+
+--------------------------------------------------------------------------------------------------------
+Throttling and usage plans
+
+Beyond just allowing or denying access to your APIs, API Gateway also helps you manage the volume of API calls that are processed through your API endpoint. 
+
+With API Gateway, you can set throttle and quota limits on your API consumers. This can useful for things such as preventing one consumer from using all of your backend system’s capacity or to ensure that your downstream systems can manage the number of requests you send through. 
+
+Keys on a key ring
+API keys
+
+        With API Gateway, you can create and distribute API keys to your customers, which can be used to identify the consumer and apply desired usage and throttle limits to their requests. Customers include the API key through x-API-key header in requests. 
+
+Usage plans
+
+        You can use API keys with usage plans to set up some very specific plans that make sense for your use case. For example, you can perform API key throttling based on a rate and a burst per API key. API key usage can also be used to meter daily, weekly, and monthly usage. 
+
+You can set throttle and quota limits based on API keys through the usage plans feature. You can set up usage plans for:
+
+API Key Throttling per second and burst
+API Key Quota by day, week, or month
+API Key Usage by daily usage records
 
 
-import json
-import uuid
+Token Bucket Algorithm----------
 
-GET_RAW_PATH = "/getPerson"
-CREATE_RAW_PATH = "/createPerson"
+Burst: Maximum size of bucket
+Rate: Number of tokens (requests) added to bucket
+The method by which the limits are measured and throttled is based on the token bucket algorithm, which is a widely used algorithm for checking that network traffic conforms to set limits. A token, in this case, counts as a request and the burst is the maximum bucket size.
 
-def lambda_handler(event, context):
-    if event['rawPath'] == GET_RAW_PATH:
-       #GetPerson Path - what happens?
-       print('Start request for GetPerson')
-       personId = event['queryStringParameters']['personId']
-       print('Received Request with personId= ' + personId)
-       return {"firstName": "azam", "lastName": "sajjad", "email": "azams@mail.com"}
-       
-    elif event['rawPath'] == CREATE_RAW_PATH:
-        #CreatePerson Path - what happens?
-        decodedEvent = json.loads(event['body'])
-        firstName = decodedEvent['firstName']
-        print('Received Request with firstName= ' + firstName)
-        # call database - NOT DOING IT HERE
-        return { "personId": str(uuid.uuid1())}
+Requests that come into the bucket are fulfilled at a steady rate. If the rate at which the bucket is being filled causes the bucket to fill up and exceed the burst value, a 429 Too Many Requests error would be returned.
+
+API Gateway sets a limit on a steady-state rate and a burst of request submissions per account and per Region. At the account level, by default, API Gateway limits the steady-state request rate to 10,000 requests per second. It limits the burst to 5,000 requests across all APIs within an AWS account. However, as discussed earlier, you can use usage plans to manage limits at a more granular level.
+
+Throttling Settings Hierarchy----------
+
+The type and level of throttling applied to a request is dependent on all of the limits involved and are applied in this order:
+
+1-Per-client, per-method throttling limits that you set for an API stage in a usage plan
+2-Per-client throttling limits that you set in a usage plan
+3-Default per-method limits and individual per-method limits that you set in API stage settings
+4-The account level limit
+=====================================================================
+IAM permissions
+
+You learned how IAM policies are used as part of the authorization models as an earlier part of this lesson. Now, it's time to take a look at the types of permission controls you can implement using IAM policies. There are two types of IAM permissions for APIs:'
+
+Who can invoke the API                          Who can manage the API
+execute-api:*                                   apigateway:*
+"Action": {                                     "Action": {
+    execute-api: Invoke                             apigateway: GET
+Who can invoke the API: To call a deployed API, or refresh the API caching, the caller needs the execute-api permission.
+// When you do this, API Gateway will expect an IAM Sig v4 request for any requests that come to that API method. After you have associated this authorization type with your API method, you can then allow users with this permission to invoke your API. This could be an IAM user who represents an API caller; it could be an IAM group containing a set of IAM users; or it could be an IAM role assumed by a user, an EC2 instance, or an application running inside AWS. 
+
+Who can manage the API: To create, deploy, and manage an API in API Gateway, the API developer needs the apigateway permission.
 
 
-'
--------------------------------------------------------------------
+-------------------------------------------Resource Policies------------------------------------------------------
+
+Resource policies help you to further refine access for your APIs. While an IAM policy is used to grant permission to a user, group, or role, you can also apply policies directly on API Gateway using a resource policy. A resource policy is a JSON policy document that you attach to an API to limit access by users from a specified account, IP address range, VPC, or VPC endpoint. You can make this as granular as you need, and resource policies can be used in coordination with IAM policies to restrict access. 
+
+For example, you could use resource policies to provide access to another AWS account, or to limit access to your API from a particular set of IP address ranges. You can also use resource policies to grant access to specific VPCs or VPC endpoints.
+
+"Principal": {
+    "AWS":
+        "arn:aws:iam::user/George
+OR
+
+"Effect": "Deny",
+"Principal": {
+"Action": "execute—api: Invoke" ,
+"Resource": {
+"arn:aws:execute-api:region:account-id:api-id/ *"
+Condition"
+"IpAddress": {
+        "aws:Sourcelp" :["192.0.2.0/24", "198.51.100.0/24"
+OR
+'Condition' {
+"StringNotEquals": {
+    "aws:SourceVpc": "vpc—la2b3c4d"
+
+
+
+
+
+
+----------------------------------Resource Policies and Authentication Methods------------------------------------
+
+Resource policy and authentication methods work together to grant access to your APIs. As illustrated below, methods for securing your APIs work in aggregate. To learn more, expand each of the following four categories.
+
+
+API Gateway resource policy only
+–
+Explicit allow is required on the inbound criteria of the caller. If not found, deny the caller. 
+
+Lambda Authorizer and resource policy
+–
+If the policy has explicit denials, the caller is denied access immediately. 
+Otherwise, the Lambda Authorizer is called and returns a policy document that is evaluated with the resource policy. 
+
+IAM authentication and resource policy
+–
+If the user authenticates successfully with IAM, policies attached to the IAM user and resource policy are evaluated together. 
+If the caller and API owner are from separate accounts, both the IAM user policies and the resource policy explicitly allow the caller to proceed.
+If the caller and the API owner are in the same account, either user policies or the resource policy must explicitly allow the caller to proceed.
+
+Cognito authentication and resource policy
+–
+If API Gateway authenticates the caller from Cognito, the resource policy is evaluated independently.
+If there is an explicit allow, the caller proceeds.
+Otherwise, deny or neither allow nor deny will result in a deny.
+=====================================================================
+Monitoring and Troubleshooting
+CloudWatch Metrics for API Gateway
+
+After your APIs are deployed, you can use CloudWatch Metrics to monitor performance of deployed APIs. API Gateway has seven default metrics out of the box:
+
+1
+Count: Total number of API requests in a period
+2
+Latency: Time between when API Gateway receives a request from a client and when it returns a response to the client; this includes the integration latency and other API Gateway overhead
+3
+IntegrationLatency: Time between when API Gateway relays a request to the backend and when it receives a response from the backend
+4
+4xxError: Client-side errors captured in a specified period
+5
+5xxError: Server-side errors captured in a specified period
+6
+CacheHitCount: Number of requests served from the API cache in a given period
+7
+CacheMissCount: Number of requests served from the backend in a given period, when API caching is turned on
+Calculating API Gateway overhead
+
+API Gateway Overhead------------------------------------------------
+
+Two Key Metrics that are used to calculate the API Gateway overhead of deployed APIs are the Latency and IntegrationLatency CloudWatch Metrics.
+1
+The latency metric gives you details about how long it takes for a full round-trip response, from the second your customer invokes your API to when your API responds with the results. This is a full round-trip duration of an API request through API Gateway.
+2
+Integration latency is how long it takes for API Gateway to make the invocation to your backend and receive the response.
+
+The difference between these two metrics gives you your API Gateway overhead. Together, these metrics can help you fine-tune your applications and see where the bottlenecks are.
+
+CloudWatch Logs for API Gateway--------------------------------------
+
+In addition to CloudWatch Metrics, you can also learn a lot about how your APIs are performing from CloudWatch Logs. API Gateway has two types of CloudWatch logs built in. 
+
+ECECUTION LOGGING -(Costly, Reveals Sensitive Info, Not Recommended for Prod)
+The first type is execution logging, which logs what’s happening on the roundtrip of a request. You can see all the details from when the request was made, the other request parameters, everything that happened between the requests, and what happened when API Gateway returned the results to the client that’s calling the service.
+
+Execution logs can be useful to troubleshoot APIs, but can result in logging sensitive data. Because of this, it is recommended you dont enable Log full requests/responses data for production APIs. In addition, there is a cost component associated with logging your APIs.
+
+ACCESS LOGGING
+The second type is access logging, which provides details about who's invoking your API. This includes everything including IP address, the method used, the user protocol, and the agent that's invoking your API. 
+Monitoring with X-Ray and CloudTrail
+
+
+
+There are two AWS tools you should understand to analyze your API use and performance: AWS X-Ray and AWS CloudTrail.
+
+AWS X-Ray-----------------------------------------------------------
+
+You can use X-Ray to trace and analyze user requests as they travel through your Amazon API Gateway APIs to the underlying services. With X-Ray, you can understand how your application is performing to identify and troubleshoot the root cause of performance issues and errors. X-Ray gives you an end-to-end view of an entire request, so you can analyze latencies and errors in your APIs and their backend services. You can also configure sampling rules to tell X-Ray which requests to record, and at what sampling rates, according to criteria that you specify.
+
+To summarize, with X-Ray, you can trace and analyze requests as they travel through your APIs to services:
+
+Analyze latencies and debug errors in your APIs and their backend services.
+Configure sampling rules to focus on specific requests.
+
+AWS CloudTrail--------------------------------------------------------
+
+The second service, CloudTrail, captures all API calls for API Gateway as events, including calls from the API Gateway console and from code calls to your API Gateway APIs. 
+Using the information collected by CloudTrail, you can determine the request that was made to API Gateway, the IP address from which the request was made, who made the request, when it was made, and additional details. You can view the most recent events in the CloudTrail console in Event history.
+
+To summarize, CloudTrail captures all API calls for API Gateway as events.
+
+IP address, requester, and time of request are included.
+Event history can be reviewed.
+Create a trail to send events to an Amazon Simple Storage Service (Amazon S3) bucket.
+=====================================================================
 You have three separate environments in your AWS account and three corresponding stages in the API Gateway. You are using the API Gateway as a HTTP proxy to a backend endpoint. How do you direct traffic for each environment without creating separate API Gateways?
 
 
@@ -563,6 +933,31 @@ With deployment stages in API Gateway, you can manage multiple release stages fo
 
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
+
+Which of these migrations patterns helps an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application?
+
+Leapfrog
+
+Correctly unselected
+Strangler
+
+Correctly selected
+Organic
+
+Correctly unselected
+Saga
+
+Correctly unselected
+Correct
+With the strangler pattern, an organization incrementally and systematically decomposes monolithic applications by creating APIs and building event-driven components that gradually replace components of the legacy application.
+
+
+
+Distinct API endpoints can point to old vs. new components, and safe deployment options (like canary deployments) let you point back to the legacy version with very little risk.
+
+
+
+To learn more about different migration patterns, review the Migrating to Serverless lesson.
 ---------------------------------------------------------------------------------------------------------
 You are trying to diagnose a performance problem with your serverless application, which uses Lambda, API Gateway, S3, and DynamoDB. Your DynamoDB table is performing well, and you suspect that your Lambda function is taking too long to execute. Which of the following could you use to investigate the source of the issue?
 
@@ -591,3 +986,143 @@ API Gateway latency is the time between when API Gateway receives a request from
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
+
+
+A company hosts its web application backend on Amazon Elastic Container Service (Amazon ECS). The application's Amazon ECS tasks run behind an Application Load Balancer (ALB). The application supports three environments: production, testing, and development. The application uses the ALB to route traffic to the correct environment.
+
+The company has configured three listener rules for the ALB to forward traffic to a different target group based on the port number (Port 80 for production target group, Port 8080 for testing target group, and Port 8081 for development target group).
+
+The company decides to migrate the application backend to a serverless architecture by using an Amazon API Gateway API backed by AWS Lambda functions. The company plans to use the URI path pattern to access the desired environment instead of the port number. The company has created the Lambda functions for the application backend. Each Lambda function has three aliases (production, testing, and development).
+
+Which option includes the next steps the company must take to complete the process?
+
+A```````````````````````
+Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the expression ${stageVariables.LambdaAlias}. Modify the Lambda resource-based policy by adding the permission lambda:InvokeFunction. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
+
+Correct. To add "stageVariable" to the Lambda ARN, you should use the following format: ${stageVariable.stageVariableName}.
+
+For more information about API Gateway stage variables, see Using Amazon API Gateway Stage Variables.
+
+
+B
+Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the name of the Lambda alias. Modify the Lambda resource-based policy by adding the permission lambda:InvokeFunction. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
+Incorrect. To add "stageVariable" to the Lambda ARN, you do not use the Lambda alias name. You should use the following format: ${stageVariable.stageVariableName}.
+
+
+C
+Create an API Gateway API and configure the routes to use Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the expression ${stageVariables.LambdaAlias}. Modify the Lambda execution role by adding the permission apigateway:*. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
+Incorrect. You use the Lambda execution role to grant Lambda permission to AWS resources. The resource-based policy allows other services to invoke the Lambda function.
+
+For more information about Lambda and AWS Identity and Access Management (IAM), see AWS Lambda Permissions.
+
+
+D
+Create an API Gateway API and configure the routes with Lambda proxy integration. Target the corresponding Lambda function Amazon Resource Name (ARN) that is concatenated with the name of the Lambda alias. Modify the Lambda execution role by adding the permission apigateway:*. Create production, testing, and development stages. Add the LambdaAlias stage variable to the corresponding stage.
+Incorrect. To add "stageVariable" to the Lambda ARN, you do not use the Lambda alias name. You should use the following format: ${stageVariable.stageVariableName}. You use the Lambda execution role to grant Lambda permission to AWS resources. The resource-based policy allows other services to invoke the Lambda function.
+
+
+===============================================================================================================
+'
+A company has a microservices application that must be integrated with API Gateway. The developer must configure custom data mapping between the API Gateway and the microservices.
+
+In addition, the developer must specify how the incoming request data is mapped to the integration request and how the resulting integration response data is mapped to the method response.
+
+Which of the following integration types is the MOST suitable one to use in API Gateway to meet this requirement?
+
+
+HTTP_PROXY
+
+HTTP```````````````
+
+AWS_PROXY
+
+AWS
+
+You can integrate an API method in your API Gateway with a custom HTTP endpoint of your application in two ways:
+
+ – HTTP proxy integration
+
+ – HTTP custom integration
+
+In your API Gateway console, you can define the type of HTTP integration of your resource by toggling the “Configure as proxy resource” checkbox.
+
+With proxy integration, the setup is simple. You only need to set the HTTP method and the HTTP endpoint URI, according to the backend requirements, if you are not concerned with content encoding or caching.
+
+With custom integration, setup is more involved. In addition to the proxy integration setup steps, you need to specify how the incoming request data is mapped to the integration request and how the resulting integration response data is mapped to the method response. API Gateway supports the following endpoint ports: 80, 443 and 1024-65535.
+
+Programmatically, you choose an integration type by setting the type property on the Integration resource. For the Lambda proxy integration, the value is AWS_PROXY. For the Lambda custom integration and all other AWS integrations, it is AWS. For the HTTP proxy integration and HTTP integration, the value is HTTP_PROXY and HTTP, respectively. For the mock integration, the type value is MOCK.
+
+Since the integration type that is being described in the scenario fits the definition of an HTTP custom integration, the correct answer in this scenario is to use the HTTP integration type.
+
+AWS is incorrect because this type is only used for Lambda custom integration. Take note that the scenario uses an application hosted in EC2 and not in Lambda.
+
+AWS_PROXY is incorrect because this type is primarily used for Lambda proxy integration. The scenario didn’t mention that it uses a serverless application or Lambda.
+
+HTTP_PROXY is incorrect because this type is only used for HTTP proxy integration where you don’t need to do data mapping for your request and response data.
+
+=========================================================================================================
+
+With proxy integration, the setup is simple. You only need to set the HTTP method and the HTTP endpoint URI, according to the backend requirements, if you are not concerned with content encoding or caching.
+
+With custom integration, setup is more involved. In addition to the proxy integration setup steps, you need to specify how the incoming request data is mapped to the integration request and how the resulting integration response data is mapped to the method response. API Gateway supports the following endpoint ports: 80, 443 and 1024-65535.
+
+Programmatically, you choose an integration type by setting the type property on the Integration resource. For the Lambda proxy integration, the value is AWS_PROXY. For the Lambda custom integration and all other AWS integrations, it is AWS. For the HTTP proxy integration and HTTP integration, the value is HTTP_PROXY and HTTP, respectively. For the mock integration, the type value is MOCK.
+
+Since the integration type that is being described in the scenario fits the definition of an HTTP proxy integration, the correct answer in this scenario is to use the HTTP_PROXY integration type.
+
+=========================================================================================================
+A developer is using API Gateway Lambda Authorizer to provide authentication for every API request and control access to your API. The requirement is to implement an authentication strategy which is similar to OAuth or SAML.
+
+Which of the following is the MOST suitable method that the developer should use in this scenario?
+
+Cross-Account Lambda Authorizer
+Token-based Authorization`````````````````````````
+AWS STS-based Authentication
+Request Parameter-based Authorization
+
+
+
+Incorrect
+A Lambda authorizer is an API Gateway feature that uses a Lambda function to control access to your API. When a client makes a request to one of your API’s methods, API Gateway calls your Lambda authorizer, which takes the caller’s identity as input and returns an IAM policy as output.
+
+There are two types of Lambda authorizers:
+
+ – A token-based Lambda authorizer (also called a TOKEN authorizer) receives the caller’s identity in a bearer token, such as a JSON Web Token (JWT) or an OAuth token.
+
+ – A request parameter-based Lambda authorizer (also called a REQUEST authorizer) receives the caller’s identity in a combination of headers, query string parameters, stageVariables, and $context variables.
+
+
+ ===============================================================================================================
+ A serverless application consisting of Lambda functions integrated with API Gateway, and DynamoDB processes ad hoc requests that its users send. Due to the recent spike in incoming traffic, some of your customers are complaining that they are getting HTTP 504 errors from time to time.
+
+Which of the following is the MOST likely cause of this issue?
+
+An authorization failure occurred between API Gateway and the Lambda function.
+Since the incoming requests are increasing, the API Gateway automatically enabled throttling which caused the HTTP 504 errors.
+"API Gateway request has timed out because the underlying Lambda function has been running for more than 29 seconds."
+The usage plan quota has been exceeded for the Lambda function.
+Correct
+A gateway response is identified by a response type defined by API Gateway. The response consists of an HTTP status code, a set of additional headers that are specified by parameter mappings, and a payload that is generated by a non-VTL (Apache Velocity Template Language) mapping template.
+
+
+
+
+You can set up a gateway response for a supported response type at the API level. Whenever API Gateway returns a response of the type, the header mappings and payload mapping templates defined in the gateway response are applied to return the mapped results to the API caller.
+
+The following are the Gateway response types which are associated with the HTTP 504 error in API Gateway:
+
+INTEGRATION_FAILURE – The gateway response for an integration failed error. If the response type is unspecified, this response defaults to the DEFAULT_5XX type.
+
+INTEGRATION_TIMEOUT – The gateway response for an integration timed out error. If the response type is unspecified, this response defaults to the DEFAULT_5XX type.
+
+"For the integration timeout, the range is from 50 milliseconds to 29 seconds for all integration types, including Lambda, Lambda proxy, HTTP, HTTP proxy, and AWS integrations."
+
+In this scenario, there is an issue where the users are getting HTTP 504 errors in the serverless application. This means the Lambda function is working fine at times but there are instances when it throws an error. Based on this analysis, the most likely cause of the issue is the INTEGRATION_TIMEOUT error since you will only get an INTEGRATION_FAILURE error if your AWS Lambda integration does not work at all in the first place.
+
+Hence, the root cause of this issue is that the API Gateway request has timed out because the underlying Lambda function has been running for more than 29 seconds.
+
+The option that says: Since the incoming requests are increasing, the API Gateway automatically enabled throttling which caused the HTTP 504 errors is incorrect because a large number of incoming requests will most likely produce an HTTP 502 or 429 error but not a 504 error. If executing the function would cause you to exceed a concurrency limit at either the account level (ConcurrentInvocationLimitExceeded) or function level (ReservedFunctionConcurrentInvocationLimitExceeded), Lambda may return a TooManyRequestsException as a response. For functions with a long timeout, your client might be disconnected during synchronous invocation while it waits for a response and returns an HTTP 504 error.
+
+The option that says: An authorization failure occurred between API Gateway and the Lambda function is incorrect because an authentication issue usually produces HTTP 403 errors and not 504s. The gateway response for authorization failures for missing authentication token error, invalid AWS signature error, or Amazon Cognito authentication problems is HTTP 403, which is why this option is unlikely to be the cause of this issue.
+
+The option that says: The usage plan quota has been exceeded for the Lambda function is incorrect. Although this is a possible root cause for this scenario, this option has the least chance to produce HTTP 504 errors. The scenario says that the issue happens from time to time and not all the time which suggests that this happens intermittently. If the usage plan indeed exceeded the quota, then the 504 error should always show up and not just from time to time.

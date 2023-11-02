@@ -697,9 +697,25 @@ Create a CloudWatch alarm that will trigger if the CPU Utilization metric exceed
 
 
 ---------------------------------------------------------------------------
+New – Amazon CloudWatch Evidently – Experiments and Feature Management
+
+As a developer, I am excited to announce the availability of Amazon CloudWatch Evidently. This is a new Amazon CloudWatch capability that makes it easy for developers to introduce experiments and feature management in their application code. CloudWatch Evidently may be used for two similar but distinct use-cases: implementing dark launches, also known as feature flags, and A/B testing.
+
+Features flags--------------------------
+Features flags is a software development technique that lets you enable or disable features without needing to deploy your code. It decouples the feature deployment from the release. Features in your code are deployed in advance of the actual release. They stay hidden behind if-then-else statements. At runtime, your application code queries a remote service. The service decides the percentage of users who are exposed to the new feature. You can also configure the application behavior for some specific customers, your beta testers for example.
+
+When you use feature flags you can deploy new code in advance of your launch. Then, you can progressively introduce a new feature to a fraction of your customers. During the launch, you monitor your technical and business metrics. As long as all goes well, you may increase traffic to expose the new feature to additional users. In the case that something goes wrong, you may modify the server-side routing with just one click or API call to present only the old (and working) experience to your customers. This lets you revert back user experience without requiring rollback deployments.
+
+A/B Testing-----------------------
+A/B Testing shares many similarities with feature flags while still serving a different purpose. A/B tests consist of a randomized experiment with multiple variations. A/B testing lets you compare multiple versions of a single feature, typically by testing the response of a subject to variation A against variation B, and determining which of the two is more effective. For example, let’s imagine an e-commerce website (a scenario we know quite well at Amazon). You might want to experiment with different shapes, sizes, or colors for the checkout button, and then measure which variation has the most impact on revenue.
+
+The infrastructure required to conduct A/B testing is similar to the one required by feature flags. You deploy multiple scenarios in your app, and you control how to route part of the customer traffic to one scenario or the other. Then, you perform deep dive statistical analysis to compare the impacts of variations. CloudWatch Evidently assists in interpreting and acting on experimental results without the need for advanced statistical knowledge. You can use the insights provided by Evidently’s statistical engine, such as anytime p-value and confidence intervals for decision-making while an experiment is in progress.
 
 
 
+Many of you already know and use AWS AppConfig, a capability of AWS Systems Manager, that can be used to create, manage, and deploy feature flags as well as other application configurations. CloudWatch Evidently offers even more advanced feature management and experimentation. Let’s see how it works from an application developer point of view.
+
+CloudWatch Evidently uses the terms “launches” for feature flags and “experiments” for A/B testing, and so do I in the rest of this article.
 ---------------------------------------------------------------------------
 
 
@@ -834,7 +850,59 @@ Lambda,ApiG,Fargate,ELB,SNS,SQS,CloudTrail,CloudWatch,EC2,ECS,EB,aws config
 go,java,nodejs,python,ruby,php,.net         no powershell
 
 
+\
+namespaces of aws and remote are in SUBSEGMENT 
+metadata and annotations objects are in SEGMENTS
+\
+===========================================================================
+In order to quickly troubleshoot their systems, your manager instructed you to record the calls that your application makes to all AWS services and resources. You developed a custom code that will send the segment documents directly to X-Ray by using the PutTraceSegments API.
 
+What should you include in your segment document to meet the above requirement?
+
+annotations
+metadata
+tracing header
+subsegments```````````
+
+Incorrect
+A segment can break down the data about the work done into subsegments. Subsegments provide more granular timing information and details about downstream calls that your application made to fulfill the original request. A subsegment can contain additional details about a call to an AWS service, an external HTTP API, or an SQL database. You can even define arbitrary subsegments to instrument specific functions or lines of code in your application.
+
+ 
+For services that don’t send their own segments like Amazon DynamoDB, X-Ray uses subsegments to generate inferred segments and downstream nodes on the service map. This lets you see all of your downstream dependencies, even if they don’t support tracing, or are external.
+
+Subsegments represent your application’s view of a downstream call as a client. If the downstream service is also instrumented, the segment that it sends replaces the inferred segment generated from the upstream client’s subsegment. The node on the service graph always uses information from the service’s segment, if it’s available, while the edge between the two nodes uses the upstream service’s subsegment.
+
+Hence, the correct answer in this scenario is to include subsegments in your segment document.
+
+Including tracing header is incorrect because this is added in the HTTP request header and not on the segment document. A tracing header (X-Amzn-Trace-Id) can originate from the X-Ray SDK, an AWS service, or the client request.
+
+Including metadata is incorrect because this does not record the calls to AWS services and resources that are made by the application. Segments and subsegments can include a metadata object containing one or more fields with values of any type, including objects and arrays.
+
+Including annotations is incorrect because just like metadata, this also does not record the application’s calls to your AWS services and resources. Segments and subsegments can include an annotations object containing one or more fields that X-Ray indexes for use with filter expressions.
+
+ 
+===========================================================================
+A developer is instrumenting an application that will be hosted in a large On-Demand EC2 instance in AWS. All of the downstream calls invoked by the application must be traced properly, including the AWS SDK calls. A user-defined data should also be present to expedite the troubleshooting process.
+
+Which of the following are valid considerations in AWS X-Ray that the developer should follow? (Select TWO.)
+
+
+Set the namespace subsegment field to aws for AWS SDK calls and remote for other downstream calls.`````
+
+Set the metadata object with any additional custom data that you want to store in the segment.`````
+
+Set the annotations object with any additional custom data that you want to store in the segment.
+
+Set the metadata object with key-value pairs that you want X-Ray to index for search.
+
+Set the namespace subsegment field to remote for AWS SDK calls and aws for other downstream calls.
+
+
+
+Incorrect
+A segment document conveys information about a segment to X-Ray. A segment document can be up to 64 kB and contain a whole segment with subsegments, a fragment of a segment that indicates that a request is in progress, or a single subsegment that is sent separately. You can send segment documents directly to X-Ray by using the PutTraceSegments API.
+
+X-Ray compiles and processes segment documents to generate queryable trace summaries and full traces that you can access by using the GetTraceSummaries and BatchGetTraces APIs, respectively. In addition to the segments and subsegments that you send to X-Ray, the service uses information in subsegments to generate inferred segments and adds them to the full trace. Inferred segments represent downstream services and resources in the service map.
 ---------------------------------------------------------------------------
 A company notices performance degradation in one of its production web applications. The application is running on AWS services and uses a microservices architecture. The company suspects that one of these microservices is causing the performance issue.
 
@@ -854,12 +922,87 @@ Amazon EventBridge (Amazon CloudWatch Events) events
 D
 AWS Trusted Advisor performance report
 
+---------------------------------------------------------------------------
+A recently deployed Lambda function has an intermittent issue in processing customer data. You enabled the active tracing option in order to detect, analyze, and optimize performance issues of your function using the X-Ray service.
 
+Which of the following environment variables are used by AWS Lambda to facilitate communication with X-Ray? (Select TWO.)
+
+
+_X_AMZN_TRACE_ID``````````
+
+AWS_XRAY_CONTEXT_MISSING```````````
+
+AUTO_INSTRUMENT
+
+AWS_XRAY_TRACING_NAME
+
+AWS_XRAY_DEBUG_MODE
+Incorrect
+AWS X-Ray is an AWS service that allows you to detect, analyze, and optimize performance issues with your AWS Lambda applications. X-Ray collects metadata from the Lambda service and any upstream or downstream services that make up your application. X-Ray uses this metadata to generate a detailed service graph that illustrates performance bottlenecks, latency spikes, and other issues that impact the performance of your Lambda application.
+
+
+
+AWS Lambda uses environment variables to facilitate communication with the X-Ray daemon and configure the X-Ray SDK.
+
+_X_AMZN_TRACE_ID: Contains the tracing header, which includes the sampling decision, trace ID, and parent segment ID. If Lambda receives a tracing header when your function is invoked, that header will be used to populate the _X_AMZN_TRACE_ID environment variable. If a tracing header was not received, Lambda will generate one for you.
+
+AWS_XRAY_CONTEXT_MISSING: The X-Ray SDK uses this variable to determine its behavior in the event that your function tries to record X-Ray data, but a tracing header is not available. Lambda sets this value to LOG_ERROR by default.
+
+AWS_XRAY_DAEMON_ADDRESS: This environment variable exposes the X-Ray daemon’s address in the following format: IP_ADDRESS:PORT. You can use the X-Ray daemon’s address to send trace data to the X-Ray daemon directly without using the X-Ray SDK.
+
+Therefore, the correct answers for this scenario are the _X_AMZN_TRACE_ID and AWS_XRAY_CONTEXT_MISSING environment variables.
+
+AWS_XRAY_TRACING_NAME is incorrect because this is primarily used in X-Ray SDK where you can set a service name that the SDK uses for segments.
+
+AWS_XRAY_DEBUG_MODE is incorrect because this is used to configure the SDK to output logs to the console without using a logging library.
+
+AUTO_INSTRUMENT is incorrect because this is primarily used in X-Ray SDK for Django Framework only. This allows the recording of subsegments for built-in database and template rendering operations.
 ---------------------------------------------------------------------------
 
+In the next financial year, a company has decided to develop a completely new version of its legacy application that will utilize Node.js and GraphQL. The new architecture aims to offer an end-to-end view of requests as they traverse the application and display a map of the underlying components.
 
+To achieve this, the application will be hosted in an Auto Scaling group (ASG) of Linux EC2 instances behind an Application Load Balancer (ALB) and must be instrumented to send trace data to the AWS X-Ray.
+
+Which of the following options is the MOST suitable way to satisfy this requirement?
+
+Use a user data script to install the X-Ray daemon.
+
+Refactor your application to send segment documents directly to X-Ray by using the PutTraceSegments API.
+Enable AWS Web Application Firewall (WAF) on the ALB to monitor web requests.
+Enable AWS X-Ray tracing on the ASG’s launch template.```````````````````````````````````````
+=========================================================================
+A developer is planning to use the AWS Elastic Beanstalk console to run the AWS X-Ray daemon on the EC2 instances in her application environment. She will use X-Ray to construct a service map to help identify issues with her application and to provide insight on which application component to optimize. The environment is using a default Elastic Beanstalk instance profile.
+
+Which IAM managed policy does Elastic Beanstalk use for the X-Ray daemon to upload data to X-Ray?
+
+
+AWSXRayDaemonWriteAccess`````````````
+
+AWSXrayFullAccess
+
+AWSXRayElasticBeanstalkWriteAccess
+
+AWSXrayReadOnlyAccess
 
 ---------------------------------------------------------------------------
+A developer uses AWS X-Ray to create a trace on an instrumented web application to identify any performance bottlenecks. The segment documents being sent by the application contain annotations that the developer wants to utilize in order to identify and filter out specific data from the trace.
+
+Which of the following should the developer do in order to satisfy this requirement with minimal configuration? (Select TWO.)
+
+Configure Sampling Rules in the AWS X-Ray Console.
+Use filter expressions via the X-Ray console.```````````
+
+Fetch the trace IDs and annotations using the GetTraceSummaries API.```````````
+Send trace results to an S3 bucket then query the trace output using Amazon Athena.
+
+Fetch the data using the BatchGetTraces API.
+
+
+
+
+
+
+
 
 
 

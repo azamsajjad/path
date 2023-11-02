@@ -826,3 +826,157 @@ The Mappings section of a CloudFormation template is used to match a key to a co
 
 Selected
 Use environment variables.
+
+===========================================================================================================
+A developer uses AWS SAM templates to deploy a serverless application. He needs to embed the application from the AWS Serverless Application Repository or from an S3 bucket as a nested application.
+
+Which of the following resource type is the most SUITABLE one that the developer should use?
+
+
+AWS::Serverless::Function
+
+AWS::Serverless::LayerVersion
+
+AWS::Serverless::Api
+
+AWS::Serverless::Application
+Incorrect
+A serverless application can include one or more nested applications. You can deploy a nested application as a stand-alone artifact or as a component of a larger application.
+
+As serverless architectures grow, common patterns emerge in which the same components are defined in multiple application templates. You can now separate out common patterns as dedicated applications, and then nest them as part of new or existing application templates. With nested applications, you can stay more focused on the business logic that’s unique to your application.
+
+==================================================================================================================
+Category: CDA – Development with AWS Services
+A development team has started using AWS CloudFormation for deploying Lambda functions. Their project structure places the source code for the Lambda function locally within a directory named “tutorialsdojo”. The lambda handler for the function is in a file called “app.js”.
+
+Below is a snippet of their template.
+
+Transform: AWS: : Serverless-2016-10-31
+Resources :
+  TutorialsDojoFunction :
+    Type: AWS: : Serverless: : Function
+    Properties :
+      Handler: app.lambdaHand1er
+      Role: arn:aws: iam: : 123456789012: role/execution role
+      CodeUri : tutorialsdojo/
+      Runtime : nodejs14.x
+      Timeout : 15
+
+
+What is the next step in order for the template to be deployed using the aws cloudformation deploy CLI?
+
+
+Upload the app.js file to an S3 bucket. Update the CodeUri property in the template to point to the S3 URI of the file.
+
+Use the aws cloudformation package command to upload the local artifacts of the Lambda function to an S3 bucket and produce a version of the template with references to the S3 URI of the file.```````````````````````````````
+
+Package the Lambda function in a ZIP file. Specify the local path of the packaged file in the CodeUri property.
+
+Use the Fn::Base64 intrinsic function inline with the CodeUri property to encode the content of the app.js file.
+
+
+
+The aws cloudformation package command packages the local artifacts (local paths) that your AWS CloudFormation template references. The command uploads local artifacts, such as source code for an AWS Lambda function or a Swagger file for an AWS API Gateway REST API, to an S3 bucket. The command returns a copy of your template, replacing references to local artifacts with the S3 location where the command uploaded the artifacts.
+
+Use this command to quickly upload local artifacts that might be required by your template. After you package your template’s artifacts, run the aws cloudformation deploy command to deploy the returned template.
+
+Since we have local artifacts (source code for the AWS Lambda functions), we should use the package command.
+E:\Sandbox\P.E aws cloudformation package \
+--template-file tdojo_template.yml \
+--s3-bucket lakas-pilipinas \
+--output-template-file tdojo_packaged .yml
+
+
+===============================================================================================================
+An application architect manages several AWS accounts for staging, testing, and production environments, which are used by several development teams. For application deployments, the developers use the similar base CloudFormation template for their applications.
+
+Which of the following can allow the developer to effectively manage the updates on this template across all AWS accounts with minimal effort?
+
+Upload the CloudFormation templates to CodeCommit and use a combination of CodeDeploy and CodePipeline to manage the deployment to multiple accounts.
+Create and manage stacks on multiple AWS accounts using CloudFormation Change Sets.
+Update the stacks on multiple AWS accounts using CloudFormation StackSets.`````````````````````````````````````
+Define and manage stack instances on multiple AWS Accounts using CloudFormation Stack Instances.
+
+
+Incorrect
+AWS CloudFormation StackSets extends the functionality of stacks by enabling you to create, update, or delete stacks across multiple accounts and regions with a single operation. Using an administrator account, you define and manage an AWS CloudFormation template, and use the template as the basis for provisioning stacks into selected target accounts across specified regions.
+
+
+
+A stack set lets you create stacks in AWS accounts across regions by using a single AWS CloudFormation template. All the resources included in each stack are defined by the stack set’s AWS CloudFormation template. As you create the stack set, you specify the template to use, as well as any parameters and capabilities that the template requires.
+
+Hence, the correct solution in this scenario is to update the stacks on multiple AWS accounts using CloudFormation StackSets.
+
+
+
+After you’ve defined a stack set, you can create, update, or delete stacks in the target accounts and regions you specify. When you create, update, or delete stacks, you can also specify operational preferences, such as the order of regions in which you want the operation to be performed, the failure tolerance beyond which stack operations stop, and the number of accounts in which operations are performed on stacks concurrently. Remember that a stack set is a regional resource so if you create a stack set in one region, you cannot see it or change it in other regions.
+
+Creating and managing stacks on multiple AWS accounts using CloudFormation Change Sets is incorrect because Change Sets only allow you to preview how proposed changes to a stack might impact your running resources. In this scenario, the most suitable way to meet the requirement is to use StackSets.
+
+Defining and managing stack instances on multiple AWS Accounts using CloudFormation Stack Instances is incorrect because a stack instance is simply a reference to a stack in a target account within a region. Remember that a stack instance is associated with one stack set which is why this is just one of the components of CloudFormation StackSets.
+
+Uploading the CloudFormation templates to CodeCommit and using a combination of CodeDeploy and CodePipeline to manage the deployment to multiple accounts is incorrect. Although using a combination of CodeCommit, CodePipeline, and CodeDeploy might work, this entails a lot of manual work and additional overhead. It is better to use the CloudFormation StackSets instead to be able to update the templates across all AWS accounts with minimal effort.
+
+===================================================================================================================
+An aerospace engineering company has recently migrated to AWS for their cloud architecture. They are using CloudFormation and AWS SAM as deployment services for both of their monolithic and serverless applications. There is a new requirement where you have to dynamically install packages, create files, and start services on your EC2 instances upon the deployment of the application stack using CloudFormation.
+
+Which of the following helper scripts should you use in this scenario?
+
+cfn-signal
+cfn-hup
+cfn-init````````````````````````
+cfn-get-metadata
+Incorrect
+AWS CloudFormation provides the following Python helper scripts that you can use to install software and start services on an Amazon EC2 instance that you create as part of your stack:
+
+cfn-init: Use to retrieve and interpret resource metadata, install packages, create files, and start services.
+
+cfn-signal: Use to signal with a CreationPolicy or WaitCondition, so you can synchronize other resources in the stack when the prerequisite resource or application is ready.
+
+cfn-get-metadata: Use to retrieve metadata for a resource or path to a specific key.
+
+cfn-hup: Use to check for updates to metadata and execute custom hooks when changes are detected.
+
+You call the scripts directly from your template. The scripts work in conjunction with resource metadata that’s defined in the same template. The scripts run on the Amazon EC2 instance during the stack creation process. The scripts are not executed by default. You must include calls in your template to execute specific helper scripts.
+
+
+
+Hence, cfn-init helper script is the correct answer since it interprets the metadata that contains the sources, packages, files, and services. You run the script on the EC2 instance when it is launched. The script is installed by default on Amazon Linux and Windows AMIs.
+
+The cfn-get-metadata helper script is incorrect since it is only a wrapper script that retrieves either all metadata that is defined for a resource or path to a specific key or a subtree of the resource metadata, but does not interpret the resource metadata, install packages, create files, and start services.
+
+The cfn-signal helper script is incorrect since it does not perform any retrieval and interpretation of resource metadata, installation of packages, creation of files, and starting of services. Instead, it is a wrapper thats signals an AWS CloudFormation WaitCondition for synchronizing other resources in the stack when the application is ready.
+
+The cfn-hup helper script is incorrect because this is just a daemon that checks for updates to metadata and executes custom hooks when changes are detected. It does not retrieve and interpret the resource metadata, install packages, create files, and start services unlike cfn-init helper script.
+
+===============================================================================================================
+A development team has recently completed building their serverless application, and they are now ready to deploy it to AWS. They need to zip their code artifacts, upload them to Amazon S3, and produce the package template file for deployment.
+
+Which command is the MOST suitable to use for automating the deployment steps?
+
+
+sam package
+
+sam deploy````````````````
+
+sam publish
+
+aws cloudformation deploy
+Incorrect
+AWS SAM uses AWS CloudFormation as the underlying deployment mechanism. You can deploy your application by using AWS SAM command line interface (CLI) commands. You can also use other AWS services that integrate with AWS SAM to automate your deployments.
+
+After you develop and test your serverless application locally, you can package and deploy your application by using the sam deploy command.
+
+
+
+The sam deploy command zips your code artifacts, uploads them to Amazon S3, and produces a packaged AWS SAM template file that it uses to deploy your application.
+
+To deploy an application that contains one or more nested applications, you must include the CAPABILITY_AUTO_EXPAND capability in the sam deploy command.
+
+Hence, the correct answer is: sam deploy
+
+aws cloudformation deploy is incorrect. While this command can be used to deploy a CloudFormation stack, it expects that your artifacts are already packaged and uploaded to S3. It doesn’t handle the packaging process implicitly.
+
+sam package is incorrect. This command prepares the serverless application for deployment by zipping artifacts, uploading them to S3, and generating a CloudFormation template with references to the uploaded artifacts in S3. It doesn’t deploy the application.
+
+sam publish is incorrect because this command publishes an AWS SAM application to the AWS Serverless Application Repository, and does not generate the template file. It takes a packaged AWS SAM template and publishes the application to the specified region.

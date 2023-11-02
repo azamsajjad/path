@@ -320,3 +320,41 @@ For more information about the TimeoutSeconds attribute, see Task.
 D
 Set the tasks HeartbeatSeconds attribute to 30 seconds. Set the Retry.MaxAttempts attribute to 3.
 Correct. The HeartbeatSeconds attribute defines the maximum interval that the task will wait for a heartbeat signal. If an activity worker fails to send heartbeats within this interval, the state is failed. A retry policy on the state allows another activity worker to attempt to complete the state."
+
+
+===================================================================================================================
+A developer is managing a serverless application orchestrated by AWS Step Functions. One of the Lambda functions sends an API call to a third-party payment service, which takes some time to complete. The Step Functions workflow needs to pause while the service validates the payment. It should only resume after the service sends a notification to a webhook endpoint.
+
+Which combination of actions will fulfill the requirements in the most cost-effective manner? (Select Two)
+
+Set the invocation method of the Lambda function task state to asynchronous. Create an AWS SQS queue and configure the webhook handler to send the payment service’s response to the queue. Use a combination of Wait State and Choice State to poll the queue.
+
+Use a Wait State to pause the execution of the workflow. Configure the webhook handler to invoke the Lambda function synchronously.
+
+Configure the webhook handler to call the SendTaskHeartbeat method after a successful notification.
+
+Configure the webhook handler to call the SendTaskSuccess method after a successful notification.``````
+
+Configure the Lambda function task state to use the waitForTaskToken option. Retrieve the task token from the context object of the state machine and include it as part of the Lambda function’s payload body.``````
+
+
+
+Incorrect
+In AWS Step Functions, the waitForTaskToken option allows a task to be paused until an external system signals its completion. When a task is configured with this option, Step Functions generates a unique token, which can be retrieved from the context object of the state machine. This token, for instance, can be stored in a data store for reference.
+
+The diagram below depicts how waitForTaskToken is used for an SQS task state.
+
+
+
+An external system, such as a webhook handler can then reference the token and call the SendTaskSuccess or SendTaskFailure method to signal Step Functions to resume the workflow. When the workflow is in a paused state, you’re not billed for the time the workflow is paused, making it a cost-effective method for awaiting external processes or events.
+
+Hence, the correct answers are:
+
+Configure the Lambda function task state to use the waitForTaskToken option. Retrieve the task token from the context object of the state machine and include it as part of the Lambda function’s payload body.
+Configure the webhook handler to call the SendTaskSuccess method after a successful notification.
+The option that says: Set the invocation method of the Lambda function task state to asynchronous. Create an AWS SQS queue and configure the webhook handler to send the payment service’s response to the queue. Use a combination of Wait State and Choice State to poll the queue is incorrect. While this solution may work, every iteration involving the Wait State and Choice State incurs a cost as a state transition. If the third-party service takes an unpredictable amount of time, the state machine could go through multiple cycles of waiting and checking the SQS queue, resulting in a higher cost.
+
+The option that says: Use a Wait State to pause the execution of the workflow. Configure the webhook handler to invoke the Lambda function synchronously is incorrect. A fixed Wait State is less cost-effective in scenarios where the waiting duration is unpredictable. If the third-party service finishes earlier than the wait duration, you’re paying for unused time. If it takes longer, the workflow might proceed before the task is complete.
+
+The option that says: Configure the webhook handler to call the SendTaskHeartbeat method after a successful notification is incorrect because this method is simply used for keeping tasks alive and preventing them from timing out. It also does not signal completion.
+==============================================================================================================

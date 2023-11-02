@@ -1,3 +1,8 @@
+Use Case 2
+Media streaming: Amazon ElastiCache
+Amazon ElastiCache offers a fast, in-memory data store to power live streaming use cases. ElastiCache can store metadata for user profiles and viewing history, authentication information/tokens for millions of users, and manifest files to enable content delivery networks to stream videos to millions of mobile and desktop users at a time.
+
+
 You can use Amazon ElastiCache to support data-intensive apps or improve the performance of your existing apps by retrieving data from high throughput and low latency in-memory data stores. This service offers fully managed Redis and Memcached cache engines for in-memory data stores. ElastiCache is a popular choice for gaming, advertising technology (ad tech), financial service, healthcare, and Internet of Things (IoT) apps.
 
 On the surface, the Redis and Memcached engines look similar. Each is an in-memory key-value store. However, there are significant differences between the two. Requirements such as compliance, backup and replication, and automatic failover dictate which engine you should implement. For the full list of differences, see Comparing Memcached and Redis.
@@ -193,3 +198,59 @@ Add a MemoryDB for Redis instance to improve performance for read queries. Point
 
 ElastiCache is an in-memory caching service that can be used to cache the results of I/O-intensive database queries, which helps improve performance for database reads.'
 ---------------------------------------------------------------------------
+
+A developer migrates a web application from an on-premises data center to the AWS Cloud. Authenticated customers use the application from many different clients simultaneously, including laptops, smartphones, and tablets. The application runs on Amazon EC2 instances behind an Application Load Balancer. The instances run in an Amazon EC2 Auto Scaling group. Upon initial testing, users report that they have to reenter information when they use the web application on their laptops and then switch to using their smartphones.
+
+Which solution will make the session state information persist across devices?
+
+A
+Implement sticky sessions at the Application Load Balancer.
+Incorrect. The sticky session feature of the Application Load Balancer does not solve the problem across devices. Sticky sessions rely on a cookie that is not going to be consistent across devices.
+
+For more information about sticky sessions, see Sticky Sessions for your Application Load Balancer.
+
+
+B`````````````````````
+Store session state information in an Amazon ElastiCache for Redis cluster.
+Correct. ElastiCache for Redis is a fast in-memory data store that provides sub-millisecond latency to power internet-scale applications in real time. The data will not be stored on the instance itself. This choice is ideal for ensuring that the session state information persists across devices.
+
+For more information about Well-Architected Framework principles, see Make services stateless where possible within Design Interactions in a Distributed System to Mitigate or Withstand Failures.
+
+For more information about using ElastiCache for Redis for session states, see Getting Started tutorial, Building a fast session store for your online applications.
+
+
+C
+Implement session state information storage in a local file on the webserver.
+Incorrect. A local file could store session state information persistently over time, but this does not solve the problem presented. If session state information is stored locally on the instance when a request is sent to another node behind the Application Load Balancer, the other node does not have access to the session state information.
+
+
+D
+Store session state information in AWS Systems Manager State Manager.
+Incorrect. Systems Manager State Manager is not for use of session state information management. Systems Manager State Manager is used to manage the state of an instance itself, such as specific instance configurations or software installations
+
+
+=============================================================================================================
+A developer is building a web application which requires a multithreaded event-based key/value cache store that will cache result sets from database calls. You need to run large nodes with multiple cores for your cache layer and it should scale up or down as the demand on your system increases and decreases.
+
+Which of the following is the MOST suitable service that you should use?
+
+AWS Greengrass
+Amazon ElastiCache for Memcached````````````````
+Amazon CloudFront
+Amazon ElastiCache for Redis
+Incorrect
+Redis and Memcached are popular, open-source, in-memory data stores. Although they are both easy to use and offer high performance, there are important differences to consider when choosing an engine. Memcached is designed for simplicity while Redis offers a rich set of features that make it effective for a wide range of use cases.
+
+In this scenario, Redis can provide a much more durable and powerful cache layer to the prototype distributed system, however, you should take note of one keyword in the requirement: multithreaded. In terms of commands execution, Redis is mostly a single-threaded server. It is not designed to benefit from multiple CPU cores unlike Memcached, however, you can launch several Redis instances to scale out on several cores if needed.
+
+Memcached is a more suitable choice since the scenario specifies that the system will run large nodes with multiple cores or threads which Memcached can adequately provide.
+
+You can choose Memcached over Redis if you have the following requirements:
+
+– You need the simplest model possible.
+
+– You need to run large nodes with multiple cores or threads.
+
+– You need the ability to scale out and in, adding and removing nodes as demand on your system increases and decreases.
+
+– You need to cache objects, such as a database.

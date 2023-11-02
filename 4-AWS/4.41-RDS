@@ -107,6 +107,16 @@ You don’t want to lose your data. To take regular backups of your Amazon RDS i
 ---------------------------------------------------------------------------
 Redundancy with Amazon RDS Multi-AZ
 
+Deployment options Info
+The deployment options below are limited to those supported by the engine you selected above.
+A) Multi-AZ DB Cluster - new
+                                Creates a DB cluster with a primary DB instance and two readable standby DB instances, with each DB instance in a different Availability Zone (AZ). Provides high availability, data redundancy and increases capacity to serve read workloads.
+B) Multi-AZ DB instance
+                        Creates a primary DB instance and a standby DB instance in a different AZ. Provides high availability and data redundancy, but the standby DB instance doesnt support connections for read workloads.
+C) Single DB instance
+                Creates a single DB instance with no standby DB instances.
+
+
 In an Amazon RDS Multi-AZ deployment, Amazon RDS creates a redundant copy of your database in another Availability Zone. You end up with two copies of your database—a primary copy in a subnet in one Availability Zone and a standby copy in a subnet in a second Availability Zone.
 
 The primary copy of your database provides access to your data so that applications can query and display the information. The data in the primary copy is synchronously replicated to the standby copy. The standby copy is not considered an active database, and it does not get queried by applications.
@@ -288,3 +298,44 @@ For more information about RDS Multi-AZ DB instances, see High availability (Mul
 
 D
 Add an RDS read replica. Configure the application to direct the intensive read operations to the read replica.
+
+
+==============================================================================================================
+A company has an application hosted in an ECS Cluster that heavily uses an RDS database. A developer needs to closely monitor how the different processes on a DB instance use the CPU, such as the percentage of the CPU bandwidth or the total memory consumed by each process to ensure application performance.
+
+Which of the following is the MOST suitable solution that the developer should implement?
+
+Develop a shell script that collects and publishes custom metrics to CloudWatch which tracks the real-time CPU Utilization of the RDS instance.
+/Use Enhanced Monitoring in RDS./
+
+Track the CPU% and MEM% metrics which are readily available in the Amazon RDS console.
+Use CloudWatch to track the CPU Utilization of your database.
+==============================================================================================================
+A web application is currently using an on-premises Microsoft SQL Server 2019 Enterprise Edition database. Your manager instructed you to migrate the application to Elastic Beanstalk and the database to RDS. For additional security, you must configure your database to automatically encrypt data before it is written to storage, and automatically decrypt data when the data is read from storage.
+
+Which of the following services will you use to achieve this?
+
+Use Microsoft SQL Server Windows Authentication.
+Enable RDS Encryption.
+Use IAM DB Authentication.
+Enable Transparent Data Encryption (TDE).``````````````````````````
+Incorrect
+Amazon RDS supports using Transparent Data Encryption (TDE) to encrypt stored data on your DB instances running Microsoft SQL Server. TDE automatically encrypts data before it is written to storage, and automatically decrypts data when the data is read from storage.
+
+Amazon RDS supports TDE for the following SQL Server versions and editions:
+
+– SQL Server 2019 Standard and Enterprise Editions
+
+– SQL Server 2017 Enterprise Edition
+
+– SQL Server 2016 Enterprise Edition
+
+– SQL Server 2014 Enterprise Edition
+
+– SQL Server 2012 Enterprise Edition
+
+
+
+To enable transparent data encryption for an RDS SQL Server DB instance, specify the TDE option in an RDS option group that is associated with that DB instance.
+
+Transparent data encryption for SQL Server provides encryption key management by using a two-tier key architecture. A certificate, which is generated from the database master key, is used to protect the data encryption keys. The database encryption key performs the actual encryption and decryption of data on the user database. Amazon RDS backs up and manages the database master key and the TDE certificate. To comply with several security standards, Amazon RDS is working to implement automatic periodic master key rotation.

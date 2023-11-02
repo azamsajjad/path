@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: #1e1e1e;
+    color: #fff;
+    padding: 10px 0;
+}
+
+header .logo h1 {
+    font-size: 36px;
+    margin: 0;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header nav ul li {
+    display: inline-block;
+    margin: 0 15px;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+main {
+    background-color: #f7f7f7;
+    padding: 40px 0;
+}
+
+main .main-content {
+    width: 70%;
+    float: left;
+}
+
+main .main-content article {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+main .main-content article h2 {
+    color: #333;
+}
+
+main .main-content article .date {
+    color: #777;
+}
+
+main .main-content article p {
+    line-height: 1.6;
+}
+
+main .main-content article a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+main .main-content article a:hover {
+    text-decoration: underline;
+}
+
+main .sidebar {
+    width: 30%;
+    float: left;
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+main .sidebar h2 {
+    color: #333;
+}
+
+main .sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+main .sidebar ul li {
+    margin-bottom: 10px;
+}
+
+main .sidebar ul li a {
+    color: #333;
+    text-decoration: none;
+}
+
+footer {
+    background-color: #1e1e1e;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    clear: both;
+}

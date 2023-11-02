@@ -754,3 +754,82 @@ Use generated keys to configure DynamoDB table encryption with AWS managed KMS k
 
 E
 Use generated keys to configure DynamoDB table encryption with AWS owned KMS keys.
+
+================================================================================================================
+A cryptocurrency exchange portal has a key management service hosted in their on-premises data center, which stores encryption keys and uses an RSA asymmetric encryption algorithm. The company has recently implemented a hybrid cloud architecture in AWS and you were assigned to migrate the exchange portal to their cloud infrastructure. For security compliance, the keys should be stored in dedicated, third-party validated hardware security modules under your exclusive control.
+
+Which of the following is the BEST solution that you should implement to meet the above requirement?
+
+Import the encryption keys from your on-premises key management service to AWS CloudHSM.````````````````````````
+Develop a custom key management service using the AWS Encryption SDK.
+Use AWS KMS to store and manage the encryption keys.
+Import the encryption keys from your on-premises key management service to AWS Secrets Manager as Customer Master Keys (CMKs).
+Incorrect
+AWS CloudHSM provides hardware security modules in AWS Cloud. A hardware security module (HSM) is a computing device that processes cryptographic operations and provides secure storage for cryptographic keys.
+
+
+
+When you use an HSM from AWS CloudHSM, you can perform a variety of cryptographic tasks:
+
+– Generate, store, import, export, and manage cryptographic keys, including symmetric keys and asymmetric key pairs.
+
+– Use symmetric and asymmetric algorithms to encrypt and decrypt data.
+
+– Use cryptographic hash functions to compute message digests and hash-based message authentication codes (HMACs).
+
+– Cryptographically sign data (including code signing) and verify signatures.
+
+– Generate cryptographically secure random data.
+
+ 
+
+You should consider using AWS CloudHSM instead of AWS KMS if you require:
+
+– Keys stored in dedicated, third-party validated hardware security modules under your exclusive control.
+
+– FIPS 140-2 compliance.
+
+– Integration with applications using PKCS#11, Java JCE, or Microsoft CNG interfaces.
+
+– High-performance in-VPC cryptographic acceleration (bulk crypto).
+
+ 
+
+Hence, the correct answer is to import the encryption keys from your on-premises key management service to AWS CloudHSM.
+
+Using AWS KMS to store and manage the encryption keys is incorrect. Although AWS KMS supports asymmetric encryption, it doesn’t provide dedicated, third-party validated hardware security modules which are under your exclusive control. You have to use CloudHSM instead.
+
+Importing the encryption keys from your on-premises key management service to AWS Secrets Manager as Customer Master Keys (CMKs) is incorrect because you can’t store CMKs to AWS Secrets Manager.
+
+Developing a custom key management service using the AWS Encryption SDK is incorrect because this entails a lot of effort to implement. Moreover, the AWS Encryption SDK only encrypts your data using a symmetric key algorithm which doesn’t comply with the requirements provided in the scenario.
+
+===============================================================================================================
+A developer is designing a multi-tiered system which utilizes various AWS resources. The application will be hosted in Elastic Beanstalk, which uses an RDS database and an S3 bucket that is configured to use Server-Side Encryption with Customer-Provided Encryption Keys (SSE-C). In this configuration, Amazon S3 does not store the encryption key you provide but instead, stores a randomly salted hash-based message authentication code (HMAC) value of the encryption key in order to validate future requests.
+
+Which of the following is a valid consideration that the developer should keep in mind when implementing this architecture?
+
+If you lose the encryption key, the salted HMAC value can be used to decrypt the object.
+The salted HMAC value can be used to decrypt the contents of the encrypted object.
+If you lose the encryption key, you lose the object.```````````````````````````````````````
+The salted HMAC value can be used to derive the value of the encryption key.
+Correct
+Server-side encryption is about protecting data at rest. Using server-side encryption with customer-provided encryption keys (SSE-C) allows you to set your own encryption keys. With the encryption key you provide as part of your request, Amazon S3 manages both the encryption, as it writes to disks, and decryption, when you access your objects. Therefore, you don’t need to maintain any code to perform data encryption and decryption. The only thing you do is manage the encryption keys you provide.
+
+
+
+When you upload an object, Amazon S3 uses the encryption key you provide to apply AES-256 encryption to your data and removes the encryption key from memory. It is important to note that Amazon S3 does not store the encryption key you provide. Instead, it is stored in a randomly salted HMAC value of the encryption key in order to validate future requests. The salted HMAC value cannot be used to derive the value of the encryption key or to decrypt the contents of the encrypted object. That means, if you lose the encryption key, you lose the object.
+
+When you retrieve an object, you must provide the same encryption key as part of your request. Amazon S3 first verifies that the encryption key you provided matches, and then decrypts the object before returning the object data to you.
+
+================================================================================================================
+A company uses AWS Systems Manager (SSM) Parameter Store to manage configuration details for multiple applications. The parameters are currently stored in the Standard tier. The company wants its operations team to be notified if there are sensitive parameters that haven’t been rotated within 90 days.
+
+Which must be done to meet the requirement?
+
+
+Convert the sensitive parameters from Standard tier into Advanced tier. Set a ExpirationNotification policy with a value of 90 days. Use Amazon EventBridge (Amazon CloudWatch Events) to send a notification via Amazon SNS.
+
+Configure a NoChangeNotification policy with a value of 90 days. Use Amazon EventBridge (Amazon CloudWatch Events) to send a notification via Amazon SNS.
+Set up an Amazon EventBridge (Amazon CloudWatch Events) event pattern that captures SSM Parameter-related events. Use Amazon SNS to send notifications.
+
+/Convert the sensitive parameters from Standard tier into Advanced tier. Set a NoChangeNotification policy with a value of 90 days. Use Amazon EventBridge (Amazon CloudWatch Events) to send a notification via Amazon SNS./

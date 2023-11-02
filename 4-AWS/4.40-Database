@@ -242,7 +242,6 @@ AWS Direct Connect
 Amazon S3
 ```AWS SCT agent
 
-ChatGPT
 To perform a large-scale migration of an on-premises data warehouse to Amazon Redshift, you can use:
 
 AWS DMS (Database Migration Service): AWS DMS is a fully managed service that enables you to migrate databases to AWS quickly and securely. It supports both homogeneous (e.g., Oracle to Oracle) and heterogeneous (e.g., Oracle to Amazon Redshift) migrations.

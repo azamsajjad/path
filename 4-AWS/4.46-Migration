@@ -1,3 +1,9 @@
+AWS DMS
+AWS SCT
+Database Migration Playbooks
+AWS SCT Extension Pack
+
+
 common reasons to migrate a database:
 
 Database modernization
@@ -37,7 +43,7 @@ If you want to switch database engines, AWS SCT can convert your existing databa
 Envisioning and assessing migration (AWS SCT)
 Step 1: Envision and assess migration
 
-    AWS SCT can assist you in the migration process by cataloging the physical and logical components of the existing system. If you are performing a hete rogeneous migration, AWS SCT will evaluate how much effort is needed to migrate to one or more popular open-source engines. It will provide a detailed report on each engine, and you can choose the best target for your particular use case.
+    AWS SCT can assist you in the migration process by cataloging the physical and logical components of the existing system. If you are performing a heterogeneous migration, AWS SCT will evaluate how much effort is needed to migrate to one or more popular open-source engines. It will provide a detailed report on each engine, and you can choose the best target for your particular use case.
 
 How does AWS SCT assess the complexity of my migration?
 

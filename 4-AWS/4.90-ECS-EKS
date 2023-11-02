@@ -176,8 +176,135 @@ Pricing         atleast 1 min and every     pay per 100ms
                 additional second   
 
 
+Launch your Fargate Tasks into subnets
+Under the hood •
+• We create an Elastic Network Interface (ENI)
+• The ENI is allocated a private IP from your subnet
+• The ENI is attached to your task
+• Your task now has a private IP from your subnet!
 
+You can assign public IPs to your tasks
+Configure security groups to control inbound & outbound traffic
+
+Docker images are composed of layers
+The topmost layer is the "writable" layer to capture file changes made by the running container
+IO-GB layer storage available per task, across all containers, including image layers 
+Writes are not visible across containers
+
+
+Writable Layer
+Image Layers
+Container 1
+
+
+
+-------------------------------------
+IAM PERMISSIONS:
+
+1-Cluster Permissions:
+Control who can launch/describe tasks in your cluster 
+
+2-Application(Task) Permissions:
+Allows your application containers to access AWS resources securely
+
+3-Housekeeping Permissions:(AWS Managed)
+Allows us to perform housekeeping activities around your task:
+
+Housekeeping Permissions
+We (AWS) need certain permissions in your account to bootstrap your task and keep itrunning.
+Execution Role gives us permissions for:
+    • ECR Image Pull
+    • Pushing CloudWatch Logs
+ECS Service Linked Role gives us permissions for:
+    ENI Management
+    ELB Target Registration/Deregistration targets into Elastic Load Balancing
 =========================================================================
+
+Managed Service Discovery for ECS: AWS Managed Integration wit Route 53
+• Service registry:
+    • Predictable Names for services
+    • Auto updated with latest, healthy IP, port
+• High availability, high scale
+• Extensible: Flexible boundaries for auto discovery
+- - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - -  - -
+Amazon Route 53 Auto Naming Provides Service Registry:
+Amazon Route 53 provides APIs to create
+• Namespace
+• CNAME per service autoname
+• A records per task IP
+• SRV records per task IP + port
+- - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - - - -  - -
+ECS Schedules & Places Service Endpoints:
+ECS Scheduler updates on:
+• Service scaling
+    • Task registrations
+    • Task de-registrations
+. Task health
+• Scheduling / Placement changes
+• ECS instance changes
+ECS maintains latest state of the dynamic environment in Service Registry
+============================================================================
+CI/CD for our tasks in AWS Fargate
+[ec2-user@ip-19-e-2-65 FargateDemo] aws ecs create-cluster --cluster-name ptctshare --regton ap-southeast-2
+[ec2-user@ip-19-e-2-65 FargateDemo]S nano task_definition.json
+[ec2-user@ip-19-e-2-65 FargateDemo]S aws ecs register-task-definition \
+                                > --cli-input-json file://task_definition.json
+                                > -- region ap-southeast-2 --query 'taskDefinition. taskDefinitionArn'
+[ec2-user@ip-19-e-2-65 FargateDemo]S nano service.json
+[ec2-user@ip-19-e-2-65 FargateDemo]S aws ecs create-service --cli-input-json file:/ /service.json
+[ec2-user@ip-19-e-2-65 FargateDemo]S aws application-autoscaling register-scalable-target \
+                                --resource-id service/pictshare/pictshare --service-namespace ecs \
+                                --scalabte-dimension ecs:service:DesiredCount --min-capacity 1 --max-capacity 20 \
+                                --role-arn arn:aws:.......
+[ec2-user@ip-19-e-2-65 FargateDemo]S nano Scale-Out.json
+[ec2-user@ip-19-e-2-65 FargateDemo]S aws application-autoscaling put-scaling-policy --cli-input-json file:/ /scale-out.json
+
+[ec2-user@ip-19-e-2-65 FargateDemo]S aws codecommit create-repository --repository-name pictshare
+[ec2-user@ip-1@-@-2-65 FargateDemo]$ aws codebuild create-project \
+> --name "pictshare" \
+> --description "Build project for Pictshare" \
+> --source type="CODEPIPELINE"\
+> --service-role "arn:aws:iam:::role/CodeBuIldExecutionRole" \
+> --environment type="LINUX_CONTAINER", \
+> environmentVariables=" [{name=AWS_DEFAULT_REGION.value='ap-southeast-2'
+{name=REPOSITORY URI.value=arn:aws:codecommit:ap-southeast-243543636:pictshare}]" \
+--artifacts type="CODEPIPELINE"
+
+[ec2-user@ip-I@-@-2-65 FargateDemo]$ nano pipeline structure.json
+[ec2-user@ip-1@-@-2-65 FargateDemo]$ aws codepipelfne create-pipeline \
+--pipeline file://pipeline_structure.json
+
+[ec2-user@ip-1@-@-2-65 FargateDemo]$ nano event.json
+[ec2-user@ip-1@-@-2-65 FargateDemo]$ aws events put-rule \
+> --cli-input-json file://event_put_rule.json
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - -  - - - -
+Scale-Out.json
+"PolicyName":
+"ServiceNamespace": "ecs" ,
+"Resourceld": "service/pictshare/pictshare",
+"ScalableDimension": "ecs:service:Desi redCount" ,
+"Policy Type": "Target TrackingScaling"
+"Target TrackingScalingPolicyConfiguration": {
+    "TargetValue": 50
+            "PredefinedMetricSpecification" : {
+            "PredefinedMetricType": "ECSServiceAverageCPUUtilization"
+        },
+        "ScaleOutCooldown". 5
+        "ScalelnCooldown": 5
+        "DisableScaleIn" : false
+    }
+}
+
+event.json
+"Name" : "CodeCommitRulePictshare",
+"EventPattern" : "[\"source\": [ \"aws.codecommit\" ] .\"detail-type\": [\"CodeCommit Repository State Change\"
+"State": "ENABLED"
+"
+============================================================================
+============================================================================
+============================================================================
+============================================================================
 In Amazon ECS, the machine that runs the containers is an EC2 instance that has an ECS agent installed and configured to run and manage your containers. This instance is called a container instance. In Amazon EKS, the machine that runs the containers is called a worker node or Kubernetes node. 
 
 An ECS container is called a task. An EKS container is called a pod.
@@ -272,3 +399,61 @@ CREATE Task -->
 in Networking -> attach proper VPC and editted Security Group
 in Task overrides -> use ecsTaskExecutionRole with AmazonECSTaskExecutionRolePolicy
 browser -> http://44.211.180.156:8443/
+
+"
+==============================================================================================================
+
+A developer is building an application that will be hosted in ECS and must be configured to run tasks and services using the Fargate launch type. The application will have four different tasks, each of which will access different AWS resources than the others.
+
+Which of the following is the MOST efficient solution that can provide your application in ECS access to the required AWS resources?
+
+Create 4 different IAM Roles with the required permissions and attach them to each of the 4 ECS tasks.```````
+Create 4 different Container Instance IAM Roles with the required permissions and attach them to each of the 4 ECS tasks.
+Create 4 different Service-Linked Roles with the required permissions and attach them to each of the 4 ECS tasks.
+Create an IAM Group with all the required permissions and attach them to each of the 4 ECS tasks.
+Incorrect
+By default, IAM users don’t have permission to create or modify Amazon ECS resources or perform tasks using the Amazon ECS API. This means that they also can’t do so using the Amazon ECS console or the AWS CLI. To allow IAM users to create or modify resources and perform tasks, you must create IAM policies. Policies grant IAM users permission to use specific resources and API actions. Then, attach those policies to the IAM users or groups that require those permissions.
+
+
+
+
+When you attach a policy to a user or group of users, it allows or denies the users permission to perform the specified tasks on the specified resources. Likewise, Amazon ECS container instances make calls to the Amazon ECS and Amazon EC2 APIs on your behalf, so they need to authenticate with your credentials. This authentication is accomplished by creating an IAM role for your container instances and associating that role with your container instances when you launch them.
+
+If you use an Elastic Load Balancing load balancer with your Amazon ECS services, calls to the Amazon EC2 and Elastic Load Balancing APIs are made on your behalf to register and deregister container instances with your load balancers.
+
+Hence, the most suitable solution in this scenario is: Create 4 different IAM Roles with the required permissions and attach them to each of the 4 ECS tasks.
+
+The option that says: Creating an IAM Group with all the required permissions and attaching them to each of the 4 ECS tasks is incorrect because you cannot directly attach an IAM Group to an ECS Task. Attaching an IAM Role is a more suitable solution in this scenario and not an IAM Group.
+
+The option that says: Creating 4 different Container Instance IAM Roles with the required permissions and attaching them to each of the 4 ECS tasks is incorrect because a Container Instance IAM Role only applies if you are using the EC2 launch type. Take note that the scenario says that the application will be using a Fargate launch type.
+
+The option that says: Creating 4 different Service-Linked Roles with the required permissions and attaching them to each of the 4 ECS tasks is incorrect because a service-linked role is a unique type of IAM role that is linked directly to Amazon ECS itself, not on the ECS task. Service-linked roles are predefined by Amazon ECS and include all the permissions that the service requires to call other AWS services on your behalf.
+
+ =================================================================================================================
+ A developer is designing an application which will be hosted in ECS and uses an EC2 launch type. You need to group your container instances by certain attributes such as Availability Zone, instance type, or custom metadata. After you have defined a group of container instances, you will need to customize Amazon ECS to place tasks on container instances based on the group you specified.
+
+Which of the following ECS features provides you with expressions that you can use to group container instances by a specific attribute?
+
+Task Placement Constraints
+Task Groups
+Task Placement Strategies
+Cluster Query Language`````````````````````
+Incorrect
+When a task that uses the EC2 launch type is launched, Amazon ECS must determine where to place the task based on the requirements specified in the task definition, such as CPU and memory. Similarly, when you scale down the task count, Amazon ECS must determine which tasks to terminate. You can apply task placement strategies and constraints to customize how Amazon ECS places and terminates tasks. Task placement strategies and constraints are not supported for tasks using the Fargate launch type. By default, Fargate tasks are spread across Availability Zones.
+
+
+
+Cluster queries are expressions that enable you to group objects. For example, you can group container instances by attributes such as Availability Zone, instance type, or custom metadata. You can add custom metadata to your container instances, known as attributes. Each attribute has a name and an optional string value. You can use the built-in attributes provided by Amazon ECS or define custom attributes.
+
+After you have defined a group of container instances, you can customize Amazon ECS to place tasks on container instances based on group. Running tasks manually is ideal in certain situations. For example, suppose that you are developing a task but you are not ready to deploy this task with the service scheduler. Perhaps your task is a one-time or periodic batch job that does not make sense to keep running or restart when it finishes.
+
+Hence, the correct ECS feature which provides you with expressions that you can use to group container instances by a specific attribute is Cluster Query Language.
+
+Task Group is incorrect because this is just a set of related tasks. This does not provide expressions that enable you to group objects. All tasks with the same task group name are considered as a set when performing spread placement.
+
+Task Placement Constraint is incorrect because it is just a rule that is considered during task placement. Although it uses cluster queries when you are placing tasks on container instances based on a specific expression, it does not provide the actual expressions which are used to group those container instances.
+
+Task Placement Strategies is incorrect because this is just an algorithm for selecting instances for task placement or tasks for termination.
+
+ 
+

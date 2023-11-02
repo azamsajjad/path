@@ -325,7 +325,33 @@ Amazon FSx for Lustre can use Amazon S3 as a raw data repository as well as a re
 When linked to an S3 bucket, FSx for Lustre transparently presents objects as files, allowing you to run your workload without managing data transfer from S3. As the contents of your S3 bucket change, FSx for Lustre automatically updates your file system with the latest data available to run your workload.
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+CLOUDFRONT - Amazons CDN content delivery network
+CLOUDFRONT Origin - EC2,S3,ELB,R53 address
+CLOUDFRONT EDGE LOCATION - location where content is cached
+CLOUDFRONT Distribution - name given to config settings
 ----------------------------------------------------------------------
+A developer is managing a distributed system that consists of an Application Load Balancer, an SQS queue, and an Auto Scaling group of EC2 instances. The system has been integrated with CloudFront to better serve clients worldwide. To enhance the security of the in-flight data, the developer was instructed to establish an end-to-end SSL connection between the origin and the end-users.
+
+Which TWO options will allow the developer to meet this requirement using CloudFront? (Select TWO.)
+
+Set up an Origin Access Control (OAC) setting
+Associate a Web ACL using AWS Web Application Firewall (WAF) with your CloudFront Distribution.
+Configure your ALB to only allow traffic on port 443 using an SSL certificate from AWS Config.
+Configure the Origin Protocol Policy to use HTTPS only``````
+Configure the Viewer Protocol Policy to use HTTPS only``````
+
+======================================================================
+A website is hosted in an Auto Scaling group of EC2 instances behind an Application Load Balancer. It also uses CloudFront with a default domain name to distribute its static assets and dynamic contents. However, the website has a poor search ranking as it doesn’t use a secure HTTPS/SSL on its site.
+
+Which are the possible solutions that the developer can implement in order to set up HTTPS communication between the viewers and CloudFront? (Select TWO.)
+
+
+Set the Viewer Protocol Policy to use Redirect HTTP to HTTPS.```````
+Configure the ALB to use its default SSL/TLS certificate.
+Use a self-signed certificate in the ALB.
+
+Set the Viewer Protocol Policy to use HTTPS Only.`````````````
+Use a self-signed SSL/TLS certificate in the ALB which is stored in a private S3 bucket.
 ----------------------------------------------------------------------
 CLOUDFRONT - Amazons CDN content delivery network
 CLOUDFRONT Origin - EC2,S3,ELB,R53 address
@@ -629,3 +655,168 @@ Create multiple access points for the Amazon S3 bucket. Adopt a naming pattern t
 Adjust the Amazon S3 bucket settings for Minimum TTL, Maximum TTL, and Default TTL to control cache behavior.
 
 "Create an Amazon CloudFront web distribution with the Amazon S3 bucket as an origin. Set the distribution's Minimum TTL, Maximum TTL, and Default TTL to control cache behavior. Adjust the web application to use the CloudFront distribution domain name."
+
+
+=============================================================================================================
+Your manager assigned you a task of implementing server-side encryption with customer-provided encryption keys (SSE-C) to your S3 bucket, which will allow you to set your own encryption keys. Amazon S3 will manage both the encryption and decryption process using your key when you access your objects, which will remove the burden of maintaining any code to perform data encryption and decryption.
+
+To properly upload data to this bucket, which of the following headers must be included in your request?
+
+
+x-amz-server-side-encryption, x-amz-server-side-encryption-customer-key and x-amz-server-side-encryption-customer-key-MD5 headers
+
+x-amz-server-side-encryption-customer-key header only
+
+x-amz-server-side-encryption and x-amz-server-side-encryption-aws-kms-key-id headers
+
+x-amz-server-side​-encryption​-customer-algorithm, x-amz-server-side-encryption-customer-key and x-amz-server-side-encryption-customer-key-MD5 headers`````````````````````````````````````````
+
+
+Incorrect
+Server-side encryption is about protecting data at rest. Using server-side encryption with customer-provided encryption keys (SSE-C) allows you to set your own encryption keys. With the encryption key you provide as part of your request, Amazon S3 manages both the encryption, as it writes to disks, and decryption, when you access your objects. Therefore, you don’t need to maintain any code to perform data encryption and decryption. The only thing you do is manage the encryption keys you provide.
+
+
+x-amz-server-side-encryption-customer-algorithm – This header specifies the encryption algorithm. The header value must be “AES256”.
+
+x-amz-server-side-encryption-customer-key – This header provides the 256-bit, base64-encoded encryption key for Amazon S3 to use to encrypt or decrypt your data.
+
+x-amz-server-side-encryption-customer-key-MD5 – This header provides the base64-encoded 128-bit MD5 digest of the encryption key according to RFC 1321. Amazon S3 uses this header for a message integrity check to ensure the encryption key was transmitted without error.
+
+Hence, the correct answer is to include the x-amz-server-side​-encryption​-customer-algorithm, x-amz-server-side-encryption-customer-key and x-amz-server-side-encryption-customer-key-MD5 headers on the upload request.
+
+Including the x-amz-server-side-encryption and x-amz-server-side-encryption-aws-kms-key-id headers in the upload request is incorrect because these headers are primarily used in Server-Side Encryption with AWS KMS-Managed Keys (SSE-KMS) and not for Server-Side Encryption with Customer-Provided Keys (SSE-C).
+
+Including the x-amz-server-side-encryption, x-amz-server-side-encryption-customer-key and x-amz-server-side-encryption-customer-key-MD5 headers is incorrect because the x-amz-server-side-encryption header is not used in SSE-C encryption. This should be replaced with the x-amz-server-side​-encryption​-customer-algorithm header.
+
+Including just the x-amz-server-side-encryption-customer-key header only is incorrect because you have to include the x-amz-server-side​-encryption​-customer-algorithm and x-amz-server-side-encryption-customer-key-MD5 headers as well to upload the objects to the S3 bucket with SSE-C encryption.
+
+============================================================================================================
+A recruitment agency has a large collection of resumes stored in an Amazon S3 bucket. The agency wants to perform an analysis on these files, but for privacy compliance reasons, they need to ensure that certain personally identifiable information (PII) is redacted before being processed by their internal service.
+
+Which solution can meet the requirements in the most cost-effective way?
+
+Implement a solution with AWS Glue to transform the data and redact PII before storing it in an S3 bucket.
+
+Use Amazon S3 Object Lambda to redact PII before it is returned to the application.`````````````
+
+Configure an Amazon S3 Access Point and set up an Amazon CloudFront distribution with a Lambda@Edge function to redact the PII as data is fetched from the S3 bucket.
+Use a Lambda function to create a redacted copy of each file in a separate S3 bucket. Then, set up an Amazon S3 Access Point to serve these files.
+
+
+Correct
+S3 Object Lambda allows you to add your own code to S3 GET requests to modify and process data as it’s being returned to an application. This feature is designed for use cases where data needs to be transformed on-the-fly without the need to store a transformed copy of the data. It’s useful in scenarios like filtering rows, redacting confidential data, dynamically resizing images and other similar situations where data transformation or processing is required during data retrieval.
+
+=================================================================================================================
+A company has a latency-sensitive service running on AWS Fargate, which is fronted by an Application Load Balancer (ALB). A CloudFront distribution uses the ALB as its origin and presents a custom domain for clients to access the service. The service authenticates requests by validating the JSON Web Token (JWT) obtained from the Authorization header sent by clients. Lately, there has been a significant influx of login attempts from unauthenticated users, which increases the CPU utilization of the Fargate tasks.
+
+Which solution would reduce the load on the Fargate tasks in the most operationally efficient manner?
+
+Create a Lambda@Edge function for JWT validation. Attach it to the Origin Response event of the CloudFront distribution.
+Create a CloudFront function for JWT validation. Attach it to the Viewer Request event of the CloudFront distribution.`````````````
+Enable auto-scaling on the Fargate tasks.
+Create a Lambda function that performs JWT validation. Configure the ALB to route login requests to the Lambda function.
+
+Incorrect
+CloudFront Functions allows you to write lightweight functions in JavaScript for high-scale, latency-sensitive CDN customizations. This feature is designed for operations that can be processed with low latency at the edge locations of AWS, such as:
+
+– Cache key normalization – You can transform HTTP request attributes (headers, query strings, cookies, even the URL path) to create an optimal cache key, which can improve your cache hit ratio.
+
+– Header manipulation – You can insert, modify, or delete HTTP headers in the request or response. For example, you can add a True-Client-IP header to every request.
+
+– Status code modification and body generation – You can evaluate headers and respond back to viewers with customized content.
+
+– URL redirects or rewrites – You can redirect viewers to other pages based on information in the request or rewrite all requests from one path to another.
+
+– Request authorization – You can validate hashed authorization tokens, such as JSON web tokens (JWT), by inspecting authorization headers or other request metadata.
+
+When you associate a CloudFront function with a CloudFront distribution, it allows CloudFront to intercept requests and responses at CloudFront edge locations.
+
+CloudFront functions can only be invoked during two specific events: when CloudFront receives a request from a viewer (viewer request) and before CloudFront returns the response to the viewer (viewer response).
+
+
+
+    In the given scenario, by attaching the validation function to the Viewer Request event, requests can be authenticated right when they hit the CloudFront cache and before they are forwarded to your AWS Fargate service. This method not only helps in reducing unnecessary traffic to your Fargate tasks but also improves overall latency for valid requests, as they don’t have to wait behind unauthenticated requests being processed by your backend infrastructure. In addition, because CloudFront Functions operate at the edge locations of AWS’s infrastructure, they are highly scalable and can handle a very high number of requests per second.
+
+    Hence, the correct answer is the option that says: Create a CloudFront function for JWT validation. Attach it to the Viewer Request event of the CloudFront distribution.
+
+    The option that says: Create a Lambda function that performs JWT validation. Configure the ALB to route login requests to the Lambda function is incorrect. This option doesn’t eliminate the problem of unauthenticated requests reaching the backend infrastructure. All requests, regardless of authentication, will still need to traverse the network to reach the ALB and Lambda, which is not operationally efficient and could increase latency.
+
+    The option that says: Enable auto-scaling on the Fargate tasks is incorrect.  While auto-scaling could help handle the increased load by adding more tasks as demand increases, it is a reactive measure and not a long-term solution. It doesn’t prevent unauthenticated requests from consuming resources on Fargate.
+
+    The option that says: Create a Lambda@Edge function for JWT validation. Attach it to the Origin Response event of the CloudFront distribution is incorrect. The Origin Response event is triggered after the request has been processed by your origin (in this case, the ALB) and the origin has returned a response to CloudFront. Validating the JWT at this stage would not reduce the number of unauthenticated requests reaching your Fargate service. It’s too late in the request processing flow to prevent unauthenticated requests from consuming resources on your backend infrastructure. Moreover, this could also introduce errors in the CloudFront flow.
+
+    ============================================================================================================
+    A company has an application that is using CloudFront to serve their static contents to their users around the globe. They are receiving a number of bad reviews from their customers lately because it takes a lot of time to log into their website. Sometimes, their users are also getting HTTP 504 errors which is why the developer was instructed to fix this problem immediately.
+
+Which of the following combination of options should the developer use together to set up a cost-effective solution for this scenario? (Select TWO.)
+
+
+Add a Cache-Control max-age directive to your objects in CloudFront and specify the longest practical value for max-age to increase the cache hit ratio of your CloudFront distribution.
+Launch your application to multiple and geographically disperse VPCs on various AWS regions then create a transit VPC to easily connect all your resources. Use several Lambda functions in each region using the AWS Serverless Application Model (SAM) service to improve the overall application performance.
+'Customize the content that the CloudFront web distribution delivers to your users using Lambda@Edge, which allows your Lambda functions to execute the authentication process in AWS locations closer to the users.'
+/Configure an origin failover by creating an origin group with two origins. Specify one as the primary origin and the other as the second origin which CloudFront automatically switches to when the primary origin returns specific HTTP status code failure responses./
+Launch your application to multiple AWS regions to serve your global users. Use a Route 53 record with latency routing policy to route incoming traffic to the region with the best latency to the user.
+Incorrect
+Lambda@Edge lets you run Lambda functions to customize the content that CloudFront delivers, executing the functions in AWS locations closer to the viewer. The functions run in response to CloudFront events, without provisioning or managing servers. You can use Lambda functions to change CloudFront requests and responses at the following points:
+
+– After CloudFront receives a request from a viewer (viewer request)
+
+– Before CloudFront forwards the request to the origin (origin request)
+
+– After CloudFront receives the response from the origin (origin response)
+
+– Before CloudFront forwards the response to the viewer
+
+
+
+In the given scenario, you can use Lambda@Edge to allow your Lambda functions to customize the content that CloudFront delivers and to execute the authentication process in AWS locations closer to the users. In addition, you can set up an origin failover by creating an origin group with two origins with one as the primary origin and the other as the second origin, which CloudFront automatically switches to when the primary origin fails. This will alleviate the occasional HTTP 504 errors that users are experiencing.
+
+Hence, the correct answers in this scenario are:
+
+– Customize the content that the CloudFront web distribution delivers to your users using Lambda@Edge, which allows your Lambda functions to execute the authentication process in AWS locations closer to the users.
+
+– Configure an origin failover by creating an origin group with two origins. Specify one as the primary origin and the other as the second origin which CloudFront automatically switches to when the primary origin returns specific HTTP status code failure responses.
+
+The option that says: Launch your application to multiple AWS regions to serve your global users. Use a Route 53 record with latency routing policy to route incoming traffic to the region with the best latency to the user is incorrect. Although this may resolve the performance issue, this solution entails a significant implementation cost since you have to deploy your application to multiple AWS regions. Remember that the scenario asks for a solution that will improve the performance of the application with minimal cost.
+
+The option that says: Launch your application to multiple and geographically disperse VPCs on various AWS regions then create a transit VPC to easily connect all your resources. Use several Lambda functions in each region using the AWS Serverless Application Model (SAM) service to improve the overall application performance is incorrect. Although setting up multiple VPCs across various regions which are connected with a transit VPC is valid, this solution still entails higher setup and maintenance costs. A more cost-effective option would be to use Lambda@Edge instead.
+
+The option that says: Add a Cache-Control max-age directive to your objects in CloudFront and specify the longest practical value for max-age to increase the cache hit ratio of your CloudFront distribution is incorrect because improving the cache hit ratio for the CloudFront distribution is irrelevant in this scenario. You can improve your cache performance by increasing the proportion of your viewer requests that are served from CloudFront edge caches instead of going to your origin servers for content. However, take note that the problem in the scenario is the slow authentication process of your global users and not just the caching of the static objects.
+
+================================================================================================================
+A company is legally obligated to keep transaction records containing Personally Identifiable Information (PII) for a duration of five years. These records are stored in Amazon S3. To handle data redaction, the company has developed Lambda functions with naming conventions starting as RedactPII-[role], where represents different roles.
+
+The company wants to provide varying levels of redaction based on each role, ensuring each user only sees the necessary data. Only a single copy of the records should be maintained.
+
+Which combination of actions will achieve the given requirements? (Select THREE.)
+
+
+/Use the GetObject API to retrieve the redacted data/
+
+Use the GetObjectLegalHold API to retrieve the redacted data.
+
+/Configure an S3 Object Lambda Access Point for each S3 Access Point name. Associate the RedactPII-[role] Lambda functions with the corresponding S3 Object Lambda Access Point./
+
+Set up S3 Replication for the bucket.
+
+Set up an S3 event notification to invoke the corresponding RedactPII-[role] function in response to GET requests.
+
+/Create an S3 Access Point for each user role./
+
+Incorrect
+S3 Object Lambda allows you to add your own code to S3 GET requests to modify and process data as it’s being returned to an application. This feature is designed for use cases where data needs to be transformed on the fly without the need to store a transformed copy of the data. It’s useful in scenarios like filtering rows, redacting confidential data, dynamically resizing images, and other similar situations where data transformation or processing is required during data retrieval.
+
+
+In the scenario, we have to create dedicated S3 Object Lambda Access Points, with each user having access to their own unique Access Point. Each of these Access Points is associated with the corresponding RedactPII-[role] Lambda function. On the client side, users issue standard GetObject requests to their specific S3 Object Lambda Access Point, allowing them to retrieve redacted data tailored to their role. This setup ensures that each user can only access the data associated with their role while maintaining the requirement of a single copy of the records in the S3 bucket.
+
+=============================================================================================================
+An application running in an EC2 instance is regularly fetching and processing a lot of data from an S3 bucket which resulted in a significant increase in your operating costs. You want to lower the latency of retrieving data from S3 and bring the operating costs down. To improve the system, you need to use simple structured query language (SQL) statements to filter the contents of Amazon S3 objects and retrieve just the subset of data that you need.
+
+Which is the MOST suitable service that will help you accomplish this requirement?
+
+Athena
+AWS Step Functions
+S3 Select`````````````````````
+Redshift Spectrum
+Incorrect
+With Amazon S3 Select, you can use simple structured query language (SQL) statements to filter the contents of Amazon S3 objects and retrieve just the subset of data that you need. By using Amazon S3 Select to filter this data, you can reduce the amount of data that Amazon S3 transfers, which reduces the cost and latency of retrieving these data.

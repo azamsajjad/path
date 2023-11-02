@@ -1,3 +1,38 @@
+A developer is creating a React application whose source code is hosted in GitHub. To help ensure proper functionality and identify any UI issues before going live, the developer must perform end-to-end (E2E) testing using Cypress.
+
+Which combination of actions should the developer take? (Select Two)
+
+
+Include the location of the Cypress configuration file in the aws-exports.js file.
+
+Connect the Github repository to AWS Amplify Hosting````````````````
+
+
+Create an application in AWS Amplify Studio. Clone the application’s source code in a local environment and run amplify pull --appId APP_ID --envName ENV_NAME
+
+Update the amplifyconfiguration.json with appropriate configuration settings for Cypress.
+
+Update the amplify.yml file with appropriate configuration settings for Cypress.```````````
+
+
+
+// Correct
+// AWS Amplify is a set of purpose-built tools and features that enables frontend web and mobile developers to quickly and easily build full-stack applications on AWS.
+
+// Amplify provides two services:
+
+// -Amplify Hosting – provides a git-based workflow for hosting full-stack serverless web apps with continuous deployment.
+
+// -Amplify Studio – a visual development environment that simplifies the creation of scalable, full-stack web and mobile apps. Use can use Amplify Studio to build your frontend UI with a set of ready-to-use UI components, create an app backend with AWS resources, and then connect the two together.
+
+// Amplify Hosting provides deep integration with Cypress for End-to-End (E2E) testing, allowing developers to generate a UI report for their tests. To add Cypress tests to your application, you can update the build settings in the amplify.yml configuration file, which will enable Amplify to run the tests during the build process.
+
+
+==========================================================================
+
+
+
+
 Amazon Lightsail - FOR NOOBS.
 
 With a virtual private server (VPS), also known as an instance, users can run websites and web applications in a highly secure and available environment. Lightsail is a VPS provider and is a useful way to get started with AWS for users who need a solution to build and host their applications on AWS Cloud.
@@ -232,7 +267,7 @@ option_settings:
         NODE_ENV: production
 
 
-002_node_command.config
+   002_node_command.config
 option_settings:
     aws:elasticbeanstalk:container:nodejs:
         NodeCommand: "npm start"
@@ -438,3 +473,131 @@ add commit
 eb init 
 git push 
 eb create --single
+
+
+==============================================================================================================
+I want to monitor memory use with Amazon CloudWatch from my AWS Elastic Beanstalk environment in Windows.
+
+
+Short description
+You can provision Elastic Beanstalk configuration files (.ebextensions) to monitor memory utilization with CloudWatch for .NET on Windows Server with IIS by doing the following:
+
+Create the .ebextensions directory.
+Create and save configuration file in the .ebextensions directory.
+Deploy your application and view your metrics.
+Note: By default, the unified CloudWatch agent is installed on all Elastic Beanstalk Windows environments running platform versions 2.0.1 or later.
+
+Resolution
+Create the .ebextensions directory
+In the root of your application bundle, create a hidden directory named .ebextensions.
+Example: This example demonstrates an application source bundle structure with .ebextensions directory at the top level of the project directory.
+
+~/workspace/my-application/
+|-- Content
+|-- .ebextensions
+|  
+|-- archive.xml
+`-- systemInfo.xml
+Create and save configuration file in the .ebextensions directory
+Create a file called 01_cw-memory-metrics.config inside the .ebextensions directory that you created as part of the application source bundle.
+Example: This example extends the CloudWatch agent configuration file - Metrics section.
+
+files:
+  "C:\\Program Files\\Amazon\\AmazonCloudWatchAgent\\cw-memory-config.json":
+    content: |
+{
+  "metrics": {
+    "append_dimensions": {
+      "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+      "ImageId": "${aws:ImageId}",
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}"
+    },
+    "metrics_collected": {
+      "Memory": {
+        "measurement": [
+          "% Committed Bytes In Use"
+        ],
+        "metrics_collection_interval": 10
+      }
+    }
+  }
+}
+
+container_commands:
+  01_set_config_and_reinitialize_cw_agent:
+    command: powershell.exe cd 'C:\Program Files\Amazon\AmazonCloudWatchAgent'; powershell.exe -ExecutionPolicy Bypass -File ./amazon-cloudwatch-agent-ctl.ps1 -a append-config -m ec2 -c file:cw-memory-config.json -s; powershell.exe -ExecutionPolicy Bypass -File ./amazon-cloudwatch-agent-ctl.ps1 -a start; exit
+The 01_cw-memory-metrics.config configuration file does the following:
+
+Defines the metrics that the CloudWatch agent collects and publishes to CloudWatch console - Metrics.
+Collects the metrics for percentage of memory used.
+The files section includes the CloudWatch agent configuration JSON content that defines which metric to publish to CloudWatch.
+The container_commands section runs commands after the application bundle is unpacked on the Amazon Elastic Compute Cloud (Amazon EC2) instance.
+
+
+
+
+================================================================================================================
+A developer needs to configure the environment name, solution stack, and environment links of his application environment which will be hosted in Elastic Beanstalk. Which configuration file should the developer add in the source bundle to meet the above requirement?
+
+
+env.yaml
+
+Dockerrun.aws.json
+
+cron.yaml
+
+env.config
+================================================================================================================
+A developer is instructed to configure a worker daemon to queue messages based on a specific schedule using a worker environment hosted in Elastic Beanstalk. Periodic tasks should be defined to automatically add jobs to your worker environment’s queue at regular intervals.
+
+Which configuration file should the developer add to the source bundle to meet the above requirement?
+
+
+appspec.yml
+
+env.yaml
+
+cron.yaml``````````````````````
+
+Dockerrun.aws.json
+
+You can define periodic tasks in a file named cron.yaml in your source bundle to add jobs to your worker environment’s queue automatically at a regular intervals. For example, you can configure and upload a cron.yaml file, which creates two periodic tasks: one that runs every 12 hours and a second that runs at 11 pm UTC every day.
+
+Hence, using the cron.yaml is the correct configuration file to be used in this scenario.
+
+Dockerrun.aws.json is incorrect because this configuration file is primarily used in multi-container Docker environments that are hosted in Elastic Beanstalk. This can be used alone or combined with source code and content in a source bundle to create an environment on a Docker platform.
+
+env.yaml is incorrect because this is primarily used to configure the environment name, solution stack, and environment links to use when creating your environment in Elastic Beanstalk.
+
+appspec.yml is incorrect because this is used to manage each application deployment as a series of lifecycle event hooks in CodeDeploy and not in Elastic Beanstalk.
+
+=================================================================================================================
+An application performs various workflows and processes long-running tasks that take a long time to complete. The users are complaining that the application is unresponsive since the workflow substantially increased the time it takes to complete a user request.
+
+Which of the following is the BEST way to improve the performance of the application?
+
+Use an Amazon ECS Cluster with a Fargate launch type to process the tasks asynchronously.
+"Use an Elastic Beanstalk worker environment to process the tasks asynchronously."
+Use a multicontainer docker environment in Elastic Beanstalk to process the long-running tasks asynchronously.
+Spawn a worker process locally in the EC2 instances and process the tasks asynchronously.
+Correct
+If your application performs operations or workflows that take a long time to complete, you can offload those tasks to a dedicated worker environment. Decoupling your web application front end from a process that performs blocking operations is a common way to ensure that your application stays responsive under load.
+
+A long-running task is anything that substantially increases the time it takes to complete a request, such as processing images or videos, sending emails, or generating a ZIP archive. These operations can take only a second or two to complete, but a delay of a few seconds is a lot for a web request that would otherwise complete in less than 500 ms.
+
+
+
+One option is to spawn a worker process locally, return success, and process the task asynchronously. This works if your instance can keep up with all of the tasks sent to it. Under high load, however, an instance can become overwhelmed with background tasks and become unresponsive to higher-priority requests. If individual users can generate multiple tasks, the increase in load might not correspond to an increase in users, making it hard to scale out your web server tier effectively.
+
+To avoid running long-running tasks locally, you can use the AWS SDK for your programming language to send them to an Amazon Simple Queue Service (Amazon SQS) queue and run the process that performs them on a separate set of instances. You then design these worker instances to take items from the queue only when they have the capacity to run them, preventing them from becoming overwhelmed.
+
+Elastic Beanstalk worker environments simplify this process by managing the Amazon SQS queue and running a daemon process on each instance that reads from the queue for you. When the daemon pulls an item from the queue, it sends an HTTP POST request locally to http://localhost/ on port 80 with the contents of the queue message in the body. All that your application needs to do is perform the long-running task in response to the POST. You can configure the daemon to post to a different path, use a MIME type other than application/JSON, connect to an existing queue, or customize connections (maximum concurrent requests), timeouts, and retries.
+
+Hence, the best solution to meet the requirements of this scenario is to use an Elastic Beanstalk worker environment to process the tasks asynchronously.
+
+Spawning a worker process locally in the EC2 instances then processing the tasks asynchronously is incorrect. Although this is a valid solution, it is not scalable and hence, it’s not the best one. Under high load, an instance can become overwhelmed with background tasks and become unresponsive to higher priority requests. This makes it hard to scale out your web server tier effectively.
+
+Using a multicontainer docker environment in Elastic Beanstalk to process the long-running tasks asynchronously is incorrect because this is primarily used to support multiple containers per Amazon EC2 instance with multicontainer Docker platform. This is not applicable when processing long-running tasks and it is not scalable since it’s not using an SQS queue.
+
+Using an Amazon ECS Cluster with a Fargate launch type to process the tasks asynchronously is incorrect because Fargate just allows you to run your containerized applications without the need to provision and manage the backend infrastructure.
