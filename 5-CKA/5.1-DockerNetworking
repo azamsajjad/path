@@ -123,3 +123,68 @@ PS C:\Users\T480> docker network inspect edefc04be1a6
         "Labels": {}
     }
 ]
+
+
+
+
+=========================================================================================
+CREATE A NETWORK 
+
+ docker network create --subnet 10.1.0.0/16 --gateway 10.1.0.1 --ip-range 10.1.4.0/24 --driver bridge --label host4network br329
+   43  docker network ls
+   44  docker netwrok inspect br329
+   49  docker container run -it --name net-test --network br329 centos /bin/bash
+
+
+
+INSIDE CONTAINER
+    sudo rpm -i 'centos-gpg-keys-8-3.el8.noarch.rpm'
+    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+    yum update -y
+    [root@326c4e586a16 /]# yum install -y net-tools
+
+    [root@326c4e586a16 /]# ifconfig
+    eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+            inet 10.1.4.0  netmask 255.255.0.0  broadcast 10.1.255.255
+            ether 02:42:0a:01:04:00  txqueuelen 0  (Ethernet)
+            RX packets 68364  bytes 99325174 (94.7 MiB)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 22399  bytes 1550589 (1.4 MiB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+    lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+            inet 127.0.0.1  netmask 255.0.0.0
+            loop  txqueuelen 1000  (Local Loopback)
+            RX packets 128  bytes 19170 (18.7 KiB)
+            RX errors 0  dropped 0  overruns 0  frame 0
+            TX packets 128  bytes 19170 (18.7 KiB)
+            TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+
+    [root@326c4e586a16 /]# ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+        valid_lft forever preferred_lft forever
+    12: eth0@if13: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default
+        link/ether 02:42:0a:01:04:00 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+        inet 10.1.4.0/16 brd 10.1.255.255 scope global eth0
+        valid_lft forever preferred_lft forever
+    [root@326c4e586a16 /]# netstat -rn
+    Kernel IP routing table
+    Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+    0.0.0.0         10.1.0.1        0.0.0.0         UG        0 0          0 eth0
+    10.1.0.0        0.0.0.0         255.255.0.0     U         0 0          0 eth0
+    [root@326c4e586a16 /]# cat /etc/resolv.conf
+    nameserver 127.0.0.11
+    options ndots:0
+
+-------------------------------------------------------------------
+
+rupert@T480-M8VDO3T:~$ docker container run -d --name net-test2 --ip 10.1.4.102 --network br329 nginx
+
+rupert@T480-M8VDO3T:~$ docker container inspect net-test2 | grep IPAddr
+            "SecondaryIPAddresses": null,
+            "IPAddress": "",
+                    "IPAddress": "10.1.4.102",
