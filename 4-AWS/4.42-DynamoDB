@@ -1507,3 +1507,82 @@ Which of the following should the developer consider when using this type of ind
 When you query this index, you can choose either eventual consistency or strong consistency.
 Queries or scans on this index consume read capacity units from the base table.
 For each partition key value, the total size of all indexed items must be 10 GB or less.
+=================================================================================================
+	
+A mobile game developer is using DynamoDB as a data store and a Web Identity Federation for authorization and authentication. Each item in the DynamoDB table contains the attributes for individual user's game data such as user ID, game scores, and top score where the user ID is the partition key. The developer must control user access to specific data items based on their IDs. In doing so, users will only be able to obtain items that they own.
+
+Which of the following solutions must be implemented by the developer?
+
+(view)	1	0	1	00:03:27	
+ Modify the IAM Policy associated with the Identity provider's role by setting the value of the dynamodb:LeadingKeys condition key to the user IDs.````````````````````````````````````````````
+ Modify the IAM Policy associated with the Identity provider's role by setting the value of the dynamodb:Attributes condition key to the user IDs.
+ Modify the IAM Policy associated with the Identity provider's role by setting the value of the dynamodb:ReturnValues condition key to the user IDs.
+ Modify the IAM Policy associated with the Identity provider's role by setting the value of the dynamodb:Select condition key to the user IDs.
+In DynamoDB, you can control access to individual data items and attributes in a table. For example, you can do the following:
+
+- Grant permissions on a table, but restrict access to specific items in that table based on certain primary key values. An example might be a social networking app for games, where all users' saved game data is stored in a single table, but no users can access data items that they do not own, as shown in the following illustration:
+
+
+- Hide information so that only a subset of attributes is visible to the user. An example might be an app that displays flight data for nearby airports, based on the user's location. Airline names, arrival and departure times, and flight numbers are all displayed. However, attributes such as pilot names or the number of passengers are hidden, as shown in the following illustration:
+
+
+To implement this kind of fine-grained access control, you write an IAM permissions policy that specifies conditions for accessing security credentials and the associated permissions. You then apply the policy to IAM users, groups, or roles that you create using the IAM console. Your IAM policy can restrict access to individual items in a table, access to the attributes in those items, or both at the same time.
+
+You can optionally use web identity federation to control access by users who are authenticated by Login with Amazon, Facebook, or Google.
+
+You use the IAM Condition element to implement a fine-grained access control policy. By adding a Condition element to a permissions policy, you can allow or deny access to items and attributes in DynamoDB tables and indexes, based upon your particular business requirements.
+
+In the given scenario, we are only required to restrict access to specific items in the table based on User Id which is the partition key. We can achieve this by inserting a dynamodb:LeadingKeys condition key to the IAM policy associated with the Identity provider's role.
+
+
+
+Hence, the correct answer is: Modify the IAM Policy associated with the Identity provider’s role by adding a dynamodb:LeadingKeys condition key.
+
+The option that says: Modify the IAM Policy associated with the Identity provider's role by adding a dynamodb:Attributes condition key to the user IDs is incorrect because this type of condition key is used for granting permissions that will limit access to specific attributes in the table. Note that the question is requiring access control to the items.
+
+The option that says: Modify the IAM Policy associated with the Identity provider's role by adding a dynamodb:ReturnValues condition key to the user IDs is incorrect because this type of condition key is just used for getting the item attributes as they appear before or after they are updated.
+
+The option that says: Modify the IAM Policy associated with the Identity provider's role by adding a dynamodb:Select condition key to the user IDs is incorrect because this type of condition key is mainly used for specifying attributes to be returned in the result of a Query or Scan request.
+============================================================================================================
+'
+A developer is building an application with Amazon DynamoDB as its database. The application needs to group the PUT, UPDATE, and DELETE actions into a single all-or-nothing operation to make changes against multiple items in the DynamoDB table.
+
+Which DynamoDB operation should the developer use?
+
+(view)	1	0	1	00:00:30	
+ TransactWriteItems`````````````````````````
+ BatchWriteItem
+ Scan
+ Query
+With Amazon DynamoDB transactions, you can group multiple actions together and submit them as a single all-or-nothing TransactWriteItems or TransactGetItems operation.
+
+TransactWriteItems is a synchronous and idempotent write operation that groups up to 25 write actions in a single all-or-nothing operation. These actions can target up to 25 distinct items in one or more DynamoDB tables within the same AWS account and in the same Region. The aggregate size of the items in the transaction cannot exceed 4 MB. The actions are completed atomically so that either all of them succeed or none of them succeeds.
+
+You can add the following types of actions to a transa
+===============================================================================================================
+A developer wants to cut down the execution time of the scan operation on a DynamoDB table during periods of low demand without interfering with typical workloads. The operation consumes half of the strongly consistent read capacity units within regular operating hours.
+
+How can the developer improve this scan operation?
+
+(view)	1	0	1	00:00:44	
+ Perform a rate-limited parallel scan operation.```````````````
+ Perform a rate-limited sequential scan operation.
+ Use a parallel scan operation.
+ Use eventually consistent reads for the scan operation instead of strongly consistent reads.
+By default, the Scan operation processes data sequentially. Amazon DynamoDB returns data to the application in 1 MB increments, and an application performs additional Scan operations to retrieve the next 1 MB of data.
+
+The larger the table or index being scanned, the more time the Scan takes to complete. In addition, a sequential Scan might not always be able to fully use the provisioned read throughput capacity: Even though DynamoDB distributes a large table's data across multiple physical partitions, a Scan operation can only read one partition at a time. For this reason, the throughput of a Scan is constrained by the maximum throughput of a single partition.
+
+To address these issues, the Scan operation can logically divide a table or secondary index into multiple segments, with multiple application workers scanning the segments in parallel. Each worker can be a thread (in programming languages that support multithreading) or an operating system process. To perform a parallel scan, each worker issues its own Scan request with the following parameters:
+
+
+
+To make the most of your table’s provisioned throughput, you’ll want to use the Parallel Scan API operation so that your scan is distributed across your table’s partitions. But be careful that your scan doesn’t consume your table’s provisioned throughput and cause the critical parts of your application to be throttled. To avoid throttling, you need to rate-limit your client application.
+
+Hence, the correct answer is: Perform a rate-limited parallel scan operation.
+
+The option that says: Perform a rate-limited sequential scan operation is incorrect because a DynamoDB scan operation is sequential by default, therefore, there will be no improvement in the execution time of the current scan operation.
+
+The option that says: Use a parallel scan operation is incorrect because running a parallel scan alone might consume all of your table's provisioned throughput which may affect your application's normal workload. You must use a rate-limiter along with it.
+
+The option that says: Use eventually consistent reads for the scan operation instead of strongly consistent reads is incorrect. You might reduce the cost of your provisioned throughput but the scan operation will still run sequentially, making no improvements at all.

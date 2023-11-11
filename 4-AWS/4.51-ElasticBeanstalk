@@ -147,6 +147,28 @@ Example Buildfile
                     make: ./build.sh
 If you want to provide custom build steps, we recommend that you use predeploy platform hooks for anything but the simplest commands, instead of a Buildfile. Platform hooks allow richer scripts and better error handling. Platform hooks are described in the next section.
 ------------------------------------
+With ElasticBeanstalk, you can:
+
+– Select the operating system that matches your application requirements (e.g., Amazon Linux or Windows Server 2016)
+
+– Choose from several Amazon EC2 instances, including On-Demand, Reserved Instances, and Spot Instances.
+
+– Choose from several available database and storage options.
+
+– Enable login access to Amazon EC2 instances for immediate and direct troubleshooting
+
+– Quickly improve application reliability by running in more than one Availability Zone.
+
+– Enhance application security by enabling HTTPS protocol on the load balancer
+
+– Access built-in Amazon CloudWatch monitoring and getting notifications on application health and other important events
+
+– Adjust application server settings (e.g., JVM settings) and pass environment variables
+
+– Run other application components, such as a memory caching service, side-by-side in Amazon EC2.
+
+– Access log files without logging in to the application servers
+------------------------------------
 Create a ProcFile for long running processes.
 For example, custom commands to start up your application.
 Use a Procfile for long-running application processes that shouldn't exit. Elastic Beanstalk expects processes run from the Procfile to run continuously. Elastic Beanstalk monitors these processes and restarts any process that terminates.'
@@ -601,3 +623,16 @@ Spawning a worker process locally in the EC2 instances then processing the tasks
 Using a multicontainer docker environment in Elastic Beanstalk to process the long-running tasks asynchronously is incorrect because this is primarily used to support multiple containers per Amazon EC2 instance with multicontainer Docker platform. This is not applicable when processing long-running tasks and it is not scalable since it’s not using an SQS queue.
 
 Using an Amazon ECS Cluster with a Fargate launch type to process the tasks asynchronously is incorrect because Fargate just allows you to run your containerized applications without the need to provision and manage the backend infrastructure.
+
+
+==============================================================================================================
+	
+A developer plans to use AWS Elastic Beanstalk to deploy a microservice application. The application will be implemented in a multi-container Docker environment.
+
+How should the developer configure the container definitions in the environment?
+
+(view)	1	0	1	00:01:06	
+ Configure the container definitions in the Dockerrun.aws.json file.``````````````
+ Configure the container definitions in the Amazon ECS Console when building the Docker environment.
+ Configure the container definitions in the Dockerrun.aws.json.config and put it inside the .ebextensions folder.
+ Use the eb config command to configure the container definitions.

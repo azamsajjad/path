@@ -606,7 +606,7 @@ Amazon Directory Services
 
 SAML 2.0 enables web-based, single sign-on (SSO) authentication between an identity provider (IdP) and an application, which in this case would be AWS. This allows you to use your existing Active Directory for authentication.
 
-Amazon Directory Services allows you to connect your AWS resources to an existing Microsoft AD, which means you can use your existing AD users and groups to access AWS resources. This option leverages your existing infrastructure and doesn't require the creation of additional IAM users.
+Amazon Directory Services allows you to connect your AWS resources to an existing Microsoft AD, which means you can use your existing AD users and groups to access AWS resources. This option leverages your existing infrastructure and doesnt require the creation of additional IAM users.
 
 
 
@@ -769,3 +769,79 @@ Integrating AWS Amplify to your mobile app is incorrect because this service jus
 Integrating Amazon Cognito Sync to your mobile app is incorrect. Although this service can also be used in synchronizing application data across devices, it does not allow multiple users to synchronize and collaborate in real-time on shared data, unlike AWS AppSync.
 
 Integrating Amazon Pinpoint to your mobile app is incorrect because this service simply allows you to engage with your customers across multiple messaging channels. This is primarily used to send push notifications, emails, SMS text messages, and voice messages.
+
+=================================================================================================================
+	
+	
+A developer is building a ReactJS application that will be hosted on Amazon S3. Amazon Cognito handles the registration and signing of users using the AWS Software Development Kit (SDK) for JavaScript. The JSON Web Token (JWT) received upon authentication will be stored on the browsers local storage. After signing in, the application will use the JWT as an authorizer to access an API Gateway endpoint.
+
+What are the steps needed to implement the scenario above? (Select THREE.)
+
+(view)	1	0	1	00:01:58	
+ Create an Amazon Cognito Identity Pool.
+ Create an Amazon Cognito User Pool.```````````
+ On the API Gateway Console, create an authorizer using the Cognito User Pool ID.````````````
+ Set the name of the header that will be used from the request to the Cognito User Pool as a token source for authorization.```````````````
+ Choose and set the authentication provider for your website.
+ Set the name of the header that will be used from the request to the Cognito Identity Pool as a token source for authorization.
+As an alternative to using IAM roles and policies or Lambda Authorizers (formerly known as custom authorizers), you can use an Amazon Cognito User Pool to control who can access your API in Amazon API Gateway.
+
+To use an Amazon Cognito user pool with your API, you must first create an authorizer of the COGNITO_USER_POOLS type and then configure an API method to use that authorizer. After the API is deployed, the client must first sign the user into the user pool, obtain an identity or access token for the user, and then call the API method with one of the tokens, which are typically set to the request's Authorization header. The API call succeeds only if the required token is supplied and the supplied token is valid, otherwise, the client isn't authorized to make the call because the client did not have credentials that could be authorized.
+
+==================================================================================================================
+A team of developers needs permission to launch EC2 instances with an instance role that will allow them to update items in a DynamoDB table. Each developer has access to IAM users that belongs in the same IAM group.
+
+Which of the following steps must be done to implement the solution?
+
+(view)	1	0	1	00:03:11	
+ Create an IAM role with an IAM policy that will allow access to the DynamoDB table. Add the EC2 service to the trust policy of the role. Create a custom policy with iam:GetRolePolicy and iam:PutRolePolicy permissions. Attach the policy to the IAM group.
+ /Create an IAM role with an IAM policy that will allow access to the DynamoDB table. Add the EC2 service to the trust policy of the role. Create a custom policy with the iam:PassRole permission. Attach the policy to the IAM group./
+ Create an IAM role with an IAM policy that will allow access to the EC2 instances. Add the DynamoDB service to the trust policy of the role. Create a custom policy with the iam:GetRole permission. Attach the policy to the IAM group.
+ Create an IAM role with an IAM policy that will allow access to the EC2 instances. Add the DynamoDB service to the trust policy of the role. Create a custom policy with the iam:PassRole permission. Attach the policy to the IAM group.
+Before you can access any AWS services via CLI/API from an EC2 instance, you must first configure and specify your access credentials. A more secure approach is by allowing the EC2 to assume an IAM role so it can access AWS services on your behalf. This way, your credentials are never stored or exposed.
+
+According to the scenario, the EC2 instances (that will be launched by the developers) need access to a DynamoDB table. First, we need to create an IAM role with permission that will allow access to the DynamoDB table. After creating the role, you must add the EC2 service as a trusted entity in the role's trust policy. You need to do this so EC2 instances can assume the IAM role. Afterwhich, you have to attach the following policy to the IAM Group:
+
+
+
+If the developers don’t have iam:PassRole permission, he or she can’t associate a role with the instance during launch.
+
+The PassRole permission helps you make sure that a user doesn’t pass a role to an EC2 instance where the role has more permissions than you want the user to have. For example, Alice might be allowed to perform only EC2 and S3 actions. If Alice could pass a role to the EC2 instance that allows additional actions, she could log into the instance, get temporary security credentials via the role she passed, and make calls to AWS that you don’t intend.
+
+Hence, the correct answer is: Create an IAM role with an IAM policy that will allow access to the DynamoDB table. Add the EC2 service to the trust policy of the role. Create a custom policy with iam:PassRole permission. Attach the policy to the IAM group.
+
+
+'
+============================================================================================================
+An EC2 instance has an IAM role that explicitly denies all S3 API Write operations. Moreover, the instance has access key credentials configured to gain full access to S3 operations.
+
+Which statement is correct for this scenario?
+
+(view)	1	0	1	00:01:18	
+ The instance cannot upload objects to S3 buckets.
+ The instance can list all S3 buckets but will not be able to delete them.
+ The instance can perform all S3 operations on any S3 bucket.
+ The instance can perform all S3 operations except for write operations on any S3 bucket.
+The AWS CLI uses credentials and configuration settings located in multiple places, such as the system or user environment variables, local AWS configuration files, or explicitly declared on the command line as a parameter. Certain locations take precedence over others. The AWS CLI credentials and configuration settings take precedence in the following order:
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+1. Command line options – Overrides settings in any other location. You can specify --region, --output, and --profile as parameters on the command line.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+
+2. Environment variables – You can store values in your systems environment variables.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+
+3. CLI credentials file – The credentials and config file are updated when you run the command aws configure. The credentials file is located at ~/.aws/credentials on Linux or macOS, or at C:\Users\USERNAME\.aws\credentials on Windows. This file can contain the credential details for the default profile and any named profiles.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+
+4. CLI configuration file – The credentials and config file are updated when you run the command aws configure. The config file is located at ~/.aws/config on Linux or macOS, or at C:\Users\USERNAME\.aws\config on Windows. This file contains the configuration settings for the default profile and any named profiles.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+
+5. Container credentials – You can associate an IAM role with each of your Amazon Elastic Container Service (Amazon ECS) task definitions. Temporary credentials for that role are then available to that tasks containers.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+
+6. Instance profile credentials – You can associate an IAM role with each of your Amazon Elastic Compute Cloud (Amazon EC2) instances. Temporary credentials for that role are then available to code running in the instance. The credentials are delivered through the Amazon EC2 metadata service.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - -
+
+The EC2 instance can perform any S3 operations since the CLI credentials file takes precedence over Instance profile credentials.
+
+Hence, the correct answer is: The instance can perform all S3 operations on any S3 bucket.

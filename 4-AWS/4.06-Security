@@ -730,6 +730,23 @@ to configure server-side encryption. Upload an object to the Amazon S3 bucket.
 "
 Use server-side encryption with customer-provided encryption keys (SSE-C) to configure server-side encryption. Upload an object to the Amazon S3 bucket."
 
+---------------------------------------------------------------------------
+An application uses the PutObject operation in parallel to upload hundreds of thousands of objects per second to an S3 bucket. To meet security compliance, the developer uses the server-side encryption in AWS KMS (SSE-KMS) to encrypt objects as they get stored in the S3 bucket. There is a noticeable performance degradation after making the change.
+
+Which of the following is the most likely cause of the problem?
+
+(view)	1	0	1	00:04:44	
+ The Amazon S3 throttles the PutObject operation for objects encrypted with SSE-KMS.
+ The API request rate has exceeded the quota for AWS KMS API operations.```````````````````````````
+ The CMK is using an AES 256 algorithm, which makes the encryption process slower. AES 128 should be used instead.
+ The KMS is not using an alias to easily identify the CMK required for the server-side encryption with AWS KMS (SSE-KMS.)
+AWS KMS establishes quotas for the number of API operations requested in each second.
+
+You can make API requests directly or by using an integrated AWS service that makes API requests to AWS KMS on your behalf. The quota applies to both kinds of requests.
+
+For example, you might store data in Amazon S3 using server-side encryption with AWS KMS (SSE-KMS). Each time you upload or download an S3 object that's encrypted with SSE-KMS, Amazon S3 makes a GenerateDataKey (for uploads) or Decrypt (for downloads) request to AWS KMS on your behalf. These requests count toward your quota, so AWS KMS throttles the requests if you exceed a combined total of 5,500 (or 10,000 or 30,000 depending upon your AWS Region) uploads or downloads per second of S3 objects encrypted with SSE-KMS.
+
+Hence, the correct answer is: The API request rate has exceeded the quota for AWS KMS API operations.'
 ======================================================================
 A company is developing a Python application that submits data to an Amazon DynamoDB table. The company requires client-side encryption of specific data items and end-to-end protection for the encrypted data in transit and at rest.
 

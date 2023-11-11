@@ -820,3 +820,22 @@ S3 Select`````````````````````
 Redshift Spectrum
 Incorrect
 With Amazon S3 Select, you can use simple structured query language (SQL) statements to filter the contents of Amazon S3 objects and retrieve just the subset of data that you need. By using Amazon S3 Select to filter this data, you can reduce the amount of data that Amazon S3 transfers, which reduces the cost and latency of retrieving these data.
+
+==================================================================================================================
+	
+A developer is building an application that uses Amazon CloudFront to distribute thousands of images stored in an S3 bucket. The developer needs a fast and cost-efficient solution that will allow him to update the images immediately without waiting for the object’s expiration date.
+
+Which solution meets the requirements?
+
+(view)	1	0	1	00:00:41	
+ Update the images by invalidating them from the edge caches.
+ Update the images by using versioned file names.```````````````````
+ Disable the CloudFront distribution and re-enable it to update the images in all edge locations.
+ Upload the new images in the S3 bucket and wait for the objects in the edge locations to expire to reflect the changes.
+When you update existing files in a CloudFront distribution, AWS recommends that you include some sort of version identifier either in your file names or in your directory names to give yourself better control over your content. This identifier might be a date-time stamp, a sequential number, or some other method of distinguishing two versions of the same object.
+
+
+
+For example, instead of naming a graphic file image.jpg, you might call it image_1.jpg. When you want to start serving a new version of the file, you'd name the new file image_2.jpg, and you'd update the links in your web application or website to point to image_2.jpg. Alternatively, you might put all graphics in an images_v1 directory and, when you want to start serving new versions of one or more graphics, you'd create a new images_v2 directory, and you'd update your links to point to that directory. With versioning, you don't have to wait for an object to expire before CloudFront begins to serve a new version of it, and you don't have to pay for object invalidation.
+
+Hence, the correct answer is: Update the images by using versioned file names.

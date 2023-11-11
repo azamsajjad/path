@@ -1,0 +1,69 @@
+PS C:\Users\T480> docker run -d -p 8080:80 --name webserver nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+578acb154839: Pull complete
+e398db710407: Pull complete
+85c41ebe6d66: Pull complete
+7170a263b582: Pull complete
+8f28d06e2e2e: Pull complete
+6f837de2f887: Pull complete
+c1dfc7e1671e: Pull complete
+Digest: sha256:86e53c4c16a6a276b204b0fd3a8143d86547c967dc8258b3d47c3a21bb68d3c6
+Status: Downloaded newer image for nginx:latest
+52b5267e8b83a13fc10ca37b41ba23df1ccd60221e75a9a2650cd6246c6fedd4
+PS C:\Users\T480> docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                  NAMES
+52b5267e8b83   nginx     "/docker-entrypoint.…"   25 seconds ago   Up 23 seconds   0.0.0.0:8080->80/tcp   webserver
+PS C:\Users\T480> docker images
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+nginx        latest    c20060033e06   9 days ago   187MB
+PS C:\Users\T480>  docker container exec -it webserver bash
+root@52b5267e8b83:/# ll
+bash: ll: command not found
+root@52b5267e8b83:/# ls
+bin   dev                  docker-entrypoint.sh  home  lib32  libx32  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc                   lib   lib64  media   opt  root  sbin  sys  usr
+root@52b5267e8b83:/#
+
+
+
+
+
+Docker Compose
+• Define and run multi-containers applications
+• Define using YAML files
+• Run using the docker CLI with the compose plugin
+• Docker compose
+• Compose Specs
+• https://compose-spec.io
+
+$ docker compose build
+$ docker compose start
+$ docker compose stop
+$ docker compose up -d
+$ docker compose ps
+$ docker compose rm
+$ docker compose down
+$ docker compose logs
+$ docker compose exec [container] bash 
+
+
+$ docker compose --project-name testl up -d
+$ docker compose -p test 2 up -d
+$ docker compose Is
+$ docker compose cp
+
+
+
+
+Exposing and Publishing ports
+Expose:
+Expose a port or a range of ports. This does not publish the port
+Use --expose <PORT>.
+docker container run --expose 1234
+Publish:
+• Maps a container's port toa host's port
+• —p, ——publish: Used to list a published container's port(s) to the host
+
+—P, ——publish—all:
+publish all exposed ports to random ports

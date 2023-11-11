@@ -980,3 +980,17 @@ aws cloudformation deploy is incorrect. While this command can be used to deploy
 sam package is incorrect. This command prepares the serverless application for deployment by zipping artifacts, uploading them to S3, and generating a CloudFormation template with references to the uploaded artifacts in S3. It doesn’t deploy the application.
 
 sam publish is incorrect because this command publishes an AWS SAM application to the AWS Serverless Application Repository, and does not generate the template file. It takes a packaged AWS SAM template and publishes the application to the specified region.
+==============================================================================================================
+	
+An application is hosted in the us-east-1 region. The app needs to be recreated on the us-east-2, ap-northeast-1, and ap-southeast-1 region using the same Amazon Machine Image (AMI). As the developer, you have to use AWS CloudFormation to rebuild the application using a template.
+
+Which of the following actions is the most suitable way to configure the CloudFormation template for the scenario?
+
+(view)	1	0	1	00:01:04	
+ Copy the AMI of the instance from the us-east-1 region to the us-east-2, ap-northeast-1, and ap-southeast-1 region. Then, add a Mappings section wherein you will define the different Image Id for the three regions. Use the region name as the key in mapping to its correct Image Id. Lastly, use the Fn::ImportValue function to retrieve the desired Image Id from the region key.
+
+ 'Copy the AMI of the instance from the us-east-1 region to the us-east-2, ap-northeast-1, and ap-southeast-1 region. Then, add a Mappings section wherein you will define the different Image Id for the three regions. Use the region name as the key in mapping to its correct Image Id. Lastly, use the Fn::FindInMap function to retrieve the desired Image Id from the region key.'
+
+ Copy the AMI of the instance from the us-east-1 region to the us-east-2, ap-northeast-1, and ap-southeast-1 region. Then, add a Mappings section wherein you will define the different Image Id for the three regions. Use the region name as the key in mapping to its correct Image Id. Lastly, use the Fn::GetAtt function to retrieve the desired Image Id from the region key.
+
+ Copy the AMI of the instance from the us-east-1 region to the us-east-2, ap-northeast-1, and ap-southeast-1 region. Then, add a Parameters section wherein you will define the different Image Id for the three regions. Use the region name as the key in mapping to its correct Image Id. Lastly, use the Ref function to retrieve the desired Image Id from the region key.

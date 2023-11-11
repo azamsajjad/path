@@ -1,0 +1,125 @@
+Docker Networking 101
+Docker Networking:
+Container Network Model (CNM)
+The Iibnetwork implements CNM
+Driver extend the model by network topologies
+Network Drivers:
+•
+•
+bridge
+host
+overlay
+macvlan
+none
+Network plugins
+
+
+Container Network Model
+Defines three building blocks:
+                            Sandboxes
+                            Endpoints
+                            Networks
+
+
+    --------CONTAINER A---------                   --------CONTAINER B--------------- 
+    |                           |                  |                                 |
+    |                           |                  |                                 |
+    |  SANDBOX                  |                  |  SANDBOX                        |
+    |      ENDPOINT (ep)        |                  |   ENDPOINT (ep)   ENDPOINT (ep) |
+    |         |                 |                  |        |                |       |
+    -----------------------------                   ---------------------------------
+              |                                             |                |
+            NETWORK A                                   NETWORK A           NETWORK B
+
+Endpoints behave as real-world network adapters so they can be only connected to single network
+
+Networking Commands
+
+List networks:
+docker network Is
+
+Getting detailed info on a network:
+docker network inspect <NAME>
+
+Create a network
+docker network create <NAME>
+
+
+PS C:\Users\T480> docker network ls
+NETWORK ID     NAME                                                        DRIVER    SCOPE
+bdb6aa4df74f   bridge                                                      bridge    local
+a434b634df19   docker_volumes-backup-extension-desktop-extension_default   bridge    local
+edefc04be1a6   host                                                        host      local
+578d1dd2d81c   none                                                        null      local
+PS C:\Users\T480> docker network inspect bdb6aa4df74f
+[
+    {
+        "Name": "bridge",
+        "Id": "bdb6aa4df74fca168c6295600eedcde76431461b7ef18f0f047c1cb7111dd2d0",
+        "Created": "2023-11-10T09:32:33.66701017Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "f1a5c71e3da7742132d7b01426dfca75e4c8a8d1561a506470110d5d684746cb": {
+                "Name": "web1",
+                "EndpointID": "9bf24c3dcbd796b1422b7808d8fe595a2fd527050005b7cba9e63f5679ba1a27",
+                "MacAddress": "02:42:ac:11:00:02",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+PS C:\Users\T480> docker network inspect edefc04be1a6
+[
+    {
+        "Name": "host",
+        "Id": "edefc04be1a68acaceeb7ef1ab5de15d944cc9e7ad546812d355c43aecd5338a",
+        "Created": "2023-11-10T09:32:33.647544665Z",
+        "Scope": "local",
+        "Driver": "host",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": []
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]

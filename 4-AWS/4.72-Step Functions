@@ -358,3 +358,55 @@ The option that says: Use a Wait State to pause the execution of the workflow. C
 
 The option that says: Configure the webhook handler to call the SendTaskHeartbeat method after a successful notification is incorrect because this method is simply used for keeping tasks alive and preventing them from timing out. It also does not signal completion.
 ==============================================================================================================
+A company plans to conduct an online survey to distinguish the users who bought its product from those who didnt. The survey will be processed by Step Functions which comprises four states that will manage the application logic and error handling of the state machine. It is required to aggregate all the data that passes through the nodes if the process fails.
+
+What should the company do to meet the requirements?
+
+(view)	1	0	1	00:03:07	
+ Include a Parameters field in the state machine definition to capture the errors. Then, use ResultPath to include each nodes input data with its output.
+ Include a Catch field in the state machine definition to capture the errors. Then, use ItemsPath to include each nodes input data with its output.
+ Include a Parameters field in the state machine definition to capture the errors. Then, use ItemsPath to include each nodes input data with its output.
+ 'Include a Catch field in the state machine definition to capture the error. Then, use ResultPath to include each nodes input data with its output.'
+
+ 
+The output of a state can be a copy of its input, the result it produces (for example, the output from a Task state’s Lambda function), or a combination of its input and result. Use ResultPath to control which combination of these is passed to the state output.
+
+You can use a Catch field to capture the error in a Task and Parallel State. This field's value must be an array of objects, known as catchers.
+
+A catcher contains the following fields:
+
+ErrorEquals - A non-empty array of strings that match error names.
+
+Next - A string that must exactly match one of the state machine's state names.
+
+ResultPath - A path that determines what input is sent to the state specified in the Next field.
+
+When a state reports an error and either there is no Retry field, or if retries fail to resolve the error, Step Functions scans through the catchers in the order listed in the array. When the error name appears in the value of a catcher's ErrorEquals field, the state machine transitions to the state named in the Next field.
+
+Below is the visual representation of the workflow that is given in the scenario:
+
+
+
+The four states that handle the application logic and error handling are as follows:
+
+Choice State - "Yes or No"
+
+Task State - "YesMessage" and "NoMessage"
+
+Pass State - "Cause Of Error"
+
+The workflow is initiated by passing an input of values "yes" or "no". On the left side, we can see that an error has occurred during the "NoMessage" task state (as labeled by its orange color) when a "no" value was passed as an input.
+
+On the right side, we can see that all data that passes through the nodes (input, error, output) are aggregated in a single step output.
+
+This can be done by including a Catch field in the state machine definition to capture the error in a state and the ResultPath to include each node's input with its output.
+
+
+
+Hence, the correct answer is: Include a Catch field in the state machine definition to capture the errors. Then, use ResultPath to include each node’s input data with its output.
+
+The option that says: Include a Parameters field in the state machine definition to capture the errors. Then, use ResultPath to include each node’s input data with its output is incorrect because the Parameters field is mainly used for passing a collection of key-value pairs, where the values are either static values that you define in your state machine definition, or that are selected from the input using a path. It can't be used to capture errors in a state.
+
+The option that says: Include a Catch field in the state machine definition to capture the errors. Then, use ItemsPath to include each node’s input data with its output is incorrect because the ItemsPath is only applicable in a Map state.
+
+The option that says: Include a Parameters field in the state machine definition to capture the errors. Then, use ItemsPath to include each node’s input data with its output is incorrect because the Parameters field cannot be used to capture errors in a state. ItemsPath is also incorrect because this is only applicable in a Map state.

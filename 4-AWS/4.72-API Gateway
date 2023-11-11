@@ -1126,3 +1126,29 @@ The option that says: Since the incoming requests are increasing, the API Gatewa
 The option that says: An authorization failure occurred between API Gateway and the Lambda function is incorrect because an authentication issue usually produces HTTP 403 errors and not 504s. The gateway response for authorization failures for missing authentication token error, invalid AWS signature error, or Amazon Cognito authentication problems is HTTP 403, which is why this option is unlikely to be the cause of this issue.
 
 The option that says: The usage plan quota has been exceeded for the Lambda function is incorrect. Although this is a possible root cause for this scenario, this option has the least chance to produce HTTP 504 errors. The scenario says that the issue happens from time to time and not all the time which suggests that this happens intermittently. If the usage plan indeed exceeded the quota, then the 504 error should always show up and not just from time to time.
+================================================================================================================
+	
+A developer is hosting a static website from an S3 bucket. The website makes requests to an API Gateway endpoint integrated with a Lambda function (non-proxy). The developer noticed that the requests were failing. Upon debugging, he found a: "No 'Access-Control-Allow-Origin' header is present on the requested resource" error message.
+
+What should the developer do to resolve this issue?
+
+(view)	1	0	1	00:02:10	
+ In the Amazon S3 Console, enable cross-origin resource sharing (CORS) on the S3 bucket where the website is hosted.
+ /In the API Gateway Console, enable cross-origin resource sharing (CORS) for the method in the specified resource./
+ Set the value of the Access-Control-Max-Age header to 0.
+ Set the value of the Access-Control-Allow-Credentials header to true.
+ 
+ 
+ Cross-origin resource sharing (CORS) is a browser security feature that restricts cross-origin HTTP requests that are initiated from scripts running in the browser. If your REST API's resources receive non-simple cross-origin HTTP requests, you need to enable CORS support.
+
+
+
+For a Lambda custom (non-proxy) integration, HTTP custom (non-proxy) integration, or AWS service integration, you can set up the required headers by using API Gateway method response and integration response settings. When you enable CORS by using the AWS Management Console, API Gateway creates an OPTIONS method and attempts to add the Access-Control-Allow-Origin header to your existing method integration responses.
+
+Hence, the correct answer is: In the API Gateway Console, enable cross-origin resource sharing (CORS) for the method in the specified resource.
+
+The option that says: In the Amazon S3 Console, enable cross-origin resource sharing (CORS) on the S3 bucket where the website is hosted is incorrect. This could be a possible solution if the website is interacting with resources from another website-enabled S3 bucket.
+
+The option that says: Set the value of the Access-Control-Max-Age header to 0 is incorrect because this header is simply used to indicate how long the results of a preflight request can be cached.
+
+The option that says: Set the value of the Access-Control-Allow-Credentials header to true is incorrect because this is just a response header that tells browsers whether to expose the response to frontend JavaScript code when the request's credentials mode (Request.credentials) is include.

@@ -457,3 +457,17 @@ Task Placement Strategies is incorrect because this is just an algorithm for sel
 
  
 
+============================================================================================================
+	
+A company wants to know how its monolithic application will perform on a microservice architecture. The Lead Developer has deployed the application on Amazon ECS using the EC2 launch type. He terminated the container instance after testing; however, the container instance still appears as a resource in the ECS cluster.
+
+What is the possible cause of this?
+
+(view)	1	0	1	00:01:01	
+ When a container instance is terminated in the running state, the container instance is not automatically deregistered from the cluster.
+ When a container instance is terminated in the stopped state, the container instance is not automatically deregistered from the cluster.````````````````````````
+ After terminating the container instance in the running state, the container instance must be manually deregistered in the Amazon ECS Console.
+ After terminating the container instance in the stopped state, the container instance must be manually deregistered in the Amazon EC2 Console since it was launched using the EC2 launch type.
+If you terminate a container instance in the RUNNING state, that container instance is automatically removed or deregistered from the cluster. However, if you terminate a container instance in the STOPPED state, that container instance isn't automatically removed from the cluster.
+
+To deregister your container instance from the cluster, you should deregister it after terminating it in the STOPPED state by using the Amazon ECS Console or AWS Command Line Interface. The deregistered container instance will no longer appear as a resource in your Amazon ECS cluster.

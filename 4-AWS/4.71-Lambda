@@ -1683,3 +1683,26 @@ Lambda@Edge
 Layers
 DLQ
 Custom Runtime```````````````
+
+=====================================================================
+A developer is debugging an issue in an AWS Lambda-based application. To save time searching through logs, the developer wants the function to return the corresponding log location of an invocation request.
+
+Which approach should the developer take with the least amount of effort?
+
+(view)	1	0	1	00:00:45	
+ Extract the log stream name from the Context object of the handler function.````````````
+ Extract the invocation request id from the Context object of the handler function. Then, call the FilterLogEvents API and pass the request id to filter results.
+ Extract the log stream name from the Event object of the handler function.
+ Extract the invocation request id from the Event object of the handler. Call the FilterLogEvents API and use the request id to filter results.
+
+ ===================================================================
+ 	
+A developer is managing several microservices built using API Gateway and AWS Lambda. The Developer wants to deploy new updates to one of the APIs. He wants to ensure a smooth transition between the versions by giving users enough time to migrate to the new version before retiring the previous one.
+
+Which solution should the developer implement?
+
+(view)	1	0	1	00:01:39	
+ Implement the updates and publish a new version of the Lambda function. Then, issue the new Lambda invocation URL.
+ Implement the updates and publish a new version of the Lambda function. Specify the new version in the API Gateway target resource then redeploy it to the same stage.
+ Implement the updates and publish a new version of the Lambda function. Specify the new version in the API Gateway target resource then redeploy it to a new stage.`````````````````
+ Implement the updates on the Lambda function. Create a CloudFront distribution and use the function as the origin.

@@ -996,7 +996,31 @@ Fetch the trace IDs and annotations using the GetTraceSummaries API.```````````
 Send trace results to an S3 bucket then query the trace output using Amazon Athena.
 
 Fetch the data using the BatchGetTraces API.
+============================================================================================================
+An application executes GET operations to various AWS services. The development team is using AWS X-Ray to trace all the calls made to AWS. As one of the developers, you are responsible for maintaining a particular block of code on the application. To save time, you only want to record data associated with the code to group the traces in the AWS console.
 
+Which of the following X-Ray features should you use?
+
+(view)	1	0	1	00:01:12	
+ Annotations``````````````````````````
+ Metadata
+ Sampling
+ Subsegment
+AWS X-Ray analyzes and debugs production, distributed applications, such as those built using a microservices architecture. With, X-Ray, you can identify performance bottlenecks, edge case errors, and other hard to detect issues.
+
+
+
+When you instrument your application, the X-Ray SDK records information about incoming and outgoing requests, the AWS resources used, and the application itself. You can add other information to the segmented document as annotations and metadata. Annotations and metadata are aggregated at the trace level and can be added to any segment or subsegment.
+
+Annotations are simple key-value pairs that are indexed for use with filter expressions. Use annotations to record data that you want to use to group traces in the console, or when calling the GetTraceSummaries API.
+
+Hence, the correct answer is: Annotations.
+
+Metadata is incorrect because you can not group traces with it. Metadata are key-value pairs with values of any type, including objects and lists, but that is not indexed. You commonly use metadata to record data that you want to store in the trace but dont need to search for traces.
+
+Sampling is incorrect because it is just used to ensure efficient tracing and to provide a representative sample of the requests that your application serves. Additionally, sampling will help you save money by reducing the amount of traces for high-volume and unimportant requests.
+
+Subsegment is incorrect because it is only used to provide more granular timing information and details about downstream calls that your application made to fulfill the original request. It cannot group traces from recorded data.
 
 
 
@@ -1102,3 +1126,4 @@ Write a Lambda function that scans all EC2 instances in the company accounts to 
 Configure EC2 to deliver the lifecycle events from all accounts to the EventBridge event bus of the main account. Add an EventBridge rule to the event bus of the main account that matches all EC2 instance lifecycle events. Add the SQS queue as a target of the rule.
 
 EC2 will not be able to send events unless the main account EventBridge event bus is configured to receive events from the other accounts.
+

@@ -259,7 +259,7 @@ aws cloudformation create-stack --stack-name CodeDeployDemoStack \
 --template-url https://cloudformation12329.s3.amazonaws.com/CF_Template.json \
 --parameters ParameterKey=InstanceCount,ParameterValue=1 \
 ParameterKey=InstanceType,ParameterValue=t2.micro \
-ParameterKey=KeyPairName,ParameterValue=azam \
+ParameterKey=KeyPairName,ParameterValue=ams \
 ParameterKey=OperatingSystem,ParameterValue=Linux \
 ParameterKey=SSHLocation,ParameterValue=0.0.0.0/0 \
 ParameterKey=TagKey,ParameterValue=Name \
@@ -711,7 +711,7 @@ Configure a CloudWatch Events rule to send a message to SES which will trigger a
 Create a new SNS topic and configure it to poll for CodeCommit events. Ask all your users subscribe to the topic to receive notifications
 
 Sorry!
-Incorrect. CodeCommit can use a trigger to send events to Amazon SNS, but Amazon SNS can't poll for CodeCommit events.
+Incorrect. CodeCommit can use a trigger to send events to Amazon SNS, but Amazon SNS cant poll for CodeCommit events.
 
 Correct Answer
 Correct. You can set up notification rules for a repository so that repository users receive emails about the repository event types you specify. Notifications are sent when events match the notification rule settings. You can create an Amazon SNS topic to use for notifications or use an existing one in your AWS account. You can use the CodeCommit console and the AWS CLI to configure notification rules.
@@ -779,3 +779,92 @@ Use Systems Manager Parameter Store.`````````
 
 
 Store the variables as key-value pairs in S3.
+
+===================================================================================================
+A developer is building a new feature for an application deployed on an EC2 instance in the N. Virginia region. A co-developer suggests to upload the code on Amazon S3 and use CodeDeploy to deploy the new version of the application. The deployment fails during the DownloadBundle deployment lifecycle event with the UnknownError: not opened for reading error.
+
+What is the possible cause of this?
+
+(view)	1	0	1	00:01:11	
+ Wrong configuration of the DownloadBundle lifecycle event in the AppSec file.
+ The DownloadBundle deployment lifecycle event is not supported in the N. Virginia region.
+ /The EC2 instance’s IAM profile does not have the permissions to access the application code in Amazon S3./
+ Versioning is not enabled on the Amazon S3 Bucket where the application code resides.
+An EC2/On-Premises deployment hook is executed once per deployment to an instance. You can specify one or more scripts to run in a hook. Each hook for a lifecycle event is specified with a string on a separate line. Here are descriptions of the hooks available for use in your AppSpec file.
+
+
+
+DownloadBundle deployment lifecycle event will throw an error whenever:
+
+- The EC2 instance’s IAM profile does not have permission to access the application code in the Amazon S3.
+
+- An Amazon S3 internal error occurs.
+
+- The instances you deploy to are associated with one AWS Region (for example, US West Oregon), but the Amazon S3 bucket that contains the application revision is related to another AWS Region (for example, US East N. Virginia).
+
+Hence, the correct answer is: The EC2 instance’s IAM profile does not have the permissions to access the application code in Amazon S3.
+
+The option that says: Wrong configuration of the DownloadBundle lifecycle event in the AppSec file is incorrect because you can not manually configure DownloadBundle in the Appsec file. The CodeDeploy Agent installed on the EC2 instance manages the DownloadBundle lifecycle event.
+
+The option that says: The DownloadBundle deployment lifecycle event is not supported in the N. Virginia region is incorrect because CodeDeploy is supported in N. Virginia.
+
+The option that says: Versioning is not enabled on the Amazon S3 Bucket where the application code resides is incorrect because versioning on Amazon S3 Bucket is just used to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket.
+
+==================================================================================================================
+	
+A company uses AWS CodeDeploy in their CI/CD pipeline to handle in-place deployments of their web application on EC2 instances. Recently, a new version of the application was pushed, which contained a code regression. The deployment group is configured with automatic rollback.
+
+What happens if the deployment of the new version fails?
+
+(view)	1	0	1	00:01:38	
+ /CodeDeploy redeploys the last known good version of an application with a new deployment ID./
+ CodeDeploy pauses the current deployment, restores the last stable version from S3, and uses the deployment ID of the most recent deployment with a SUCCEEDED status.
+ CodeDeploy reroutes traffic back to the blue environment and terminates the green environment.
+ CodeDeploy reverts the EC2 instance to a previous AMI snapshot taken during the last successful deployment.
+
+
+
+
+ 	
+A development team needs to deploy an application revision into three environments: Test, Staging, and Production. The application should be deployed into the Test environment first, then Staging, and then Production.
+
+Which approach will conveniently allow the team to deploy the application into different environments?
+
+(view)	1	1	0	00:00:51	
+ /Create multiple deployment groups for each environment using AWS CodeDeploy./
+ Create a repository for each environment in AWS CodeCommit to deploy the application.
+ Create, configure, and deploy multiple application projects for each environment using CodeBuild.
+ Create multiple data pipeline provisions for each environment to deploy the application using the AWS Data Pipeline.
+
+
+
+ CodeDeploy provides two deployment type options:
+
+In-place deployment: The application on each instance in the deployment group is stopped, the latest application revision is installed, and the new version of the application is started and validated. You can use a load balancer so that each instance is deregistered during its deployment and then restored to service after the deployment is complete. Only deployments that use the EC2/On-Premises compute platform can use in-place deployments. AWS Lambda compute platform deployments cannot use an in-place deployment type.
+
+Blue/green deployment: The behavior of your deployment depends on which compute platform you use:
+
+– Blue/green on an EC2/On-Premises compute platform: The instances in a deployment group (the original environment) are replaced by a different set of instances (the replacement environment). If you use an EC2/On-Premises compute platform, be aware that blue/green deployments work with Amazon EC2 instances only.
+
+– Blue/green on an AWS Lambda compute platform: Traffic is shifted from your current serverless environment to one with your updated Lambda function versions. You can specify Lambda functions that perform validation tests and choose the way in which the traffic shift occurs. All AWS Lambda compute platform deployments are blue/green deployments. For this reason, you do not need to specify a deployment type.
+
+– Blue/green on an Amazon ECS compute platform: Traffic is shifted from the task set with the original version of a containerized application in an Amazon ECS service to a replacement task set in the same service. The protocol and port of a specified load balancer listener are used to reroute production traffic. During deployment, a test listener can be used to serve traffic to the replacement task set while validation tests are run.
+
+The CodeDeploy agent is a software package that, when installed and configured on an instance, makes it possible for that instance to be used in CodeDeploy deployments. The CodeDeploy agent communicates outbound using HTTPS over port 443.
+
+It is also important to note that the CodeDeploy agent is required only if you deploy to an EC2/On-Premises compute platform. The agent is not required for deployments that use the Amazon ECS or AWS Lambda compute platform.
+
+
+
+
+The current application deployment process of a company is tedious and is prone to errors. They asked a developer to set up CodeDeploy as their deployment service, which can automate their application deployments on their hybrid cloud architecture.
+
+Which of the following deployment types does CodeDeploy support? (Select TWO.)
+
+Rolling deployments to ECS.
+In-place deployments to on-premises servers``````````````
+Blue/green deployments to ECS.```````````````````````````
+In-place deployments to AWS Lambda.
+Blue/green deployments to on-premises servers.
+Correct
+CodeDeploy is a deployment service that automates application deployments to Amazon EC2 instances, on-premises instances, serverless Lambda functions, or Amazon ECS services.

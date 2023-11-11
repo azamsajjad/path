@@ -59,3 +59,234 @@ ServerName dhamaps.com
 ServerAlias www.dhamaps.com
 
 
+
+
+
+
+===============================================================================================================
+2. Link Domain Name
+If you have a domain name, you can link it to your EC2 instance by creating a DNS record.
+
+Go to your registrar and find the DNS settings of your domain name. Create an A record that points to the IP address of your EC2 instance and another A record for the www version of your website that points to the same IP address of your EC2 instance.
+
+
+
+
+3. Login to EC2 via SSH
+If you are on Mac or Linux, you can use Terminal to login via SSH and Windows users can either use Command Prompt or Putty to login. Here is an example of the SSH command to login to your EC2 server.
+
+chmod 400 awsec2.pem
+ssh -i awsec2.pem ubuntu@IP
+If you configured your DNS settings in the previous step, you can also use your domain name instead of your instance IP address in the command above.
+
+
+
+
+4. Update System and Install LEMP Packages
+Execute the following to upgrade Ubuntu server packages.
+
+sudo apt update
+sudo apt upgrade
+Use the apt package manager to install PHP, MariaDB, and the Nginx web server.
+
+sudo apt install nginx mariadb-server php-fpm php-mysql
+
+
+
+
+5. Install WordPress
+After logging in to your server as described above, execute the following commands to install WordPress on Ubuntu.
+
+cd /var/www
+sudo wget https://wordpress.org/latest.tar.gz
+sudo tar -xzvf latest.tar.gz
+sudo rm latest.tar.gz
+sudo chown -R www-data:www-data wordpress
+sudo find wordpress/ -type d -exec chmod 755 {} \;
+sudo find wordpress/ -type f -exec chmod 644 {} \;
+
+
+
+6. Setup the Database
+Secure your MariaDB installation by adding a password and disabling other features. When prompted, answer Y.
+
+sudo mysql_secure_installation
+Access the MariaDB console with the password that you just created.
+
+sudo mysql -u root -p
+Within the MariaDB console, create a database for WordPress. Please choose your own database name, user name, and a password.
+
+create database example_db default character set utf8 collate utf8_unicode_ci;
+create user 'example_user'@'localhost' identified by 'example_pw';
+grant all privileges on example_db.* TO 'example_user'@'localhost';
+flush privileges;
+exit
+
+
+
+
+new ATTEMPT 
+ubuntu@ip-10-1-1-40:~$ sudo mysql_secure_installation
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MariaDB
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+In order to log into MariaDB to secure it, we'll need the current
+password for the root user. If you've just installed MariaDB, and
+haven't set the root password yet, you should just press enter here.
+
+Enter current password for root (enter for none):
+OK, successfully used password, moving on...
+
+Setting the root password or using the unix_socket ensures that nobody
+can log into the MariaDB root user without the proper authorisation.
+
+You already have your root account protected, so you can safely answer 'n'.
+
+Switch to unix_socket authentication [Y/n] n
+ ... skipping.
+
+You already have your root account protected, so you can safely answer 'n'.
+
+Change the root password? [Y/n] y
+New password:
+Re-enter new password:
+Password updated successfully!
+Reloading privilege tables..
+ ... Success!
+
+
+By default, a MariaDB installation has an anonymous user, allowing anyone
+to log into MariaDB without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] y
+ ... Success!
+
+By default, MariaDB comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] y
+ - Dropping test database...
+ ... Success!
+ - Removing privileges on test database...
+ ... Success!
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] y
+ ... Success!
+
+Cleaning up...
+
+All done!  If you've completed all of the above steps, your MariaDB
+installation should now be secure.
+
+Thanks for using MariaDB!
+ubuntu@ip-10-1-1-40:~$ sudo mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 39
+Server version: 10.6.12-MariaDB-0ubuntu0.22.04.1 Ubuntu 22.04
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> create database wp_db default character set utf8 collate utf8_unicode_ci;
+Query OK, 1 row affected (0.002 sec)
+
+MariaDB [(none)]> create user 'dhamaps'@'localhost' identified by 'dhamaps_pw';
+Query OK, 0 rows affected (0.004 sec)
+
+MariaDB [(none)]> grant all privileges on wp_db.* TO 'dhamaps'@'localhost';
+Query OK, 0 rows affected (0.001 sec)
+
+MariaDB [(none)]> flush privileges;
+Query OK, 0 rows affected (0.000 sec)
+
+MariaDB [(none)]> exit
+Bye
+
+
+
+
+7. Configure Nginx Web Server
+Navigate to the directory which contains configuration files for the Nginx web server, and create a new configuration file with the text editor of your choice. In this example, the text editor is vim.
+
+cd /etc/nginx/sites-available/
+sudo vim wordpress.conf
+
+
+ubuntu@ip-10-1-1-40:/etc/nginx/sites-available$ ls /var/run/php/php
+php-fpm.sock     php8.1-fpm.pid   php8.1-fpm.sock
+
+ubuntu@ip-10-1-1-40:~$ cd /etc/nginx/sites-available
+ubuntu@ip-10-1-1-40:/etc/nginx/sites-available$ ll
+total 12
+drwxr-xr-x 2 root root 4096 Nov  7 08:20 ./
+drwxr-xr-x 8 root root 4096 Nov  7 08:20 ../
+-rw-r--r-- 1 root root 2412 May 30 17:31 default
+ubuntu@ip-10-1-1-40:/etc/nginx/sites-available$ sudo vim wordpress.conf
+
+
+
+upstream php-handler {
+        server unix:/var/run/php/php8.1-fpm.sock;
+}
+server {
+        listen 80;
+        server_name dhamaps.com www.dhamaps.com;
+        root /var/www/wordpress;
+        index index.php;
+        location / {
+                try_files $uri $uri/ /index.php?$args;
+        }
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass php-handler;
+        }
+}
+~
+
+ubuntu@ip-10-1-1-40:/etc/nginx/sites-available$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+ubuntu@ip-10-1-1-40:/etc/nginx/sites-available$ sudo systemctl restart nginx
+
+
+
+
+8. Finish WordPress Install
+Assuming that DNS propagation has finished, you can now access your website via your domain name in a web browser. You will be prompted to finish the WordPress installation, part of which is entering the database name, user, and password that you created earlier.
+
+
+9. Install PHP Packages Required by WordPress
+From your WordPress administrator dashboard, navigate to Tools > Site Health > Status and you may see a critical issue that says “One or more required modules are missing”.
+
+To fix this, go back to your EC2 instance’s console window and install these packages.
+
+sudo apt install php-curl php-dom php-mbstring php-imagick php-zip php-gd
+
+
+
+
+10. Install an SSL Certificate for HTTPS
+Secure your website with an SSL certificate from Let’s Encrypt. To do this, execute the following commands.
+
+sudo apt install snapd
+sudo snap install core; snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
+Finally back in your WordPress administrator dashboard, go to Settings > General and change the WordPress Address and Site Address to start with https.
