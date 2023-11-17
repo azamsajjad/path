@@ -1,0 +1,212 @@
+Best Practices
+General guidelines:
+•
+Keep containers as ephemeral as possible.
+Follow Principle 6 of the 12 Factor App.
+Avoid including unnecessary file.
+Use .dockerignore
+Use multi-stage builds.
+Don't install unnecessary packages.
+Decouple applications.
+Minimize the number of layers.
+Sort multi-line arguments.
+Leverage the build cache.
+
+
+Working with Instruction
+
+FROM :
+    Initializes a new build stage and sets the Base Image.
+
+RUN :
+    Will execute any commands in a new layer.
+
+CMD:
+    Provides a default for an executing container. There can only be one CMD instruction in a Dockerfile.
+
+LABEL:
+    Adds metadata to an image.
+
+EXPOSE:
+    Informs Docker that the container listens to the specified network ports at runtime.
+
+ENV:
+    Sets the environment variable <key> <value> to the value
+
+ADD:
+    Copies new files, directories, or remote file URLs from <src>
+    and adds them to the filesystem of the image at the path <dest>
+
+
+
+COPY:
+    Copies new files or directories from <src> and adds them to the
+    filesystem of the container at the path <dest>
+
+ENTRYPOINT:
+    Allows you to configure a container that will run as an executable.
+
+VOLUME:
+    Creates a mount point with the specified name and marks it as holding externally mounted volumes from the
+    native host or other containers.
+
+USER:
+    Sets the user name (or UID) and optionally the user group (or GID) to use when running the image and for
+    any RUN CMD and ENTRYPOINT instructions that follow it in the Dockerfile.
+
+
+
+
+# Image for weather-app with environment variables
+FROM node
+LABEL org.label-schema.version=v1.1
+ENV ENV_NODE="development"
+ENV PORT 3000
+RUN mkdir -p /var/node
+ADD src/ /var/node/
+WORKDIR /var/node
+RUN npm install
+EXPOSE $PORT
+CMD ./bin/www
+
+
+
+
+
+---------------------------------------------------
+FROM node
+LABEL org.label-schema.version=v1.1
+ARG SRC_DIR=/var/node
+
+RUN mkdir -p $SRC_DIR
+ADD src/ $SRC_DIR
+WORKDIR $SRC_DIR
+RUN npm install
+EXPOSE 3000
+CMD ./bin/www
+
+
+
+----------------------------------------------------
+FROM node
+LABEL org.label-schema.version=v1.1
+RUN useradd -ms /bin/bash node_user
+USER node_user
+ADD src/ /home/node_user
+WORKDIR /home/node_user
+RUN npm install
+EXPOSE 3000
+CMD ./bin/bash
+
+
+---------------------------------------------------
+Using the Volume Instruction Dockerfile:
+FROM nginx: latest
+VOLUME ["/usr/share/nginx/htmt/"]
+
+
+============================================================================================
+Entrypoint vs. Command
+ENTRYPOINT defines a container with
+a specific executable.
+It cannot be overridden when
+starting the container without
+flag.
+using the ——ent rypoint
+Use ENTRYPOINT to specify an
+executable and CMD to easily set
+environment variables.
+
+
+CMD defines a default command for
+a container.
+It's best used for setting a default
+command.
+It can be easily overridden.
+
+
+============================================================================================
+Building an image by piping the
+Dockerfile through
+stdin
+
+In-line Dockerfile
+Building Image --rm -> any intermediary container must be deleted at the end
+rupert@T480-M8VDO3T:~$ docker image build -t azamsajjad/nginx:mine --rm -<<EOF
+> FROM nginx:latest
+> VOLUME ["usr/share/nginx/html"]
+> EOF
+            [+] Building 0.2s (5/5) FINISHED                                                                                          docker:default
+            => [internal] load build definition from Dockerfile                                                                                0.1s
+            => => transferring dockerfile: 87B                                                                                                 0.0s
+            => [internal] load .dockerignore                                                                                                   0.1s
+            => => transferring context: 2B                                                                                                     0.0s
+            => [internal] load metadata for docker.io/library/nginx:latest                                                                     0.0s
+            => CACHED [1/1] FROM docker.io/library/nginx:latest                                                                                0.0s
+            => exporting to image                                                                                                              0.0s
+            => => exporting layers                                                                                                             0.0s
+            => => writing image sha256:2f4829f455f8bd1ee2d392baa74458d09fd7e3634f39352a566c4b567ef328ea                                        0.0s
+            => => naming to docker.io/azamsajjad/nginx:mine
+
+
+
+Three ways to build an image using a
+URL:
+docker image build —t <NAME>:<TAG> <GIT_URL>#<REF>
+docker image build —t <NAME>:<TAG> <GIT_URL>#:<DIRECTORY>
+docker image build —t <NAME>:<TAG> <GIT_URL>#<REF>:<DIRECTORY>
+
+
+Build an image using tar archive:
+  223  git clone https://github.com/linuxacademy/content-weather-app.git
+  224  cd content-weather-app/
+  225  ll
+  226  git checkout remote-build
+  242  tar -zcvf weather-app.tar.gz Dockerfile src
+  243  ll
+  244  docker image build -t azamsajjad/weather-app:from-tar - < weather-app.tar.gz
+
+
+================================================================================================
+Using Multi-Stage Builds - allow us to build products from multiple images
+By default, the stages are not named
+Stages are integer numbers
+Starting with for the first
+FROM
+instruction
+Name the stage by adding
+to the FROM instruction
+<NAME>
+Reference the stage n ar-ne in
+the COPY instruction
+
+
+
+# multi-stage build
+FROM node AS build
+RUN mkdir -p /var/node
+WORKDIR /var/node
+ADD src/ /var/node
+RUN npm install
+
+FROM node:alpine
+ARG Version=V1.1
+LABEL org.label-schema.version=v1.1
+ENV ENV_NODE="production"
+COPY --from-build /var/node /var/node
+WORKDIR /var/node
+EXPOSE 3000
+ENTRYPOINT ["./bin/www"]
+
+
+===============================================================================================
+Retagging
+
+Use the commit hash Git as the
+image tag:
+git log -1 --pretty=%H
+Use docker image tag to a create a new tagged image:
+docker image tag
+<SOURCE_IMAGE><:TAG>
+<TARGET_IMAGE><:TAG>
+rupert@T480-M8VDO3T:~/docker_images/multi_stage_build$ docker image tag azamsajjad/weather-app:v1 azamsajjad/weather-app:v2

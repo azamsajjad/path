@@ -1,0 +1,305 @@
+Introduction to Docker Security
+
+We'll begin exploring ways to secure Docker by using security features native to both the operating system and Docker itself.
+
+Docker Security 101
+Security is all about layers
+
+
+
+
+Docker security:
+Docker Swarm
+Docker Content Trust
+Docker Security Scanner
+Docker secrets
+
+
+
+
+
+Linux security:
+Namespaces   <------------------------for isolation
+Control Groups  <---------------------for isolation
+Capabilities    <---------------------containers shud run as root but also not root
+Mandatory Access Control (MAC)
+Seccomp
+
+
+
+
+
+Namespaces
+Docker creates a set of namespaces and control groups for the container. Docker containers are an organized collections of namespaces.
+
+Namespaces provide isolation.
+        Each container also gets its own network stack.
+        Docker on Linux namespaces:
+
+====    Process ID (pid)========================PID ID namespace isolates the process free of each container.
+                                                prevents the container from seeing/accessing the process tree of other containers or the host that it's running on.
+====    network (net)===========================The net namespace provides each container with its own isolated 
+                                                network stack.
+====    Filesystem/mount (mount)================prevents the container from accessing
+                                                mount namespaces of the Linux host or other containers.
+====    Inter-process Communication (ipc)=======The IPC namespace is used for sharing memory access within a 
+                                                container and also isolates it from other containers.
+                                                The IPC namespace is used for sharing memory access
+                                                within a container and also isolates it from other containers
+====    User (user)=============================maps root of container to normal user of host
+====    UTS (uts)===============================The UTS namespace provides each container with its own unique 
+                                                hostname.
+
+
+Control Groups
+        Control Groups are about setting limits for:
+
+        CPU
+        RAM
+        Disk I/O
+        They help to mitigate denial-of-service attacks, and are important on multi-tenant platforms.
+
+Capabilities
+        Capabilities turn the binary “root/non-root” dichotomy into a fine-grained access control system. In most cases, containers do not need “real” root privileges at all. This means root within a container has much less privileges than the real root. It also means that even if an intruder manages to escalate to root within a container, it is much harder to do serious damage, or to escalate to the host.
+
+Mandatory Access Control systems
+    Two major MAC technologies are:
+                                    SELinux
+                                    AppArmor
+
+Seccomp -> secure computing mode, also known as seccomp. seccomp is a Linux kernel future that allows you to go
+    into restrict actions available within a container. Every container is given a default seccomp profile. 
+    This profile can be overwritten during container creation. Probably one of the easiest ways of going
+    and securing Docker is to run it in swarm mode.
+    This limits the syscalls a container can make to the host's kernel. All new containers get a default seccomp configured
+
+
+
+
+Docker Security:
+Docker Swarm
+                The easiest way of adding an additional layer of security is
+                by having Docker run in swarm mode.
+
+                This gives us the following features:
+                Cryptographic node IDs, mutual authentication via TLS,
+                secure join tokens for both worker and management nodes,
+                a CA with automatic certificate rotation,
+                encrypted cluster stores, as well as encrypted networking.
+                Now, before we close things out,
+
+
+                Swarm Mode:
+
+                Cryptographic node Ids
+                Mutual authentication via TLS
+                Secure join tokens
+                CA configuration with automatic certificate rotation
+                Encrypted cluster store
+                Encrypted networks
+                docker swarm update --cert-expiry [INT]h
+
+Docker Secrets
+    These store sensitive data like:
+                                    Passwords
+                                    TLS Certificates
+                                    API Keys
+
+    Secrets Workflow:
+
+    A secret is created and posted to the Swarm.
+    The secret is encrypted and stored.
+    A service is created and the secret is attached.
+    Secrets are stored in-flight.
+    The secret is mounted into the container of a service.
+    When the task is complete, the in-memory is torn down.
+
+    I want to cover the high-level workflow of how secrets work.
+    First off, secrets are only available to us in swarm mode,
+    and this is because of the encrypted cluster store.
+    When we create a secret, it is posted to the swarm.
+    It gets stored in the encrypted cluster store,
+    and again, this runs on all the managers.
+    We can then create the service that is going to be
+    using the secret and have that secret attached to it.
+    The secret is encrypted in flight when it's delivered
+    to the replica task.
+    The secret is then mounted into the container of the service
+    as an unencrypted file.
+    It's to be found in /run/secrets.
+    This is a in-memory tmpfs.
+    This means that each secret is going to be mounted
+    into the container using its own tmpfs file system.
+    For example, let's say we have a secret called, my-secret.
+    It's going to be mounted in a container under
+    /run/secrets/mysecret.
+    Once the replica task is complete,
+    the in-memory file system is torn down
+    and then the secret is flushed from the node.
+==================================================================
+
+
+At the very basic level, there are things that we can do
+at the operating system level to go
+and help make things more secure,
+as well as Docker-specific technologies.
+Docker containers are very similar to LXC containers.
+They have some very similar security features.
+Whenever you create a container
+by executing docker container run,
+Docker is going to create a set of namespaces
+as well as control groups for that container.
+Namespaces provide isolation for the container.
+This means processes running within that container
+cannot see or interact with processes running
+on the host operating system or in another container.
+This also gives each container its own network stack.
+What this means is each container does not have privileged
+access to sockets or interfaces on other containers.
+This also means that containers can interact
+with one another using their network interfaces.
+This is just like any other computer on a network.
+When a Docker container is created,
+it's going to get its own namespaces
+for the process ID, PID, network, net,
+file system mount, mount, interprocess communication, IPC,
+user, and UTS.
+This collection of namespaces is what we call a container.
+Control groups, also known as cgroups,
+are responsible for accounting and limiting resources
+on a container.
+It's also responsible for making sure that each container
+gets its fair share of resources.
+This includes CPU, memory, and disk IO.
+cgroups are also responsible for making sure
+that a container can't exhaust all the resources
+on a Docker host, therefore bringing the system down.
+By default, containers don't have any resource constraints.
+This means they can consume as many resources as allowed
+by the kernel scheduler.
+One of the problems that we face when running containers
+is that we typically don't want to run them as a root
+because root is pretty powerful
+and it can be very, very dangerous.
+However, if we run it using a non-root user,
+it can become pretty useless.
+And in order to solve this problem,
+this is where capabilities come in.
+The root account is made up of a long list of capabilities.
+Docker works with these capabilities so the container
+can run as root, but strips out some of these capabilities
+that are not needed.
+Also, if a capability has been removed,
+Docker will prevent the container from adding a back in.
+Docker works with 2 of the major mandatory
+access control systems: AppArmor and SELinux.
+AppArmor, or Application Armor, is a Linux security module
+that is responsible for protecting the operating system
+and its applications from security threats.
+Security-enhanced Linux, or SELinux,
+is a Linux kernel security module that provides a mechanism
+for supporting access control security policies.
+And the last of the Linux technologies
+is secure computing mode, also known as seccomp.
+seccomp is a Linux kernel future that allows you to go into
+restrict actions available within a container.
+Every container is given a default seccomp profile.
+This profile can be overwritten during container creation.
+Probably one of the easiest ways of going
+and securing Docker is to run it in swarm mode.
+We'll go over this in a little bit
+more detail in another slide.
+Docker security scanning is currently available
+with private repositories on Docker Hub
+or the Docker trusted registry on-premises solution.
+This solution helps identify code vulnerabilities
+within your images.
+It does this by performing binary-level scans
+of the Docker image, and then checks it against
+a database of known vulnerabilities.
+Docker content trust, or DTC, allows you to verify
+the integrity and the publisher of an image.
+This is how you know that an image coming from Nginx
+is actually by Nginx.
+This also allows developers to sign their images
+before pushing them to Docker Hub or to a trusted registry.
+Docker secrets allows you to store sensitive data
+such as passwords and API keys.
+Prior to Docker 1.13, there was no standard way
+of maintaining secrets within Docker.
+You had to use a third-party application
+like console and vault.
+
+
+
+
+
+===========================================================================
+https://docs.docker.com/config/containers/resource_constraints/
+https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
+https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources
+https://github.com/docker/docker-bench-security
+
+In this lesson we will start implementing some of the Docker security practices.
+
+Seccomp Profile
+docker container run --security-opt seccomp=[PROFILE] [IMAGE] [CMD]
+Testing Seccomp:
+
+docker container run --rm -it alpine sh
+whoami
+mount /dev/sda1 /tmp
+swapoff -a
+Using a custom Seccomp profile:
+
+mkdir -p seccomp/profiles/chmod
+cd seccomp/profiles/chmod
+wget https://raw.githubusercontent.com/moby/moby/master/profiles/seccomp/default.json
+Remove chmod, fchmod and fchmodat from the syscalls whitelist. Syscalls starts at line 52.
+
+Applying the custom Seccomp profile:
+
+docker container run --rm -it --security-opt seccomp=./default.json alpine sh
+chmod +r /usr
+Capabilities:
+Dropping Capabilities:
+
+docker container run --cap-drop=[CAPABILITY] [IMAGE] [CMD]
+Test mknod:
+
+docker container run --rm -it alpine sh
+mknod /dev/random2 c 1 8
+Disable mknod:
+
+docker container run --rm -it --cap-drop=MKNOD alpine sh
+mknod /dev/random2 c 1 8
+Runtime privilege and Linux capabilities
+https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
+
+Control Groups
+Limiting CPU and memory:
+
+docker container run -it --cpus=[VALUE] --memory=[VALUE][SIZE] --memory-swap [VALUE][SIZE] [IMAGE] [CMD]
+Setting memory limits on a container:
+
+docker container run -d --name resource-limits --cpus=".5" --memory=512M --memory-swap=1G rivethead42/weather-app
+Inspect resource-limits:
+
+docker container inspect resource-limits
+Runtime constraints on resources
+https://docs.docker.com/engine/reference/run/#runtime-constraints-on-resources 
+More info on resource constraints
+https://docs.docker.com/config/containers/resource_constraints/
+
+Running Docker Bench for Security
+Running Docker Bench Security:
+
+docker container run --rm -it --network host --pid host --userns host --cap-add audit_control \
+    -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
+    -v /var/lib:/var/lib \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /usr/lib/systemd:/usr/lib/systemd \
+    -v /etc:/etc --label docker_bench_security \
+    docker/docker-bench-security
+Docker Bench Security
+https://github.com/docker/docker-bench-security

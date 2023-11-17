@@ -1,0 +1,408 @@
+docker swarm
+docker node 
+docker service 
+
+
+
+
+
+
+The Cluster
+A swarm consists of one or more Docker nodes
+Nodes are either a manager or a worker
+Managers:
+Manage the state of the cluster Dispatches tasks to workers
+Workers:
+Accepts and execute tasks State is held in etcd
+
+Swarm uses Transport Layer Security (TLS)
+
+Encrypted communication
+
+Authenticate Nodes
+
+Authorize roles
+
+=============================================================
+The following is the most up-to-date instructions for setting up Docker Swarm on CentOS 7.
+
+Provision 3 medium size CentOS 7 servers in the Cloud Playground.
+https://learn.acloud.guru/cloud-playground/cloud-servers
+
+Use the tag names:
+Swarm Manager
+Swarm Worker 1
+Swarm Worker 2
+
+On all 3 servers, run:
+========
+
+sudo yum update -y
+
+
+On the CentOS 7 Swarm Manager:
+========
+
+sudo yum remove -y docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl start docker
+
+sudo groupadd docker
+
+sudo usermod -aG docker $USER
+
+newgrp docker
+
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+
+docker run hello-world
+
+sudo yum install -y device-mapper-persistent-data lvm2
+
+docker swarm init \
+--advertise-addr [Private IP of the Swarm Manager]
+
+
+Copy the `docker swarm join` command provided (to be used on the workers after they have Docker setup.
+
+
+On the CentOS 7 Swarm Workers:
+========
+
+sudo yum remove -y docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+sudo yum install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl start docker
+
+sudo groupadd docker
+
+sudo usermod -aG docker $USER
+
+newgrp docker
+
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+
+docker run hello-world
+
+sudo yum install -y device-mapper-persistent-data lvm2
+
+Then run the earlier copied `docker swarm join` command:
+
+Example only:
+docker swarm join --token SWMTKN-1-058yz85mc76fsf1ldm7w2evqjuit5nsdksrzqbtgtnaetnze1m-4w76mpkecb5y1utjexhdhlly8 172.31.37.43:2377
+
+
+Back on the On the CentOS 7 Swarm Manager:
+========
+docker node ls
+
+
+Official Docker install reference:
+https://docs.docker.com/engine/install/centos/
+https://docs.docker.com/engine/install/linux-postinstall/
+
+
+
+==========================================================================
+[devops@rhel1 ~]$ docker swarm init \
+> --advertise-addr 192.168.100.155
+Swarm initialized: current node (zccb6oomyskevzszg82ahfaw4) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-5bmpyj0v1ycgqv4rwiwlnwa5ci5963t6tps8j2vy0pgurq7xgg-35tj2f8m3i1rluxvcy66td6fn 192.168.100.155:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+$ firewall-cmd --zone=public --add-port=2377/tcp --permanent
+$ firewall-cmd --reload
+$ firewall-cmd --query-port=2377/tcp
+
+
+List the nodes in the swarm:
+docker node Is
+Inspecting a node:
+docker node inspect [NODE_NAME]
+Promoting a worker to a manager:
+docker node promote [NODE_NAMEI
+Demoting a manager to a worker:
+docker node demote [NODE_NAME]
+Removing a node from the swarm:
+docker node rm —f [NODE_NAME]
+
+
+docker swarm leave 
+docker node ls 
+docker swarm join-token worker
+
+Services, tasks, and containers
+When you deploy the service to the swarm, the swarm manager accepts your service definition as the desired state for the service.
+Then it schedules the service on nodes in the swarm as one or more replica tasks. The tasks run independently Of each Other on nodes
+in the Swarm.
+For example, imagine you want to load balance between three instances of an HTTP listener. The diagram below shows an HTTP
+listener service with three replicas. Each of the three instances of the listener iS a task in the swarm.
+
+A container iS an isolated process. In the swarm mode model, each task invokes exactly one container, A task iS analogous to a "Slot" where the scheduler places a container. Once the container iS live, the scheduler recognizes that the task iS in a running state, If the container fails health Checks or terminates, the task terminates.
+
+
+
+[devops@rhel1 ~]$ docker service create --name nginx-swarm -p 8080:80 --replicas 2 nginx:latest
+p9iyxdhfpr4eck8lyrjvsn17v
+overall progress: 2 out of 2 tasks 
+1/2: running   [==================================================>] 
+2/2: running   [==================================================>] 
+verify: Service converged 
+
+
+[devops@rhel1 ~]$ docker service ls
+ID             NAME          MODE         REPLICAS   IMAGE          PORTS
+p9iyxdhfpr4e   nginx-swarm   replicated   2/2        nginx:latest   *:8080->80/tcp
+
+
+[devops@rhel1 ~]$ docker service ps nginx-swarm 
+ID             NAME            IMAGE          NODE      DESIRED STATE   CURRENT STATE                ERROR     PORTS
+xozp4t8klnar   nginx-swarm.1   nginx:latest   rhel1     Running         Running about a minute ago             
+a0spwvtvqpk7   nginx-swarm.2   nginx:latest   rhel2     Running         Running about a minute ago   
+
+
+
+[devops@rhel1 ~]$ docker service scale nginx-swarm=4
+nginx-swarm scaled to 4
+overall progress: 4 out of 4 tasks 
+1/4: running   [==================================================>] 
+2/4: running   [==================================================>] 
+3/4: running   [==================================================>] 
+4/4: running   [==================================================>] 
+verify: Service converged 
+[devops@rhel1 ~]$ docker service ps nginx-swarm 
+ID             NAME            IMAGE          NODE      DESIRED STATE   CURRENT STATE            ERROR     PORTS
+xozp4t8klnar   nginx-swarm.1   nginx:latest   rhel1     Running         Running 3 minutes ago              
+a0spwvtvqpk7   nginx-swarm.2   nginx:latest   rhel2     Running         Running 3 minutes ago              
+sozpwehkimyh   nginx-swarm.3   nginx:latest   rhel1     Running         Running 27 seconds ago             
+1mfu5l9vrwvz   nginx-swarm.4   nginx:latest   rhel2     Running         Running 8 seconds ago              
+
+
+
+[devops@rhel1 ~]$ docker service scale nginx-swarm=2
+nginx-swarm scaled to 2
+overall progress: 2 out of 2 tasks 
+1/2: running   [==================================================>] 
+2/2: running   [==================================================>] 
+verify: Service converged 
+[devops@rhel1 ~]$ docker service ps nginx-swarm 
+ID             NAME            IMAGE          NODE      DESIRED STATE   CURRENT STATE           ERROR     PORTS
+xozp4t8klnar   nginx-swarm.1   nginx:latest   rhel1     Running         Running 3 minutes ago             
+a0spwvtvqpk7   nginx-swarm.2   nginx:latest   rhel2     Running         Running 3 minutes ago             
+
+
+
+Updating a service:
+docker service update [OPTIONS] [NAME]
+
+docker network create -d overlay my_overlay
+   43  docker network ls
+   44  docker network create -d overlay --opt encrypted encrypted_overlay
+   45  docker network ls
+   46  docker network inspect encrypted_overlay 
+   47  docker network inspect my_overlay 
+
+ docker service create -d -p 8081:80 --name nginx-overlay --network my_overlay --replicas 2 nginx:latest
+   54  docker service ls
+   55  docker service ps nginx-overlay 
+   56  docker service update --network-add my_overlay nginx-swarm
+    57 docker service inspect nginx-swarm
+
+
+          "Mode": {
+                "Replicated": {
+                    "Replicas": 2
+                }
+            },
+            "EndpointSpec": {
+                "Mode": "vip",
+                "Ports": [
+                    {
+                        "Protocol": "tcp",
+                        "TargetPort": 80,
+                        "PublishedPort": 8080,
+                        "PublishMode": "ingress"
+                    }
+                ]
+            }
+        },
+        "Endpoint": {
+            "Spec": {
+                "Mode": "vip",
+                "Ports": [
+                    {
+                        "Protocol": "tcp",
+                        "TargetPort": 80,
+                        "PublishedPort": 8080,
+                        "PublishMode": "ingress"
+                    }
+                ]
+            },
+            "Ports": [
+                {
+                    "Protocol": "tcp",
+                    "TargetPort": 80,
+                    "PublishedPort": 8080,
+                    "PublishMode": "ingress"
+                }
+            ],
+            "VirtualIPs": [
+                {
+                    "NetworkID": "wjz3ala791fbfd3472wc5l9vl",   <-----------------
+                    "Addr": "10.0.0.5/24"
+                },
+                {
+                    "NetworkID": "xlbf3z4gxgzcrnhlxgc4tp5cb",   <----------------- 2 networks
+                    "Addr": "10.0.1.7/24"
+                }
+            ]
+        },
+        "UpdateStatus": {
+            "State": "completed",
+            "StartedAt": "2023-11-17T09:00:27.621208756Z",
+            "CompletedAt": "2023-11-17T09:00:47.431569743Z",
+            "Message": "update completed"
+        }
+    }
+]
+[devops@rhel1 ~]$  docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+8b2ff65ba1bc   bridge              bridge    local
+1ec46a77e26e   docker_gwbridge     bridge    local
+pd9jwksgxu98   encrypted_overlay   overlay   swarm
+a44310bf7e1e   host                host      local
+wjz3ala791fb   ingress             overlay   swarm  <-----------------------
+xlbf3z4gxgzc   my_overlay          overlay   swarm  <-----------------------
+fdd34a6e11cf   none                null      local
+
+
+[devops@rhel1 ~]$ docker service update --network-rm my_overlay nginx-swarm
+
+
+
+=======================================================================================
+
+how to use volumes with Docker Swarm.
+Now when it comes to using volumes in Swarm mode,
+we're going to need to use a volume plugin.
+And the reason why is because
+the native driver for volumes is local.
+So this means that if you go and create a volume
+it's only going to be created locally
+to where that command was executed.
+For example, let's say we create a service
+and it has multiple replica tasks,
+and those tasks are running on different nodes,
+a volume will be created on each worker node.
+So, for example, if we have worker 1 and 2
+and we have 2 replica tasks,
+each are running on those individual nodes,
+then we're going to have 2 separate volumes created,
+which presents a problem because if you change
+the data on one of the volumes,
+it's not going to be updated on the other. So the
+data is not going to be persistent across those volumes,
+and that's the reason why we need to use a driver.
+
+
+Using Volumes in Swarm Mode
+Adding Plugins:
+    docker plugin install [PLUGIN] [OPTIONS]
+Listing plugins:
+    docker plugin Is
+Volume Plugins:
+    Hedvig
+    Pure Storage
+    HPE Nimble Storage
+    Nutanix DVP
+    Blockbridge
+    NexentaStor
+    StorageOS
+    Rex-Ray
+
+
+
+Install the Splunk plugin:
+docker plugin install splunk/docker-logging-plugin
+
+Disable a plugin:
+docker plugin disable [ID]
+
+Remove a plugin:
+docker plugin rm [ID]
+
+Digital Ocean example:
+docker plugin install rexray/dobs \
+DOBS_REGION=<DO_REGION> \
+DOBS_TOKEN=<DIGITAL_OCEAN_TOKEN> \
+DOBS_CONVERTUNDERSCORES=true
+
+Create a volume using a driver:
+docker volume create -d [DRIVER] [NAME]
+docker service create -d --name [NAME] \
+--mount type=[TYPE],src=[SOURCE],dst=[DESTINATION] \
+-p [HOST_PORT]:[CONTAINER_PORT] \
+--replicas [REPLICAS] \
+[IMAGE] [CMD]
+
+Create a volume on the manager:
+docker volume create -d local portainer_data
+
+Create a portainers service that uses a volume:
+docker service create \
+--name portainer \
+--publish 8000:9000 \
+--constraint 'node.role == manager' \
+--mount type=volume,src=portainer_data,dst=/data \
+--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+portainer/portainer \
+-H unix:///var/run/docker.sock
+
+Volume Drivers 
+https://hub.docker.com/search?q=volume%20plugins&type=plugin&category=volume
+Rex-Ray Volume Driver
+https://rexray.readthedocs.io/en/stable/user-guide/schedulers/docker/plug-ins/
+
+
+REXRAY -> compatible with AWS EBS/EFS,GCP persistent data,AZURE,Openstack Cinder
+$ docker plugin install rexray/ebs \
+EBS_ACCESSKEY=abc \
+EBS_SECRETKEY=123
+
+
+Amazon EC2	    EBS/EFS/S3FS
+Ceph	        RBD
+Dell EMC	    Isilon/ScaleIO
+DigitalOcean	Block Storage
+Google GCE      Persistent Disk
+Microsoft	    Azure Unmanaged Disk
+OpenStack	    Cinder

@@ -1,0 +1,101 @@
+Non-persistent Data
+Non-persistent data:
+By default all container use local storage Storage locations:
+
+linux:/var/lib/docker/<storage-driver>/
+windows: c:\ProgramData\Docker\windowsfilter\
+
+Storage Drivers:
+RHEL uses overlay2
+Ubuntu uses overlay2 or aufs
+SUSE uses btrfs
+Windows uses it's own
+
+
+2 Types of Persistent Storage:
+Volumes
+Bind Mounts
+
+
+Persistent Data Using Volumes (cont.)
+Volumes:
+Third party drivers
+                Block storage
+                File storage
+                Object storage
+Storage locations
+linux: /var/lib/docker/volumes/
+• windows: c:\ProgramData\Docker\volumes\
+
+    List all Docker volume commands:
+docker volume —h
+    List all volumes on a host:
+docker volume Is
+    Creating volumes:
+docker volume create <NAME>
+    Inspecting a volume:
+docker volume inspect <NAME>
+
+
+Using Bind Mounts
+Bind mounts have been around since the early days of Docker.
+They have limited functionality compared to volumes.
+With bind mount, a file or directory on the host machine is mounted into a container.
+Volumes use a new directory that is created within Docker's storage directory on the host
+machine, and Docker manages that directory's contents.
+
+Using Bind Mounts
+Using the mount flag:
+docker container run —d ——name <NAME> ——mount type=bind,source=<source>,target=<Target> <image>
+
+Using the volume flag:
+docker container run —d -v ——name <NAME> <source>:<target> image
+
+The reason why using a bind mount to manage
+a configuration file is pretty handy is it allows us to go
+and make a change to that file
+and then restart the container to go and pick it up.
+This way, we don't have to go and make a change to an image,
+rebuild it, and then go and redeploy the container.
+Now we could do the same thing using a volume,
+but instead, it would be managing the entire directory
+where the config file is located.
+If we're making changes to multiple files,
+using a volume would make sense.
+However, if we're just managing a single file,
+we can get away with using a bind mount instead.
+
+ 71  docker container run -d --name nginx-bind-mounted --mount type=bind,source="$(pwd)"/target,target=/app nginx
+   72  ll
+   73  cd target/
+   74  touch mytest.txt | echo "this is life" > mytest.txt
+   75  cat mytest.txt
+   76  cd ..
+   77  docker container attach -it nginx-bind-mounted
+   78  docker container inspect nginx-bind-mounted
+   79  docker container exec -it nginx-bind-mounted /bin/bash
+   80  mkdir target2
+   81  docker container run -d --name nginx-bind-mounted2 -v "$(pwd)"/target2:/app nginx
+
+
+===================================================================================================
+Using Volumes for Storage Volume drivers let you store volumes on remote hosts or cloud providers,
+to encrypt the contents of volumes, or to add other functionality.
+New volumes can have their content pre-populated by a container.
+
+volumes are the preferred method when it comes
+to maintaining persistent data in Docker.
+So let's go and cover some of the use cases.
+First off, volumes are more easier to back up,
+as well as migrate.
+You can go and manage volumes using the Docker CLI,
+or the API.
+Volumes work on both Linux and Windows.
+And other huge advantages:
+you can more safely share a volume with multiple containers.
+Certain drivers allow you to create volumes
+on a remote system or in the cloud.
+A good example would be the REX-Ray driver, and last of all,
+when we go and create a volume and we're mounting it
+to a directory that has files preexisting,
+those files will get pre-populated into the volume.

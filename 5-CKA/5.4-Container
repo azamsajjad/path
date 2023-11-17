@@ -1,0 +1,157 @@
+INSIDE CONTAINER
+    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+    yum update -y
+
+    in parrallel , run $ docker container stats centos
+    to view live running processes
+
+  268  docker container exec -it weather-app-multi /bin/bash
+  269  docker container run -itd --name centos centos:latest /bin/bash
+  270  docker container exec -it centos /bin/bash
+  271  docker container attach centos
+  272  docker container start centos
+  273  docker container stats centos
+  274  # gives you live container stats of running processes
+  275  docker container stats centos
+
+Auto-restarting
+To configure the restart policy for a flag:
+container, use the --restart
+
+
+no: The default. Do not automatically restart the container.
+
+on—failure: Restart the container if it exits due to an error, which manifests as a non-zero exit code.
+
+always: Always restart the container if it stops.
+
+unless—stopped: Similar to always, except that when the container is stopped, it is not
+                restarted even after the Docker daemon restarts.
+
+
+
+====================================================================================================
+Docker Events
+Get real-time events from the docker system events
+$ docker system events '<TIME PERIOD>'
+
+Filters events:
+docker system events ——since ——filter <FILTER>
+
+rupert@T480-M8VDO3T:~$ docker system events --since '1h'
+
+rupert@T480-M8VDO3T:~$ docker system events --since '1h' --filter type=container
+
+rupert@T480-M8VDO3T:~$ docker system events --since '1h' --filter type=container --filter event=start
+
+rupert@T480-M8VDO3T:~$ docker system events --since '1h' --filter type=container --filter event=attach
+
+rupert@T480-M8VDO3T:~$ docker system events --since '1h' --filter type=container --filter event=stop
+
+rupert@T480-M8VDO3T:~$ docker system events --since '1h' --filter type=container --filter event=die
+
+rupert@T480-M8VDO3T:~/docker_images/multi_stage_build$ docker container ls -a -f status=exited
+rupert@T480-M8VDO3T:~/docker_images/multi_stage_build$ docker container ls -a -q
+b665a5736090
+ef140bc59a22
+7c302f802574
+
+
+
+======================================================================================================
+PORTAINER 
+localhost:9443
+
+rupert@T480-M8VDO3T:~$ docker volume create portainer_data
+rupert@T480-M8VDO3T:~$ docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+(port 8000 mapping is only required when you use edge computing)
+rupert@T480-M8VDO3T:~$ docker run -d -p 9443:9443 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+
+======================================================================================================
+WATCHTOWER
+
+Watchtower is an application
+that will monitor your running Docker containers
+to see if there's any changes to its image.
+And if there is a change, it will go
+and restart the container using the new image.
+Now Watchtower is a pretty handy tool
+to keep your containers up to date,
+but whether you choose to use it or not
+really kind of depends on your CI/CD processes
+along with your company's change control policies.
+To get this process going, we're going to start
+by setting up a containerized application
+that Watchtower's going to monitor.
+We're going to start off by going and cloning this
+repository, and we're going to call it Watchtower.
+cd into the watchtower/ directory.
+Next, execute a Docker checkout,
+and the name of the branch is called dockerfile.
+Okay, in the Watchtower directory,
+we have our application along with our Dockerfile.
+If we take a look at that,
+you can see that we're going and copying everything
+into /var/node, which proposes a problem
+because we do have a Dockerfile in there, but that's fine.
+We will deal with that
+after we get Watchtower set up.
+before we build our image,
+we're going to log into Docker Hub,
+execute a Docker login -u and then supply
+your Docker Hub username, and then enter your password.
+
+Updating Containers with Watchtower
+
+In this lesson, we'll see how to use Watchtower to keep a container up-to-date when its image gets updated.
+
+Clone Express app:
+
+git clone https://github.com/linuxacademy/content-express-demo-app.git watchtower
+cd watchtower
+git checkout dockerfile
+Build the Docker image:
+
+docker login -u [USERNAME]
+docker image build -t rivethead42/my-express .
+docker image push rivethead42/my-express
+Create the container:
+
+docker container run -d --name watched-app -p 80:3000 --restart always rivethead42/my-express
+Create Watchtower:
+
+docker container run -d --name watchtower \
+--restart always \
+-v /var/run/docker.sock:/var/run/docker.sock \
+v2tec/watchtower -i 15
+Add a .dockerignore file:
+
+vi .dockerignore
+.dockerignore contents:
+
+Dockerfile
+.git
+.gitignore
+Edit app.js and add a comment:
+
+vi app.js
+app.js contents:
+
+//This is a comment
+//
+...
+Add the file newfile.js:
+
+touch newfile.js
+Rebuild the image:
+
+docker image build -t rivethead42/my-express --no-cache .
+docker image push rivethead42/my-express
+Check to see if the container was restarted with the new image:
+
+docker container ls
+Verify the changes by attaching to watched-app:
+
+docker container exec -it watched-app /bin/bash
+

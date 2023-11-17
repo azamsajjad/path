@@ -138,7 +138,6 @@ CREATE A NETWORK
 
 
 INSIDE CONTAINER
-    sudo rpm -i 'centos-gpg-keys-8-3.el8.noarch.rpm'
     sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
     sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
     yum update -y
@@ -188,3 +187,101 @@ rupert@T480-M8VDO3T:~$ docker container inspect net-test2 | grep IPAddr
             "SecondaryIPAddresses": null,
             "IPAddress": "",
                     "IPAddress": "10.1.4.102",
+
+
+-------------------------------------------------------------------
+LOCALHOST NETWORK 
+    rupert@T480-M8VDO3T:~$ docker network create -d bridge --internal localhost
+    b0287782f827604ec79c4340e443e572bfd60c5a3a3502d1da4e7f7fa46c95a8
+    rupert@T480-M8VDO3T:~$ docker network ls
+    NETWORK ID     NAME        DRIVER    SCOPE
+    afcd1054aa17   br329       bridge    local
+    a04d8f83bd47   bridge      bridge    local
+    10d3258d1648   host        host      local
+    b0287782f827   localhost   bridge    local
+    92cb770de2e9   none        null      local
+    rupert@T480-M8VDO3T:~$ # localhost means, it is not bound by any network interfaces, and cannot be reached publically
+    rupert@T480-M8VDO3T:~$ docker container run -d --name test_mysql --network localhost -e MYSQL_ROOT_PASSWORD=azam329 \
+    > mysql:5.7
+    Unable to find image 'mysql:5.7' locally
+    5.7: Pulling from library/mysql
+    9ad776bc3934: Pull complete
+    a280ac4a8665: Pull complete
+    4047a3b08336: Pull complete
+    435611dd4999: Pull complete
+    f84f2572cb0b: Pull complete
+    ef893e58839b: Pull complete
+    42897f531783: Pull complete
+    8a8aad27e96b: Pull complete
+    6b2751f26202: Pull complete
+    b0e9b86ed64c: Pull complete
+    bfef93045c96: Pull complete
+    Digest: sha256:880063e8acda81825f0b946eff47c45235840480da03e71a22113ebafe166a3d
+    Status: Downloaded newer image for mysql:5.7
+    02a4bd107a54c35f5cb3d1ba3fb96de8ff6dc95a53f9ab20fd9698069bde96e0
+    rupert@T480-M8VDO3T:~$ docker container run -it ping-mysql --network bridge centos
+    Unable to find image 'ping-mysql:latest' locally
+    docker: Error response from daemon: pull access denied for ping-mysql, repository does not exist or may require 'docker login': denied: requested access to the resource is denied.
+    See 'docker run --help'.
+    rupert@T480-M8VDO3T:~$ docker container run -it --name ping-mysql --network bridge centos
+    [root@14db3244942e /]# exit
+    exit
+    rupert@T480-M8VDO3T:~$ docker network connect localhost ping-mysql
+    rupert@T480-M8VDO3T:~$ docker container start -ia ping-mysql
+    [root@14db3244942e /]# ping test-mysql
+    ping: test-mysql: Name or service not known
+    [root@14db3244942e /]# ping test_mysql
+    PING test_mysql (172.18.0.2) 56(84) bytes of data.
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=1 ttl=64 time=0.480 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=2 ttl=64 time=0.054 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=3 ttl=64 time=0.218 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=4 ttl=64 time=0.183 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=5 ttl=64 time=0.163 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=6 ttl=64 time=0.176 ms
+
+
+    rupert@T480-M8VDO3T:~$ docker container run -it --name cant-ping-mysql centos
+    [root@d5baf2857078 /]# ping test_mysql
+    ^C
+    [root@d5baf2857078 /]# exit
+    exit
+    rupert@T480-M8VDO3T:~$ docker network connect localhost cant-ping-mysql
+    rupert@T480-M8VDO3T:~$ docker container start -ia cant-ping-mysql
+    [root@d5baf2857078 /]# ping test_mysql
+    PING test_mysql (172.18.0.2) 56(84) bytes of data.
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=1 ttl=64 time=0.280 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=2 ttl=64 time=0.146 ms
+    64 bytes from test_mysql.localhost (172.18.0.2): icmp_seq=3 ttl=64 time=0.049 ms
+
+
+-------------------------------------------------------------
+LAB 
+Create a bridge network called frontend that will be publicly accessible.
+Create a second bridge network called localhost that will be internal.
+Deploy a MySQL container called database that will use the localhost network. Use the mysql 5.7 image:
+
+Use the -e flag to set MYSQL_ROOT_PASSWORD to "P4ssW0rd0!".
+The MySQL container should run in the background.
+Next, deploy a second container called frontend-app. Connect it to the frontend network using the --network flag. Use the latest Nginx image. The Nginx container should run in the background.
+
+Once the Nginx container is created, connect it to the localhost network.
+
+Used the docker network command to create the frontend network:
+docker network create frontend
+
+User the docker network command to create the localhost network:
+docker network create localhost \
+--internal
+Create a MySQL container that is attached to the localhost network:
+docker container run —d —name database \
+—network localhost \
+mysql:5.7
+
+
+    3  docker network create frontend
+    4  docker network create localhost --internal
+    5  docker container run -d --name database --network localhost -e MYSQL_ROOT_PASSWORD=Password! mysql:5.7
+    6  docker container run -d --name frontend-app --network frontend nginx:latest
+
+    8  docker network connect localhost  frontend-app
+    9  docker container inspect frontend-app

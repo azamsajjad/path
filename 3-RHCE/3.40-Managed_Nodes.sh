@@ -14,7 +14,7 @@ Be able to analyze simple shell scripts and convert them to playbooks
     7  ssh rupert@192.168.100.101
     8  ssh-copy-id rupert@192.168.100.102
     9  ssh rupert@192.168.100.102
-echo "rupert ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/rupert
+echo "devops ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/devops
 echo "rupert ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/rupert
 
 vim ~/automation/ansible.cfg (check configuration)

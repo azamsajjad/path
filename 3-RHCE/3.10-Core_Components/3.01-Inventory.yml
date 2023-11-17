@@ -53,6 +53,7 @@ ansible-inventory --graph
   |  |--@rhel2:
   |  |  |--server2
 
+
 VIM SETTINGS FOR YAML:
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 # filetype ndent plugin On

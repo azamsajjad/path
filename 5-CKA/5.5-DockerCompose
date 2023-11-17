@@ -1,0 +1,237 @@
+
+Download the latest version of Docker Compose:
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+Apply executable permissions:
+
+sudo chmod +x /usr/local/bin/docker-compose
+Test Docker Compose:
+
+docker-compose --version
+
+
+Compose Commands
+Management Commands:
+
+up: Create and start containers
+    
+ps: List containers
+
+stop: Stop services
+
+start: Start services
+
+restart: Restart services
+
+down: Stop and remove containers, networks, images, andvolumes
+
+
+375  docker compose -f commands/docker-compose.yml ps
+  376  cd commands/
+  377  docker compose stop
+  378  docker compose ps
+  379  docker compose down
+
+
+version: '3'
+services:
+  weather-app:
+    container_name: weather-compose
+    build:
+      context: .
+      args:
+        - VERSION=v2.0
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+
+----------------------------------------------------------------------------------------------------
+In this lesson, we will learn how to use volumes and networks in a docker compose file.
+
+Setup your environment:
+
+mkdir -p compose/ghost
+cd compose/ghost
+Create a docker-compose.yml file:
+
+vi docker-compose.yml
+docker-compose.yml:
+
+version: '3'
+services:
+  ghost:
+    container_name: ghost
+    image: ghost:latest
+    ports:
+      - "80:2368"
+    environment:
+      - database__client=mysql
+      - database__connection__host=mysql
+      - database__connection__user=root
+      - database__connection__password=P4SSw0rd0!
+      - database__connection__database=ghost
+    volumes:
+      - ghost-volume:/var/lib/ghost
+    networks:
+      - ghost_network
+      - mysql_network
+    depends_on:
+      - mysql
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=P4SSw0rd0!
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    networks:
+      - mysql_network
+
+volumes:
+  ghost-volume:
+  mysql-volume:
+
+networks:
+  ghost_network:
+  mysql_network:
+Create the compose container:
+
+docker-compose up -d
+List compose services:
+
+docker-compose ps
+List the volumes:
+
+docker volumes ls
+List the volumes:
+
+docker network ls
+Docker Compose Documentation
+https://docs.docker.com/compose/compose-file/
+
+
+
+===================================================================================================
+In the lab directory you will find two directories. The nginx directory has a Dockerfile and an nginx.conf file. Nginx will be used to load balance the weather-app. The weather-app directory has the Dockerfile and source code.
+
+In the lab directory, create a Docker Compose file.
+
+Setting up the weather-app
+Make sure the version you are using is 3.
+Create three weather-app services: weather-app1, weather-app2, and weather-app3.
+Each one should build an image that is located in the weather-app directory.
+It will take one argument, VERSION, Set it to v2.0.
+For weather-app1, publish port 8080 to 3000 on the container.
+For weather-app2, publish port 8081 to 3000 on the container.
+For weather-app3, publish port 8082 to 3000 on the container.
+All three weather-app containers will be on the weather_app network, which is internal.
+The NODE_ENV environment variable will be set to production.
+
+Setting up Nginx
+Create a service called nginx.
+Update upstream localhost in nginx.conf to include the three containers with their private port.
+Example: server [APP-NAME]:[PORT]
+Build an image using the Dockerfile in the nginx directory.
+Set tty to true.
+Publish port 80 to port 80 on the container.
+The nginx container will be on two networks: frontend and weather_app.
+
+Setting up the Networks:
+Create a public network called frontend.
+Create an internal network called weather_app.
+
+Deploy the Services:
+Bring up the services. Test to make sure that everything is working by running curl against localhost.
+
+
+version: '3'
+services:
+  weather-app1:
+    build:
+      context: ./weather-app
+      args:
+        - VERSION=v2.0
+    ports:
+      - "8080:3000"
+    networks:
+      - weather_app
+    environmentcurl lo:
+      - NODE_ENV=production
+  weather-app2:
+    build:
+      context: ./weather-app
+      args:
+        - VERSION=v2.0
+    ports:
+      - "8081:3000"
+    networks:
+      - weather_app
+    environment:
+      - NODE_ENV=production
+  weather-app3:
+    build:
+      context: ./weather-app
+      args:
+        - VERSION=v2.0
+    ports:
+      - "8082:3000"
+    networks:
+      - weather_app
+    environment:
+      - NODE_ENV=production
+  nginx:
+    build:
+      context: ./nginx
+    tty: true
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+      - weather_app
+
+networks:
+  frontend:
+  weather_app:
+    internal: true
+
+
+nginx.conf============>
+events { worker_connections 1024; }
+
+http {
+  upstream localhost {
+          server weather-app1:3000;
+          server weather-app2:3000;
+          server weather-app3:3000;
+
+  }
+  server {
+    listen 80;
+    server_name localhost;
+    location / {
+      proxy_pass http://localhost;
+      proxy_set_header Host $host;
+    }
+  }
+}
+===================>
+
+docker compose up -d
+
+$ docker compose build
+$ docker compose start
+$ docker compose stop
+$ docker compose up -d
+$ docker compose ps
+$ docker compose rm
+$ docker compose down
+$ docker compose logs
+$ docker compose exec [container] bash 
+
+
+$ docker compose --project-name testl up -d
+$ docker compose -p test 2 up -d
+$ docker compose Is
+$ docker compose cp
