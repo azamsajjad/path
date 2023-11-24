@@ -290,3 +290,23 @@ sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 sudo certbot --nginx
 Finally back in your WordPress administrator dashboard, go to Settings > General and change the WordPress Address and Site Address to start with https.
+
+
+
+  1  sudo yum update -y
+    2  sudo amazon-linux-extras install mariadb10.5
+    3  sudo yum update -y
+    4  sudo amazon-linux-extras install php8.2
+    5  cat /etc/system-release
+    6  sudo yum install -y httpd
+    7  sudo systemctl enable --now httpd
+    8  sudo usermod -aG apache ec2-user
+    9  groups
+   10  exit
+   11  cd tmp
+   12  cd /tmp
+   13  wget -O epel.rpm –nv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+   14  sudo yum install -y ./epel.rpm
+   15  cd ~
+   16  sudo yum install python2-certbot-apache.noarch
+   17  sudo certbot -i apache -a manual --preferred-challenges dns -d dhamaps.com

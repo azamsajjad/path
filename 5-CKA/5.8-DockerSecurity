@@ -242,6 +242,12 @@ https://github.com/docker/docker-bench-security
 
 In this lesson we will start implementing some of the Docker security practices.
 
+==================================================================================================
+===================================Seccomp Profile=================================================
+==================================================================================================
+
+
+
 Seccomp Profile
 docker container run --security-opt seccomp=[PROFILE] [IMAGE] [CMD]
 Testing Seccomp:
@@ -261,6 +267,14 @@ Applying the custom Seccomp profile:
 
 docker container run --rm -it --security-opt seccomp=./default.json alpine sh
 chmod +r /usr
+
+
+
+==================================================================================================
+===================================Capabilities=================================================
+==================================================================================================
+
+
 Capabilities:
 Dropping Capabilities:
 
@@ -276,7 +290,10 @@ mknod /dev/random2 c 1 8
 Runtime privilege and Linux capabilities
 https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
 
-Control Groups
+
+==================================================================================================
+===================================Control Groups=================================================
+==================================================================================================
 Limiting CPU and memory:
 
 docker container run -it --cpus=[VALUE] --memory=[VALUE][SIZE] --memory-swap [VALUE][SIZE] [IMAGE] [CMD]
@@ -294,12 +311,305 @@ https://docs.docker.com/config/containers/resource_constraints/
 Running Docker Bench for Security
 Running Docker Bench Security:
 
-docker container run --rm -it --network host --pid host --userns host --cap-add audit_control \
+docker container run --rm -it --network host --pid host --userns host \
+    --cap-add audit_control \
     -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
     -v /var/lib:/var/lib \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v /usr/lib/systemd:/usr/lib/systemd \
     -v /etc:/etc --label docker_bench_security \
     docker/docker-bench-security
+
+    Run with Docker
+    Building Docker image
+    You have two options if you wish to build and run this container yourself:
+
+    Use Docker Build:
+    git clone https://github.com/docker/docker-bench-security.git
+    cd docker-bench-security
+    docker build --no-cache -t docker-bench-security .
+    Followed by an appropriate docker run command as stated below.
+
+    Use Docker Compose:
+    git clone https://github.com/docker/docker-bench-security.git
+    cd docker-bench-security
+    docker-compose run --rm docker-bench-security
+    Please note that the docker/docker-bench-security image is out-of-date and and a manual build is required. See #405 for more information.
+
+    Note that this container is being run with a lot of privilege -- sharing the host's filesystem, pid and network namespaces, due to portions of the benchmark applying to the running host.
+
+    Using the container
+    docker run --rm --net host --pid host --userns host --cap-add audit_control \
+        -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
+        -v /etc:/etc:ro \
+        -v /usr/bin/containerd:/usr/bin/containerd:ro \
+        -v /usr/bin/runc:/usr/bin/runc:ro \
+        -v /usr/lib/systemd:/usr/lib/systemd:ro \
+        -v /var/lib:/var/lib:ro \
+        -v /var/run/docker.sock:/var/run/docker.sock:ro \
+        --label docker_bench_security \
+        docker-bench-security
+        
+    
 Docker Bench Security
 https://github.com/docker/docker-bench-security
+
+
+=====================================================================================================
+
+=======================Docker Content Trust==========================================================
+
+Creating a Key:
+docker trust key generate [NAME]
+
+Importing a Key:
+docker trust key load [PEM] -—name [NAME]
+
+Add signer:
+docker trust signer add --key [PEM] [NAME] [REPOSITORY]
+
+Remove signer:
+docker trust signer remove [NAME] [REPOSITORY]
+
+
+Signing an Image:
+docker trust sign [IMAGE] : [TAG]
+
+
+
+
+Enabling DCT:
+[devops@rhel1 ~]$ export DOCKER_CONTENT_TRUST=1   <---temporary
+ 
+vi /etc/docker/daemon.json   <---permanent
+
+/etc/docker/daemon.json
+{
+    "content—trust": {
+    "mode": "enforced"
+    }
+}
+
+
+
+==============================================================================================
+SECRETS 
+==============================================================================================
+Working with Secrets
+
+In this lesson, we will start working with Docker Secrets to protect sensitive data, such as passwords and API Keys.
+
+Docker secrets commands:
+
+create: Create a secret from a file or STDIN as content
+inspect: Display detailed information on one or more secrets
+ls: List secrets
+rm: Remove one or more secrets
+Creating a secret:
+
+STDIN | docker secret create [NAME] -
+List secrets:
+
+docker secret ls
+Inspecting a secret:
+
+docker secret inspect [NAME]
+Using secrets:
+
+docker service create --name [NAME] --secret [SECERT] [IMAGE]
+Deleting a secret:
+
+docker secret rm [NAME]
+Setup environment:
+
+mkdir Secrets
+cd secrets
+Create a secret using STDIN:
+
+openssl rand -base64 20 | docker secret create my_secret_data -
+Create a secret using a file:
+
+openssl rand -base64 20 > secret.txt
+docker secret create my_secret_data2 secret.txt
+Create a service using a secret:
+
+docker service create --name redis --secret my_secret_data redis:alpine
+Find the node the service is running on:
+
+docker service ps redis
+Remove secret my_secret_data2:
+
+docker secret rm my_secret_data2
+Generate password files:
+
+openssl rand -base64 20 > db_password.txt
+openssl rand -base64 20 > db_root_password.txt
+Create a Wordpress Stack:
+
+vi docker-compose.yml
+docker-compose.yml contents:
+
+version: '3.1'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     networks:
+       mysql_internal:
+         aliases: ["db"]
+     environment:
+       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD_FILE: /run/secrets/db_password
+     secrets:
+       - db_root_password
+       - db_password
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     networks:
+       mysql_internal:
+         aliases: ["wordpress"]
+       wordpress_public:
+     ports:
+       - "8001:80"
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+     secrets:
+       - db_password
+
+secrets:
+   db_password:
+     file: db_password.txt
+   db_root_password:
+     file: db_root_password.txt
+
+volumes:
+    db_data:
+networks:
+  mysql_internal:
+    driver: "overlay"
+    internal: true
+  wordpress_public:
+    driver: "overlay"
+Deploy stack:
+
+docker stack deploy --compose-file docker-compose.yml wp
+
+
+=====================================================================================================
+
+Working with Secrets
+
+In this lesson, we will start working with Docker Secrets to protect sensitive data, such as passwords and API Keys.
+
+Docker secrets commands:
+
+create: Create a secret from a file or STDIN as content
+inspect: Display detailed information on one or more secrets
+ls: List secrets
+rm: Remove one or more secrets
+Creating a secret:
+
+STDIN | docker secret create [NAME] -
+List secrets:
+
+docker secret ls
+Inspecting a secret:
+
+docker secret inspect [NAME]
+Using secrets:
+
+docker service create --name [NAME] --secret [SECERT] [IMAGE]
+Deleting a secret:
+
+docker secret rm [NAME]
+Setup environment:
+
+mkdir Secrets
+cd secrets
+Create a secret using STDIN:
+
+openssl rand -base64 20 | docker secret create my_secret_data -
+Create a secret using a file:
+
+openssl rand -base64 20 > secret.txt
+docker secret create my_secret_data2 secret.txt
+Create a service using a secret:
+
+docker service create --name redis --secret my_secret_data redis:alpine
+Find the node the service is running on:
+
+docker service ps redis
+Remove secret my_secret_data2:
+
+docker secret rm my_secret_data2
+Generate password files:
+
+openssl rand -base64 20 > db_password.txt
+openssl rand -base64 20 > db_root_password.txt
+Create a Wordpress Stack:
+
+vi docker-compose.yml
+docker-compose.yml contents:
+
+version: '3.1'
+
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     networks:
+       mysql_internal:
+         aliases: ["db"]
+     environment:
+       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD_FILE: /run/secrets/db_password
+     secrets:
+       - db_root_password
+       - db_password
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     networks:
+       mysql_internal:
+         aliases: ["wordpress"]
+       wordpress_public:
+     ports:
+       - "8001:80"
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_password
+     secrets:
+       - db_password
+
+secrets:
+   db_password:
+     file: db_password.txt
+   db_root_password:
+     file: db_root_password.txt
+
+volumes:
+    db_data:
+networks:
+  mysql_internal:
+    driver: "overlay"
+    internal: true
+  wordpress_public:
+    driver: "overlay"
+Deploy stack:
+
+docker stack deploy --compose-file docker-compose.yml wp
