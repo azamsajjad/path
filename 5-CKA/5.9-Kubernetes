@@ -125,7 +125,7 @@ sudo apt-get update
 # Install Docker Engine, containerd, and Docker Compose:
 
 VERSION_STRING=5:23.0.1-1~ubuntu.20.04~focal
-sudo apt-get install -y docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Add your 'cloud_user' to the docker group:
 
@@ -184,3 +184,145 @@ sudo kubeadm join ...
 # On the control plane node, verify all nodes in your cluster are ready. Note that it may take a few moments for all of the nodes to enter the READY state:
 
 kubectl get nodes
+
+
+
+kubeadm join 172.31.16.108:6443 --token 7i6fq0.h46x3ux332we16v8 \
+        --discovery-token-ca-cert-hash sha256:4f8ab90e1d1f0bd5edcda02fb37c7bf8a3d8911523eb6cd52d6f443be0a49346
+
+
+rhel1
+kubeadm join 192.168.100.155:6443 --token jrsilt.314ori2dndgag9ul \
+	--discovery-token-ca-cert-hash sha256:c784ca4c7c995f90185782ef50c4b07d3e2d7232c6d6698e408c1448c43d4606 
+
+
+
+========================================================================================
+RHEL
+root@rhel2 pki]# history
+
+    7  hostnamectl set-hostname rhel2
+    8  yum update -y
+    9  sudo yum remove -y docker docker-client docker-client-latest docker-common \
+       docker-latest docker-latest-logrotate docker-logrotate docker-engine
+
+
+   10  echo "devops ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/devops
+
+
+# Step 1) Disable SWAP
+        sudo swapoff -a
+
+# Step 2) Disable SELinux
+        sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+# Step 3) Configure networking in master and worker node
+        hostnamectl set-hostname rhel2
+        sudo vim /etc/hosts
+        192.168.100.155 rhel1
+        192.168.100.154 rhel2
+        sudo dnf install -y iproute-tc
+
+# Step 4) Allow firewall rules for k8s
+        On Master node, allow following ports,
+
+        $ sudo firewall-cmd --permanent --add-port=6443/tcp
+        $ sudo firewall-cmd --permanent --add-port=2379-2380/tcp
+        $ sudo firewall-cmd --permanent --add-port=10250/tcp
+        $ sudo firewall-cmd --permanent --add-port=10251/tcp
+        $ sudo firewall-cmd --permanent --add-port=10252/tcp
+        $ sudo firewall-cmd --reload
+        On Worker node, allow following ports,
+
+        $ sudo firewall-cmd --permanent --add-port=10250/tcp
+        $ sudo firewall-cmd --permanent --add-port=30000-32767/tcp                                                 
+        $ sudo firewall-cmd --reload
+
+# Step 5) Install CRI-O container runtime
+                                        <!-- Kubernetes requires a container runtime for pods to run. Kubernetes 1.23 and later versions require that you install a container runtime that confirms with the Container Runtime Interface.
+                                        A Container Runtime is an application that supports running containers. Kubernetes supports the following Container Runtime:
+                                        Containerd
+                                        CRI-O
+                                        Docker Engine
+                                        Mirantis Container Runtime -->
+        To achieve this, we need to configure the prerequisites as follows:
+
+        First, create a modules configuration file for Kubernetes.
+
+        $ sudo vi /etc/modules-load.d/k8s.conf
+            overlay
+            br_netfilter
+        Then load both modules using the modprobe command.
+        $ sudo modprobe overlay
+        $ sudo modprobe br_netfilter
+
+        Next, configure the required sysctl parameters as follows
+        $ sudo vi /etc/sysctl.d/k8s.conf
+            net.bridge.bridge-nf-call-iptables  = 1
+            net.ipv4.ip_forward                 = 1
+            net.bridge.bridge-nf-call-ip6tables = 1
+        $ sudo sysctl --system
+        
+        To install CRI-O, set the $VERSION environment variable to match your CRI-O version. For instance, to install CRI-O version 1.26 set the $VERSION as shown:
+
+        $ export VERSION=1.26
+        Next, run the following commands:
+
+        $ sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo
+        $ sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/CentOS_8/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo
+        Then use the DNF package manager to install CRI-O:
+
+        $ sudo dnf install cri-o
+ 
+        $ systemctl enable --now crio
+
+# Step 6)  Install Kubernetes Packages
+
+        $ sudo vi /etc/yum.repos.d/kubernetes.repo
+            [kubernetes] 
+            name=Kubernetes
+            baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+            enabled=1
+            gpgcheck=1
+            repo_gpgcheck=1
+            gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+            exclude=kubelet kubeadm kubectl
+
+        $ sudo dnf install -y kubelet-1.26.1 kubeadm-1.26.1 kubectl-1.26.1 --disableexcludes=kubernetes
+
+        $ sudo systemctl enable kubelet
+        $ sudo systemctl start kubelet
+
+# Step 7)  Create a Kubernetes cluster (ON CONTROL NODE)
+        
+        kubeadm init --cri-socket /var/run/crio/crio.sock
+        kubeadm init --pod-network-cidr=10.1.0.0/24 --cri-socket /var/run/crio/crio.sock (optional)
+
+        $ kubectl taint nodes --all node-role.kubernetes.io/master-
+                Also, be sure to remove taints from the master node: (it will not deploy tasks to control node)
+
+
+# Step 8) Install Calico Pod Network Add-on
+        The next step is to install Calico CNI (Container Network Interface). It is an opensource project used to provide container networking and security. After Installing Calico CNI, nodes state will change to Ready state, DNS service inside the cluster would be functional and containers can start communicating with each other.
+
+        Calico provides scalability, high performance, and interoperability with existing Kubernetes workloads. It can be deployed on-premises and on popular cloud technologies such as Google Cloud, AWS and Azure.
+
+        To install Calico CNI, run the following command from the master node
+
+        $ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+        To confirm if the pods have started, run the command:
+
+        $ kubectl get pods -n kube-system
+        You should see that each pod is ‘READY’ and has the ‘RUNNING’ status as shown in the third column.
+        $ kubectl get nodes -o wide
+        $ kubectl get pods --all-namespaces
+
+# Step 9) Adding worker node to the cluster
+           kubeadm join 192.168.100.155:6443 --token s9c0ba.60idwc32aa0slxul --discovery-token-ca-cert-hash sha256:e7523724b39a6d24240742562cfe012e7144572be045d4ace084ec54a709fb9b --cri-socket /var/run/crio/crio.sock 
+
+           got error 
+                24  kubeadm join 192.168.100.155:6443 --token s9c0ba.60idwc32aa0slxul --discovery-token-ca-cert-hash sha256:e7523724b39a6d24240742562cfe012e7144572be045d4ace084ec54a709fb9b --cri-socket /var/run/crio/crio.sock 
+                --ignore-preflight-errors all
+                25  cd /etc/kubernetes/pki
+                26  ls
+                27  rm -rf ca.crt 

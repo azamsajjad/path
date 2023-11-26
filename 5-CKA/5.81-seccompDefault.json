@@ -824,10 +824,4 @@
 		}
 	]
 }
-
-
-
-
-
-
-docker container run -it --rm --security-opt seccomp=./default.json alpine
+// docker container run -it --rm --security-opt seccomp=./default.json alpine
