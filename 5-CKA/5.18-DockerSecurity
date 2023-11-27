@@ -613,3 +613,22 @@ networks:
 Deploy stack:
 
 docker stack deploy --compose-file docker-compose.yml wp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for seccomp
+// docker container run -it --rm --security-opt seccomp=./default.json alpine
