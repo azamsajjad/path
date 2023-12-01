@@ -1,0 +1,214 @@
+# K8s Management Overview
+• Introduction to High Availability in K8s
+• Introducing K8s Management Tools
+• Safely Draining a K8s Node
+• Upgrading K8s with kubeadm
+• Backing Up and Restoring etcd Cluster Data
+
+
+
+# High Availability
+High Availability in K8s
+High Availability Control Plane
+Stacked etcd
+External etcd
+
+When using multiple control planes for high availability, you will likely need to communicate with the Kubernetes API through a load balancer.
+This includes clients such as kubelet instances running on worker nodes.
+
+
+# K8s Management Tools
+kubectl - kubectl is the official command line interface
+kubeadm - used to quickly create k8 clusters
+Minikube - set up a local single-node k8 cluster for development
+Helm - templating and package management for k8 objects = charts
+Kompose - translate docker compose files into k8 objects
+Kustomize - configuration management tool for managing k8 object
+
+# Safely Draining a Kubernetes Node
+What Is Draining?
+When performing maintenance, you may sometimes need to remove a
+Kubernetes node from service.
+To do this, you can drain the node. Containers running on the node will be gracefully terminated (and potentially rescheduled on another node).
+
+$ kubectl drain <node name>
+
+Ignoring DaemonSets
+When draining a node, you may need to ignore DaemonSets (pods that are tied to each node). If you have any DaemonSet pods running on the node, you will likely need to use the  -ignore-daemonsets flag.
+
+
+ $ kubectl drain <node name> -- ignore-daemonsets
+
+~~~bash
+  217  vim deployment.yml 
+  218  kubectl apply -f deployment.yml
+  219  kubectl get pods -o wide
+  220  kubectl drain rhel2
+  221  kubectl drain rhel2 --ignore-daemonsets --force
+  222  kubectl get pods -o wide
+  223  kubectl get nodes
+
+  225  kubectl uncordon rhel2
+  226  kubectl get nodes
+  227  kubectl get pods -o wide
+  228  kubectl delete deployment my-deployment
+  229  kubectl get pods -o wide
+  230  history
+~~~
+~~~yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    app: my-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-deployment
+  template:
+    metadata:
+      labels:
+        app: my-deployment
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+~~~
+
+# Control Plane Upgrade Steps
+• Upgrade kubeadm on the control plane node.
+• Drain the control plane node.
+• Plan the upgrade (kubeadm upgrade plan).
+• Apply the upgrade (kubeadm upgrade apply).
+• Upgrade kubelet and kubectl on the control plane node.
+• Uncordon the control plane node.
+# Worker Node Upgrade Steps
+• Drain the node.
+• Upgrade kubeadm.
+• Upgrade the kubelet configuration (kubeadm upgrade node).
+• Upgrade kubelet and kubectl.
+• Uncordon the node.
+
+
+# Control Node Upgrade
+~~~bash
+  232  kubectl drain rhel1 --ignore-daemonsets
+
+  259  sudo yum install -y kubeadm-1.27.2-00 --disableexcludes=kubernetes
+  260  sudo kubeadm upgrade plan v1.27.2
+  261  sudo kubeadm upgrade apply v1.27.2
+
+  263  sudo yum install -y kubelet-1.27.2-00 kubectl-1.27.2-00 --disableexcludes=kubernetes
+  264  history
+  265  sudo systemctl daemon-reload
+  266  sudo systemctl restart kubelet
+  267  kubectl uncordon rhel1
+  268  kubectl get nodes
+# Worker Node Upgrade
+  232  kubectl drain rhel2 --ignore-daemonsets   <----control
+   61  sudo yum install -y kubeadm-1.27.2 --disableexcludes=kubernetes
+   62  sudo kubeadm upgrade node
+   63  sudo yum install -y kubelet-1.27.2-00 kubectl-1.27.2-00 --disableexcludes=kubernetes
+   64  sudo systemctl daemon-reload
+   65  sudo systemctl restart kubelet
+  267  kubectl uncordon rhel1   <----control
+  268  kubectl get nodes        <----control
+~~~
+--------------------------------------------------------------
+
+# Why Back Up etcd?
+etcd is the backend data storage solution for
+your Kubernetes cluster. As such, all your
+Kubernetes objects, applications, and
+configurations are stored in etcd.
+Therefore, you will likely want to be able to
+back up your cluster's data by backing up
+etcd.
+
+
+You need to install etcd Binaries
+~~~bash
+]# wget "https://github.com/coreos/etcd/releases/download/v3.3.9/etcd-v3.3.9-linux-amd64.tar.gz"
+]# tar -xvf etcd-v3.3.9-linux-amd64.tar.gz
+]# sudo mv etcd-v3.3.9-linux-amd64/etcd* /usr/local/bin/
+]# export ETCDCTL_API=3
+~~~
+
+cloud_user@etcd-1:~/etcd-certs$ ETCDCTL_API=3 etcdctl --endpoints=https://10.0.1.101:2379 get cluster.name --cacert=/home/cloud_user/etcd-certs/etcd-ca.pem --cert=/home/cloud_user/etcd-certs/etcd-server.crt --key=/home/cloud_user/etcd-certs/etcd-server.key
+cluster.name
+beebox
+
+~~~bash
+cloud_user@etcd-1:~$ ETCDCTL_API=3 etcdctl snapshot \
+save /home/cloud_user/etcd_backup.db \
+--endpoints=https://10.0.1.101:2379  \
+--cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
+--cert=/home/cloud_user/etcd-certs/etcd-server.crt \
+--key=/home/cloud_user/etcd-certs/etcd-server.key
+
+$ sudo systemctl stop etcd
+$ sudo rm -rf /var/lib/etcd
+
+
+cloud_user@etcd-1:~$ sudo ETCDCTL_API=3 etcdctl snapshot restore /home/cloud_user/etcd_backup.db \
+--initial-cluster etcd-restore=https://10.0.1.101:2380 \
+--initial-advertise-peer-urls https://10.0.1.101:2380 \
+--name etcd-restore --data-dir /var/lib/etcd
+
+cloud_user@etcd-1:~$ sudo ls /var/lib/etcd
+member
+restored , but everything is owned by root
+so....
+$ sudo chown -R etcd:etcd /var/lib/etcd
+~~~
+--------------------------------------------------------------
+## Backing Up and Restoring Etcd Cluster Data
+Relevant Documentation
+Backing Up an etcd Cluster
+Lesson Reference
+Look up the value for the key cluster.name in the etcd cluster. The value should be beebox .
+~~~bash
+ETCDCTL_API=3 etcdctl get cluster.name \
+--endpoints=https://10.0.1.101:2379 \
+--cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
+--cert=/home/cloud_user/etcd-certs/etcd-server.crt \
+--key=/home/cloud_user/etcd-certs/etcd-server.key
+
+Back up etcd using etcdctl and the provided etcd certificates.
+ETCDCTL_API=3 etcdctl snapshot save /home/cloud_user/etcd_backup.db \
+--endpoints=https://10.0.1.101:2379 \
+--cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
+--cert=/home/cloud_user/etcd-certs/etcd-server.crt \
+--key=/home/cloud_user/etcd-certs/etcd-server.key
+
+Reset etcd by removing all existing etcd data.
+sudo systemctl stop etcd
+sudo rm -rf /var/lib/etcd
+~~~
+Restore the etcd data from the backup. This command spins up a temporary etcd cluster, saving the data from the backup file
+to a new data directory (in the same location where the previous data directory was).
+~~~bash
+sudo ETCDCTL_API=3 etcdctl snapshot restore /home/cloud_user/etcd_backup.db \
+--initial-cluster etcd-restore=https://10.0.1.101:2380 \
+--initial-advertise-peer-urls https://10.0.1.101:2380 \
+--name etcd-restore \
+--data-dir /var/lib/etcd
+Set ownership on the new data directory.
+sudo chown -R etcd:etcd /var/lib/etcd
+Start etcd.
+sudo systemctl start etcd
+
+$ Verify that the restored data is present by looking up the value for the key cluster.name again. The value should be beebox .
+
+ETCDCTL_API=3 etcdctl get cluster.name \
+--endpoints=https://10.0.1.101:2379 \
+--cacert=/home/cloud_user/etcd-certs/etcd-ca.pem \
+--cert=/home/cloud_user/etcd-certs/etcd-server.crt \
+--key=/home/cloud_user/etcd-certs/etcd-server.key
+~~~
+----------------------------------------------------------------

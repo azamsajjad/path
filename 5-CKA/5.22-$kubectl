@@ -1,0 +1,325 @@
+
+# 3 components of your WORKER node
+kubelet
+CRI
+Proxy
+
+
+# 4 components of your MASTER node
+
+user -> kubectl -> K8s API Server (listens on 6443 default)
+                   Schedular
+                   Controller Manager
+                   ETCD
+
+
+> K8S API SERVER
+# kubectl
+
+## kubectl get
+Use kubectl get to list objects in the Kubernetes cluster.
+• -o— Set output format.
+• --sort-by— Sort output using a JSONPath expression.
+• --selector — Filter results by label.
+
+## kubectl describe
+You can get detailed information about
+Kubernetes objects using kubectl describe.
+ $ kubectl describe <Object type> cobject name>
+
+## kubectl create
+Use kubectl create to create objects.
+Supply a YAML file with -f to create an object
+from a YAML descriptor stored in the file.
+ $ kubectl create -f <file name>
+
+## kubectl apply
+kubectl apply is similar to kubectl create.
+However, if you use kubectl apply on an
+object that already exists, it will modify the
+existing object, if possible.
+ $ kubectl apply -f <file name>
+
+## kubectl delete
+Use kubectl delete to delete objects from
+the cluster.
+ $ kubectl delete <0bject types <0bject name> 
+
+## kubectl exec
+kubectl exec can be used to run
+commands inside containers. Keep in mind
+that, in order for a command to succeed, the
+necessary software must exist within the
+container to run it.
+~~~yml
+$ kubectl exec <Pod name> -c <container name> -- <command>
+
+
+[devops@rhel1 pods]$ vim busybox.yml
+[devops@rhel1 pods]$ cat busybox.yml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: busybox
+    image: radial/busyboxplus:curl
+    command: ['sh', '-c', 'while true; do sleep 3600; done']
+
+
+[devops@rhel1 pods]$ kubectl apply -f busybox.yml 
+
+[devops@rhel1 pods]$ kubectl get pod
+NAME     READY   STATUS    RESTARTS   AGE
+my-pod   1/1     Running   0          27s
+~~~
+ *******************************************
+* [devops@rhel1 pods]$ kubectl api-resources *
+ *******************************************
+ get shortcuts
+ 
+~~~yml
+382  kubectl get pods -o yaml
+==>
+ spec:
+    containers:
+    - command:
+      - sh
+      - -c
+      - while true; do sleep 3600; done
+      image: radial/busyboxplus:curl
+      imagePullPolicy: IfNotPresent
+      name: busybox
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-6r7nj
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: rhel2
+
+
+
+  379  kubectl get pods -o wide
+  380  curl 172.16.94.207
+  381  kubectl get pods -o json
+  382  kubectl get pods -o yaml
+
+  388  kubectl get pods -o wide --sort-by .spec.nodeName
+~~~
+~~~bash
+  [devops@rhel1 ~]$ kubectl get pods -n kube-system
+NAME                                      READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-57b57c56f-95fsj   1/1     Running   25         17h
+calico-node-f25w6                         0/1     Running   1          25h
+calico-node-mnqqz                         0/1     Running   22         26h
+coredns-5d78c9869d-4h7cx                  1/1     Running   1          17h
+coredns-5d78c9869d-v99c7                  1/1     Running   1          17h
+etcd-rhel1                                1/1     Running   1          17h
+kube-apiserver-rhel1                      1/1     Running   21         17h
+kube-controller-manager-rhel1             1/1     Running   21         17h
+kube-proxy-5qdqp                          1/1     Running   0          17h
+kube-proxy-x6nvq                          1/1     Running   1          17h
+kube-scheduler-rhel1                      1/1     Running   17         17h
+[devops@rhel1 ~]$ kubectl get pods -n kube-system --selector k8s-app=calico-node
+NAME                READY   STATUS    RESTARTS   AGE
+calico-node-f25w6   0/1     Running   1          25h
+calico-node-mnqqz   0/1     Running   22         26h
+~~~
+
+~~~bash
+[devops@rhel1 pods]$ kubectl create -f busybox.yml 
+Error from server (AlreadyExists): error when creating "busybox.yml": pods "my-pod" already exists
+[devops@rhel1 pods]$ kubectl apply -f busybox.yml 
+pod/my-pod unchanged
+[devops@rhel1 pods]$ use it if you make a change
+[devops@rhel1 pods]$ kubectl exec my-pod -c busybox -- echo "Hello World!"
+Hello World!
+[devops@rhel1 pods]$ kubectl delete pod my-pod
+pod "my-pod" deleted
+[devops@rhel1 pods]$ kubectl get pods
+NAME     READY   STATUS        RESTARTS   AGE
+my-pod   0/1     Terminating   0          15h
+[devops@rhel1 pods]$ kubectl delete pod my-pod --grace-period=0 --force 
+~~~
+
+
+---------------------------------------------------------
+# LAB 
+> Get a List of Persistent Volumes Sorted by Capacity
+
+> Run a Command Inside the `quark` Pod's Container to Obtain a Key Value
+Locate the quark pod within the beebox-mobile namespace. Run a command inside this pod's container to obtain a key value. The key value is located inside the container's file system in a file called /etc/key/key.txt. Save the key value to a file on the Kube control plane server at /home/cloud_user/key.txt.
+
+> Create a Deployment Using a Spec File
+
+> Delete the `beebox-auth` Service
+
+```bash
+  1  sudo -i
+    2  kubectl get pv
+    3  kubectl get pv -o yaml
+    4  kubectl get pv --sort-by .spec.capacity.storage
+    5  kubectl get pv --sort-by .spec.capacity.storage > /home/cloud_user/pv_list.txt
+    6  kubectl get pod
+    7  kubectl get pods --all-namespaces
+    8  kubectl exec quark -n beebox-mobile -- cat /etc/key/key.txt
+    9  kubectl exec quark -n beebox-mobile -- cat /etc/key/key.txt > /home/cloud_user/key.txt
+   10  ls
+   11  cat deployment.yml
+   12  kubectl apply -f deployment.yml
+   13  kubectl get deployments -n beebox-mobile
+   14  kubectl get pods -n beebox-mobile
+   15  # kubectl delete service beebox-auth-svc -n beebox-mobile
+   16  kubectl get pods -n beebox-mobile
+   17  kubectl get deployments -n beebox-mobile
+   18  kubectl get pods -n all
+   19  kubectl get pods --all-namespaces <----------------------------or -A>
+   20  kubectl get services
+   21  kubectl get pods -A
+   22  cat deployment.yml
+   23  kubectl service --help
+   24  kubectl get pods -l
+   25  kubectl get endpoints
+   26  kubectl get svc
+   27  kubectl get svc -A
+   28  kubectl get svc beebox-auth-svc -o yaml
+   29  kubectl get svc beebox-auth-svc -o wide
+   30  #kubectl delete svc beebox-auth-svc
+   31  kubectl get svc beebox-auth-svc -n beebox-mobile
+   32  kubectl get svc beebox-auth-svc -n beebox-mobile -o
+   33  kubectl delete svc beebox-auth-svc -n beebox-mobile
+```
+
+---
+## TWO APPROACHES IN DEPLOYING THROUGH $KUBECTL
+
+**Declarative**
+> `Define` objects using data structures such as YAML or JSON.
+
+**Imperative**
+Define objects using kubectl commands and flags. Some people find imperative commands faster. Experiment and see what works for you!
+
+```
+$ kubectl create deployment my-deployment --image=nginx
+```
+**Quick Sample YAML**
+Use the --dry-run flag to run an imperative command without creating an object. Combine it with -o yaml to quickly obtain a sample YAML file you can manipulate!
+~~~
+$ kubectl create deployment my-deployment --image=nginx --dry- run -o yaml
+~~~
+
+
+**Record a Command**
+Use the -- record flag to record the command
+that was used to make a change.
+~~~
+$ kubectl scale deployment my-deployment replicas—5 --record
+~~~
+
+Use the Docs
+You can often find YAML examples in the
+Kubernetes documentation. You are allowed to
+use this documentation during the exam. Feel
+free to copy and paste example YAML and/or
+commands from the docs!
+
+
+~~~
+[devops@rhel1 pods]$ kubectl create deployment my-deployment --image=nginx
+deployment.apps/my-deployment created
+[devops@rhel1 pods]$ kubectl create deployment my-deployment --image=nginx --dry-run -o yaml
+W1128 04:55:01.466198  173080 helpers.go:692] --dry-run is deprecated and can be replaced with --dry-run=client.
+~~~
+~~~yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: my-deployment
+  name: my-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-deployment
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-deployment
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+~~~
+> use dry-run & -o yaml to get basic template from which you can build your own template
+
+[devops@rhel1 pods]$ kubectl create deployment my-deployment --image=nginx --dry-run -o yaml > nginx-deployment.yml
+
+
+
+
+
+## DESCRIBE
+
+~~~bash
+[devops@rhel1 pods]$ kubectl get deployment
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+my-deployment   1/1     1            1           5m42s
+
+
+[devops@rhel1 pods]$ kubectl scale deployment my-deployment --replicas 5 --record
+Flag --record has been deprecated, --record will be removed in the future
+deployment.apps/my-deployment scaled
+[devops@rhel1 pods]$ kubectl get deployment
+NAME            READY   UP-TO-DATE   AVAILABLE   AGE
+my-deployment   1/5     5            1           6m17s
+
+
+
+[devops@rhel1 pods]$ kubectl describe deployment my-deployment
+Name:                   my-deployment
+Namespace:              default
+CreationTimestamp:      Tue, 28 Nov 2023 04:53:27 +0500
+Labels:                 app=my-deployment
+Annotations:            deployment.kubernetes.io/revision: 1
+------------------->    kubernetes.io/change-cause: kubectl scale deployment 
+------------------->    my-deployment --replicas=5 --record=true
+Selector:               app=my-deployment
+Replicas:               5 desired | 5 updated | 5 total | 5 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=my-deployment
+  Containers:
+   nginx:
+    Image:        nginx
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Progressing    True    NewReplicaSetAvailable
+  Available      True    MinimumReplicasAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   my-deployment-6d69b4dd5 (5/5 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  6m59s  deployment-controller  Scaled up replica set my-deployment-6d69b4dd5 to 1
+  Normal  ScalingReplicaSet  47s    deployment-controller  Scaled up replica set my-deployment-6d69b4dd5 to 5 from 1
+
+~~~

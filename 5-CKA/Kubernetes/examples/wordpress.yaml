@@ -1,0 +1,130 @@
+kind: Secret
+apiVersion: v1
+metadata:
+   name: wp-mysql
+data:
+   password: "YWRtaW4="
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+   name: wp-mysql-pv
+spec:
+  storageClassName: manual
+  hostPath:
+    path: /opt/mysql-data
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: wp-mysql-claim
+spec:
+  storageClassName: manual 
+  volumeName: wp-mysql-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wp-mysql-svc
+  labels:
+    app: mysql
+spec:
+  clusterIP: None
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: wp-mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wp-mysql
+  labels:
+    app: wp-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp-mysql
+  template:
+    metadata:
+      labels:
+        app: wp-mysql
+    spec:
+      containers:
+        - image: mysql:8
+          name: mysql
+          #args:
+          #  - "--default-authentication-plugin=mysql_native_password"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                   name: wp-mysql
+                   key: password
+          ports:
+            - containerPort: 3306
+              name: wp-mysql
+          volumeMounts:
+            - name: wp-mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: wp-mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: wp-mysql-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wordpress
+  name: wordpress
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: wordpress
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - image: wordpress
+          name: wordpress
+          env:
+          - name: WORDPRESS_DB_HOST
+            value: wp-mysql-svc
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: wp-mysql
+                key: password
+          ports:
+            - containerPort: 80
+              name: wordpress

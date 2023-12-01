@@ -1,0 +1,156 @@
+# Container Health
+K8s provides a number of features that allow you to build robust solutions, such as the
+ability to automatically restart unhealthy containers. To make the most of these
+features, K8s needs to be able to accurately determine the status of your applications.
+This means actively monitoring container health.
+
+## Liveness Probes
+Liveness probes allow you to automatically
+determine whether or not a container
+application is in a healthy state.
+By default, K8s will only consider a container
+to be "down" if the container process stops.
+Liveness probes allow you to customize this
+detection mechanism and make it more
+sophisticated.
+
+## Startup Probes
+Startup probes are very similar to liveness
+probes. However, while liveness probes run
+constantly on a schedule, startup probes run
+at container startup and stop running once
+they succeed.
+They are used to determine when the
+application has successfully started up.
+Startup probes are especially useful for
+legacy applications that can have long
+startup times.
+
+## Readiness Probes
+Readiness probes are used to determine when
+a container is ready to accept requests. When
+you have a service backed by multiple
+container endpoints, user traffic will not be sent
+to a particular pod until its containers have all
+passed the readiness checks defined by their
+readiness probes.
+Use readiness probes to prevent user traffic
+from being sent to pods that are still in the
+process of starting up.
+
+
+----------------------------------------------------------------
+~~~yml
+piVersion: v1
+kind: Pod
+metadata:
+  name: liveness-pod-http
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+~                            
+~~~
+
+~~~yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-pod-http
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    startupProbe:
+      httpGet:
+        path: /
+        port: 80
+      failureThreshold: 30
+      periodSeconds: 5
+~                            
+~~~
+
+----------------------------------------------------------------
+## Restart Policies
+K8s can automatically restart containers
+when they fail. Restart policies allow you to
+customize this behavior by defining when
+you want a pod's containers to be
+automatically restarted.
+Restart policies are an important component
+of self-healing applications, which are
+automatically repaired when a problem
+arises.
+There are three possible values for a pod's
+restart policy in K8s: 
+> Always, 
+> OnFaiIure,
+> Never
+
+> Always
+Always is the default restart policy in K8s.
+With this policy, containers will always be
+restarted if they stop, even if they completed
+successfully. Use this policy for applications
+that should always be running.
+
+> OnFaiIure
+The OnFailure restart policy will restart
+containers only if the container process exits
+with an error code or the container is
+determined to be unhealthy by a liveness
+probe. Use this policy for applications that
+need to run successfully and then stop.
+
+> Never
+The Never restart policy will cause the pod's
+containers to never be restarted, even if the
+container exits or a liveness probe fails. Use
+this for applications that should run once and
+never be automatically restarted.
+
+~~~yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restart-always
+spec: 
+  restartPolicy: Always
+  containers:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'sleep 10']
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restart-never
+spec: 
+  restartPolicy: Never
+  containers:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'sleep 10; Just Do It!']
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restart-onfailure
+spec: 
+  restartPolicy: OnFailure
+  containers:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'sleep 10']
+~~~
+
+restart-always         Completed   5 (112s ago)   4m22s
+restart-never          Error       0              21s
+restart-onfailure      Completed   0              36m
+

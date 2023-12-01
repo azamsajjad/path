@@ -1,0 +1,50 @@
+# What Is a Namespace?
+Namespaces are virtual clusters backed by the same physical cluster. Kubernetes
+objects, such as pods and containers, live in namespaces. Namespaces are a way to
+separate and organize objects in your cluster.
+~~~bash
+[devops@rhel1 ~]$ kubectl get namespaces
+NAME              STATUS   AGE
+default           Active   3h41m
+kube-node-lease   Active   3h41m    ignore
+kube-public       Active   3h41m    ignore
+kube-system       Active   3h41m    kubeadm
+
+
+[devops@rhel1 ~]$ kubectl get pods --namespace kube-system
+NAME                                      READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-57b57c56f-p6fss   1/1     Running   0          3h24m
+calico-node-f25w6                         0/1     Running   1          3h3m
+calico-node-mnqqz                         0/1     Running   0          3h24m
+coredns-787d4945fb-9pq5j                  1/1     Running   0          3h42m
+coredns-787d4945fb-nv5v6                  1/1     Running   0          3h42m
+etcd-rhel1                                1/1     Running   0          3h42m
+kube-apiserver-rhel1                      1/1     Running   0          3h42m
+kube-controller-manager-rhel1             1/1     Running   0          3h42m
+kube-proxy-b7xnx                          1/1     Running   1          3h3m
+kube-proxy-kqgrl                          1/1     Running   0          3h42m
+kube-scheduler-rhel1                      1/1     Running   0          3h42m
+
+[devops@rhel1 ~]$ kubectl get pods --all-namespaces
+NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
+kube-system   calico-kube-controllers-57b57c56f-p6fss   1/1     Running   0          3h28m
+kube-system   calico-node-f25w6                         0/1     Running   1          3h6m
+kube-system   calico-node-mnqqz                         0/1     Running   0          3h28m
+kube-system   coredns-787d4945fb-9pq5j                  1/1     Running   0          3h45m
+kube-system   coredns-787d4945fb-nv5v6                  1/1     Running   0          3h45m
+kube-system   etcd-rhel1                                1/1     Running   0          3h45m
+kube-system   kube-apiserver-rhel1                      1/1     Running   0          3h45m
+kube-system   kube-controller-manager-rhel1             1/1     Running   0          3h45m
+kube-system   kube-proxy-b7xnx                          1/1     Running   1          3h6m
+kube-system   kube-proxy-kqgrl                          1/1     Running   0          3h45m
+kube-system   kube-scheduler-rhel1                      1/1     Running   0          3h45m
+
+
+
+You can create your own namespaces with kubectl.
+$ kubectl create namespace my-namespace
+~~~
+-------------------------------------
+kubectl get ns
+kubectl get pods -n dev
+kubectl get pods -A

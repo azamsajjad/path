@@ -1,0 +1,127 @@
+# Cross-Container Interaction
+Containers sharing the same Pod can interact with
+one another using shared resources.
+
+> Network-
+Containers share the same networking
+namespace and can communicate with one
+another on any port, even if that port is not
+exposed to the cluster.
+
+> Storage-
+Containers can use volumes to share data in
+a Pod.
+
+ > Example Use Case-
+You have an application that is hard-coded
+to write log output to a file on disk.
+You add a secondary container to the Pod
+(sometimes called a sidecar) that reads the
+log file from a shared volume and prints it to
+the console so the log output will appear in
+the container log.
+
+[POD]
+CONTAINER --> VOLUME --> SIDECAR CONTAINER --> K8S CONTAINER LOG
+
+~~~yml
+[devops@rhel1 pods]$ cat multi*
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: multi-container-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  - name: redis
+    image: redis
+  - name: couchbase
+    image: couchbase
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sidecar-pod
+spec:
+  containers:
+  - name: busybox1
+    image: busybox
+    command: ['sh', '-c', 'while true; do echo logs data > /output/output.log; sleep 5; done']
+    volumeMounts:
+    - name: sharedvol
+      mountPath: /output
+  - name: sidecar
+    image: busybox
+    command: ['sh', '-c', 'tail -f /input/output.log']
+    volumeMounts:
+    - name: sharedvol
+      mountPath: /input
+  volumes:
+  - name: sharedvol
+    emptyDir: {}
+~~~
+
+kubectl logs sidecar-pod -c sidecar
+
+
+-----------------------------------
+# Init containers 
+are containers that run
+once during the startup process of a
+pod. A pod can have any number of init
+containers, and they will each run once
+(in order) to completion.
+
+Init Container 1
+Init containers run to
+completion before the next
+init container or app
+containers Start.
+
+Init Container 2
+You can have any number
+of init containers, and each
+will run in order,
+
+App Containers
+App containers will start up
+only once all init containers
+have completed,
+
+## Use Cases for Init Containers
+Some sample use cases for init containers:
+• Cause a pod to wait for another K8s
+resource to be created before finishing
+startup.
+• Perform sensitive startup steps securely
+outside of app containers.
+• Populate data into a shared volume at
+startup.
+• Communicate with another service at
+startup.
+
+multiInitContainer.yml
+~~~yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  initContainers:
+  - name: delay
+    image: busybox
+    command: ['sleep', '30']
+~~~
+
+~~~bash
+[devops@rhel1 pods]$ kgp
+NAME                            READY   STATUS      RESTARTS   AGE
+big-request-pod                 0/1     Pending     0          26h
+init-pod                        0/1     Init:0/1    0          28s
+~~~
