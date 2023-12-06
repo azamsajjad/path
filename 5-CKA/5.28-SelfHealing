@@ -4,6 +4,12 @@ ability to automatically restart unhealthy containers. To make the most of these
 features, K8s needs to be able to accurately determine the status of your applications.
 This means actively monitoring container health.
 
+we use Liveness Probe when pod has to give service immediately
+In Liveness Probe, Your Container will not be LIVE -> keeps restarting
+In Readiness Probe, Your Container will not be READY -> unhealthy, waiting
+we use Readiness Probe when there is a init container which will cook something and provide to main container
+
+
 ## Liveness Probes
 Liveness probes allow you to automatically
 determine whether or not a container
@@ -13,6 +19,10 @@ to be "down" if the container process stops.
 Liveness probes allow you to customize this
 detection mechanism and make it more
 sophisticated.
+[devops@rhel1 pods]$ kubectl get pods
+NAME                   READY   STATUS             RESTARTS      AGE
+ip-nginx-demo          0/1     CrashLoopBackOff   4 (32s ago)   2m42s
+
 
 ## Startup Probes
 Startup probes are very similar to liveness
@@ -37,7 +47,9 @@ readiness probes.
 Use readiness probes to prevent user traffic
 from being sent to pods that are still in the
 process of starting up.
-
+[devops@rhel1 pods]$ kubectl get pods
+NAME                   READY   STATUS             RESTARTS      AGE
+ip-nginx-demo          0/1     Running                0        2m42s
 
 ----------------------------------------------------------------
 ~~~yml

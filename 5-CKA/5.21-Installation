@@ -1,3 +1,28 @@
+if kubernetes is corrupted or ip changed:
+Please find K8S cluster settings, where master and worker IP has changed.
+Edit /etc/hosts file with new host IP of master and worker nodes
+
+Then reset cluster:
+For 1.23 v: sudo kubeadm reset
+For 1.26 v: sudo kubeadm reset --cri-socket unix:///var/run/crio/crio.sock
+
+Reinitialize the cluster
+For version 1.23: sudo kubeadm init
+For version 1.26: sudo kubeadm init --cri-socket unix:///var/run/crio/crio.sock
+This command will generate key to join worker.
+ 
+on WORKER node:
+[devops@rhel2 ~]$ sudo vim /etc/fstab
+sudo kubeadm reset --cri-socket unix://var/run/crio/crio.socket
+
+[devops@rhel2 ~]$ sudo rm -rf /etc/kubernetes/kubelet.conf
+[devops@rhel2 ~]$ sudo rm -rf /etc/kubernetes/bootstrap-kubelet.conf 
+[devops@rhel2 ~]$ sudo rm -rf /etc/kubernetes/pki/ca.crt
+then join command
+sudo kubeadm join 192.168.100.47:6443 --token 0cqxc0.ucwjjl9yfwul6iw7         --discovery-token-ca-cert-hash sha256:4ed2ebb00bc488418f13d1c8bbdef703b8fbfe460df0bf1486fe590b71be1d3e --cri-socket unix:///var/run/crio/crio.sock 
+
+----------------------------------------------------------------------------
+
  2 ways to install: kubeadm way
                     hard way - install each component like api, schedular, controller, etcd separately
  
@@ -321,9 +346,9 @@ root@rhel2 pki]# history
         Calico provides scalability, high performance, and interoperability with existing Kubernetes workloads. It can be deployed on-premises and on popular cloud technologies such as Google Cloud, AWS and Azure.
 
         To install Calico CNI, run the following command from the master node
-
+curl -OL https://docs.projectcalico.org/v3.9/manifests/calico.yaml
         $ kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
-        To confirm if the pods have started, run the command:
+        To confirm if the pods have started, run the command::
 
         $ kubectl get pods -n kube-system
         You should see that each pod is ‘READY’ and has the ‘RUNNING’ status as shown in the third column.

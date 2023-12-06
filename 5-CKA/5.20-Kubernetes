@@ -1,3 +1,12 @@
+Dayl - What are containers. Intro to Docker, Install Docker. Commands Docker
+Day2- Architecture, Install. @ootStrpp. Components. Folders, Api - resources. Pods
+Day3- YAML, Multipods, Static. Init Namespaces, labels, limits, variables, probe*
+Day4- Controllers, rolling updates.'rollbacks, Services
+Day5- Storages, gonfigMaps, Secrets, Cloud Disk, Service - LB
+Day6- Schedular, Namespaces limits, etcd-backup, Monitoring
+Day7- Networks. Security, Contexts, Config file •
+Day8- Troubleshooting, Ingress, Stateful sets and Headless svc, Helm, HPA, EXAM tips
+
 # 3 components of your WORKER node
 kubelet
 CRI

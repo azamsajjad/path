@@ -125,3 +125,66 @@ NAME                            READY   STATUS      RESTARTS   AGE
 big-request-pod                 0/1     Pending     0          26h
 init-pod                        0/1     Init:0/1    0          28s
 ~~~
+
+---------------------------------------------------------------------
+# Static Pods
+Pods created directly on the node
+not created through kubectl
+you directly instruct kubelet of the node to create the container
+if you delete it via kubectl command, it will re-spawn
+~~~sh
+[devops@rhel1 ~]$ kubectl get pods -A
+NAMESPACE     NAME                                       READY   STATUS    RESTARTS   AGE
+kube-system   calico-kube-controllers-85578c44bf-tv2ms   1/1     Running   0          28m
+kube-system   calico-node-8srvq                          0/1     Running   1          3h39m
+kube-system   calico-node-lnc6j                          0/1     Running   1          3h39m
+kube-system   calico-node-njprs                          0/1     Running   1          3h39m
+kube-system   coredns-5d78c9869d-2zppd                   1/1     Running   2          7h51m
+kube-system   coredns-5d78c9869d-6sv5f                   1/1     Running   2          7h51m
+kube-system   etcd-rhel1                                 1/1     Running   1          7h51m
+kube-system   kube-apiserver-rhel1                       1/1     Running   1          7h51m
+kube-system   kube-controller-manager-rhel1              1/1     Running   2          7h51m
+kube-system   kube-proxy-g6mvf                           1/1     Running   1          3h49m
+kube-system   kube-proxy-htsp6                           1/1     Running   1          7h51m
+kube-system   kube-proxy-z54lj                           1/1     Running   1          3h55m
+kube-system   kube-scheduler-rhel1                       1/1     Running   2          7h51m
+[devops@rhel1 ~]$ 
+~~~
+all kube-system pods running on master node are also static pods, if you delete them, they will re-spawn
+~~~sh
+[devops@rhel1 ~]$ ls /etc/kubernetes/manifests/
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+~~~
+this is where all static pods are saved at master node
+
+this is so, because your master components should only be running on your master node
+
+~~~sh
+[devops@rhel2 ~]$ cd /etc/kubernetes/manifests/
+[devops@rhel2 manifests]$ vim static-pod.yml
+[devops@rhel2 manifests]$ cat static-pod.yml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-pod
+  labels:
+    app: tomcat
+spec: 
+  containers:
+    - name: tomcat
+      image: tomcat
+      ports:
+        - containerPort: 8080
+
+
+
+any pod created on any node in the manifests folder is a static pod
+[devops@rhel1 ~]$ kubectl get pods
+NAME               READY   STATUS              RESTARTS   AGE
+static-pod-rhel2   0/1     ContainerCreating   0          39s
+[devops@rhel1 ~]$ kubectl delete pods static-pod-rhel2
+pod "static-pod-rhel2" deleted
+[devops@rhel1 ~]$ kubectl get pods
+NAME               READY   STATUS    RESTARTS   AGE
+static-pod-rhel2   0/1     Pending   0          4s
+~~~

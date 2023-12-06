@@ -14,7 +14,7 @@ spec:
   # These containers are run during pod initialization
   initContainers:
   - name: alpine
-    image: alpine
+    ima111ge: alpine
     command:
     - sh 
     - "-c" 

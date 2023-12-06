@@ -48,3 +48,56 @@ $ kubectl create namespace my-namespace
 kubectl get ns
 kubectl get pods -n dev
 kubectl get pods -A
+
+
+---------------------------------------------------------------------------
+# LABELS
+to filter out pods among thousands of pods
+
+~~~sh
+[devops@rhel1 ~]$ kubectl run pod1 --image nginx --labels='env=prod'
+
+[devops@rhel1 ~]$ kubectl run pod2 --image nginx --labels='env=dev,owner=rupert'
+pod/pod2 created
+[devops@rhel1 ~]$ kubectl run pod3 --image nginx --labels='env=dev,type=db'
+pod/pod3 created
+[devops@rhel1 ~]$ kubectl get pods
+NAME                   READY   STATUS    RESTARTS   AGE
+init-container-nginx   1/1     Running   0          3h50m
+my-pod                 1/1     Running   0          3h30m
+pod1                   1/1     Running   0          5m
+pod2                   1/1     Running   0          41s
+pod3                   1/1     Running   0          32s
+[devops@rhel1 ~]$ kubectl get pods -l type=db
+NAME   READY   STATUS    RESTARTS   AGE
+pod3   1/1     Running   0          41s
+[devops@rhel1 ~]$ kubectl get pods -l owner=rupert
+NAME   READY   STATUS    RESTARTS   AGE
+pod2   1/1     Running   0          62s
+[devops@rhel1 ~]$ kubectl get pods -l env=prod
+NAME   READY   STATUS    RESTARTS   AGE
+pod1   1/1     Running   0          5m31s
+~~~
+
+~~~yml
+[devops@rhel1 pods]$ cat labelsEnv.yml 
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: labels-envar
+  labels:
+    purpose: demonstrate-errors
+spec:
+  containers:
+    - name: envar-container
+      image: gcr.io/google-samples/node-hello:1.0
+      env:
+        - name: WELCOME
+          value: "Hello from the environment"
+        - name: CKAEXAM
+          value: "CKA exam version 1.18"
+
+
+            # kubectl exec -it labels-envar -- /bin/bash
+            # printenv
+~~~

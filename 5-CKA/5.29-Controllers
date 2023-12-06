@@ -1,0 +1,73 @@
+Controllers • RC,RS, Deployments,
+Jobs, Cronjobs, Daemonsets
+Rolllng updates. rollback
+Services - NodePort, ClusterIP
+
+# ReplicationController   -----> Deprecated, replaced by -> ReplicaSets
+ReplicaSet is smart -> if your cluster already has a running pod which is similar, it will not create 4 more pods if your specify 4, it will create 3
+~~~yml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: tomcatrc
+spec:
+  replicas: 3
+  selector:
+    app: tomcat
+  template:
+    metadata:
+      name: tomcat
+      labels:
+        pod: tomcatrc
+        app: tomcat
+    spec:
+      containers:
+      - name: tomcat
+        image: lerndevops/tomcat:8.5.47
+        ports:
+        - containerPort: 8080
+~~~
+
+ kubectl get rc
+ kubectl delete rc tomcatrc
+
+
+------------------------------------------------------------
+# Replica Sets   ---> Load Balancer  [ LABELS ENABLE LOAD BALANCING ]
+ReplicaSet is smart -> if your cluster already has a running pod which is similar, it will not create 4 more pods if your specify 4, it will create 3
+<important field> selector. this is how RS will know if a similar pod is running
+
+~~~yml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: test
+spec:
+  replicas: 3
+  selector:             <--------------->important field
+    matchLabels:
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: lb
+        image: lerndevops/samplepyapp:v1
+~~~
+before running this ym, create a similar pod first
+[devops@rhel1 pods]$ kubectl run podrs --image nginx --labels='tier=frontend'
+
+[devops@rhel1 pods]$ kubectl get pods -l tier=frontend
+NAME               READY   STATUS    RESTARTS   AGE
+podrs              1/1     Running   0          2m35s
+replicaset-brssw   1/1     Running   0          63s
+replicaset-d2xrw   1/1     Running   0          63s
+
+again change no. of replicas
+[devops@rhel1 pods]$ kubectl edit rs replicaset
+[devops@rhel1 pods]$ kubectl get pods -l tier=frontend
+NAME               READY   STATUS    RESTARTS   AGE
+replicaset-brssw   1/1     Running   0          21m
+replicaset-d2xrw   1/1     Running   0          21m
