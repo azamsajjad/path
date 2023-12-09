@@ -1,7 +1,10 @@
-Controllers • RC,RS, Deployments,
-Jobs, Cronjobs, Daemonsets
+Controllers • RC,RS,
+Services - NodePort, ClusterIP, Loadbalancer
+Deployments
 Rolllng updates. rollback
-Services - NodePort, ClusterIP
+Daemonsets
+Jobs, Cronjobs
+
 
 # ReplicationController   -----> Deprecated, replaced by -> ReplicaSets
 ReplicaSet is smart -> if your cluster already has a running pod which is similar, it will not create 4 more pods if your specify 4, it will create 3
@@ -71,3 +74,517 @@ again change no. of replicas
 NAME               READY   STATUS    RESTARTS   AGE
 replicaset-brssw   1/1     Running   0          21m
 replicaset-d2xrw   1/1     Running   0          21m
+
+
+-------------------------------------------------------------------
+# Services - we use service to make our pods accessible from external world
+otherwise pod is not accessible
+services are service level resource 
+NodePort range = 30000-32766
+[devops@rhel1 pods]$ kubectl run website --image nginx
+pod/website created
+
+[devops@rhel1 pods]$ kubectl expose pod website --name websitesvc --port 80 --target-port 80 --type NodePort
+service/websitesvc exposed
+[devops@rhel1 pods]$ kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        47h
+websitesvc   NodePort    10.103.110.130   <none>        80:31860/TCP   10s
+[devops@rhel1 pods]$ 
+# Types of Services:
+> NodePort
+> ClusterIP
+> LoadBalancer
+
+> NodePort 
+Exposes your service from internal to external
+~~~yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pyapp
+  labels:
+    app: npapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: npapp
+  template:
+    metadata:
+      labels:
+        app: npapp 
+    spec:
+      containers:
+      - name: myapp-cont
+        image: lerndevops/samplepyapp:v2
+        ports:
+        - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pyapp
+spec:
+  type: NodePort
+  selector:
+    app: npapp
+  ports:
+   - protocol: TCP
+     port: 80
+     targetPort: 3000
+     #nodePort: 30005
+~~~
+
+port is POD port = 80
+containerPort & targetPort are CONTAINER port = 3000
+nodePort is host port where service is accessible = 30005
+
+~~~sh
+rupert@k8s-master:~/kubernetes$ kubectl get svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP        13h
+pyapp        NodePort    10.106.255.38   <none>        80:30005/TCP   43m
+websvc       NodePort    10.98.57.220    <none>        80:30718/TCP   13h
+rupert@k8s-master:~/kubernetes$ minikube service websvc --url
+http://192.168.49.2:30718
+rupert@k8s-master:~/kubernetes$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:9f:ab:a7 brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+
+>  inet 192.168.100.158/24 brd 192.168.100.255 scope global dynamic noprefixroute ens33
+       valid_lft 80752sec preferred_lft 80752sec
+    inet6 2407:aa80:314:e7de::5/128 scope global dynamic noprefixroute 
+       valid_lft 80780sec preferred_lft 80780sec
+    inet6 2407:aa80:314:e7de:63e9:5f6a:4699:d86/64 scope global temporary dynamic 
+       valid_lft 85750sec preferred_lft 80209sec
+    inet6 2407:aa80:314:e7de:ee06:4e27:932e:caf7/64 scope global dynamic mngtmpaddr noprefixroute 
+       valid_lft 85750sec preferred_lft 85750sec
+    inet6 fe80::f980:ae5:118e:c0e6/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: br-89ccbe3ec7fb: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:94:53:58:7d brd ff:ff:ff:ff:ff:ff
+
+>>   inet 192.168.49.1/24 brd 192.168.49.255 scope global br-89ccbe3ec7fb
+       valid_lft forever preferred_lft forever
+    inet6 fe80::42:94ff:fe53:587d/64 scope link 
+       valid_lft forever preferred_lft forever
+4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 02:42:d5:01:e8:23 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+       valid_lft forever preferred_lft forever
+6: veth8038438@if5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-89ccbe3ec7fb state UP group default 
+    link/ether 16:41:ba:4b:ad:36 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::1441:baff:fe4b:ad36/64 scope link 
+       valid_lft forever preferred_lft forever
+~~~
+
+-----------------------------------------------------------------------
+> LoadBalancer - only supported with cloud provides such as GKE,EKS
+~~~yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend 
+    spec:
+      containers:
+      - name: myapp-cont
+        image: lerndevops/samplepyapp:v2
+        ports:
+        - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+   - protocol: TCP
+     port: 80
+     targetPort: 3000
+     #nodePort: 30003
+~~~
+------------------------------------------------------------------
+> ClusterIP
+by default, if you donot give any type: , then you will have Cluster IP type of service
+NodePort : exposes your service to outer world
+ClusterIP: doesnot expose your service to outer world
+          lets your deployment of application communicate to your deployment of database internally.
+          it gives your cluster of pods an IP so any other deployment can talk to it 
+
+~~~yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cipapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cipapp
+  template:
+    metadata:
+      labels:
+        app: cipapp
+    spec:
+      containers:
+      - name: myapp-cont
+        image: lerndevops/samplepyapp:v1
+        ports:
+        - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cipapp
+spec:
+  type: ClusterIP  ## this is default if we do not type in service definition
+  selector:
+    app: cipapp
+  ports:
+   - protocol: TCP
+     port: 80
+     targetPort: 3000
+
+
+rupert@k8s-master:~/k8/pods$ kubectl describe svc cipappsvc
+Name:              cipappsvc
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=cipapp
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.103.64.195
+IPs:               10.103.64.195
+Port:              <unset>  80/TCP
+TargetPort:        3000/TCP
+Endpoints:         10.244.0.24:3000,10.244.0.25:3000,10.244.0.26:3000
+Session Affinity:  None
+Events:            <none>
+rupert@k8s-master:~/k8/pods$ kubectl describe svc pyapp
+Name:                     pyapp
+Namespace:                default
+Labels:                   <none>
+Annotations:              <none>
+Selector:                 app=pyapp
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.106.255.38
+IPs:                      10.106.255.38
+Port:                     <unset>  80/TCP
+TargetPort:               3000/TCP
+NodePort:                 <unset>  30005/TCP
+Endpoints:                10.244.0.18:3000,10.244.0.19:3000,10.244.0.20:3000
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+~~~
+
+----------------------------------------------------------------------
+-------------------------------------------------------------------
+# Deployments - simply an extension to your ReplicaSet
+whenever you create a deployment, a replicaset is created by default in the backend just like when u create a pod, a container is created in backend.
+
+~~~sh
+rupert@k8s-master:~/k8/pods$ kubectl create deployment rupertdep --image nginx
+deployment.apps/rupertdep created
+rupert@k8s-master:~/k8/pods$ kubectl get all
+NAME                             READY   STATUS    RESTARTS      AGE
+pod/rupertdep-7dc9c94ddb-fn6vf   1/1     Running   0             11s
+
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/rupertdep   1/1     1            1           11s
+
+NAME                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/rupertdep-7dc9c94ddb   1         1         1       11s
+
+
+whenever you create a deployment, a replicaset and pod is created too
+
+rupert@k8s-master:~/k8/pods$ kubectl scale deployment rupertdep --replicas=2
+deployment.apps/rupertdep scaled
+
+
+~~~
+~~~yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeserve
+spec:
+  replicas: 10
+  minReadySeconds: 45 # wait for 45 sec before pod is ready going to next
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  
+      maxSurge: 2        
+  selector:
+    matchLabels:
+      app: kubeserve
+  template:
+    metadata:
+      name: kubeserve
+      labels:
+        app: kubeserve
+    spec:
+      containers:
+      - image: leaddevops/kubeserve:v1
+        name: app
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+   name: kubeserve-svc
+spec:
+  type: NodePort
+  selector: 
+    app: kubeserve
+  ports:
+    - port: 80
+      targetPort: 80
+~~~
+
+# RollingUpdate-----------------------------------------------------
+
+rupert@k8s-master:~/k8/pods$ while true; do curl 192.168.49.2:31891; sleep 5; echo " "; done
+rupert@k8s-master:~/k8/pods$ kubectl set image deployment kubeserve app=leaddevops/kubeserve:v2
+rupert@k8s-master:~/k8/pods$ kubectl get all
+rupert@k8s-master:~/k8/pods$ kubectl rollout history deployment kubeserve
+deployment.apps/kubeserve 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+
+rupert@k8s-master:~/k8/pods$ kubectl set -h
+Configure application resources.
+
+ These commands help you make changes to existing application resources.
+
+Available Commands:
+  env              Update environment variables on a pod template
+  image            Update the image of a pod template
+  resources        Update resource requests/limits on objects with pod templates
+  selector         Set the selector on a resource
+  serviceaccount   Update the service account of a resource
+  subject          Update the user, group, or service account in a role binding
+or cluster role binding
+
+Usage:
+  kubectl set SUBCOMMAND [options]
+
+
+
+
+
+rupert@k8s-master:~/k8/pods$ kubectl set image deployment kubeserve kubeserve-cont=leaddevops/kubeserve:v3 --record=true
+Flag --record has been deprecated, --record will be removed in the future
+deployment.apps/kubeserve image updated
+rupert@k8s-master:~/k8/pods$ kubectl rollout history deployment kubeserve
+deployment.apps/kubeserve 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+3         kubectl set image deployment kubeserve kubeserve-cont=leaddevops/ 
+          kubeserve:v3 --record=true
+
+> VERY IMPORTANT FOR CKA EXAM ^
+
+rupert@k8s-master:~/k8/pods$ kubectl get rs
+NAME                   DESIRED   CURRENT   READY   AGE
+cipapp-7657565fd8      3         3         3       5h33m
+frontend-567ddcbfd6    3         3         3       6h16m
+kubeserve-59c7769cf    3         3         3       80m
+kubeserve-866dcbc89    0         0         0       106m
+kubeserve-d5cbb6bf4    0         0         0       93m
+npapp-6cc45758cc       3         3         3       7h27m
+replicaset             3         3         3       20h
+rupertdep-7dc9c94ddb   2         2         2       5h4m
+
+
+# RollBack---------------------------------------------------------------
+> we still have previous versions in the form of replica sets. so that we can roll back anytime
+
+rupert@k8s-master:~/k8/pods$ kubectl rollout undo deployment kubeserve --to-revision=2
+deployment.apps/kubeserve rolled back
+
+
+--------------------------------------------------------------------------
+# DaemonSets
+## Daemonset
+
+> **A DaemonSet ensures that all (or some) Nodes run a copy of a Pod.** 
+
+> **As nodes are added to the cluster, Pods are added to them. As nodes are removed from the cluster, those Pods are garbage collected.** 
+
+> **Deleting a DaemonSet will clean up the Pods it created.**
+
+#### Some typical uses of a DaemonSet are:
+
+1. running a cluster storage daemon on every node
+2. running a logs collection daemon on every node
+3. running a node monitoring daemon on every node
+
+if you want to deploy a pod on every node, and make sure atleast 1 pod keeps running on each node for a particular app, use daemon sets
+
+~~~yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: mydaemonset
+  labels:
+     app: test
+     env: prod
+spec:
+  selector:
+     matchLabels:
+       app: test
+  template:
+     metadata:
+      name: mydaemonsetpod
+      labels:
+        app: test
+     spec:
+       containers:
+        - name: mydaemonsetcont
+          image: lerndevops/tomcat:8.5.47
+          ports:
+           - containerPort: 8080
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+~~~
+
+------------------------------------------------------------------------
+# JOBs
+
+~~~yml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: countdown
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      name: countdown
+    spec:
+      containers:
+      - name: counter
+        image: centos:7
+        command:
+         - "bin/bash"
+         - "-c"
+         - "for i in 9 8 7 6 5 4 3 2 1 ; do echo $i ; done"
+      restartPolicy: Never
+~~~
+
+rupert@k8s-master:~/k8/pods$ kubectl get jobs
+NAME        COMPLETIONS   DURATION   AGE
+countdown   1/1           34s        2m19s
+rupert@k8s-master:~/k8/pods$ kubectl logs countdown
+Error from server (NotFound): pods "countdown" not found
+rupert@k8s-master:~/k8/pods$ kubectl logs countdown-2b8xt
+9
+8
+7
+6
+5
+4
+3
+2
+1
+
+> Kubernetes Jobs ensure that one or more pods execute their commands and exit successfully. 
+
+> When all the pods have exited without errors, the Job gets completed. 
+
+> When the Job gets deleted, any created pods get deleted as well.
+
+> d/f b/w job & pod, job retains logs
+
+
+if you want to schedule this job
+
+
+use 
+# Cronjob
+
+~~~yml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: mypod
+          labels:
+            app: myapp
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: hello
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+~~~
+rupert@k8s-master:~/k8/pods$ kubectl get pods
+NAME                   READY   STATUS              RESTARTS   AGE
+countdown-2b8xt        0/1     Completed           0          13m
+hello-28365806-2vchk   0/1     Completed           0          3m1s
+hello-28365807-n8887   0/1     Completed           0          2m1s
+hello-28365808-n2tlj   0/1     Completed           0          61s
+hello-28365809-pdpt8   0/1     ContainerCreating   0          1s
+mydaemonset-lxckv      1/1     Running             0          53m
+rupert@k8s-master:~/k8/pods$ kubectl logs hello-28365808-n2tlj 
+Thu Dec  7 11:28:02 UTC 2023
+Hello from the Kubernetes cluster
+
+rupert@k8s-master:~/k8/pods$ kubectl get cj
+NAME    SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE   AGE
+hello   */1 * * * *   False     0        50s             6m39s
+rupert@k8s-master:~/k8/pods$ kubectl delete cj hello
+cronjob.batch "hello" deleted
+
+> A CronJob creates Jobs on a repeating schedule.
+
+> One CronJob object is like one line of a crontab (cron table) file. It runs a job periodically on a given schedule, written in Cron format.
+

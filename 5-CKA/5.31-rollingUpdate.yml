@@ -1,0 +1,21 @@
+Create a new pod called admin-pod with image busybox.
+Allow the pod to be able to set system_time.
+The container should sleep for 3200 seconds.
+
+
+Create a new deployment called web-proj-268, with
+image nginx:1.16 and 1 replica. Next upgrade the
+deployment to version 1.17 using rolling update.
+Make sure that the version upgrade is recorded in
+the resource annotation.
+
+Create a new deployment called web-003.
+Scale the deployment to 3 replicas.
+Make sure desired number of pod always
+running.
+
+
+Upgrade the Cluster (Master and worker
+Node) from 1.18.0 to 1.19.0.
+Make sure to first drain both Node and
+make it available after upgrade.

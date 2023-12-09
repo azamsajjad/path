@@ -31,3 +31,39 @@ spec:
    - protocol: TCP
      port: 80
      targetPort: 3000
+
+
+rupert@k8s-master:~/k8/pods$ kubectl describe svc cipappsvc
+Name:              cipappsvc
+Namespace:         default
+Labels:            <none>
+Annotations:       <none>
+Selector:          app=cipapp
+Type:              ClusterIP
+IP Family Policy:  SingleStack
+IP Families:       IPv4
+IP:                10.103.64.195
+IPs:               10.103.64.195
+Port:              <unset>  80/TCP
+TargetPort:        3000/TCP
+Endpoints:         10.244.0.24:3000,10.244.0.25:3000,10.244.0.26:3000
+Session Affinity:  None
+Events:            <none>
+rupert@k8s-master:~/k8/pods$ kubectl describe svc pyapp
+Name:                     pyapp
+Namespace:                default
+Labels:                   <none>
+Annotations:              <none>
+Selector:                 app=pyapp
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.106.255.38
+IPs:                      10.106.255.38
+Port:                     <unset>  80/TCP
+TargetPort:               3000/TCP
+NodePort:                 <unset>  30005/TCP
+Endpoints:                10.244.0.18:3000,10.244.0.19:3000,10.244.0.20:3000
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
