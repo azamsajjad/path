@@ -17,3 +17,15 @@ NEVER REBASE SHARED COMMITs
 FORK & = fork a copy of the ORIGINAL CONTENT TO YOUR OWN ACCOUNT IN GITHUB, THEN CLONE IT LOCALLY , COMMIT AND PUSH CHANGES TO ORIGINAL(your account)
 
 PULL REQUEST - when you want the original software to commit your modification on your github account, you send PULL REQUEST, they will review it, and if they like, they will pull it from your fork
+
+90  git clone https://github.com/azamsajjad/devops.git
+   91  ssh-keygen -t ed25519 -C "azam@gmail.com"
+   93  cat ../.ssh/id_ed25519.pub 
+   94  cd k8/pods/
+   95  ssh -T git@github.com
+   96  eval "$(ssh-agent -s)"
+   97  ssh-add ~/.ssh/id_ed25519
+   98  cd ../..
+   99  git clone git@github.com:azamsajjad/devops.git
+   
+   add ssh url to .git/config
