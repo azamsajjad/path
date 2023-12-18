@@ -58,7 +58,7 @@ or
 for user in rupert reason azam hassan faizi ; do echo "Adjust Password aging for "$user"" ; chage -m 15 -M 90 $user ; echo ; done | less
 
 chage -E $(date -d +1day +%Y-%m-%d) db_user
-for user in azam hassan faizi contsvc ; do echo "Setting Password for "$user"..." ; usermod -p $(openssl passwd Altreason1) $user ; done
+for user in azam hassan faizi contsvc ; do echo "Setting Password for "$user"..." ; usermod -p $(openssl passwd r4g4554g) $user ; done
 
 
 SUDOers

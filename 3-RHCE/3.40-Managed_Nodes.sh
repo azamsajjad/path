@@ -6,7 +6,7 @@ Be able to analyze simple shell scripts and convert them to playbooks
 
 [ANSIBLE SETUP]
 1053  useradd ansible
- 1054  echo "Altreason1" | passwd --stdin ansible
+ 1054  echo "cefemf43" | passwd --stdin ansible
  1055  echo "ansible ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ansible
  1056  su - ansible
   5  ssh-keygen

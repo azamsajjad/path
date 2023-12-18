@@ -93,7 +93,7 @@ by default , ansible looks for default config files in 4 locations
 
 [ANSIBLE SETUP]
 1053  useradd ansible
- 1054  echo "Altreason1" | passwd --stdin ansible
+ 1054  echo "reg45g4" | passwd --stdin ansible
  1055  echo "ansible ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ansible
  1056  su - ansible
   5  ssh-keygen
@@ -123,12 +123,12 @@ vim ~/automation/inventory
 or without ssh setup
 vim ~/automation/inventory
     [web]
-    192.168.100.101 ansible_ssh_user=rupert ansible_ssh_pass=Altreason1
-    192.168.100.102 ansible_ssh_user=reason ansible_ssh_pass=Altreason1
+    192.168.100.101 ansible_ssh_user=rupert ansible_ssh_pass=wcm3f34
+    192.168.100.102 ansible_ssh_user=reason ansible_ssh_pass=ef434tr
     or
     [web:vars]
     ansible_ssh_user=rupert 
-    ansible_ssh_pass=Altreason1
+    ansible_ssh_pass=43f43ff
 
 
 [SSH Shortcuts]

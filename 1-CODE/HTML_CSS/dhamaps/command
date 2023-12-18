@@ -36,7 +36,7 @@ mysql -u root -p
 CREATE DATABASE database_name DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 SHOW DATABASES;
 
-CREATE USER 'rupertdb'@'localhost' IDENTIFIED BY 'Altreason1!';
+CREATE USER 'rupertdb'@'localhost' IDENTIFIED BY 'r4g45g5g4';
 GRANT PRIVILEGES ON dhamapsdb.table TO 'rupertdb'@'localhost';
 GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'sammy'@'localhost' WITH GRANT OPTION;
 or (not recommended)
@@ -48,7 +48,7 @@ DROP USER 'username'@'localhost';
 exit
 mysql -u sammy -p
 
- ALTER USER 'rupertdb'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Altreason1!';
+ ALTER USER 'rupertdb'@'localhost' IDENTIFIED WITH mysql_native_password BY '3f34gg4';
 
 old site -> all-in-one WP migration plugin
 new site -> all-in-one WP migration plugin
