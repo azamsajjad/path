@@ -1,0 +1,132 @@
+changes from 002 to 003
+Superficial name changes to to the outline domains
+Local-execute and remote-execute no longer an exam focus
+Instead of null resource use terraform data
+Terraform taint has been replaced with —replace flag for terraform plan
+Terraform refresh has been replaced with —refresh-only flag for terraform plan
+Terraform workspace is no longer part of the exam
+Connecting to Terraform Cloud now uses the cloud block instead of remote block
+Terraform.lock.hcl files are new
+You need to know how to mark data as being sensitive
+Terraform Coud has a new Ul
+
+
+Q1
+terraform state list command shows the list of resources in the state file.
+A. True     v right
+B. False  x wrong
+-------------------------------------------
+Q2
+You are new to Terraform and have been asked to find the name of the Resource Group argument from tho below code.
+resource "azurerm resource_group" "rg" {
+    name = "testrg"
+    location = "eastus2"
+}
+A rg
+B testrg                        v right
+C azurerm_resource_group.rg
+D resource
+
+-------------------------------------------
+Q3
+You noticed this symbol = "~>0.11" in your terraform provider version. What does this signify?
+A. Version which is more than 0.11 and less than 0.10
+B. Version which is loss than 0.11 and morc than 0.10
+C. Versions which arc loss than 0.1 and morc than 0.11
+D. Version which arc more than & equal to 0.11 and less than 0.12
+right
+For example, 1.0 is equivalent to >= 1.0, < 1.0, and 0.9.2, is equivalent to >= 0.9.2, < 1.0
+This is known as a Pessimistic Constraint Operator.
+
+-------------------------------------------
+Q4
+Hashicorp suggests using local-exec provisioner to run scripts on local machines.
+A. True right
+B. False x wrong
+
+-------------------------------------------
+Q5
+Is terraform state-unlock command used to unlock the locked state file?
+A True
+B. False v right
+The correct command is given belone
+terraform force-unlock [options] LOCK_ID [DIR]
+
+-------------------------------------------
+Q6
+On executing terraform plan command, you see the tilde(-) sign in tho logs. The sign represents whether the resource it is pointing to will bc deleted on Terraform apply. Truc or False.
+A. Truc
+@ B. False v right
+Explanation:
+Answer. False
+Tilde symbol means resources will be updated. For example, if you have an ec2 instance as t2.micro and have -t2nano that means on the next terraform apply it will be t2nano.
+
+-------------------------------------------
+Q7
+Domain: Implement and maintain state
+Terraform dynamic blocks allow to have multiple nested blocks inside a resource.
+A. Treo right
+B. False x wrong
+Explanation:
+Option: True
+Using dynamic blocks we can have multiple nested blocks. It helps to prevent long code and manage easily.
+A dynamic block acts much like a for expression but produces nested blocks instead of a complex typed value. It iterates over a given complex value and generates a nested block for
+each element of that complex value.
+
+-------------------------------------------
+Q8
+Domain: Implement and maintain state
+Current state and desired state must be in the same state all tho time. True or False.
+A. Truc
+@ B. False
+right
+Explanation:
+Answer: B
+Current State: The state represented by the current terraformtfstatc
+Desired State: Required state which needs to be implemented.
+When we execute terraform plan, terraform takes thc difference between the previous configuration from terraform.tfstate file and present configuration from current code and
+verifies tho differences like what resources need to be created, changed or destroyed.
+
+
+-------------------------------------------
+Q9 
+Domain: Implement and maintain state
+If you apply a sensitive flag for the database password while executing terraform plan & apply commands on the console, the output will be shown as plain text in logs.
+A True
+B. False  v right
+
+
+Explanation:
+Answer. False
+If the sensitive flag is applied with terraform apply and plan, thc output can't be visible.
+However, if you have access to state files, the output can be visible as plaintext.
+
+-------------------------------------------
+Q10 
+Domain: Understand Terraform basics
+Based on the given configuration, which of the following commands will you usc to allow multiple configurations?
+provider "aws" {
+    Region = "us-west-2"
+}
+provider "aws" {
+    Region = "us-west-1"
+}
+provider "aws" {
+    Region = "us-east-2"
+}
+
+A. Alias v right
+B. Label x wrong
+C. Module
+D. Resource for each providor
+By using tho alias command we can configure different configurations to the same provider pointing to different resources.
+
+
+-------------------------------------------
+Q11
+Domain: Read, generate, and modify configuration
+You want to evaluate an expression in terraform before applying it. How can you perform this evaluation? Select from below.
+A. Execute terraform Graph command or soc thc graph of thc resources.
+B. Executo terraform validate. x wrong
+C. On terraform console, validate thc expression. v right
+D. Push thc code to thc repository.

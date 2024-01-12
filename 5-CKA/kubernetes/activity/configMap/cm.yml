@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: birke
+data:
+  tree: birke
+  level: "3"
+  department: park
+
+--- 
+apiVersion: v1
+kind: ConfigMap 
+metadata:
+  name: trauerweide
+data:
+  tree: trauerweide

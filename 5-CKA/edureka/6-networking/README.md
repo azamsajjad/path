@@ -6,7 +6,7 @@
 
 > Kubernetes **`does not provide a default network implementation,`** it only enforces a model for third-party tools to implement. There is a variety of implementations nowadays, below we list some popular ones.
 	
-1. **`Flannel`** - a very simple overlay network that satisfies the Kubernetes requirements. Flannel runs an agent on each host and allocates a subnet lease to each of them out of a larger, preconfigured address space. Flannel creates a flat network called as overlay network which runs above the host network.
+1. **`Flannel`** - a very simple overlay network that satisfies the Kubernetes requirements. Flannel runs an agent on each host and allocates a subnet lease to each of them out of a larger, preconfigured address space.Flannel creates a flat network called as overlay network which runs above the host network.
 	
 2. **`Project Calico`** - an open source container networking provider and network policy engine. Calico provides a highly scalable networking and network policy solution for connecting Kubernetes pods based on the same IP networking principles as the internet. Calico can be deployed without encapsulation or overlays to provide high-performance, high-scale data center networking.
 
@@ -25,9 +25,9 @@
 
 > **Kubernetes services allow grouping pods under a common access policy (for example, load-balanced). The service gets assigned a virtual IP which pods outside the service can communicate with. Those requests are then transparently proxied (via the kube-proxy component that runs on each node) to the pods inside the service. Different proxy-modes are supported:**
 	
-* **`iptables:`** kube-proxy installs iptables rules trap access to service IP addresses and redirect them to the correct pods. 
+* **`iptables:`** kube-proxy installs iptables rules trap access to service IP addresses and redirect them to the correct pods.
 
-* **`userspace:`** kube-proxy opens a port (randomly chosen) on the local node. Requests on this “proxy port” get proxied to one of the service’s pods (as retrieved from Endpoints API). 
+* **`userspace:`** kube-proxy opens a port (randomly chosen) on the local node. Requests on this “proxy port” get proxied to one of the service’s pods (as retrieved from Endpoints API).
 
 * **`ipvs (from Kubernetes 1.9):`** calls netlink interface to create ipvs rules and regularly synchronizes them with the Endpoints API.
 	

@@ -1,3 +1,10 @@
+.vimrc
+
+set expandtab
+set tabstop=2
+set shiftwidth=2
+
+
 if kubernetes is corrupted or ip changed:
 Please find K8S cluster settings, where master and worker IP has changed.
 Edit /etc/hosts file with new host IP of master and worker nodes
