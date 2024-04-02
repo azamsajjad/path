@@ -1,4 +1,11 @@
- 277  echo "Apple Pie" | git hash-object --stdin -w
+REVERT to PREVIOUS COMMIT
+git log
+git reset --hard 96f9d26d51259955a7eed7743219ae182814360c && git clean -f 
+git push -u origin main -f
+
+
+ 
+277  echo "Apple Pie" | git hash-object --stdin -w
   278  cd .git
   279  ll
   280  cd objects/
